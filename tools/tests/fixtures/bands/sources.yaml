@@ -1,0 +1,52 @@
+# Test sources: chromosome 22 slices of the real files (T-006). Pins are filled in by the tests.
+version: '2016'
+levels_unavailable: [300, 700]
+files:
+  - id: ncbi-grch37-400
+    kind: ncbi_gdp
+    assembly: GRCh37
+    level: 400
+    url: https://example.invalid/ncbi-grch37-400
+    sha256: ''
+  - id: ncbi-grch37-550
+    kind: ncbi_gdp
+    assembly: GRCh37
+    level: 550
+    url: https://example.invalid/ncbi-grch37-550
+    sha256: ''
+  - id: ncbi-grch37-850
+    kind: ncbi_gdp
+    assembly: GRCh37
+    level: 850
+    url: https://example.invalid/ncbi-grch37-850
+    sha256: ''
+  - id: ncbi-grch38-400
+    kind: ncbi_gdp
+    assembly: GRCh38
+    level: 400
+    url: https://example.invalid/ncbi-grch38-400
+    sha256: ''
+  - id: ncbi-grch38-550
+    kind: ncbi_gdp
+    assembly: GRCh38
+    level: 550
+    url: https://example.invalid/ncbi-grch38-550
+    sha256: ''
+  - id: ncbi-grch38-850
+    kind: ncbi_gdp
+    assembly: GRCh38
+    level: 850
+    url: https://example.invalid/ncbi-grch38-850
+    sha256: ''
+  - id: ucsc-hg19
+    kind: ucsc_cytoband
+    assembly: GRCh37
+    level: 850
+    url: https://example.invalid/ucsc-hg19
+    sha256: ''
+  - id: ucsc-hg38
+    kind: ucsc_cytoband
+    assembly: GRCh38
+    level: 850
+    url: https://example.invalid/ucsc-hg38
+    sha256: ''

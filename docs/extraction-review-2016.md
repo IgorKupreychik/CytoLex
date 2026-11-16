@@ -155,7 +155,7 @@ checked):
 | § | Page | Reason |
 |---|---|---|
 | 2.3.2 (Table 1) | 12 | table — until `review.human: ok` |
-| 2.4 (Table 2), 2.5 (Table 3) | 14, 15 | tables — until `review.human: ok` |
+| 2.4 (Table 2) | 14 | table — until `review.human: ok` (Table 3, §2.5 p.15: signed off 2026-11-16) |
 | 3 (Symbols) | 34–36 | table — until `review.human: ok` |
 | 4.3.2, 4.3.2.2, 4.4 | 43–45 | Table 4 and the Fig. 8/9 diagrams the text depends on |
 | 7.2, 9.2.3, 9.2.17.1, 16.3.7 | 53, 61–65, 75–76, 129 | underlined homologues (U+0332 in the source text; validator behaviour is T-042) |

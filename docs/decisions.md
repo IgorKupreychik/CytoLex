@@ -51,7 +51,7 @@ The KB is the single source for all validation decisions.
 
 ## Band data
 - **Hybrid approach:**
-  - A script generates bands at 300/400/550/700/850 resolution from UCSC cytoBand (GRCh37/38), deriving coarser levels by nesting names.
+  - A script (`kb bands`) generates bands from the NCBI Genome Decoration Page ideograms (real 400/550/850 sets) and UCSC cytoBand (850, cross-check), GRCh37/38; every nesting ancestor is a valid name. 300/700 have no public source (T-006 entry below; T-007).
   - Spot-check against the book's ideograms; differences go in a cited YAML exceptions file.
 - Stored per ISCN version. Coordinates are reused for `arr` checks.
 
@@ -135,3 +135,11 @@ _(entries added by `discussion` tasks: date — task — decision — rationale)
   - **Other errors:** schema; `version` ≠ directory; file name ≠ `section`; duplicate rule IDs per edition; unknown `related` IDs; quote file without a rule file at the same path, different `section`, or quote `rule` not in that rule file. Cross-file checks run only once every file passes the schema.
   - **Outputs:** one `build/kb.sqlite` and one `build/kb.json` for all editions (keyed by `version`), so the app can give multi-version results from one load; plus `build/review/kb-review.md` (rules with `needs_review: true` / `paraphrase_checked: false`, also printed). `kb build` builds every edition by default; `--version` restricts it. On any error nothing is written (files are replaced atomically), so a previous good build stays usable. No timestamps in the outputs. `format_version: 1`.
   - **SQLite layout:** normalised tables (`rules`, `citations`, `examples`, `quotes`, `rule_applies_to`, `rule_context`, `rule_related`, `meta`) plus FTS5 `rules_fts` (id, title, statement, example texts) and `quotes_fts`, `unicode61` tokenizer. Stdlib `sqlite3` (FTS5 available in Python 3.14's SQLite 3.50).
+
+- **2026-11-16 — T-006 — Band data: NCBI GDP + UCSC, pinned, committed output.**
+  - **Sources (deviation from the original "UCSC cytoBand" plan):** UCSC `cytoBand` only has the ~850 level, so the 400/550/850 band sets come from the NCBI Genome Decoration Page ideograms (`ftp.ncbi.nlm.nih.gov/pub/gdp`, `ideogram_9606_GCF_000001305.13_*` = GRCh37, `.16_*` = GRCh38; `.14`/`.15` are byte-identical to `.16`). UCSC hg19/hg38 `cytoBand` cross-checks names and coordinates and gives the canonical 850-level coordinates (0-based → 1-based closed). The 862 UCSC primary-chromosome names equal the NCBI 850 set. Both are public data.
+  - **300 and 700 levels:** no public source has them. Recorded as `levels_unavailable` in the output; whether to derive them from the book's ideograms is left to T-007.
+  - **Names:** the 400 ∪ 550 ∪ 850 sets plus every nesting ancestor (9q34.11 → 9q34.1 → 9q34), 1,150 names; 52 are ancestor-only (`derived: true`). An ancestor's coordinates are the union of its 850 sub-bands. Arm-level terms (pter, cen, p10) are notation rules for the KB, not band data.
+  - **Checks (any failure → exit 1, nothing written):** same names per level in both assemblies; NCBI 850 = UCSC names; NCBI vs UCSC coordinates within 1 bp (NCBI 850 files mix 0/1-based starts); every 400/550 name nests over 850 names and its coordinates equal the union of its sub-bands.
+  - **Repeatability:** source URLs and sha256 pins in `tools/src/cytolex_tools/bands/sources/<version>.yaml`; a changed upstream file fails the run until re-pinned with `--update-pins`. Downloads are cached in `build/cache/bands/`. The output `kb/bands/<version>/bands.yaml` is committed (no network needed after a clone) and byte-identical across runs.
+  - **Format:** YAML, one flow-style line per band (diff-friendly); stdlib `urllib` download, no new dependencies.

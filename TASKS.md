@@ -15,7 +15,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-003 | done | 1 | T-002 | Review extraction quality; list sections affected by underlining/tables |
 | T-004 | done | 1 | T-001 | KB JSON Schema (rules, quotes, vocabularies, ID & citation conventions) |
 | T-005 | done | 1 | T-004 | KB build script (validate → SQLite FTS5 + JSON bundle; review reports) |
-| T-006 | todo | 1 | T-001 | Band data generator from UCSC cytoBand (all resolutions, versioned) |
+| T-006 | done | 1 | T-001 | Band data generator from UCSC cytoBand (all resolutions, versioned) |
 | T-007 | todo | 1 | T-006, T-003 | Spot-check bands vs. ISCN 2016 ideograms; exceptions YAML |
 | T-008 | todo | 1 | T-003, T-005 | KB: ch. 2–3 (band nomenclature, symbols & abbreviated terms) |
 | T-009 | todo | 1 | T-008 | KB: ch. 4 (karyotype designation, short/detailed systems, derivatives) |
@@ -127,7 +127,7 @@ From T-004: reuse `cytolex_tools.kb.schema` (`validate_file`, also behind `kb ch
 **Outcome (2026-11-16):** `kb build [--version YYYY]` (default: every edition) in `tools/src/cytolex_tools/kb/build.py`, with `kb/chunks.py` (chunk front matter + label blocks, multi-part sections merged) and `kb/cite.py` (`render_cite`). Errors: schema, `version`/section vs path, wrong file kind per directory, duplicate IDs, unknown `related`, orphan quote files/quotes; with chunks also cite section/label/page and **verbatim quote text** (decided: error; skipped with a warning without chunks). Warning: valid `En` example text not found in its block. Outputs: `build/kb.sqlite` (normalised tables + FTS5 `rules_fts`/`quotes_fts`), `build/kb.json`, `build/review/kb-review.md`; nothing written on errors. Tests: `tools/tests/test_kb_build.py` (+ chunk excerpt fixture `tools/tests/fixtures/kb/source-text/`). Docs: `kb/README.md` (check table), `README.md`, `CLAUDE.md`, `docs/decisions.md`. Deviations: cross-file checks run only after all files pass the schema; empty-KB message added.
 
 ### T-006 — Band data generator
-**Status:** todo
+**Status:** done
 **Description:** A script that downloads or reads UCSC cytoBand (GRCh37 + GRCh38) and generates versioned band data (`kb/bands/2016/…`).
 - Records band names at 300/400/550/700/850 resolution (coarser levels derived by nesting) plus coordinates.
 - Records the data source and version.
@@ -135,7 +135,7 @@ From T-004: reuse `cytolex_tools.kb.schema` (`validate_file`, also behind `kb ch
 - Repeatable output.
 - Known bands resolve (e.g. 9q34, 9q34.1, 22q11.2, 1p36.3).
 - Invented bands don't (e.g. 9q35).
-**Notes:**
+**Notes:** Done (2026-11-16). `kb bands [--version] [--out] [--cache] [--cache-only] [--update-pins]` → committed `kb/bands/2016/bands.yaml`: 1,150 names (NCBI 400/553/862 at 400/550/850 + 52 nesting ancestors), GRCh37/38 coordinates (1-based closed), stain, parent, levels; byte-identical re-runs. Code: `tools/src/cytolex_tools/bands/` (`fetch`, `parse`, `generate`, `lookup`, `sources/2016.yaml` with sha256 pins); tests `tools/tests/test_bands.py` + chr22 fixtures (121 pass). Docs: `CLAUDE.md`, `README.md`, `kb/README.md`, `docs/decisions.md`. Deviation (decided with the user): NCBI Genome Decoration Page ideograms are the primary source (UCSC has only the 850 level) and UCSC cytoBand is the cross-check; 300/700 have no public source → `levels_unavailable`, handed to T-007.
 
 ### T-007 — Spot-check bands vs. ideograms
 **Status:** todo
@@ -145,6 +145,7 @@ From T-004: reuse `cytolex_tools.kb.schema` (`validate_file`, also behind `kb ch
 - Exceptions file committed, with citations.
 - The generator applies the exceptions.
 **Notes:** Before starting, person sign-off of **Table 3** (landmarks, p.15): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`. See `docs/extraction-review-2016.md`.
+From T-006: `kb/bands/2016/bands.yaml` has the NCBI 400/550/850 band sets plus nesting ancestors; **300 and 700 have no public source** (`levels_unavailable`). Decide here whether to tag them from the book's ideograms (exceptions/level file) or leave them out. The exceptions file needs a format (and a schema), and it plugs into `cytolex_tools/bands/generate.py` (apply before `render`; bump `GENERATOR_VERSION`). Use `cytolex_tools.bands.lookup.load()` for spot checks.
 
 ## Knowledge base (ISCN 2016)
 

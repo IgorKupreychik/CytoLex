@@ -1,0 +1,60 @@
+# Band data sources for ISCN 2016 (T-006). Read by `kb bands`; committed.
+#
+# NCBI Genome Decoration Page ideograms give the real 400/550/850 band sets per assembly
+# (GCF_000001305.13 = GRCh37, .16 = GRCh38; .14/.15 are byte-identical to .16).
+# UCSC cytoBand (850 level only) cross-checks names and coordinates and is the canonical
+# source of 850-level coordinates. No public source has the 300 or 700 level (see T-007).
+#
+# sha256 pins the exact bytes downloaded; a mismatch fails the run. After a deliberate
+# upstream change, re-pin with `kb bands --update-pins` and review the band diff.
+version: '2016'
+levels_unavailable: [300, 700]
+files:
+  - id: ncbi-grch37-400
+    kind: ncbi_gdp
+    assembly: GRCh37
+    level: 400
+    url: https://ftp.ncbi.nlm.nih.gov/pub/gdp/ideogram_9606_GCF_000001305.13_400_V1
+    sha256: 'a708931be17f6d15da6b47110ee09f374592831894025e34db76bf1171c08eed'
+  - id: ncbi-grch37-550
+    kind: ncbi_gdp
+    assembly: GRCh37
+    level: 550
+    url: https://ftp.ncbi.nlm.nih.gov/pub/gdp/ideogram_9606_GCF_000001305.13_550_V1
+    sha256: 'c9aa5fac1967e100154df291c87c1c6d63e621529ce99fedeb8702f16dfb8b90'
+  - id: ncbi-grch37-850
+    kind: ncbi_gdp
+    assembly: GRCh37
+    level: 850
+    url: https://ftp.ncbi.nlm.nih.gov/pub/gdp/ideogram_9606_GCF_000001305.13_850_V1
+    sha256: '28842e16f266e257a4a600f32d5a497a319ba37bdaf22196106a97cf2a66ac64'
+  - id: ncbi-grch38-400
+    kind: ncbi_gdp
+    assembly: GRCh38
+    level: 400
+    url: https://ftp.ncbi.nlm.nih.gov/pub/gdp/ideogram_9606_GCF_000001305.16_400_V1
+    sha256: '1623464589c0798a41067d9ff0e33259f803f38bc040bcb0e913f2edb6035e21'
+  - id: ncbi-grch38-550
+    kind: ncbi_gdp
+    assembly: GRCh38
+    level: 550
+    url: https://ftp.ncbi.nlm.nih.gov/pub/gdp/ideogram_9606_GCF_000001305.16_550_V1
+    sha256: '25dc4ab73bb5a9ce5e196034b04544f828dfdaaab22b136b6428154314be9a4e'
+  - id: ncbi-grch38-850
+    kind: ncbi_gdp
+    assembly: GRCh38
+    level: 850
+    url: https://ftp.ncbi.nlm.nih.gov/pub/gdp/ideogram_9606_GCF_000001305.16_850_V1
+    sha256: 'd7cf09b49f687c1403b67465820493bb82c7b449499e6a74a91e4c56412a2246'
+  - id: ucsc-hg19
+    kind: ucsc_cytoband
+    assembly: GRCh37
+    level: 850
+    url: https://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/cytoBand.txt.gz
+    sha256: 'f9b82309b2bca1eb9d91a5cb2c6aa0528351158e6e20b51d82cca36d01735cba'
+  - id: ucsc-hg38
+    kind: ucsc_cytoband
+    assembly: GRCh38
+    level: 850
+    url: https://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/cytoBand.txt.gz
+    sha256: 'e514e48b0a12a516fd5231b44241a20a282f290bdd6131cadcddc6276ee26082'

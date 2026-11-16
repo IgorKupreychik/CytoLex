@@ -12,9 +12,8 @@ SUBCOMMANDS = {
     "tables": ("Render the configured table regions to PNG for review", "T-003"),
     "check": ("Check KB rule/quote YAML files against the schemas in kb/schema/", "T-004"),
     "build": ("Validate the KB and build SQLite (FTS5) + JSON bundle", "T-005"),
-    "bands": ("Generate band data from UCSC cytoBand", "T-006"),
+    "bands": ("Generate band data from NCBI GDP ideograms + UCSC cytoBand", "T-006"),
 }
-IMPLEMENTED = {"extract", "tables", "check", "build"}
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -46,6 +45,22 @@ def build_parser() -> argparse.ArgumentParser:
                 "kb/source-text/<version>" if name == "extract" else "build/review/tables/<version>"
             )
             p.add_argument("--out", type=Path, help=f"output dir (default: {default_out})")
+        if name == "bands":
+            p.add_argument("--out", type=Path, help="output dir (default: kb/bands/<version>)")
+            p.add_argument(
+                "--cache",
+                type=Path,
+                help="download cache (default: build/cache/bands/<version>)",
+            )
+            p.add_argument(
+                "--cache-only", action="store_true", help="don't download; use the cache only"
+            )
+            p.add_argument(
+                "--update-pins",
+                action="store_true",
+                help="accept the current source files and rewrite their sha256 pins",
+            )
+            p.add_argument("--sources", type=Path, help=argparse.SUPPRESS)  # tests
     return parser
 
 
@@ -148,6 +163,37 @@ def cmd_build(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_bands(args: argparse.Namespace) -> int:
+    from .bands import run
+
+    out = args.out or REPO_ROOT / "kb" / "bands" / args.version
+    cache = args.cache or REPO_ROOT / "build" / "cache" / "bands" / args.version
+    try:
+        report = run(args.version, out, cache, args.cache_only, args.update_pins, args.sources)
+    except FileNotFoundError as exc:
+        print(f"kb bands: {exc}", file=sys.stderr)
+        return 1
+    for pid in report.pinned:
+        print(f"  pinned: {pid}")
+    for w in report.warnings:
+        print(f"  warning: {w}")
+    for pr in report.problems:
+        print(f"  PROBLEM: {pr}", file=sys.stderr)
+    if report.problems:
+        print(
+            f"kb bands: FAILED, {len(report.problems)} problem(s); nothing written",
+            file=sys.stderr,
+        )
+        return 1
+    c = report.counts
+    print(
+        f"kb bands: ISCN {args.version}: {c['bands']} band names "
+        f"({c['level_400']} at 400, {c['level_550']} at 550, {c['level_850']} at 850, "
+        f"{c['derived']} derived) -> {report.out}"
+    )
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "extract":
@@ -158,9 +204,7 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_check(args)
     if args.command == "build":
         return cmd_build(args)
-    task = SUBCOMMANDS[args.command][1]
-    print(f"kb {args.command}: not implemented yet ({task})", file=sys.stderr)
-    return 2
+    return cmd_bands(args)
 
 
 if __name__ == "__main__":

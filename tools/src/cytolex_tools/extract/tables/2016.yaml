@@ -60,7 +60,7 @@ tables:
 
   - id: Table 3
     kind: float
-    review: {image: ok, human: pending, fallback: none}
+    review: {image: ok, human: ok, fallback: none}
     regions:
       - book_page: 15
         top: 100
