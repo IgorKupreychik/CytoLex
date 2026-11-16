@@ -1,0 +1,14 @@
+# ISCN source books (copyrighted) — never commit
+*.pdf
+
+# Extracted source text — rebuildable from the PDF
+kb/source-text/
+
+# Local machine config (PDF paths, etc.)
+config/local.yaml
+
+# Generated KB artifacts
+build/
+*.sqlite
+*.sqlite3
+*.db

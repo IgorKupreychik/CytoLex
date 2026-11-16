@@ -1,0 +1,5 @@
+# Copy to config/local.yaml (gitignored) and adjust paths for your machine.
+iscn_pdf:
+  "2016": "C:/path/to/ISCN_2016.pdf"
+  # "2020": "C:/path/to/ISCN_2020.pdf"
+  # "2024": "C:/path/to/ISCN_2024.pdf"
