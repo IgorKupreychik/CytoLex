@@ -13,7 +13,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-001 | done | 1 | – | Choose language/tooling for build & extraction scripts |
 | T-002 | done | 1 | T-001 | Source-text extraction script (PDF → section chunks + manifest) |
 | T-003 | done | 1 | T-002 | Review extraction quality; list sections affected by underlining/tables |
-| T-004 | todo | 1 | T-001 | KB JSON Schema (rules, quotes, vocabularies, ID & citation conventions) |
+| T-004 | done | 1 | T-001 | KB JSON Schema (rules, quotes, vocabularies, ID & citation conventions) |
 | T-005 | todo | 1 | T-004 | KB build script (validate → SQLite FTS5 + JSON bundle; review reports) |
 | T-006 | todo | 1 | T-001 | Band data generator from UCSC cytoBand (all resolutions, versioned) |
 | T-007 | todo | 1 | T-006, T-003 | Spot-check bands vs. ISCN 2016 ideograms; exceptions YAML |
@@ -105,7 +105,7 @@ Keep the summary table and the task sections in sync (status changes are made in
   - Deviations from the plan: beyond the planned scope, also recovered change bars (useful for 2020/2024 profiles), added a `figure` region kind, and added `kb tables` as a subcommand (instead of a separate script). Some ¶ labels were renumbered vs. version 1 (no rules cited them yet).
 
 ### T-004 — KB JSON Schema
-**Status:** todo
+**Status:** done
 **Description:** Schemas for rule YAML files (`kb/rules/<version>/…`) and quote files (`kb/source-quotes/<version>/…`).
 - Vocabularies: `applies_to`, `context`, severity, `fix` hints.
 - Conventions: rule ID format (stable concept IDs) and citation format `ISCN 2016 §x.y.z, p.N, ¶M`.
@@ -113,7 +113,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 - Schemas committed.
 - Sample rule + quote files validate; a deliberately broken sample fails with a clear message.
 - Conventions documented in `docs/decisions.md` or `kb/README.md`.
-**Notes:**
+**Notes:** Done. Schemas (JSON Schema 2020-12) in `kb/schema/` (`common`, `rules`, `quotes`); format and conventions in `kb/README.md`; decision in `docs/decisions.md`. One rule file per section, named like its chunk; quotes at the same relative path under `kb/source-quotes/`; structured citations `{section, page, para|example|float}`. New `kb check [PATH …]` (schema-only, `cytolex_tools/kb/schema.py`, reused by T-005). Samples + 9 broken fixtures in `tools/tests/fixtures/kb/`, tests in `tools/tests/test_kb_schema.py` (70 pass). Deviations: added `title`, `severity`, `related` fields; `referencing` added as a direct dependency (uv.lock changed); `kb check` resolves relative paths from the repo root. Cross-file checks handed to T-005 (see its Notes).
 
 ### T-005 — KB build script
 **Status:** todo
@@ -123,6 +123,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 - Reports list rules with `paraphrase_checked: false` and `needs_review: true`.
 - Fails on schema errors, duplicate IDs or orphan quotes.
 **Notes:** Proposed in T-002, not yet agreed: also check that each verbatim quote occurs in `kb/source-text/<version>/` at its cited section, page and ¶/E label (a guard against AI-invented quotes). This needs the chunks, so it should be skipped with a warning when they're absent.
+From T-004: reuse `cytolex_tools.kb.schema` (`validate_file`, also behind `kb check`). Cross-file checks left to the build: file `version` = its directory, rule/quote file pairs at the same relative path, quote `rule` IDs exist, unique rule IDs per version, `related` IDs exist, cite labels/pages match the chunk front matter (when chunks exist), and rendering citations as `ISCN 2016 §…, p.N, ¶n[, ex. En]`.
 
 ### T-006 — Band data generator
 **Status:** todo

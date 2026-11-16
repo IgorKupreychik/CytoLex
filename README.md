@@ -6,7 +6,7 @@ CytoLex validates **ISCN cytogenomic nomenclature** strings: karyotypes, FISH (`
 - **Cited.** Every diagnostic points to the book, e.g. `ISCN 2016 §9.2.17.1, p.75, ¶1`.
 - **Helpful.** It suggests deterministic fixes where one exists, or explains the problem otherwise.
 
-> **Status:** planning/foundation phase. The repo tooling (`tools/`) is set up, `kb extract` works and its output has been reviewed against the book ([`docs/extraction-review-2016.md`](docs/extraction-review-2016.md)); the validator itself does not exist yet. Progress is tracked in [`TASKS.md`](TASKS.md).
+> **Status:** planning/foundation phase. The repo tooling (`tools/`) is set up, `kb extract` works and its output has been reviewed against the book ([`docs/extraction-review-2016.md`](docs/extraction-review-2016.md)), and the KB file format is fixed by JSON Schemas ([`kb/README.md`](kb/README.md)); the validator itself does not exist yet. Progress is tracked in [`TASKS.md`](TASKS.md).
 
 ## Architecture (planned)
 - **Core library:** UI-free ISCN parsing and validation, driven by a knowledge base (KB) of cited rules.
@@ -19,6 +19,7 @@ The app tech stack is not chosen yet (T-020). All decisions and their rationale 
 | Path | Content |
 |---|---|
 | `tools/` | Self-contained Python project for repo tooling: PDF extraction, KB build, band data |
+| `kb/schema/` | JSON Schemas for rule and quote files; format and conventions in [`kb/README.md`](kb/README.md) |
 | `kb/rules/<version>/` | KB rules (YAML): paraphrase, citation, valid/invalid examples |
 | `kb/source-quotes/<version>/` | Verbatim quotes linked to rules (for auditing; private) |
 | `kb/source-text/<version>/` | Text extracted from the ISCN PDF (**gitignored**, rebuildable) |
@@ -39,29 +40,31 @@ Requirements: Windows, macOS or Linux with **Python 3.14** and **[uv](https://do
    ```sh
    uv sync --directory tools
    ```
-3. Run the KB CLI from the repo root. `extract` and `tables` work; `build` and `bands` come in T-005 and T-006.
+3. Run the KB CLI from the repo root. `extract`, `tables` and `check` work; `build` and `bands` come in T-005 and T-006.
    ```sh
    uv run --directory tools kb --help
    uv run --directory tools kb extract --version 2016   # PDF → kb/source-text/2016/ (--pdf, --out to override)
    uv run --directory tools kb tables --version 2016    # table images for review → build/review/tables/2016/
+   uv run --directory tools kb check                    # rule/quote YAML vs kb/schema/ (or: kb check <files/dirs>)
    uv run --directory tools kb build                    # KB → build/ (SQLite + JSON)
    uv run --directory tools kb bands                    # UCSC cytoBand → band data
    ```
 
 ## When to run what
-> `kb build` and `kb bands` are **placeholders** until their tasks are done: they print "not implemented yet" and exit with code 2. `kb extract` and `kb tables` are implemented.
+> `kb build` and `kb bands` are **placeholders** until their tasks are done: they print "not implemented yet" and exit with code 2. `kb extract`, `kb tables` and `kb check` are implemented.
 
 | Command | Built in | What it does | When to run it |
 |---|---|---|---|
 | `kb extract --version 2016` | T-002 | ISCN PDF → per-section text + manifest in `kb/source-text/2016/` (gitignored) | **Rarely:** once per machine/edition or after a fresh clone, and again whenever the extraction script changes. Re-running is always safe; the output is identical. |
 | `kb tables --version 2016` | T-003 | Renders every configured table region of the PDF to PNG, with an index naming the chunk that holds its extracted Markdown, in `build/review/tables/2016/` | **Rarely:** when signing off tables (`review.human` in `tools/src/cytolex_tools/extract/tables/<version>.yaml`) or after changing a table layout. |
+| `kb check [PATH …]` | T-004 | Checks rule and quote YAML (default: all of `kb/rules/` and `kb/source-quotes/`) against `kb/schema/`; prints each problem as `file:rules[0].cite[0].para: …`; exit 1 on any problem. Schema only: no cross-file checks | **Often:** while writing KB files, before `kb build`. |
 | `kb bands` | T-006 / T-007 | UCSC cytoBand → versioned band data, with cited exceptions applied | **Rarely:** once at the start, and again when the exceptions file or source data changes. |
 | `kb build` | T-005 | Checks `kb/` (schemas, unique IDs, rule ↔ quote links) → SQLite (FTS5) + JSON bundle in `build/`; lists rules still needing review | **Often:** after every KB edit, and before running or testing the app (it loads the bundle). |
 | `pytest`, `ruff check`, `ruff format` | — | Test, lint and format the tooling code in `tools/` (not the validator) | After any change in `tools/`. |
 
 Typical flow:
 1. **One-time setup:** `uv sync --directory tools`, fill in `config/local.yaml`, run `kb extract` and `kb bands`.
-2. **KB work (T-008 onwards):** write or edit rules, then run `kb build` until it passes.
+2. **KB work (T-008 onwards):** write or edit rules (format: [`kb/README.md`](kb/README.md)), run `kb check` while editing, then `kb build` until it passes.
 3. **App work (T-024 onwards):** run `kb build` first, so the app and its tests use the current KB.
 
 ## Source-text chunks (`kb extract`)

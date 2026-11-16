@@ -243,6 +243,7 @@ source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },
     { name = "pdfplumber" },
+    { name = "referencing" },
     { name = "ruamel-yaml" },
 ]
 
@@ -256,6 +257,7 @@ dev = [
 requires-dist = [
     { name = "jsonschema" },
     { name = "pdfplumber" },
+    { name = "referencing" },
     { name = "ruamel-yaml" },
 ]
 

@@ -1,0 +1,9 @@
+# Sample quote file (T-004 test fixture, not part of the KB).
+version: "2016"
+section: "9.2.17.1"
+quotes:
+  - rule: TRANSLOC.CHROMOSOME_ORDER
+    cite: {section: "9.2.17.1", page: 75, para: "¶1"}
+    text: >-
+      In translocations (t) affecting two chromosomes, the sex chromosome or the
+      autosome with the lowest number is always specified first.

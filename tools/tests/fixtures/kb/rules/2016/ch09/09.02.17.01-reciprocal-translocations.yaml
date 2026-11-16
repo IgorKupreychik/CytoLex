@@ -1,0 +1,49 @@
+# Sample rule file (T-004 test fixture, not part of the KB).
+version: "2016"
+section: "9.2.17.1"
+rules:
+  - id: TRANSLOC.CHROMOSOME_ORDER
+    title: Sex chromosome or lowest-numbered autosome first
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      In a two-chromosome translocation, a sex chromosome is written first; otherwise
+      the autosome with the lowest number is written first.
+    cite:
+      - {section: "9.2.17.1", page: 75, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XY,t(2;5)(q21;q31)"
+          cite: {section: "9.2.17.1", page: 75, example: E1}
+        - text: "46,X,t(X;13)(q27;q12)"
+          cite: {section: "9.2.17.1", page: 75, example: E3}
+      invalid:
+        - text: "46,XY,t(5;2)(q31;q21)"
+          why: Chromosome 5 is listed before chromosome 2.
+          corrected: "46,XY,t(2;5)(q21;q31)"
+    fix:
+      level: 1
+      kind: reorder
+      hint: Swap the chromosomes and their breakpoints.
+    review:
+      paraphrase_checked: false
+      needs_review: true
+      note: Sample only; ¶1 is also underlined (homologue distinction, T-042).
+  - id: TRANSLOC.THREE_WAY_ORDER
+    title: Three-way translocation order follows segment transfer
+    applies_to: [karyotype]
+    context: [constitutional, neoplastic]
+    severity: error
+    statement: >-
+      In a three-chromosome translocation the first chromosome follows the
+      two-chromosome rule; next comes the one receiving its segment, last the one
+      donating a segment to the first.
+    cite:
+      - {section: "9.2.17.1", page: 75, para: "¶1"}
+    examples:
+      valid: []
+    fix:
+      level: 3
+      hint: Explain the receiving/donating order.
+    review: {paraphrase_checked: false, needs_review: false}
+    related: [TRANSLOC.CHROMOSOME_ORDER]

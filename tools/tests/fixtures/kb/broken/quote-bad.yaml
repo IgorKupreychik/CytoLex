@@ -1,0 +1,7 @@
+# Sample quote file (T-004 test fixture, not part of the KB).
+version: "2016"
+section: "9.2.17.1"
+quotes:
+  - rule: CHROMOSOME_ORDER
+    cite: {section: "9.2.17.1", page: 75, para: "¶1"}
+    text: 

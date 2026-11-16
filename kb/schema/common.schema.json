@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cytolex.local/schema/common.schema.json",
+  "title": "CytoLex KB — shared definitions",
+  "description": "Rule IDs, citations and vocabularies shared by rule and quote files. Conventions: kb/README.md.",
+  "$defs": {
+    "version": {
+      "description": "ISCN edition year; must equal the version directory (kb/rules/<version>/).",
+      "type": "string",
+      "pattern": "^[0-9]{4}$",
+      "x-expected": "an edition year in quotes, e.g. \"2016\""
+    },
+    "section": {
+      "description": "Numbered ISCN section, as in the chunk front matter (e.g. 9.2.17.1).",
+      "type": "string",
+      "pattern": "^[1-9][0-9]*(\\.[1-9][0-9]*)*$",
+      "x-expected": "a section number in quotes, e.g. \"9.2.17.1\""
+    },
+    "rule_id": {
+      "description": "Stable concept ID: dot-separated UPPER_SNAKE segments, at least two, the first a topic prefix (e.g. TRANSLOC.CHROMOSOME_ORDER). Never renamed.",
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*(\\.[A-Z][A-Z0-9]*(_[A-Z0-9]+)*)+$",
+      "x-expected": "a valid rule ID (dot-separated UPPER_SNAKE segments, at least two, e.g. TRANSLOC.CHROMOSOME_ORDER)"
+    },
+    "cite": {
+      "description": "Book location. Rendered as 'ISCN <version> §<section>, p.<page>, ¶n' or '…, ¶n, ex. En' or '…, p.<page>, <float>'. Anchors are the chunk labels [¶n p.N], [En p.N], [Fig. N p.N]; page is the book page of that label.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["section", "page"],
+      "anyOf": [
+        { "required": ["para"] },
+        { "required": ["example"] },
+        { "required": ["float"] }
+      ],
+      "properties": {
+        "section": { "$ref": "#/$defs/section" },
+        "page": { "description": "Book page (PDF page − offset).", "type": "integer", "minimum": 1 },
+        "para": { "description": "Prose paragraph label.", "type": "string", "pattern": "^¶[1-9][0-9]*$", "x-expected": "a paragraph label (¶ + number, e.g. ¶1)" },
+        "example": { "description": "Example block label.", "type": "string", "pattern": "^E[1-9][0-9]*$", "x-expected": "an example label (E + number, e.g. E3)" },
+        "float": {
+          "description": "Figure/table label as printed in the chunk (Fig. 7, Fig. 6a, Table 1, Ploidy table, Alignment figure, Fibre diagram).",
+          "type": "string",
+          "pattern": "^(Fig\\. [1-9][0-9]*[a-z]?|Table [1-9][0-9]*|[A-Z][a-z]+ (table|figure|diagram))$",
+          "x-expected": "a float label as printed in the chunk (Fig. 7, Fig. 6a, Table 1, Ploidy table)"
+        }
+      }
+    },
+    "applies_to": {
+      "description": "Notation types a rule applies to.",
+      "enum": ["general", "karyotype", "breakage", "meiotic", "ish", "nuc_ish", "fib_ish", "rev_ish", "cgh", "arr", "rsa", "seq"]
+    },
+    "context": {
+      "description": "Clinical context a rule applies in.",
+      "enum": ["constitutional", "neoplastic", "meiotic"]
+    },
+    "severity": {
+      "description": "Default severity of a violation (policy refined in T-022).",
+      "enum": ["error", "warning", "info"]
+    },
+    "text": { "type": "string", "minLength": 1 }
+  }
+}
