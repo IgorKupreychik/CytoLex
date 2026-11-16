@@ -10,8 +10,8 @@ Keep the summary table and the task sections in sync (status changes are made in
 
 | ID | Status | Pri | Depends | Title |
 |---|---|---|---|---|
-| T-001 | in_progress | 1 | – | Choose language/tooling for build & extraction scripts |
-| T-002 | todo | 1 | T-001 | Source-text extraction script (PDF → section chunks + manifest) |
+| T-001 | done | 1 | – | Choose language/tooling for build & extraction scripts |
+| T-002 | done | 1 | T-001 | Source-text extraction script (PDF → section chunks + manifest) |
 | T-003 | todo | 1 | T-002 | Review extraction quality; list sections affected by underlining/tables |
 | T-004 | todo | 1 | T-001 | KB JSON Schema (rules, quotes, vocabularies, ID & citation conventions) |
 | T-005 | todo | 1 | T-004 | KB build script (validate → SQLite FTS5 + JSON bundle; review reports) |
@@ -68,15 +68,15 @@ Keep the summary table and the task sections in sync (status changes are made in
 ## Foundation
 
 ### T-001 — Choose language/tooling for build & extraction scripts
-**Status:** in_progress
+**Status:** done
 **Description:** Interview to pick the language and libraries for repo tooling: PDF extraction, KB schema validation and build, band-data generation. It doesn't have to match the app stack (T-020). Consider: PDF text libraries (`pdftotext` is available via mingw64), YAML + JSON Schema support, SQLite FTS5, Windows friendliness.
 **Acceptance:**
 - Decision recorded in `docs/decisions.md` (language, version, key libraries, how scripts are run).
 - `CLAUDE.md` updated with how to run scripts.
-**Notes:**
+**Notes:** Decided Python 3.14 + uv, pdfplumber, ruamel.yaml, jsonschema, stdlib sqlite3; single `kb` CLI (`extract`/`build`/`bands` stubs) in `tools/` with pytest + ruff. Files: `tools/` (pyproject, uv.lock, `src/cytolex_tools/{cli,config}.py`, `tests/test_cli.py`), `docs/decisions.md` (decision log), `CLAUDE.md` Commands, new `README.md`. Committed in a047c5a.
 
 ### T-002 — Source-text extraction script
-**Status:** todo
+**Status:** done
 **Description:** A deterministic, non-AI script that reads the PDF path from `config/local.yaml` (env var override) and writes per-section chunks to `kb/source-text/2016/` (gitignored).
 - Split by numbered headings; cap of ~3–5k tokens per chunk, splitting at subsections or paragraphs.
 - Front-matter on each chunk: section number, title, book page range (book page = PDF page − 6).
@@ -87,7 +87,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 - Re-running gives byte-identical output.
 - No chunk exceeds the cap.
 - Manifest lists section → file → book pages.
-**Notes:**
+**Notes:** Done. `kb extract --version 2016 [--pdf] [--out]` → `kb/source-text/2016/` (135 sections, 137 chunks, max 3,936 tokens, byte-identical re-runs; TOC cross-check fails the run on mismatch). Code: `tools/src/cytolex_tools/extract/` (editions, glyphs, layout, toc, blocks, chunker); tests: `tools/tests/test_extract_units.py`, `test_extract_pdf.py` (skipped without the PDF). Citation labels `¶n`/`En` per numbered section; font-aware glyph map; ch. 1–16 extracted. Deviation: invisible zero-width spaces (813) are dropped rather than only noted, since they aren't in the printed text (see `docs/decisions.md`). Open points handed to T-003; quote-check proposal noted on T-005.
 
 ### T-003 — Review extraction quality
 **Status:** todo
@@ -95,7 +95,12 @@ Keep the summary table and the task sections in sync (status changes are made in
 **Acceptance:**
 - Review report at `docs/extraction-review-2016.md` listing affected sections and pages.
 - Extraction fixes applied to the script if needed.
-**Notes:**
+**Notes:** Open points from T-002:
+  - Verify the uncertain glyph `MathTechnicalPA ^`→`≤` (pp. 90, 100). Unmapped glyphs: `GeneralSymbolsPB s` (p.106, `pter?qter`) and `GeneralSymbolsPE P/S` (pp. 109–112, drawn FISH signal symbols).
+  - The en dash `–` (minus) and `×` (copy number) are printed glyphs; decide whether rules/validator treat `-`/`x` as equivalent.
+  - Check the example-vs-prose classification. It is mostly fine, but figure legends (`P = probe for ABL1`), ch. 2 Table 1 and §16.2 alignment diagrams need a look.
+  - Ch. 3 symbol table: the column separator ` | ` is missing on rows with a wide first column.
+  - Wrapped example lines are kept as separate lines; an example broken across a page may be split into two E blocks.
 
 ### T-004 — KB JSON Schema
 **Status:** todo
@@ -115,7 +120,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 - One command builds everything.
 - Reports list rules with `paraphrase_checked: false` and `needs_review: true`.
 - Fails on schema errors, duplicate IDs or orphan quotes.
-**Notes:**
+**Notes:** Proposed in T-002, not yet agreed: also check that each verbatim quote occurs in `kb/source-text/<version>/` at its cited section, page and ¶/E label (a guard against AI-invented quotes). This needs the chunks, so it should be skipped with a warning when they're absent.
 
 ### T-006 — Band data generator
 **Status:** todo

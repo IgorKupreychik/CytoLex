@@ -15,6 +15,12 @@ def test_help_lists_subcommands(capsys):
 
 def test_unimplemented_subcommand_exits_2():
     assert main(["build"]) == 2
+    assert main(["bands"]) == 2
+
+
+def test_extract_missing_pdf_exits_1(tmp_path, capsys):
+    assert main(["extract", "--pdf", str(tmp_path / "missing.pdf"), "--out", str(tmp_path)]) == 1
+    assert "PDF not found" in capsys.readouterr().err
 
 
 def test_pdf_path_env_override(monkeypatch, tmp_path):

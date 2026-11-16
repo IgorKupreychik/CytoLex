@@ -6,7 +6,7 @@ CytoLex validates **ISCN cytogenomic nomenclature** strings: karyotypes, FISH (`
 - **Cited.** Every diagnostic points to the book, e.g. `ISCN 2016 §9.2.17.1, p.75, ¶1`.
 - **Helpful.** It suggests deterministic fixes where one exists, or explains the problem otherwise.
 
-> **Status:** planning/foundation phase. The repo tooling (`tools/`) is set up; the validator itself does not exist yet. Progress is tracked in [`TASKS.md`](TASKS.md).
+> **Status:** planning/foundation phase. The repo tooling (`tools/`) is set up and `kb extract` works; the validator itself does not exist yet. Progress is tracked in [`TASKS.md`](TASKS.md).
 
 ## Architecture (planned)
 - **Core library:** UI-free ISCN parsing and validation, driven by a knowledge base (KB) of cited rules.
@@ -39,16 +39,16 @@ Requirements: Windows, macOS or Linux with **Python 3.14** and **[uv](https://do
    ```sh
    uv sync --directory tools
    ```
-3. Run the KB CLI from the repo root. The subcommands are being implemented in T-002, T-005 and T-006.
+3. Run the KB CLI from the repo root. `extract` works; `build` and `bands` come in T-005 and T-006.
    ```sh
    uv run --directory tools kb --help
-   uv run --directory tools kb extract --version 2016   # PDF → kb/source-text/2016/
+   uv run --directory tools kb extract --version 2016   # PDF → kb/source-text/2016/ (--pdf, --out to override)
    uv run --directory tools kb build                    # KB → build/ (SQLite + JSON)
    uv run --directory tools kb bands                    # UCSC cytoBand → band data
    ```
 
 ## When to run what
-> The `kb` subcommands are **placeholders** until their tasks are done: they print "not implemented yet" and exit with code 2.
+> `kb build` and `kb bands` are **placeholders** until their tasks are done: they print "not implemented yet" and exit with code 2. `kb extract` is implemented.
 
 | Command | Built in | What it does | When to run it |
 |---|---|---|---|
@@ -61,6 +61,17 @@ Typical flow:
 1. **One-time setup:** `uv sync --directory tools`, fill in `config/local.yaml`, run `kb extract` and `kb bands`.
 2. **KB work (T-008 onwards):** write or edit rules, then run `kb build` until it passes.
 3. **App work (T-024 onwards):** run `kb build` first, so the app and its tests use the current KB.
+
+## Source-text chunks (`kb extract`)
+`kb extract` turns the ISCN PDF into one Markdown file per numbered section, plus `manifest.yaml`. It is deterministic and uses no AI: re-running gives byte-identical output.
+- **Files:** `kb/source-text/2016/ch09/09.02.17.01-reciprocal-translocations.md`. Numbers are zero-padded so files sort in book order. A section over the 4,000-token cap is split into `-p1`, `-p2`…
+- **Front matter:** section, title, book and PDF page ranges, and the citation labels in the file, with their pages.
+- **Citation labels:** `[¶n p.75]` marks a prose paragraph and `[En p.75]` an example block (with its explanation quoted below it). Both restart at every numbered heading, so a citation reads `ISCN 2016 §9.2.17.1, p.75, ¶1` or `… ¶2, ex. E3`.
+- **Faithful text:**
+  - Symbols that the PDF stores under other characters are restored by font (`]` → `→`, `~` → `×`, `!4n1` → `<4n>`, …).
+  - Invisible zero-width spaces are dropped.
+  - Example strings are otherwise verbatim. The manifest lists every glyph mapping and anything it couldn't map.
+- **Exit code 1** if a TOC section isn't found on its TOC page.
 
 ## Development
 ```sh

@@ -10,7 +10,7 @@ CytoLex validates ISCN cytogenomic nomenclature strings (karyotype, FISH, microa
 Planned architecture: a UI-free core library, a desktop app (pilot UI), and later a web service reusing the library. The tech stack is **not chosen yet** (task T-020). Full decision record: `docs/decisions.md`.
 
 ## Status & workflow
-- The project is in its planning/foundation phase. Repo tooling exists in `tools/`; no application code exists yet.
+- The project is in its planning/foundation phase. Repo tooling exists in `tools/` (`kb extract` is implemented; `build`/`bands` are stubs); no application code exists yet.
 - **`README.md` is the human-facing overview** (purpose, status, layout, setup, commands). Whenever you change `CLAUDE.md`'s Commands, layout or status, or add a new top-level folder, update `README.md` in the same change.
 - All work is tracked in `TASKS.md`: a summary table plus a section per task.
   - Statuses: `todo`, `in_progress`, `blocked`, `done`, `discussion`.
@@ -43,6 +43,7 @@ Repo tooling is a **self-contained Python 3.14 project in `tools/`**, managed by
 | `kb/source-quotes/<version>/` | Verbatim quotes linked by rule ID (for auditing; removable before public release) | Yes |
 | `build/` | Generated SQLite (FTS5) + JSON bundle | No |
 
+- **Citation anchors come from the chunks:** `[¶n p.N]` (prose paragraph) and `[En p.N]` (example block), numbered per numbered section. Cite as `ISCN 2016 §9.2.17.1, p.75, ¶1` or `… ¶2, ex. E3`; quote chunk text verbatim. See `manifest.yaml` for glyph mappings and unmapped glyphs.
 - **Rule IDs are stable concept IDs** (e.g. `TRANSLOC.CHROMOSOME_ORDER`) with a block per ISCN version. Don't rename IDs; add version blocks instead.
 - **KB examples double as the test suite** for the validator and fixer.
 - **Validation logic must trace to KB rules.** Don't encode ISCN rules from memory. If a rule is missing from the KB, add it (with a citation) first.
