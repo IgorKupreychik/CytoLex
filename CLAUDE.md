@@ -10,7 +10,7 @@ CytoLex validates ISCN cytogenomic nomenclature strings (karyotype, FISH, microa
 Planned architecture: a UI-free core library, a desktop app (pilot UI), and later a web service reusing the library. The tech stack is **not chosen yet** (task T-020). Full decision record: `docs/decisions.md`.
 
 ## Status & workflow
-- The project is in its planning/foundation phase. Repo tooling exists in `tools/` (`kb extract`, `kb tables` and `kb check` are implemented; `build`/`bands` are stubs); no application code exists yet.
+- The project is in its planning/foundation phase. Repo tooling exists in `tools/` (`kb extract`, `kb tables`, `kb check` and `kb build` are implemented; `bands` is a stub); no application code exists yet.
 - **`README.md` is the human-facing overview** (purpose, status, layout, setup, commands). Whenever you change `CLAUDE.md`'s Commands, layout or status, or add a new top-level folder, update `README.md` in the same change.
 - All work is tracked in `TASKS.md`: a summary table plus a section per task.
   - Statuses: `todo`, `in_progress`, `blocked`, `done`, `discussion`.
@@ -25,6 +25,7 @@ Repo tooling is a **self-contained Python 3.14 project in `tools/`**, managed by
   - Setup: `uv sync --directory tools`.
   - KB CLI: `uv run --directory tools kb <extract|tables|build|bands> [--version 2016]`, `kb check [PATH …]`, and `… kb <subcommand> --help`.
   - `kb check` validates rule/quote YAML against `kb/schema/` (default: all of `kb/rules/` and `kb/source-quotes/`); run it while writing KB files.
+  - `kb build [--version 2016]` (default: every edition) runs `kb check` plus the cross-file and chunk checks (see `kb/README.md`), then writes `build/kb.sqlite`, `build/kb.json` and `build/review/kb-review.md` (rules still needing review). Any error → exit 1, nothing written.
   - `kb tables` renders the configured table regions to PNG in `build/review/tables/<version>/` for the person sign-off of tables.
   - Tests: `uv run --directory tools pytest`; single test: `uv run --directory tools pytest tests/test_cli.py::test_help_lists_subcommands`.
   - Lint/format: `uv run --directory tools ruff check .` and `uv run --directory tools ruff format .`.

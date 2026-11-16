@@ -14,7 +14,6 @@ def test_help_lists_subcommands(capsys):
 
 
 def test_unimplemented_subcommand_exits_2():
-    assert main(["build"]) == 2
     assert main(["bands"]) == 2
 
 

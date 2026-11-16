@@ -7,7 +7,19 @@ uv run --directory tools kb check                 # all of kb/rules/ and kb/sour
 uv run --directory tools kb check kb/rules/2016/ch09/09.02.17.01-reciprocal-translocations.yaml
 ```
 
-`kb check` checks each file against the schema only. Checks across files (unique IDs, quote ↔ rule links, `version` = directory, quotes found in the chunks) belong to `kb build` (T-005).
+`kb check` checks each file against the schema only. `uv run --directory tools kb build` runs the schema check on every file and then, per edition:
+
+| Check | Result |
+|---|---|
+| File `version` = its edition directory; file name starts with its `section` (`09.02.17.01-…` ↔ `"9.2.17.1"`); a rules file under `rules/`, a quotes file under `source-quotes/` | error |
+| Rule IDs unique within the edition; `related` IDs exist in the edition | error |
+| Every quote file has a rule file at the same relative path with the same `section`; every quote's `rule` is in that rule file | error |
+| *With chunks:* every `cite` (rules, examples, quotes): the section exists, its `para`/`example`/`float` label is in the chunk front matter, and `page` is that label's page | error |
+| *With chunks:* quote `text` occurs verbatim in a cited label's block (whitespace, line breaks, `>` and code fences ignored) | error |
+| *With chunks:* a valid example with an `En` cite occurs in that example block (all whitespace ignored) | warning |
+| No chunks for the edition (`kb extract` not run): the chunk checks above are skipped | warning |
+
+Any error → exit 1 and nothing written. Otherwise it writes `build/kb.sqlite` (tables `rules`, `citations`, `examples`, `quotes`, `rule_applies_to`, `rule_context`, `rule_related`, `meta`; FTS5 `rules_fts`, `quotes_fts`), `build/kb.json` (`{format_version, editions: {"2016": {chunks_checked, rules, quotes}}}`, each cite with a `rendered` string) and `build/review/kb-review.md`.
 
 ## Layout
 | Path | Content |

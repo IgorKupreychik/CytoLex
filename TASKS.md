@@ -14,7 +14,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-002 | done | 1 | T-001 | Source-text extraction script (PDF → section chunks + manifest) |
 | T-003 | done | 1 | T-002 | Review extraction quality; list sections affected by underlining/tables |
 | T-004 | done | 1 | T-001 | KB JSON Schema (rules, quotes, vocabularies, ID & citation conventions) |
-| T-005 | todo | 1 | T-004 | KB build script (validate → SQLite FTS5 + JSON bundle; review reports) |
+| T-005 | done | 1 | T-004 | KB build script (validate → SQLite FTS5 + JSON bundle; review reports) |
 | T-006 | todo | 1 | T-001 | Band data generator from UCSC cytoBand (all resolutions, versioned) |
 | T-007 | todo | 1 | T-006, T-003 | Spot-check bands vs. ISCN 2016 ideograms; exceptions YAML |
 | T-008 | todo | 1 | T-003, T-005 | KB: ch. 2–3 (band nomenclature, symbols & abbreviated terms) |
@@ -116,7 +116,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 **Notes:** Done. Schemas (JSON Schema 2020-12) in `kb/schema/` (`common`, `rules`, `quotes`); format and conventions in `kb/README.md`; decision in `docs/decisions.md`. One rule file per section, named like its chunk; quotes at the same relative path under `kb/source-quotes/`; structured citations `{section, page, para|example|float}`. New `kb check [PATH …]` (schema-only, `cytolex_tools/kb/schema.py`, reused by T-005). Samples + 9 broken fixtures in `tools/tests/fixtures/kb/`, tests in `tools/tests/test_kb_schema.py` (70 pass). Deviations: added `title`, `severity`, `related` fields; `referencing` added as a direct dependency (uv.lock changed); `kb check` resolves relative paths from the repo root. Cross-file checks handed to T-005 (see its Notes).
 
 ### T-005 — KB build script
-**Status:** todo
+**Status:** done
 **Description:** Validates all YAML against the schemas, checks quote ↔ rule links and unique IDs, and compiles a SQLite DB (with FTS5 over rules and quotes) and a JSON bundle into `build/` (gitignored). Works with or without the quote files present.
 **Acceptance:**
 - One command builds everything.
@@ -124,6 +124,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 - Fails on schema errors, duplicate IDs or orphan quotes.
 **Notes:** Proposed in T-002, not yet agreed: also check that each verbatim quote occurs in `kb/source-text/<version>/` at its cited section, page and ¶/E label (a guard against AI-invented quotes). This needs the chunks, so it should be skipped with a warning when they're absent.
 From T-004: reuse `cytolex_tools.kb.schema` (`validate_file`, also behind `kb check`). Cross-file checks left to the build: file `version` = its directory, rule/quote file pairs at the same relative path, quote `rule` IDs exist, unique rule IDs per version, `related` IDs exist, cite labels/pages match the chunk front matter (when chunks exist), and rendering citations as `ISCN 2016 §…, p.N, ¶n[, ex. En]`.
+**Outcome (2026-11-16):** `kb build [--version YYYY]` (default: every edition) in `tools/src/cytolex_tools/kb/build.py`, with `kb/chunks.py` (chunk front matter + label blocks, multi-part sections merged) and `kb/cite.py` (`render_cite`). Errors: schema, `version`/section vs path, wrong file kind per directory, duplicate IDs, unknown `related`, orphan quote files/quotes; with chunks also cite section/label/page and **verbatim quote text** (decided: error; skipped with a warning without chunks). Warning: valid `En` example text not found in its block. Outputs: `build/kb.sqlite` (normalised tables + FTS5 `rules_fts`/`quotes_fts`), `build/kb.json`, `build/review/kb-review.md`; nothing written on errors. Tests: `tools/tests/test_kb_build.py` (+ chunk excerpt fixture `tools/tests/fixtures/kb/source-text/`). Docs: `kb/README.md` (check table), `README.md`, `CLAUDE.md`, `docs/decisions.md`. Deviations: cross-file checks run only after all files pass the schema; empty-KB message added.
 
 ### T-006 — Band data generator
 **Status:** todo

@@ -14,7 +14,7 @@ SUBCOMMANDS = {
     "build": ("Validate the KB and build SQLite (FTS5) + JSON bundle", "T-005"),
     "bands": ("Generate band data from UCSC cytoBand", "T-006"),
 }
-IMPLEMENTED = {"extract", "tables", "check"}
+IMPLEMENTED = {"extract", "tables", "check", "build"}
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -28,6 +28,11 @@ def build_parser() -> argparse.ArgumentParser:
                 nargs="*",
                 type=Path,
                 help="files or directories (default: kb/rules/ and kb/source-quotes/)",
+            )
+            continue
+        if name == "build":
+            p.add_argument(
+                "--version", help="build only this ISCN edition (default: every edition in kb/)"
             )
             continue
         p.add_argument("--version", default="2016", help="ISCN edition (default: 2016)")
@@ -100,6 +105,49 @@ def cmd_check(args: argparse.Namespace) -> int:
     return 1 if problems or missing else 0
 
 
+def cmd_build(args: argparse.Namespace) -> int:
+    from .kb.build import run
+
+    for stream in (sys.stdout, sys.stderr):  # ISCN glyphs (→, ¶) on a cp1252 console
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(errors="replace")
+    report = run(
+        REPO_ROOT / "kb",
+        REPO_ROOT / "kb" / "source-text",
+        REPO_ROOT / "build",
+        [args.version] if args.version else None,
+    )
+    if not report.editions:
+        print("kb build: no editions under kb/rules/ or kb/source-quotes/ (empty KB)")
+    for ed in report.editions:
+        n_rules = sum(len(f.data["rules"]) for f in ed.rule_files)
+        n_quotes = sum(len(f.data["quotes"]) for f in ed.quote_files)
+        checks = "on" if ed.chunks_checked else "skipped"
+        print(
+            f"kb build: ISCN {ed.version}: {n_rules} rules, {n_quotes} quotes "
+            f"(chunk checks: {checks})"
+        )
+    for w in report.warnings:
+        print(f"  warning: {w}")
+    for pr in report.errors:
+        print(f"  {pr}", file=sys.stderr)
+    if report.errors:
+        print(
+            f"kb build: FAILED, {len(report.errors)} problem(s); nothing written", file=sys.stderr
+        )
+        return 1
+    needs, unchecked = report.needs_review, report.unchecked
+    print(f"review: {len(needs)} rule(s) with needs_review: true")
+    for v, f, r in needs:
+        print(f"  {v} {r['id']} ({f.rel}): {r['review']['note']}")
+    print(f"review: {len(unchecked)} rule(s) with paraphrase_checked: false")
+    for v, f, r in unchecked:
+        print(f"  {v} {r['id']} ({f.rel})")
+    rel = ", ".join(p.relative_to(REPO_ROOT).as_posix() for p in report.outputs)
+    print(f"kb build: wrote {rel}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "extract":
@@ -108,6 +156,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_tables(args)
     if args.command == "check":
         return cmd_check(args)
+    if args.command == "build":
+        return cmd_build(args)
     task = SUBCOMMANDS[args.command][1]
     print(f"kb {args.command}: not implemented yet ({task})", file=sys.stderr)
     return 2
