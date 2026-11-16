@@ -9,7 +9,7 @@ def test_help_lists_subcommands(capsys):
         main(["--help"])
     assert exc.value.code == 0
     out = capsys.readouterr().out
-    for name in ("extract", "build", "bands"):
+    for name in ("extract", "tables", "build", "bands"):
         assert name in out
 
 
@@ -33,3 +33,8 @@ def test_pdf_path_from_config(monkeypatch, tmp_path):
     cfg = tmp_path / "local.yaml"
     cfg.write_text('iscn_pdf:\n  "2016": "C:/books/iscn2016.pdf"\n', encoding="utf-8")
     assert iscn_pdf_path("2016", cfg).as_posix() == "C:/books/iscn2016.pdf"
+
+
+def test_tables_missing_pdf_exits_1(tmp_path, capsys):
+    assert main(["tables", "--pdf", str(tmp_path / "missing.pdf"), "--out", str(tmp_path)]) == 1
+    assert "PDF not found" in capsys.readouterr().err

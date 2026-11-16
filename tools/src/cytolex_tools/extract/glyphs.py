@@ -10,11 +10,14 @@ from collections import Counter, defaultdict
 # (font base name, extracted char) -> real char
 GLYPH_MAP: dict[tuple[str, str], str] = {
     ("GeneralSymbolsPB", "]"): "→",
+    ("GeneralSymbolsPB", "s"): "→",  # p.106 `pter→qter` (checked against the page image, T-003)
+    ("GeneralSymbolsPE", "P"): "●",  # filled FISH signal in nucleus-diagram legends (pp.109-112)
+    ("GeneralSymbolsPE", "S"): "○",  # open FISH signal in the same legends
     ("MathTechnicalPD", "~"): "×",
     ("MathTechnicalPD", "8"): "±",
     ("MathTechnicalPA", "!"): "<",
     ("MathTechnicalPA", "1"): ">",
-    ("MathTechnicalPA", "^"): "≤",  # uncertain (2 uses): verify in T-003
+    ("MathTechnicalPA", "^"): "≤",  # pp.90, 100; checked against the page images (T-003)
     ("MathematicalPi-Three", ","): "~",  # approximate sign, written `~` in ISCN strings
     ("MathematicalPi-Three", ""): "~",
     ("MathematicalPi-Four", ""): "′",
@@ -22,7 +25,7 @@ GLYPH_MAP: dict[tuple[str, str], str] = {
     ("MathematicalPi-One", "a"): "α",
 }
 
-UNCERTAIN = {("MathTechnicalPA", "^")}
+UNCERTAIN: set[tuple[str, str]] = set()  # mappings not yet checked against the page image
 
 # Fonts whose characters can't be trusted unless they are in GLYPH_MAP.
 SYMBOL_FONT_MARKERS = ("Math", "Symbol", "Pi-")

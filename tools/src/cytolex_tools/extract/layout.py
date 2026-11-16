@@ -13,6 +13,11 @@ COLUMN_GAP = 15.0  # horizontal gap (pt) inside a line that separates table colu
 PHANTOM_GAP = 0.8  # pt; a real word space leaves >= ~1.5 pt between the glyphs around it
 SUPERSCRIPT_RATIO = 0.8  # chars smaller than this x the line's size, and raised, are superscripts
 LIGATURES = {"ﬁ": "fi", "ﬂ": "fl", "ﬀ": "ff", "ﬃ": "ffi", "ﬄ": "ffl"}
+UNDERLINE = "\u0332"  # COMBINING LOW LINE, appended to each underlined character
+RULE_HEIGHT = 1.5  # pt; a drawn line/rect thinner than this is a rule
+UNDERLINE_GAP = (-3.0, -1.0)  # rule top - glyph bottom (pt): an underline cuts the descender zone
+UNDERLINE_COVER = 0.9  # the glyphs above an underline cover at least this share of its width
+MARGIN_BAR_MIN_HEIGHT = 4.0  # pt; change bars in the outer margin (ISCN 2016 §1.6)
 
 
 def _char_key(c: dict) -> tuple[float, float, str]:
@@ -62,6 +67,50 @@ def reanchor_misplaced(chars: list[dict]) -> int:
     return moved
 
 
+def _rules(page: Page) -> list[dict]:
+    return page.objects.get("line", []) + page.objects.get("rect", [])
+
+
+def underlined_chars(page: Page) -> set[tuple[float, float, str]]:
+    """Characters printed with an underline (ISCN uses it to tell homologues apart).
+
+    Underlines are thin drawn rules that cut through the glyphs' descender zone and span exactly
+    the glyphs above them; table rules sit lower and run past the text, so they don't qualify.
+    """
+    found: set[tuple[float, float, str]] = set()
+    chars = [c for c in page.chars if c["text"].strip()]
+    for r in _rules(page):
+        width = r["x1"] - r["x0"]
+        if abs(r["bottom"] - r["top"]) >= RULE_HEIGHT or width <= 2:
+            continue
+        above = [
+            c
+            for c in chars
+            if r["x0"] - 1 <= (c["x0"] + c["x1"]) / 2 <= r["x1"] + 1
+            and UNDERLINE_GAP[0] <= r["top"] - c["bottom"] <= UNDERLINE_GAP[1]
+        ]
+        if above and sum(c["x1"] - c["x0"] for c in above) / width >= UNDERLINE_COVER:
+            found.update(_char_key(c) for c in above)
+    return found
+
+
+def margin_bars(page: Page, text_right: float) -> list[tuple[float, float]]:
+    """Vertical spans (top, bottom) of change bars drawn right of the text block."""
+    return sorted(
+        (r["top"], r["bottom"])
+        for r in _rules(page)
+        if r["x1"] - r["x0"] < RULE_HEIGHT
+        and r["x0"] > text_right
+        and r["bottom"] - r["top"] >= MARGIN_BAR_MIN_HEIGHT
+    )
+
+
+@dataclass(frozen=True)
+class Word:
+    x0: float
+    text: str  # after glyph mapping, superscript and underline marking
+
+
 @dataclass(frozen=True)
 class Line:
     pdf_page: int
@@ -72,6 +121,10 @@ class Line:
     font: str  # dominant font (base name)
     size: float  # dominant size, rounded to 0.1 pt
     col_x: float | None = None  # x0 of the second column, when the line has a column gap
+    words: tuple[Word, ...] = ()
+    changed: bool = False  # next to a margin change bar (changed since the previous edition)
+    underlined: int = 0  # number of underlined characters
+    table: str | None = None  # set on a synthetic line that carries a rendered table
 
 
 def page_lines(
@@ -84,6 +137,8 @@ def page_lines(
     mapper.reanchored += reanchor_misplaced(page.chars)
     phantoms = phantom_spaces(page.chars)
     mapper.phantom_spaces += len(phantoms)
+    underlined = underlined_chars(page)
+    bars = margin_bars(page, ed.text_right)
 
     def keep(obj: dict) -> bool:
         if obj.get("object_type") != "char":
@@ -106,6 +161,8 @@ def page_lines(
             round(c["bottom"]) for w in cluster for c in w["chars"] if round(c["size"], 1) == size
         ).most_common(1)[0][0]
         parts: list[str] = []
+        line_words: list[Word] = []
+        n_under = 0
         prev_x1 = None
         col_x = None
         for w in cluster:
@@ -119,7 +176,11 @@ def page_lines(
                 if sup and not in_sup:
                     text += "^"
                 in_sup = sup
+                if _char_key(c) in underlined:
+                    ch = "".join(x + UNDERLINE for x in ch)
+                    n_under += 1
                 text += ch
+            line_words.append(Word(round(w["x0"], 2), text))
             if prev_x1 is not None:
                 is_col = w["x0"] - prev_x1 > COLUMN_GAP
                 parts.append(" | " if is_col else " ")
@@ -130,16 +191,21 @@ def page_lines(
         text = "".join(parts).strip()
         if not text:
             continue
+        top = min(w["top"] for w in cluster)
+        low = max(w["bottom"] for w in cluster)
         lines.append(
             Line(
                 pdf_page=pdf_page,
                 book_page=book_page,
-                top=round(min(w["top"] for w in cluster), 2),
+                top=round(top, 2),
                 x0=round(cluster[0]["x0"], 2),
                 text=text,
                 font=font,
                 size=size,
                 col_x=col_x,
+                words=tuple(line_words),
+                changed=any(b_top < low and b_bot > top for b_top, b_bot in bars),
+                underlined=n_under,
             )
         )
     lines.sort(key=lambda ln: (ln.top, ln.x0))

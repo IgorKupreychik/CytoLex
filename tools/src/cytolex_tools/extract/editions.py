@@ -15,6 +15,7 @@ class Edition:
     body_size: float  # main text size (pt)
     small_size: float  # example explanations, tables (pt)
     heading_font: str  # substring of the heading font name
+    text_right: float  # right edge of the text block (pt); change bars are drawn beyond it
 
 
 EDITIONS: dict[str, Edition] = {
@@ -29,6 +30,7 @@ EDITIONS: dict[str, Edition] = {
         body_size=10.0,
         small_size=8.2,
         heading_font="MyriadPro-Bold",
+        text_right=525.0,
     ),
 }
 

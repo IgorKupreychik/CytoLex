@@ -5,7 +5,9 @@ All rules here are layout heuristics, deterministic by construction:
 - prose paragraph: body-size text; a new one starts at a first-line indent, a vertical gap,
   a heading, or at a page break when the previous line ended a sentence;
 - example: a body-size block whose lines all look like notation (few spaces, no long words);
-- note: small-print block (explanations under examples, tables).
+- note: small-print block (explanations under examples, table footnotes);
+- caption: a figure/table caption (`Fig. 7. ...`, `Table 1. ...`), which always starts a block;
+- table: a marker line standing for a configured table region (see tables.py).
 """
 
 import re
@@ -23,6 +25,14 @@ BULLET = "•"
 TERMINAL = (".", ":", ";", ")", "]")
 FOOTNOTE = re.compile(r"\^\d+")
 LONG_WORD = re.compile(r"^[A-Za-z]{4,}[.,;:]?$")
+# `Fig. 7. Metaphase ...`, `Fig. 6. (a) G-banded ...`, `Table 1. Examples ...`
+CAPTION = re.compile(r"^(Fig\.|Table) (\d+)\.(?:\^\w+)?\s+(?:\(([a-z])\)\s+)?[A-Z]")
+
+
+def caption_id(text: str) -> str | None:
+    """`Fig. 6. (b) R-banded ...` -> `Fig. 6b`; None if the line isn't a caption."""
+    m = CAPTION.match(plain(text))
+    return f"{m.group(1)} {m.group(2)}{m.group(3) or ''}" if m else None
 
 
 @dataclass
@@ -31,6 +41,7 @@ class Block:
     lines: list[Line] = field(default_factory=list)
     number: str | None = None  # numbered headings only
     title: str | None = None  # headings only
+    float_id: str | None = None  # captions only (`Fig. 7`, `Table 1`)
     column_lines: set[int] = field(default_factory=set)  # indexes of wrapped 2nd-column lines
 
     @property
@@ -79,7 +90,9 @@ def heading_text(text: str) -> str:
 
 
 def line_class(line: Line, ed: Edition) -> str:
-    """heading | text | small"""
+    """heading | table | text | small"""
+    if line.table:
+        return "table"
     if ed.heading_font in line.font and line.size >= ed.body_size - 0.1:
         return "heading"
     return "text" if line.size > ed.small_size + 0.4 else "small"  # 9pt examples count as text
@@ -98,7 +111,9 @@ def is_notation_line(text: str) -> bool:
 # method prefix (`ish`, `nuc ish`, `arr[GRCh37]`, ...).
 NOTATION_START = re.compile(
     r"^(?:\d{2,3}(?:~\d{2,3})?(?:<\d?n>)?,\S"
-    r"|(?:nuc |fib |rev )?ish\b|arr\b|arr\[|rsa\b|seq\b|seq\[|cgh\b|mos |chi )"
+    r"|(?:nuc |fib |rev )?ish\b|arr\b|arr\[|rsa\b|seq\b|seq\[|cgh\b|mos |chi "
+    # a bare abnormality followed by its description: `fra(10)(q25.2) A fragile site ...`
+    r"|[a-z]{1,5}\([^\s()]+\)\([^\s()]+\)\S* [A-Z])"
 )
 
 
@@ -146,12 +161,26 @@ def build_blocks(lines: list[Line], ed: Edition) -> list[Block]:
             prev = ln
             continue
 
+        if cls == "table":
+            cur = Block("table", [ln])
+            blocks.append(cur)
+            prev = ln
+            continue
+
         margin = margins.get(ln.pdf_page, ln.x0)
         cur_cls = None if cur is None or cur.kind in ("heading", "subheading") else cur.kind
         bullet = ln.text.startswith(BULLET)
         in_bullet = cur_cls is not None and cur.lines[0].text.startswith(BULLET)
-        # a hanging indent inside a bullet item continues it; elsewhere an indent starts a paragraph
-        indented = cls == "text" and ln.x0 - margin > INDENT and not in_bullet
+        # a hanging indent inside a bullet item continues it; elsewhere an indent starts a
+        # paragraph, unless the previous line stopped mid-sentence and this one goes on in lower
+        # case (a wrapped line set with a hanging indent, §16.2 p.126)
+        mid_sentence = (
+            cur_cls == cls
+            and prev is not None
+            and not prev.text.endswith(TERMINAL)
+            and ln.text[:1].islower()
+        )
+        indented = cls == "text" and ln.x0 - margin > INDENT and not in_bullet and not mid_sentence
         # wrapped text of a second column (`16qh+ | Increase in length ... chro-` / `mosome 1`)
         col_x = next((x.col_x for x in reversed(cur.lines) if x.col_x), None) if cur else None
         column_cont = (
@@ -166,9 +195,11 @@ def build_blocks(lines: list[Line], ed: Edition) -> list[Block]:
             cur.column_lines.add(len(cur.lines) - 1)
             prev = ln
             continue
+        caption = caption_id(ln.text) is not None
         new = (
             cur_cls is None
             or cur_cls != cls
+            or caption
             or bullet
             or indented
             or (gap is not None and gap > ln.size * GAP_FACTOR)
@@ -182,12 +213,48 @@ def build_blocks(lines: list[Line], ed: Edition) -> list[Block]:
         prev = ln
 
     for b in blocks:
-        if b.kind == "text":
+        fid = caption_id(b.lines[0].text) if b.kind in ("text", "small") else None
+        if fid:
+            b.kind, b.float_id = "caption", fid
+        elif b.kind == "text":
             first_column = [ln for i, ln in enumerate(b.lines) if i not in b.column_lines]
             b.kind = "example" if all(is_notation_line(ln.text) for ln in first_column) else "prose"
         elif b.kind == "small":
             b.kind = "note"
-    return blocks
+    return rejoin_interrupted(blocks)
+
+
+def rejoin_interrupted(blocks: list[Block]) -> list[Block]:
+    """Rejoin a paragraph that a float or footnote interrupts mid-sentence.
+
+    A figure, table (with its caption and footnotes) or page footnote is often printed in the
+    middle of a sentence (`...with ad-` / Table 1 / `ditional digits, ...`). When prose resumes in
+    lower case after such a run and the paragraph before it stopped mid-sentence, the two halves
+    are one paragraph; the float keeps its place after it.
+    """
+    out: list[Block] = []
+    before: Block | None = None  # the prose block right before the current run of floats
+    in_run = False
+    for b in blocks:
+        if b.kind in ("caption", "table") or (b.kind == "note" and (in_run or before)):
+            in_run = in_run or b.kind != "note" or FOOTNOTE.match(b.lines[0].text) is not None
+            if in_run:
+                out.append(b)
+                continue
+        if (
+            in_run
+            and before is not None
+            and b.kind == "prose"
+            and b.lines[0].text[:1].islower()
+            and not before.lines[-1].text.endswith(TERMINAL)
+        ):
+            before.lines.extend(b.lines)
+            in_run = False
+            continue
+        in_run = False
+        out.append(b)
+        before = b if b.kind == "prose" else None
+    return out
 
 
 def build_sections(blocks: list[Block], ed: Edition) -> list[Section]:
@@ -220,7 +287,7 @@ def hyphen_compounds(blocks: list[Block]) -> set[str]:
     """Hyphenated words that occur *inside* lines anywhere in the text (lower-cased)."""
     found: set[str] = set()
     for b in blocks:
-        if b.kind in ("prose", "note"):
+        if b.kind in ("prose", "note", "caption"):
             for ln in b.lines:
                 body = ln.text[:-1] if ln.text.endswith("-") else ln.text
                 found.update(m.lower() for m in HYPHEN_COMPOUND.findall(body))

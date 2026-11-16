@@ -12,7 +12,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 |---|---|---|---|---|
 | T-001 | done | 1 | – | Choose language/tooling for build & extraction scripts |
 | T-002 | done | 1 | T-001 | Source-text extraction script (PDF → section chunks + manifest) |
-| T-003 | todo | 1 | T-002 | Review extraction quality; list sections affected by underlining/tables |
+| T-003 | done | 1 | T-002 | Review extraction quality; list sections affected by underlining/tables |
 | T-004 | todo | 1 | T-001 | KB JSON Schema (rules, quotes, vocabularies, ID & citation conventions) |
 | T-005 | todo | 1 | T-004 | KB build script (validate → SQLite FTS5 + JSON bundle; review reports) |
 | T-006 | todo | 1 | T-001 | Band data generator from UCSC cytoBand (all resolutions, versioned) |
@@ -62,6 +62,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-050 | todo | 2 | T-031 | LGF computation in the core library |
 | T-051 | todo | 2 | T-049, T-050 | Comparison engine + CLI report |
 | T-052 | todo | 3 | T-051, T-038 | Desktop: comparison view |
+| T-053 | discussion | 1 | T-003 | Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`? |
 
 ---
 
@@ -90,17 +91,18 @@ Keep the summary table and the task sections in sync (status changes are made in
 **Notes:** Done. `kb extract --version 2016 [--pdf] [--out]` → `kb/source-text/2016/` (135 sections, 137 chunks, max 3,936 tokens, byte-identical re-runs; TOC cross-check fails the run on mismatch). Code: `tools/src/cytolex_tools/extract/` (editions, glyphs, layout, toc, blocks, chunker); tests: `tools/tests/test_extract_units.py`, `test_extract_pdf.py` (skipped without the PDF). Citation labels `¶n`/`En` per numbered section; font-aware glyph map; ch. 1–16 extracted. Deviation: invisible zero-width spaces (813) are dropped rather than only noted, since they aren't in the printed text (see `docs/decisions.md`). Open points handed to T-003; quote-check proposal noted on T-005.
 
 ### T-003 — Review extraction quality
-**Status:** todo
+**Status:** done
 **Description:** Spot-check chunks against the PDF. Produce a list of sections where underlining (homologue distinction), tables, figures or margin markers were lost, so those rules get `needs_review`.
 **Acceptance:**
 - Review report at `docs/extraction-review-2016.md` listing affected sections and pages.
 - Extraction fixes applied to the script if needed.
-**Notes:** Open points from T-002:
-  - Verify the uncertain glyph `MathTechnicalPA ^`→`≤` (pp. 90, 100). Unmapped glyphs: `GeneralSymbolsPB s` (p.106, `pter?qter`) and `GeneralSymbolsPE P/S` (pp. 109–112, drawn FISH signal symbols).
-  - The en dash `–` (minus) and `×` (copy number) are printed glyphs; decide whether rules/validator treat `-`/`x` as equivalent.
-  - Check the example-vs-prose classification. It is mostly fine, but figure legends (`P = probe for ABL1`), ch. 2 Table 1 and §16.2 alignment diagrams need a look.
-  - Ch. 3 symbol table: the column separator ` | ` is missing on rows with a wide first column.
-  - Wrapped example lines are kept as separate lines; an example broken across a page may be split into two E blocks.
+**Notes:** Done. Review report `docs/extraction-review-2016.md`; extractor version 2 (`kb extract`), plus new `kb tables` (table images for sign-off → `build/review/tables/2016/`).
+  - Recovered from the PDF's drawn objects: underlining (U+0332 after the character; §7.2, 9.2.3, 9.2.17.1, 16.2, 16.3.7) and margin change bars (front matter `changed`; ISCN 2016 §1.6).
+  - Captions are float labels (`[Fig. N p.X]`, `[Table N p.X]`), not ¶; float-interrupted paragraphs rejoined; FISH legends (`●`/`○`) attached to their examples; three example lists reclassified; ` | ` placed at description columns.
+  - Tables from a committed layout file `tools/src/cytolex_tools/extract/tables/2016.yaml` (Tables 1–4, ploidy table, ch. 3 symbols, §10.3 list, §16.2 alignment, §13.4 fibre diagram): text layer vs page image agree for all; person sign-off pending per table (reminders in the Notes of T-007/008/009/010/014/016/018/019). Backup plan B1–B3 documented; not needed.
+  - Glyphs: `≤` verified; `GeneralSymbolsPB s` → `→`; `GeneralSymbolsPE P/S` → `●`/`○`. `–`/`×` question → T-053. No example is split across pages; wrapped long karyotypes stay as separate lines (documented).
+  - Code: `extract/layout.py`, `blocks.py`, `chunker.py`, `tables.py`, `review.py`, `glyphs.py`, `cli.py`; tests `tests/test_extract_review.py` + additions in `test_extract_pdf.py`, `test_cli.py` (46 pass).
+  - Deviations from the plan: beyond the planned scope, also recovered change bars (useful for 2020/2024 profiles), added a `figure` region kind, and added `kb tables` as a subcommand (instead of a separate script). Some ¶ labels were renumbered vs. version 1 (no rules cited them yet).
 
 ### T-004 — KB JSON Schema
 **Status:** todo
@@ -140,7 +142,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 - Sample checked.
 - Exceptions file committed, with citations.
 - The generator applies the exceptions.
-**Notes:**
+**Notes:** Before starting, person sign-off of **Table 3** (landmarks, p.15): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`. See `docs/extraction-review-2016.md`.
 
 ## Knowledge base (ISCN 2016)
 
@@ -148,6 +150,7 @@ All KB tasks share these steps and criteria:
 - Read the relevant chunks from `kb/source-text/2016/`, never the whole book.
 - Write rules (paraphrase + cite + examples + `applies_to`/`context` + optional `fix` hint) and the matching quote files.
 - Mark ambiguous items `needs_review`.
+- Check `docs/extraction-review-2016.md` for the chapter: listed sections get `needs_review`, and configured tables must have `review.human: ok` before rules cite them (see each task's Notes).
 - Review paraphrases with the user, side by side with the quotes, and set `paraphrase_checked` for approved ones.
 - Acceptance: KB build passes; every book example in the section range is captured as a valid example; invalid examples include `why` and the corrected form where one exists.
 
@@ -155,19 +158,19 @@ All KB tasks share these steps and criteria:
 **Status:** todo
 **Description:** Band and region designation rules; full symbol/abbreviation table (ch. 3) as a vocabulary the parser can use.
 **Acceptance:** Shared KB criteria; symbol vocabulary file covers every ch. 3 entry.
-**Notes:**
+**Notes:** Before starting, person sign-off of the **ch. 3 symbol list** (pp.34–36; most important, it is the validator's vocabulary), **Table 2** (p.14) and **Table 3** (p.15): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`.
 
 ### T-009 — KB: ch. 4 (karyotype designation)
 **Status:** todo
 **Description:** General principles, breakpoint specification, short and detailed systems, derivative and recombinant chromosomes (§4.1–4.5).
 **Acceptance:** Shared KB criteria.
-**Notes:**
+**Notes:** Before starting, person sign-off of **Table 4** (p.44): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`. §4.3.2–4.4 also depend on the Fig. 8/9 diagrams (images): check the printed page, `needs_review` (`docs/extraction-review-2016.md`).
 
 ### T-010 — KB: ch. 5–7
 **Status:** todo
 **Description:** Uncertainty (`?`, `~`, `or`, `inc`), order of abnormalities, normal variable features (heteromorphisms, fragile sites).
 **Acceptance:** Shared KB criteria.
-**Notes:**
+**Notes:** Before starting, person sign-off of **Table 1** (heteromorphisms, p.12): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`. §7.2 has underlined homologues (U+0332).
 
 ### T-011 — KB: ch. 8 (numerical abnormalities)
 **Status:** todo
@@ -191,7 +194,7 @@ All KB tasks share these steps and criteria:
 **Status:** todo
 **Description:** Clone definition and size, mainline, stemline/sideline, idem vs. sl/sdl, composite karyotype, unrelated clones, modal number, constitutional karyotype in neoplasia.
 **Acceptance:** Shared KB criteria.
-**Notes:**
+**Notes:** Before starting, person sign-off of the **Ploidy table** (p.90; its ranges become numeric limits — check every number): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`. Indentation/bold of the printed table are lost (`docs/extraction-review-2016.md`).
 
 ### T-015 — KB: ch. 13.1–13.2 (metaphase ish)
 **Status:** todo
@@ -203,7 +206,7 @@ All KB tasks share these steps and criteria:
 **Status:** todo
 **Description:** `nuc ish` (signal numbers, relative positions, fusion and break-apart probes), `fib ish`, `rev ish`, `cgh`, multi-color and partial painting.
 **Acceptance:** Shared KB criteria.
-**Notes:**
+**Notes:** Before starting, person sign-off of the **Fibre diagram** (§13.4, p.112): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`. Drawn fibre symbols and nucleus diagrams (§13.3.2, pp.109–112) are not in the text: `needs_review`.
 
 ### T-017 — KB: ch. 14 (microarray)
 **Status:** todo
@@ -215,13 +218,13 @@ All KB tasks share these steps and criteria:
 **Status:** todo
 **Description:** Chromatid/chromosome aberrations and scoring; meiotic terminology.
 **Acceptance:** Shared KB criteria.
-**Notes:**
+**Notes:** Before starting, person sign-off of **Aberration groups** (§10.3, p.83): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`.
 
 ### T-019 — KB: ch. 15 & 16 (RSA, sequence-based)
 **Status:** todo
 **Description:** Region-specific assays (`rsa`, MLPA) and sequence-based nomenclature (`seq`).
 **Acceptance:** Shared KB criteria.
-**Notes:**
+**Notes:** Before starting, person sign-off of the **Alignment figure** (§16.2, p.126): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`. Its shading/bold/italic carry meaning and are lost: `needs_review`.
 
 ## Decisions before code
 
@@ -246,6 +249,12 @@ All KB tasks share these steps and criteria:
 - How book-ambiguous rules are reported.
 - What "valid" means when there are only warnings.
 **Acceptance:** Policy in `docs/decisions.md`.
+**Notes:**
+
+### T-053 — Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`?
+**Status:** discussion
+**Description:** The book prints the minus sign as an en dash (`–5`, `arr(1–22)`), copy numbers with `×` (`×2`) and the arrow as `→`; users usually type `-`, `x` and `->`. The ch. 3 symbol list itself gives "arrow (→ or ->)" (p.34). Decide whether the validator treats the ASCII forms as equivalent, as a warning with a level-1 fix, or as an error, per edition. Found in T-003 (`docs/extraction-review-2016.md`, "Glyphs and characters"). Related: T-022 (strictness policy).
+**Acceptance:** Decision in `docs/decisions.md`; the KB rule(s) to write are named.
 **Notes:**
 
 ## Core library

@@ -12,9 +12,10 @@ from .chunker import TOKEN_CAP, Chunk, chunk_section, dump_yaml
 from .editions import get_edition
 from .glyphs import GlyphMapper
 from .layout import page_lines
+from .tables import TableRegion, divert_tables, load_tables
 from .toc import parse_toc
 
-EXTRACTOR_VERSION = 1
+EXTRACTOR_VERSION = 2
 
 
 @dataclass
@@ -60,6 +61,8 @@ def run(version: str, pdf_path: Path, out_dir: Path, cap: int = TOKEN_CAP) -> Re
     ed = get_edition(version)
     mapper = GlyphMapper()
     report = Report(out_dir=out_dir)
+    specs = load_tables(version)
+    tables: dict[str, TableRegion] = {}
 
     with pdfplumber.open(pdf_path) as pdf:
         toc_lines: list[str] = []
@@ -72,9 +75,14 @@ def run(version: str, pdf_path: Path, out_dir: Path, cap: int = TOKEN_CAP) -> Re
         figure_pages: list[int] = []
         for n in range(last + 1, len(pdf.pages) + 1):
             page, has_figure = page_lines(pdf.pages[n - 1], n, ed, mapper)
-            lines += page
+            lines += divert_tables(page, specs, tables)
             if has_figure:
                 figure_pages.append(n - ed.page_offset)
+
+    for spec in specs:
+        for i, r in enumerate(spec.regions):
+            if f"{spec.id}#{i + 1}" not in tables:
+                report.problems.append(f"{spec.id}: no text in region {i + 1} (p.{r.book_page})")
 
     blocks = build_blocks(lines, ed)
     sections = build_sections(blocks, ed)
@@ -98,7 +106,7 @@ def run(version: str, pdf_path: Path, out_dir: Path, cap: int = TOKEN_CAP) -> Re
     chunks: list[Chunk] = []
     manifest_sections = []
     for s in sections:
-        sc = chunk_section(version, s, compounds, cap)
+        sc = chunk_section(version, s, compounds, cap, tables)
         chunks += sc
         book_pages, pdf_pages = s.pages()
         manifest_sections.append(
@@ -116,6 +124,9 @@ def run(version: str, pdf_path: Path, out_dir: Path, cap: int = TOKEN_CAP) -> Re
                         "tokens": c.tokens,
                         "paragraphs": len(c.paragraphs),
                         "examples": len(c.examples),
+                        **({"floats": list(c.floats)} if c.floats else {}),
+                        **({"changed": c.changed} if c.changed else {}),
+                        **({"underlined": c.underlined} if c.underlined else {}),
                     }
                     for c in sc
                 ],
@@ -138,8 +149,26 @@ def run(version: str, pdf_path: Path, out_dir: Path, cap: int = TOKEN_CAP) -> Re
             "page": "book page of the first line of the paragraph/example (book = PDF - offset)",
             "verbatim": "example lines are not normalised; stray spaces are only listed "
             "(front matter `stray_spaces`)",
+            "float": "figure/table captions are labelled `[Fig. N p.X]` / `[Table N p.X]` and "
+            "not counted as ¶; a table and its footnotes follow its caption",
+            "table": "configured tables (tables/<version>.yaml) are Markdown tables built from "
+            "word positions; front matter `tables` gives their review status",
+            "underline": "an underlined character is followed by U+0332 COMBINING LOW LINE "
+            "(e.g. `der(1` + U+0332 + `)`); front matter `underlined` lists the labels",
+            "changed": "front matter `changed` lists labels next to a margin change bar "
+            "(ISCN 2016 §1.6: changes vs. the previous edition are marked in the margin)",
+            "legend": "FISH signal legends (`● = probe for ABL1`) belong to the example above",
         },
         "figure_pages": figure_pages,
+        "tables": [
+            {
+                "id": spec.id,
+                "kind": spec.kind,
+                "book_pages": sorted({r.book_page for r in spec.regions}),
+                "review": spec.review,
+            }
+            for spec in specs
+        ],
         "glyphs": mapper.report(),
         "problems": report.problems,
         "warnings": report.warnings,

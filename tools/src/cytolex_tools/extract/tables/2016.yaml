@@ -1,0 +1,182 @@
+# Table and diagram layouts for the ISCN 2016 PDF (T-003). Read by `kb extract`; committed.
+#
+# The text layer gives every character exactly; only the cell structure is lost. Each table
+# region below says where the table sits and where its columns start, so `kb extract` can put
+# each word into its cell deterministically. Coordinates are PDF points (y grows downwards),
+# measured from the word positions on the page.
+#
+# Per table:
+#   id        float id (`Table 1`) or a name for tables without a caption
+#   kind      float: shown under its caption (or under `[<id> p.N]`), not counted as ¶
+#             paragraph: counted as ¶n
+#             figure: a drawn diagram; its text lines are kept verbatim as `> ` lines
+#   review    image: pending|ok|mismatch (rendered table image vs extracted cells)
+#             human: pending|ok (checked against the printed book by a person)
+#             fallback: none | B1 | B2 | B3 (see docs/extraction-review-2016.md, "Backup plan")
+#   regions   one per page part:
+#     book_page, top, bottom   lines whose top lies in [top, bottom] belong to the table
+#     body_top                 lines above it are header lines (joined per column, top to bottom)
+#     header                   auto (from the header lines) | none (no header row in the book)
+#     columns                  x0 (pt) where each column starts; a word goes to the last column
+#                              starting at or left of it (2 pt tolerance)
+#     key                      columns that start a new row when non-empty; other lines are
+#                              wrapped continuations of the previous row
+#     join                     how wrapped cell lines are joined: text (hyphen-aware) | br
+
+tables:
+  - id: Table 1
+    kind: float
+    review: {image: ok, human: pending, fallback: none}
+    regions:
+      - book_page: 12
+        top: 80
+        bottom: 215
+        body_top: 110
+        header: auto
+        columns: [112, 155, 201, 254, 306, 325, 350, 374, 398, 423, 468]
+        key: [0]
+        join: br
+      - book_page: 12
+        top: 235
+        bottom: 380
+        body_top: 265
+        header: auto
+        columns: [112, 151, 171, 190, 216, 243, 268, 323, 345, 359, 386, 410, 434, 455, 468]
+        key: [0]
+        join: br
+
+  - id: Table 2
+    kind: float
+    review: {image: ok, human: pending, fallback: none}
+    regions:
+      - book_page: 14
+        top: 92
+        bottom: 325
+        body_top: 92
+        header: none
+        columns: [112, 170]
+        key: [0]
+        join: text
+
+  - id: Table 3
+    kind: float
+    review: {image: ok, human: pending, fallback: none}
+    regions:
+      - book_page: 15
+        top: 100
+        bottom: 450
+        body_top: 140
+        header: auto
+        columns: [112, 152, 188, 226]
+        key: [0, 1, 2]
+        join: text
+
+  - id: Table 4
+    kind: float
+    review: {image: ok, human: pending, fallback: none}
+    regions:
+      - book_page: 44
+        top: 92
+        bottom: 315
+        body_top: 130
+        header: auto
+        columns: [112, 178, 251, 340]
+        key: [1]
+        join: text
+
+  # Ploidy levels (§11.2 refers to it as "given above"); printed without a caption at the top
+  # of p.90, inside §11.1.6. Indentation (sub-levels) and bold (near-x levels) are not kept.
+  - id: Ploidy table
+    kind: float
+    review: {image: ok, human: pending, fallback: none}
+    regions:
+      - book_page: 90
+        top: 66
+        bottom: 195
+        body_top: 66
+        header: none
+        columns: [112, 222, 362, 475]
+        key: [0]
+        join: text
+
+  # Ch. 3 symbol list: one ¶ per page, as before T-003.
+  - id: Symbols
+    kind: paragraph
+    review: {image: ok, human: pending, fallback: none}
+    regions:
+      - book_page: 34
+        top: 340
+        bottom: 700
+        body_top: 340
+        header: none
+        columns: [110, 199]
+        key: [0]
+        join: text
+      - book_page: 35
+        top: 60
+        bottom: 700
+        body_top: 60
+        header: none
+        columns: [110, 199]
+        key: [0]
+        join: text
+      - book_page: 36
+        top: 60
+        bottom: 555
+        body_top: 60
+        header: none
+        columns: [110, 199]
+        key: [0]
+        join: text
+
+  # §10.3: groups of aberrations for scoring (a two-column list after "e.g.:").
+  - id: Aberration groups
+    kind: paragraph
+    review: {image: ok, human: pending, fallback: none}
+    regions:
+      - book_page: 83
+        top: 415
+        bottom: 455
+        body_top: 415
+        header: none
+        columns: [110, 222]
+        key: [0]
+        join: text
+
+  # §16.2 p.126: sequence alignment for the 3′ rule. Shading (chr2 light, chrX dark), bold
+  # (reference sequence) and italic (alternative alignment) carry meaning and are lost.
+  - id: Alignment figure
+    kind: float
+    review: {image: ok, human: pending, fallback: none}
+    regions:
+      - book_page: 126
+        top: 512
+        bottom: 575
+        body_top: 512
+        header: none
+        columns: [110, 154, 198, 219]
+        key: [0]
+        join: text
+
+  # §13.4 p.112: fibre-FISH legend and diagram. The symbols before "=" (a bar, a row of dots,
+  # "xxxx") and the fibre line are drawn, not text; only the labels are kept, quoted verbatim.
+  - id: Fibre diagram
+    kind: figure
+    review: {image: ok, human: pending, fallback: none}
+    regions:
+      - book_page: 112
+        top: 565
+        bottom: 600
+        body_top: 565
+        header: none
+        columns: [110]
+        key: [0]
+        join: text
+      - book_page: 112
+        top: 648
+        bottom: 660
+        body_top: 648
+        header: none
+        columns: [110]
+        key: [0]
+        join: text
