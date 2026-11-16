@@ -4,7 +4,7 @@ Decisions made during planning (2026-11-16) and later `discussion` tasks. Each n
 
 ## Product & architecture
 - **Core library + desktop app.** All ISCN parsing/validation lives in a UI-free core library. A desktop app is the pilot UI. A web service is planned later (T-044) and reuses the same library.
-- **Tech stack:** not decided yet (T-020), deliberately postponed until scope and performance needs are clear. Script tooling language: T-001.
+- **Tech stack:** not decided yet (T-020), deliberately postponed until scope and performance needs are clear. Script tooling (extraction, KB build, bands): **Python 3.14 + uv** (T-001), independent of the app stack.
 
 ## Version-aware validation
 - ISCN 2016 in the pilot; 2020/2024 later (T-045/T-046). Editions are not backward compatible.
@@ -92,3 +92,12 @@ The KB is the single source for all validation decisions.
 
 ## Decision log
 _(entries added by `discussion` tasks: date — task — decision — rationale)_
+
+- **2026-11-16 — T-001 — Script tooling: Python 3.14, uv, pdfplumber, single `kb` CLI.**
+  - Language: Python 3.14 (`requires-python >=3.14`, `.python-version`).
+  - Environment: uv; `tools/pyproject.toml` + committed `tools/uv.lock`; `tools/.venv/` is local.
+  - Libraries: `pdfplumber` (PDF text with char-level font/position data), `ruamel.yaml` (round-trip YAML), `jsonschema` (draft 2020-12), stdlib `sqlite3` (FTS5) and `urllib` (UCSC download), `argparse` (CLI).
+  - Layout: a self-contained project in `tools/`, kept apart from the future app code at the repo root. The package `tools/src/cytolex_tools/` exposes the `kb` command with subcommands `extract` (T-002), `build` (T-005), `bands` (T-006). Tests are in `tools/tests/`. Run with `uv run --directory tools …`.
+  - Dev tools: pytest + ruff (lint + format).
+  - PDF path: `config/local.yaml` → `iscn_pdf.<version>`; env var `CYTOLEX_ISCN_PDF_<VERSION>` overrides it.
+  - Rationale: the strongest PDF extraction libraries (heading detection needs font data), FTS5 in the stdlib, mature YAML/JSON Schema with clear error paths, already installed on Windows. The scripts hand off to the app only through files (chunks, SQLite, JSON bundle, band YAML), so T-020 stays open. pdfplumber (MIT) was chosen over PyMuPDF (AGPL) to avoid licence questions; pdftotext has no font info.

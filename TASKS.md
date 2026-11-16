@@ -10,7 +10,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 
 | ID | Status | Pri | Depends | Title |
 |---|---|---|---|---|
-| T-001 | discussion | 1 | – | Choose language/tooling for build & extraction scripts |
+| T-001 | in_progress | 1 | – | Choose language/tooling for build & extraction scripts |
 | T-002 | todo | 1 | T-001 | Source-text extraction script (PDF → section chunks + manifest) |
 | T-003 | todo | 1 | T-002 | Review extraction quality; list sections affected by underlining/tables |
 | T-004 | todo | 1 | T-001 | KB JSON Schema (rules, quotes, vocabularies, ID & citation conventions) |
@@ -68,7 +68,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 ## Foundation
 
 ### T-001 — Choose language/tooling for build & extraction scripts
-**Status:** discussion
+**Status:** in_progress
 **Description:** Interview to pick the language and libraries for repo tooling: PDF extraction, KB schema validation and build, band-data generation. It doesn't have to match the app stack (T-020). Consider: PDF text libraries (`pdftotext` is available via mingw64), YAML + JSON Schema support, SQLite FTS5, Windows friendliness.
 **Acceptance:**
 - Decision recorded in `docs/decisions.md` (language, version, key libraries, how scripts are run).

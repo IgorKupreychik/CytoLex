@@ -1,0 +1,39 @@
+[project]
+name = "cytolex-tools"
+version = "0.1.0"
+description = "CytoLex repo tooling: ISCN source-text extraction, KB build, band data generation"
+requires-python = ">=3.14"
+dependencies = [
+    "pdfplumber",
+    "ruamel.yaml",
+    "jsonschema",
+]
+
+[project.scripts]
+kb = "cytolex_tools.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cytolex_tools"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["cytolex_tools"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

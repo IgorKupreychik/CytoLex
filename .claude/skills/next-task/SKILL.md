@@ -31,10 +31,12 @@ Works on one task from `TASKS.md` at the repo root. Arguments: `$ARGUMENTS` (opt
 1. On approval, set the task's status to `in_progress`, in **both** the Summary table and the task section.
 2. Do the work.
    - A `discussion` task records the decision (with a short rationale and the date) in `docs/decisions.md`, and updates `CLAUDE.md` if it changes how to work in the repo.
+   - Any task that changes commands, layout, setup or project status updates `CLAUDE.md` **and** `README.md` together.
 3. Check each acceptance criterion and report it as ✅ or ❌, with evidence (command output, file paths).
 4. New open questions or follow-up work: add them to `TASKS.md` as new tasks with the next free ID (`discussion` for decisions, `todo` for work), with Pri, Depends and a section. Mention them to the user.
 
 ## 4. Finish
+- List any commands the user must run now (e.g. `uv sync --directory tools`, `kb extract`, `kb bands`, `kb build`) and why; see README.md → "When to run what".
 - Ask the user to confirm the task is done. Only after they confirm:
   - Set status `done` in both places.
   - Write a short outcome in the task's **Notes**: what was produced, which files, and any deviations from the plan.

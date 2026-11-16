@@ -12,3 +12,9 @@ build/
 *.sqlite
 *.sqlite3
 *.db
+
+# Python tooling
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/

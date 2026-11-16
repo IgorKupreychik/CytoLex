@@ -10,7 +10,8 @@ CytoLex validates ISCN cytogenomic nomenclature strings (karyotype, FISH, microa
 Planned architecture: a UI-free core library, a desktop app (pilot UI), and later a web service reusing the library. The tech stack is **not chosen yet** (task T-020). Full decision record: `docs/decisions.md`.
 
 ## Status & workflow
-- The project is in its planning/foundation phase; no application code exists yet.
+- The project is in its planning/foundation phase. Repo tooling exists in `tools/`; no application code exists yet.
+- **`README.md` is the human-facing overview** (purpose, status, layout, setup, commands). Whenever you change `CLAUDE.md`'s Commands, layout or status, or add a new top-level folder, update `README.md` in the same change.
 - All work is tracked in `TASKS.md`: a summary table plus a section per task.
   - Statuses: `todo`, `in_progress`, `blocked`, `done`, `discussion`.
 - Use `/next-task` (or `/next-task T-xxx`) to work on tasks. It plans in plan mode, marks `done` only after user confirmation, and never commits (`.claude/skills/next-task/SKILL.md`).
@@ -18,7 +19,21 @@ Planned architecture: a UI-free core library, a desktop app (pilot UI), and late
 - New open questions become `discussion` tasks; decisions are logged in `docs/decisions.md`.
 
 ## Commands
-Not defined yet. Script tooling is decided in T-001; app build/test commands come in T-024. Update this section when they exist, including how to run a single test.
+Repo tooling is a **self-contained Python 3.14 project in `tools/`**, managed by **uv** (decision T-001). It's kept apart from the app code; app build/test commands come in T-024, so add them here then.
+- Layout: `tools/pyproject.toml`, `tools/uv.lock`, sources in `tools/src/cytolex_tools/`, tests in `tools/tests/`.
+- Run every command from the repo root with `--directory tools` (or `cd tools` and drop the flag). If `uv` isn't on PATH, use `py -m uv …`.
+  - Setup: `uv sync --directory tools`.
+  - KB CLI: `uv run --directory tools kb <extract|build|bands> [--version 2016]`, and `… kb <subcommand> --help`.
+  - Tests: `uv run --directory tools pytest`; single test: `uv run --directory tools pytest tests/test_cli.py::test_help_lists_subcommands`.
+  - Lint/format: `uv run --directory tools ruff check .` and `uv run --directory tools ruff format .`.
+- When to run each command: see `README.md` → "When to run what".
+- **Remind the user to run commands.** Whenever a change makes a command necessary, tell them explicitly which command to run and why, in the step where it becomes necessary and again in the task's final report. Examples:
+  - `uv sync --directory tools` after dependency changes;
+  - `kb extract` after a fresh clone, a new edition, or an extraction-script change;
+  - `kb bands` after band/exception changes;
+  - `kb build` after any KB edit, or before running the app.
+- The tools resolve repo paths (`config/`, `kb/`, `build/`) from the repo root, not the working directory.
+- ISCN PDF path: `config/local.yaml` (`iscn_pdf.<version>`), or env var `CYTOLEX_ISCN_PDF_2016` to override.
 
 ## Knowledge base (the source of truth for validation rules)
 | Path | Content | In git |
