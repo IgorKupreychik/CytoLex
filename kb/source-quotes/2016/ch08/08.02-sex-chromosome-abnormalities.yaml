@@ -1,0 +1,27 @@
+version: "2016"
+section: "8.2"
+quotes:
+  - rule: SEX.CONSTITUTIONAL_COMPLEMENT
+    cite: {section: "8.1", page: 54, para: "¶1"}
+    text: >-
+      The only exception to this rule is the convention to designate constitutional numerical sex
+      chromosome abnormalities by listing all sex chromosomes after the chromosome number, see
+      examples below.
+  - rule: SEX.CONSTITUTIONAL_COMPLEMENT
+    cite: {section: "8.2", page: 55, para: "¶2"}
+    text: >-
+      The constitutional sex chromosome complement is given without the use of plus or minus
+      signs.
+  - rule: SEX.ACQUIRED_GAIN_LOSS
+    cite: {section: "8.2", page: 55, para: "¶3"}
+    text: >-
+      Acquired sex chromosome abnormalities are expressed with plus and minus signs as follows:
+  - rule: KARYO.UNCERTAIN_CONSTITUTIONAL
+    cite: {section: "8.2", page: 56, example: E19}
+    text: >-
+      The question mark indicates that it is unclear if the extra X is constitutional or
+      acquired.
+  - rule: MAR.CONSTITUTIONAL_C_SPACE
+    cite: {section: "8.2", page: 56, example: E20}
+    text: >-
+      For constitutional markers, there is a space between mar and c.

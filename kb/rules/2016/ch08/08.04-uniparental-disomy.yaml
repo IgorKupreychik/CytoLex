@@ -1,0 +1,38 @@
+version: "2016"
+section: "8.4"
+rules:
+  - id: UPD.FORMAT
+    title: upd(n) followed by mat or pat
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      Uniparental disomy (upd: both homologues of a chromosome come from one parent) is written
+      upd with the chromosome in parentheses, followed directly by mat or pat for the parent of
+      origin (upd(15)mat). For a rearranged chromosome, upd is followed by a space and the
+      rearrangement designation (upd der(13;13)(q10;q10)pat).
+    cite:
+      - {section: "8.4", page: 57, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XY,upd(15)mat"
+          cite: {section: "8.4", page: 57, example: E1}
+        - text: "mos 47,XX,+21[23]/46,XX,upd(21)pat[7]"
+          cite: {section: "8.4", page: 57, example: E2}
+        - text: "45,XY,upd der(13;13)(q10;q10)pat"
+          cite: {section: "8.4", page: 57, example: E3}
+      invalid:
+        - text: "46,XY,upd15mat"
+          why: The chromosome is enclosed in parentheses after upd.
+          corrected: "46,XY,upd(15)mat"
+        - text: "46,XY,upd(15),mat"
+          why: mat belongs to the upd designation and follows it directly, without a comma.
+          corrected: "46,XY,upd(15)mat"
+    fix: {level: 1, kind: replace, hint: "Write upd(n) followed directly by mat or pat."}
+    review:
+      paraphrase_checked: true
+      needs_review: true
+      note: >-
+        ¶1 only defines upd; the format is read from E1–E3 (microarray form: ch. 14). Every
+        example gives mat or pat, but the text does not say it is required; whether upd(n)
+        without a parent of origin is valid is left to T-022.
+    related: [KARYO.PARENTAL_ORIGIN]

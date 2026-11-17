@@ -1,0 +1,101 @@
+version: "2016"
+section: "8.1"
+rules:
+  - id: NUM.PLOIDY_REFERENCE
+    title: Numerical changes relative to the ploidy level of the count
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      Gains and losses are stated relative to the ploidy level that the chromosome count falls
+      in: up to 34 chromosomes (near-haploid) relative to 23, 35–57 (near-diploid) relative to
+      46, 58–80 (near-triploid) relative to 69, 81–103 (near-tetraploid) relative to 92, and so
+      on for higher levels (Section 11.2).
+    cite:
+      - {section: "8.1", page: 54, para: "¶2"}
+    examples:
+      valid:
+        - text: "26,X,+4,+6,+21"
+          cite: {section: "8.1", page: 54, example: E1}
+        - text: "71,XXX,+8,+10"
+          cite: {section: "8.1", page: 54, example: E2}
+        - text: "89,XXYY,–1,–3,–5,+8,–21"
+          cite: {section: "8.1", page: 54, example: E3}
+      invalid:
+        - text: "71,XX,+X,+1,+2,+3,+4,+5,+6,+7,+8,+8,+9,+10,+10,+11,+12,+13,+14,+15,+16,+17,+18,+19,+20,+21,+22"
+          why: >-
+            A count of 71 is near-triploid, so the changes are stated relative to 69, not to 46
+            (listing every gained chromosome against the diploid level).
+          corrected: "71,XXX,+8,+10"
+    fix: {level: 3, hint: "Restate the gains and losses relative to the ploidy level of the count, or give the chosen level in angle brackets (<2n>)."}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [KARYO.PLOIDY_RELATIVE, NUM.PLOIDY_IN_ANGLE_BRACKETS, NUM.COUNT_MATCHES_CHANGES]
+
+  - id: NUM.PLOIDY_IN_ANGLE_BRACKETS
+    title: A chosen reference ploidy goes in angle brackets after the count
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      The investigator may describe a karyotype relative to another ploidy level when that is
+      convenient and biologically meaningful. The chosen level (n, 2n, 3n, 4n, …) is then written
+      in angle brackets directly after the chromosome count or count range, before the comma.
+    cite:
+      - {section: "8.1", page: 54, para: "¶3"}
+    examples:
+      valid:
+        - text: "76~102<4n>,XXXX,…"
+          cite: {section: "8.1", page: 54, example: E5}
+          note: Partial string as printed; … stands for the omitted abnormalities.
+        - text: "58<2n>,XY,+X,+4,+6,+8,+10,+11,+14,+14,+17,+18,+21,+21[10]"
+          cite: {section: "8.1", page: 54, example: E6}
+      invalid:
+        - text: "58,<2n>,XY,+X,+4,+6,+8,+10,+11,+14,+14,+17,+18,+21,+21[10]"
+          why: The ploidy level follows the chromosome count directly, before the comma.
+          corrected: "58<2n>,XY,+X,+4,+6,+8,+10,+11,+14,+14,+17,+18,+21,+21[10]"
+        - text: "58(2n),XY,+X,+4,+6,+8,+10,+11,+14,+14,+17,+18,+21,+21[10]"
+          why: The ploidy level is enclosed in angle brackets, not parentheses.
+          corrected: "58<2n>,XY,+X,+4,+6,+8,+10,+11,+14,+14,+17,+18,+21,+21[10]"
+    fix: {level: 1, kind: replace, hint: "Write the ploidy level as <Nn> directly after the chromosome count."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The ploidy symbols n, 2n, 3n, … are not in the ch. 3 symbol list; only the angle brackets
+        are (see SYM.LISTED_ONLY). Their position directly after the count is read from E5 and E6.
+    related: [NUM.PLOIDY_REFERENCE]
+
+  - id: NUM.COUNT_MATCHES_CHANGES
+    title: Chromosome count equals the reference level plus gains minus losses
+    applies_to: [karyotype]
+    severity: warning
+    statement: >-
+      The chromosome count agrees with the reference ploidy level (from the count range, or the
+      level given in angle brackets) plus the gained chromosomes minus the lost ones.
+    cite:
+      - {section: "8.1", page: 54, para: "¶2"}
+      - {section: "8.1", page: 54, para: "¶3"}
+    examples:
+      valid:
+        - text: "26,X,+4,+6,+21"
+          cite: {section: "8.1", page: 54, example: E1}
+          note: 23 + 3 = 26.
+        - text: "89,XXYY,–1,–3,–5,+8,–21"
+          cite: {section: "8.1", page: 54, example: E3}
+          note: 92 − 4 + 1 = 89.
+        - text: "58<2n>,XY,+X,+4,+6,+8,+10,+11,+14,+14,+17,+18,+21,+21[10]"
+          cite: {section: "8.1", page: 54, example: E6}
+          note: 46 + 12 = 58.
+      invalid:
+        - text: "48,XX,+21"
+          why: 46 + 1 gained chromosome gives 47, not 48.
+          corrected: "47,XX,+21"
+    fix: {level: 3, hint: Recount the gains and losses against the reference ploidy level and correct the count or the changes.}
+    review:
+      paraphrase_checked: true
+      needs_review: true
+      note: >-
+        Inference: the book never states the arithmetic; every ch. 8 example obeys it. Open points
+        for T-022/T-030: structural rearrangements change the count without a sign (rob, dic,
+        fis, …); the sex chromosome field lists the remaining chromosomes after a loss
+        (45,X,–X) but the constitutional ones before a gain (47,XX,+X), see SEX.ACQUIRED_GAIN_LOSS;
+        count ranges (~) and inc karyotypes cannot be checked exactly.
+    related: [NUM.PLOIDY_REFERENCE, SEX.ACQUIRED_GAIN_LOSS]

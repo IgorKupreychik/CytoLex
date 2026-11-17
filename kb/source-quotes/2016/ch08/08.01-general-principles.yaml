@@ -1,0 +1,21 @@
+version: "2016"
+section: "8.1"
+quotes:
+  - rule: NUM.PLOIDY_REFERENCE
+    cite: {section: "8.1", page: 54, para: "¶2"}
+    text: >-
+      All numerical changes are expressed in relation to the appropriate ploidy level (see
+      Section 11.2), i.e., in near-haploid cells (chromosome numbers up to 34) in relation to 23,
+      in near-diploid cells (chromosome numbers 35–57) in relation to 46, in near-triploid cells
+      (chromosome numbers 58–80) in relation to 69, in near-tetraploid cells (chromosome numbers
+      81– 103) in relation to 92, and so on.
+  - rule: NUM.PLOIDY_IN_ANGLE_BRACKETS
+    cite: {section: "8.1", page: 54, para: "¶3"}
+    text: >-
+      The investigator should select as the reference for the description of the karyotype what
+      is convenient and at the same time biologically meaningful. In such instances, the ploidy
+      level (n, 2n, 3n, etc.) should be given in angle brackets < > after the chromosome number.
+  - rule: NUM.COUNT_MATCHES_CHANGES
+    cite: {section: "8.1", page: 54, para: "¶2"}
+    text: >-
+      All numerical changes are expressed in relation to the appropriate ploidy level

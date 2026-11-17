@@ -1,0 +1,137 @@
+version: "2016"
+section: "8.2"
+rules:
+  - id: SEX.CONSTITUTIONAL_COMPLEMENT
+    title: Constitutional sex chromosome changes - list all sex chromosomes, no + or –
+    applies_to: [karyotype]
+    context: [constitutional]
+    severity: error
+    statement: >-
+      A constitutional numerical change of the sex chromosomes is shown by writing every sex
+      chromosome present after the chromosome count (45,X; 47,XXY), without plus or minus signs.
+      This is the one exception to marking gains and losses with + and –.
+    cite:
+      - {section: "8.1", page: 54, para: "¶1"}
+      - {section: "8.2", page: 55, para: "¶1"}
+      - {section: "8.2", page: 55, para: "¶2"}
+    examples:
+      valid:
+        - text: "45,X"
+          cite: {section: "8.2", page: 55, example: E1}
+        - text: "47,XXY"
+          cite: {section: "8.2", page: 55, example: E2}
+        - text: "47,XXX"
+          cite: {section: "8.2", page: 55, example: E3}
+        - text: "47,XYY"
+          cite: {section: "8.2", page: 55, example: E4}
+        - text: "48,XXXY"
+          cite: {section: "8.2", page: 55, example: E5}
+        - text: "mos 47,XXY[10]/46,XY[20]"
+          cite: {section: "8.2", page: 55, example: E6}
+        - text: "mos 45,X[25]/47,XXX[12]/46,XX[13]"
+          cite: {section: "8.2", page: 55, example: E7}
+        - text: "mos 47,XXX[25]/45,X[12]/46,XX[13]"
+          cite: {section: "8.2", page: 55, example: E8}
+      invalid:
+        - text: "47,XY,+X"
+          why: A constitutional extra X is written in the sex chromosome complement, not with a plus sign.
+          corrected: "47,XXY"
+        - text: "45,X,–X"
+          why: Constitutional monosomy X is written 45,X, without a minus sign (45,X,–X is the acquired form).
+          corrected: "45,X"
+    fix: {level: 1, kind: replace, hint: Move the gained or lost sex chromosome into the sex chromosome complement and drop the sign.}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The rule only applies when the string is known to be constitutional; the same strings are
+        valid acquired changes (SEX.ACQUIRED_GAIN_LOSS).
+    related: [SEX.ACQUIRED_GAIN_LOSS, KARYO.GAIN_LOSS_SIGN, KARYO.COUNT_SEX_ORDER]
+
+  - id: SEX.ACQUIRED_GAIN_LOSS
+    title: Acquired sex chromosome changes with + and –
+    applies_to: [karyotype]
+    context: [neoplastic]
+    severity: error
+    statement: >-
+      Acquired gains and losses of sex chromosomes are shown with plus and minus signs, like
+      other numerical changes (47,XX,+X; 45,X,–Y).
+    cite:
+      - {section: "8.2", page: 55, para: "¶3"}
+    examples:
+      valid:
+        - text: "47,XX,+X"
+          cite: {section: "8.2", page: 55, example: E9}
+        - text: "45,X,–X"
+          cite: {section: "8.2", page: 55, example: E10}
+        - text: "45,X,–Y"
+          cite: {section: "8.2", page: 55, example: E11}
+        - text: "45,Y,–X"
+          cite: {section: "8.2", page: 55, example: E12}
+        - text: "48,XY,+X,+Y"
+          cite: {section: "8.2", page: 55, example: E13}
+      invalid:
+        - text: "47,XXX"
+          why: >-
+            In a tumor karyotype of a female, an acquired extra X is shown with a plus sign; 47,XXX
+            would mean a constitutional trisomy X.
+          corrected: "47,XX,+X"
+    fix: {level: 1, kind: replace, hint: Write the constitutional sex chromosomes and add the acquired change with + or –.}
+    review:
+      paraphrase_checked: true
+      needs_review: true
+      note: >-
+        Read from the examples, not stated: after a loss the sex chromosome field lists the
+        chromosomes that remain (45,X,–X in a female; 45,Y,–X in a male), but with a gain it lists
+        the constitutional ones (47,XX,+X). This matters for NUM.COUNT_MATCHES_CHANGES (T-030).
+        The invalid example needs the context to be known (T-022).
+    related: [SEX.CONSTITUTIONAL_COMPLEMENT, NUM.COUNT_MATCHES_CHANGES, ORDER.X_BEFORE_Y]
+
+  - id: KARYO.UNCERTAIN_CONSTITUTIONAL
+    title: "?c when it is unclear whether an abnormality is constitutional"
+    applies_to: [karyotype]
+    context: [neoplastic]
+    severity: info
+    statement: >-
+      When it is unclear whether an abnormality is constitutional or acquired, a question mark is
+      written before the c (47,XXX?c).
+    cite:
+      - {section: "8.2", page: 56, example: E19}
+    examples:
+      valid:
+        - text: "47,XXX?c"
+          cite: {section: "8.2", page: 56, example: E19}
+      invalid:
+        - text: "47,XXXc?"
+          why: The question mark comes before the c.
+          corrected: "47,XXX?c"
+    fix: {level: 1, kind: reorder, hint: Put the question mark directly before c.}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: Stated only in the caption of E19, not in the prose.
+    related: [KARYO.CONSTITUTIONAL_C, UNCERTAIN.QUESTIONABLE_ITEM]
+
+  - id: MAR.CONSTITUTIONAL_C_SPACE
+    title: Space between mar and c
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      For a constitutional marker chromosome, a space separates mar from the c that marks it as
+      constitutional (+mar c), unlike other designations, where c follows directly.
+    cite:
+      - {section: "8.2", page: 56, example: E20}
+    examples:
+      valid:
+        - text: "48,XXY,+mar c"
+          cite: {section: "8.2", page: 56, example: E20}
+      invalid:
+        - text: "48,XXY,+marc"
+          why: A space is required between mar and c.
+          corrected: "48,XXY,+mar c"
+    fix: {level: 1, kind: insert, hint: Insert a space between mar and c.}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: Stated only in the caption of E20, not in the prose.
+    related: [KARYO.CONSTITUTIONAL_C, SYM.SPACE_BETWEEN_SYMBOLS]

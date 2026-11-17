@@ -37,6 +37,16 @@ quotes:
       A plus (+) or minus (–) sign is placed before a chromosome or an abnormality designation to
       indicate additional or missing, normal or abnormal chromosomes, e.g., +21, –7, +der(2); for
       details, see Section 8.1.
+  - rule: KARYO.GAIN_LOSS_SIGN
+    cite: {section: "8.1", page: 54, para: "¶1"}
+    text: >-
+      A plus (+) or minus (–) sign is placed before a chromosome to indicate gain or loss of that
+      particular chromosome.
+  - rule: KARYO.GAIN_LOSS_SIGN
+    cite: {section: "8.3", page: 56, para: "¶1"}
+    text: >-
+      Constitutional and acquired gains or losses of chromosomes are indicated with plus or minus
+      signs.
   - rule: KARYO.NO_ARM_LENGTH_SIGN
     cite: {section: "4.1", page: 38, para: "¶5"}
     text: >-
@@ -139,6 +149,18 @@ quotes:
       When an acquired chromosome abnormality is found in an individual with a constitutional
       chromosome anomaly, the latter is indicated by the letter c immediately after the
       constitutional abnormality designation (see Sections 8.3 and 11.3).
+  - rule: KARYO.CONSTITUTIONAL_C
+    cite: {section: "8.2", page: 56, para: "¶4"}
+    text: >-
+      Acquired chromosome abnormalities in individuals with a constitutional sex chromosome
+      anomaly can be distinguished with the use of the letter c after the constitutional
+      abnormality designation, as illustrated in more detail in Section 11.3.
+  - rule: KARYO.CONSTITUTIONAL_C
+    cite: {section: "8.3", page: 56, para: "¶2"}
+    text: >-
+      Acquired autosomal abnormalities in individuals with a constitutional anomaly are, as
+      exemplified above for sex chromosome abnormalities, distinguished by the letter c (see
+      Section 11.3) after the constitutional abnormality designation.
   - rule: KARYO.ABBREVIATED_FORM
     cite: {section: "4.1", page: 40, para: "¶15"}
     text: >-

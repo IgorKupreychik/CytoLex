@@ -20,7 +20,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-008 | done | 1 | T-003, T-005 | KB: ch. 2–3 (band nomenclature, symbols & abbreviated terms) |
 | T-009 | done | 1 | T-008 | KB: ch. 4 (karyotype designation, short/detailed systems, derivatives) |
 | T-010 | done | 1 | T-008 | KB: ch. 5–7 (uncertainty, order of abnormalities, variable features) |
-| T-011 | todo | 1 | T-008 | KB: ch. 8 (numerical abnormalities) |
+| T-011 | done | 1 | T-008 | KB: ch. 8 (numerical abnormalities) |
 | T-012 | todo | 1 | T-008 | KB: ch. 9.1–9.2.10 (structural, part 1) |
 | T-013 | todo | 1 | T-008 | KB: ch. 9.2.11–9.3 (structural, part 2 incl. translocations) |
 | T-014 | todo | 2 | T-013 | KB: ch. 11 (neoplasia) |
@@ -182,10 +182,11 @@ All KB tasks share these steps and criteria:
 **Outcome (2026-11-17):** Table 1 (p.12, 2 parts, 14 rows + footnotes) signed off before planning. 19 rules + quotes in `kb/rules/2016/ch05–ch07/` and `kb/source-quotes/2016/ch05–ch07/` (9 section files), new prefixes `UNCERTAIN` (?, ~, or, inc), `ORDER` (§6), `VAR` (§7.1), `FRA` (§7.2); all paraphrases approved by the user. Every example block and inline example list in §5.1–7.2 is a valid example; `kb build` passes (82 rules, 113 quotes). Table 1 (decided with the user) is one info rule, `VAR.POPULATION_INVERSIONS`, holding its 7 inversion variants, not a vocabulary. Changes to earlier rules: `BREAK.ALTERNATIVE_BANDS` lost its invalid `1q21 or q24` (§5.3 E1 `add(19)(p13 or q13)` is valid; re-approved); `KARYO.ABNORMALITY_ORDER` cites §6 ¶1 + E2; `DER.ABERRATION_ORDER` gains §6 E8; `KARYO.NO_ARM_LENGTH_SIGN` cites §5.1 E7; `SYM.LISTED_ONLY` notes ch. 5–7 checked. `needs_review`: `ORDER.SHORTEST_STRING_PREFERRED` (T-022, note added there) and `FRA.HOMOLOGUE_UNDERLINING` (T-042). Book fragments with `…` kept as printed (T-025 must treat them as fragments). Notes added to T-012 and T-022; decision entry in `docs/decisions.md`.
 
 ### T-011 — KB: ch. 8 (numerical abnormalities)
-**Status:** todo
+**Status:** done
 **Description:** General principles, sex chromosome and autosomal abnormalities, UPD.
 **Acceptance:** Shared KB criteria.
 **Notes:**
+**Outcome (2026-11-17):** No sign-off needed. 8 new rules + quotes in `kb/rules/2016/ch08/` and `kb/source-quotes/2016/ch08/` (§8.1, §8.2, §8.4), new prefixes `NUM` (PLOIDY_REFERENCE, PLOIDY_IN_ANGLE_BRACKETS, COUNT_MATCHES_CHANGES), `SEX` (CONSTITUTIONAL_COMPLEMENT, ACQUIRED_GAIN_LOSS), `UPD.FORMAT`, `MAR.CONSTITUTIONAL_C_SPACE`, plus `KARYO.UNCERTAIN_CONSTITUTIONAL` (`?c`); all paraphrases approved by the user. All 35 ch. 8 example blocks are valid examples; `kb build` passes (90 rules, 126 quotes). Deviation: §8.3 has no rule file. Its content is already in ch. 4, so `KARYO.GAIN_LOSS_SIGN` (§8.1 ¶1, §8.3 ¶1, E1–E4) and `KARYO.CONSTITUTIONAL_C` (§8.2 ¶4, §8.3 ¶2, 7 examples; statement extended with the `mar c` exception and re-approved) were extended instead; `KARYO.CLONE_ORDER_CONSTITUTIONAL` gains §8.1 E4 and §8.4 E2. `needs_review`: `NUM.COUNT_MATCHES_CHANGES` (an inference, recorded as the user decided), `SEX.ACQUIRED_GAIN_LOSS` and `UPD.FORMAT`; notes added to T-022 and T-030. `SYM.LISTED_ONLY` notes that the ploidy symbols `n`/`2n`/`4n` are not listed. Decision entry in `docs/decisions.md`.
 
 ### T-012 — KB: ch. 9.1–9.2.10 (structural, part 1)
 **Status:** todo
@@ -258,7 +259,7 @@ All KB tasks share these steps and criteria:
 - How book-ambiguous rules are reported.
 - What "valid" means when there are only warnings.
 **Acceptance:** Policy in `docs/decisions.md`.
-**Notes:** From T-007: include the severity for band names that exist in the genome assemblies but not in the book's idiograms (`book: false` in band data, e.g. 9q34.12 in a karyotype string). From T-009: severities in the ch. 4 rules are provisional ("always/is/must/should not" → error, descriptive → info); decide `KARYO.ABBREVIATED_FORM` (abbreviations such as `46,XX,der(5)mat` and copies without breakpoints are only valid after an earlier full form, which a single string can't show) and `REC.KNOWN_PARENTAL_REARRANGEMENT` (warn on `rec` without mat/pat/inh?), both `needs_review`. From T-010: `ORDER.SHORTEST_STRING_PREFERRED` (§6 E6 note: `+inv(3)(…)` preferred over `+3,inv(3)(…)`; info hint or nothing?), `needs_review`.
+**Notes:** From T-007: include the severity for band names that exist in the genome assemblies but not in the book's idiograms (`book: false` in band data, e.g. 9q34.12 in a karyotype string). From T-009: severities in the ch. 4 rules are provisional ("always/is/must/should not" → error, descriptive → info); decide `KARYO.ABBREVIATED_FORM` (abbreviations such as `46,XX,der(5)mat` and copies without breakpoints are only valid after an earlier full form, which a single string can't show) and `REC.KNOWN_PARENTAL_REARRANGEMENT` (warn on `rec` without mat/pat/inh?), both `needs_review`. From T-010: `ORDER.SHORTEST_STRING_PREFERRED` (§6 E6 note: `+inv(3)(…)` preferred over `+3,inv(3)(…)`; info hint or nothing?), `needs_review`. From T-011: `UPD.FORMAT` (is `upd(n)` without `mat`/`pat` valid? every book example has one), `SEX.ACQUIRED_GAIN_LOSS` / `SEX.CONSTITUTIONAL_COMPLEMENT` (the same string, e.g. `47,XXX` or `45,X,–X`, is valid in one context and not the other: how to report when the context is unknown), severity of `NUM.COUNT_MATCHES_CHANGES` (provisional warning), all `needs_review` where noted.
 
 ### T-053 — Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`?
 **Status:** discussion
@@ -339,7 +340,7 @@ All KB tasks share these steps and criteria:
 **Status:** todo
 **Description:** Chromosome count consistency, sex chromosome notation, order of abnormalities.
 **Acceptance:** Related KB examples pass.
-**Notes:**
+**Notes:** From T-011: the count check is `NUM.COUNT_MATCHES_CHANGES` (count = reference ploidy level from the count range or `<Nn>` + gains − losses; an inference, `needs_review`). It must handle structural changes that alter the count without a sign (rob, dic, fis, …), count ranges (`~`) and `inc`, and the sex-field convention in `SEX.ACQUIRED_GAIN_LOSS` (after a loss the field lists the remaining sex chromosomes, `45,X,–X`; with a gain the constitutional ones, `47,XX,+X`). Ploidy ranges: `NUM.PLOIDY_REFERENCE` (§8.1 ¶2) and the §11.2 Ploidy table.
 
 ### T-031 — Rules: structural rearrangements
 **Status:** todo

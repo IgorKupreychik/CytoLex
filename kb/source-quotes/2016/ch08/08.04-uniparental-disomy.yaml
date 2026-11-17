@@ -1,0 +1,8 @@
+version: "2016"
+section: "8.4"
+quotes:
+  - rule: UPD.FORMAT
+    cite: {section: "8.4", page: 57, para: "¶1"}
+    text: >-
+      Uniparental disomy, abbreviated upd, a condition in which both homologous chromosomes are
+      derived from one parent, may in certain circumstances be identified cytogenetically.

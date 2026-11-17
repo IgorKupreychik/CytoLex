@@ -28,7 +28,10 @@ rules:
         Reading the list as closed is an inference from "All symbols … are listed below". Later
         chapters may use terms that are not in the list; check this while writing T-009 to T-019.
         Checked so far: ch. 4 (T-009) and ch. 5–7 (T-010), where every symbol used is listed
-        (ch. 7 strings such as 13cenh+ or 14pstk+ are concatenations of listed symbols).
+        (ch. 7 strings such as 13cenh+ or 14pstk+ are concatenations of listed symbols), and ch. 8
+        (T-011): the ploidy levels n, 2n, 3n, 4n inside angle brackets (§8.1 ¶3, 58<2n>) are not
+        listed; only the angle brackets are. §8.1 defines them, so the list is not strictly
+        closed (see NUM.PLOIDY_IN_ANGLE_BRACKETS).
 
   - id: SYM.SPACE_BETWEEN_SYMBOLS
     title: Space between combined symbols
