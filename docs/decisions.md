@@ -4,7 +4,7 @@ Decisions made during planning (2026-11-16) and later `discussion` tasks. Each n
 
 ## Product & architecture
 - **Core library + desktop app.** All ISCN parsing/validation lives in a UI-free core library. A desktop app is the pilot UI. A web service is planned later (T-044) and reuses the same library.
-- **Tech stack:** not decided yet (T-020), deliberately postponed until scope and performance needs are clear. Script tooling (extraction, KB build, bands): **Python 3.14 + uv** (T-001), independent of the app stack.
+- **App tech stack (T-020):** C# on **.NET 10 LTS**. Core library: a hand-written lexer and recursive-descent parser. Desktop app: **Avalonia + AvaloniaEdit** with CommunityToolkit.Mvvm. Tests: **xUnit v3**. Web service later: ASP.NET Core. Script tooling (extraction, KB build, bands): **Python 3.14 + uv** (T-001), independent of the app stack.
 
 ## Version-aware validation
 - ISCN 2016 in the pilot; 2020/2024 later (T-045/T-046). Editions are not backward compatible.
@@ -206,3 +206,15 @@ _(entries added by `discussion` tasks: date — task — decision — rationale)
   - **Inferred invalid examples** (stated as such in `review.note`): `rob(9;22)` (rob is for acrocentrics only), `der(1)t(1;3)(p10;q10)` for a whole-arm derivative, `t(1;3)(p11.1;q11.1)` for a whole-arm translocation, `del(6)(q13q23)×3` where only two copies can replace normal homologues (§9.3 E3 caption).
   - **Printed forms:** multi-line detailed forms in §9.2.17.1 (E5–E12) are joined without spaces; partial strings with `…` (§9.2.12 E7–E9, §9.2.15 E10–E11) are kept as printed; inline forms from the §9.2.13 E1 explanation are valid examples.
   - **Deferred:** `TRANSLOC.HOMOLOGUE_UNDERLINING` is `needs_review` (T-042). Severities: `MAR.NO_SIZE_MORPHOLOGY` warning ("discouraged"), `NEO.FORMAT` info, context-only `ROB.NOT_ACQUIRED`/`TRANSLOC.JUMPING` (T-022). Every symbol used in §9.2.11–9.3 is listed in ch. 3 (`acro`, in the discouraged "acro mar", is not).
+
+- **2026-11-17 — T-020 — App stack: C#/.NET 10, hand-written parser, Avalonia + AvaloniaEdit, CommunityToolkit.Mvvm, xUnit v3.**
+  - **Core library:** C# in a UI-free .NET class library. Rationale: the user's preferred language. It is typed and fast (batches), native on Windows, and reused unchanged by ASP.NET Core; browser-side checking stays possible later via Blazor WASM.
+  - **Target:** .NET 10 LTS (C# 14), supported until Nov 2028; retarget to the next LTS (.NET 12) when it ships. .NET 11 (STS, shorter support) was rejected.
+  - **Parser:** a hand-written lexer plus a recursive-descent parser, with no parser library. Rationale: full control over error recovery (report every problem, not just the first), character spans and messages, so each recovery decision can be traced to a KB rule. Rejected: ANTLR4 (generic recovery and messages, awkward for ISCN's context-sensitive segments, Java build dependency); Superpower/Pidgin combinators (they stop at the first failure).
+  - **Desktop app:** Avalonia + AvaloniaEdit. Rationale: XAML/MVVM in the WPF style and cross-platform (Windows now, macOS/Linux possible later); AvaloniaEdit's text decorations cover the planned highlighting (underlined ranges, insertion marker with grey expected text, strikethrough). Rejected: WPF (Windows only), Blazor Hybrid (WebView2 dependency, mixes web and .NET UI skills), WinUI 3 (younger, no AvalonEdit equivalent).
+  - **MVVM:** CommunityToolkit.Mvvm (source generators, lightweight). ReactiveUI was rejected for its steeper learning curve.
+  - **Tests:** xUnit v3. `[Theory]` + `MemberData` gives one named test case per KB example (T-025); `dotnet test --filter` runs a single test. NUnit and MSTest are equivalent but less common.
+  - **Web service (T-044):** ASP.NET Core (minimal API) over the same core library. This was not asked; it is the default for the stack.
+  - **KB at runtime:** the app reads the `kb build` output (`build/kb.json` via `System.Text.Json`; `build/kb.sqlite` via `Microsoft.Data.Sqlite` where FTS5 search is needed, e.g. in the rule browser). The Python tooling and the app still exchange only files (T-001). How the bundle is located or embedded is decided in T-023.
+  - **Other languages considered:** TypeScript (best for in-browser checking, but the user prefers C#), Python (would share the tooling language, but slower batches and awkward desktop packaging), Rust (fastest, but a steep learning curve and slower rule iteration).
+  - **Proposed layout for T-024:** app code at the repo root, apart from `tools/`: `CytoLex.slnx`, `src/CytoLex.Core/`, `src/CytoLex.Desktop/`, `tests/CytoLex.Core.Tests/`, shared settings in `Directory.Build.props`, and `global.json` pinning the .NET 10 SDK.

@@ -13,7 +13,7 @@ CytoLex validates **ISCN cytogenomic nomenclature** strings: karyotypes, FISH (`
 - **Desktop app:** the pilot UI. Single-string check, batch validation, rule browser, fix view.
 - **Web service:** later, reusing the core library.
 
-The app tech stack is not chosen yet (T-020). All decisions and their rationale are in [`docs/decisions.md`](docs/decisions.md).
+The app stack is C# on .NET 10 LTS: a core library with a hand-written parser, an Avalonia + AvaloniaEdit desktop app, xUnit v3 tests, and ASP.NET Core for the web service later (decision T-020). The projects aren't scaffolded yet (T-024). All decisions and their rationale are in [`docs/decisions.md`](docs/decisions.md).
 
 ## Repository layout
 | Path | Content |

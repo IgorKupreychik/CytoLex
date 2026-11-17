@@ -7,7 +7,7 @@ CytoLex validates ISCN cytogenomic nomenclature strings (karyotype, FISH, microa
 - Results are given per ISCN edition (2016 now; 2020/2024 later — editions are not backward compatible).
 - Every diagnostic cites the book (`ISCN 2016 §9.2.17.1, p.75, ¶1`).
 
-Planned architecture: a UI-free core library, a desktop app (pilot UI), and later a web service reusing the library. The tech stack is **not chosen yet** (task T-020). Full decision record: `docs/decisions.md`.
+Planned architecture: a UI-free core library, a desktop app (pilot UI), and later a web service reusing the library. App stack (T-020): **C# / .NET 10 LTS**. The core library uses a hand-written recursive-descent parser; the desktop app uses **Avalonia + AvaloniaEdit** with CommunityToolkit.Mvvm; tests use **xUnit v3**; the web service will use ASP.NET Core. The projects aren't scaffolded yet (T-024). Full decision record: `docs/decisions.md`.
 
 ## Status & workflow
 - The project is in its planning/foundation phase. Repo tooling exists in `tools/` (`kb extract`, `kb tables`, `kb check`, `kb build`, `kb bands` and `kb ideograms` are implemented); no application code exists yet.

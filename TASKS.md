@@ -29,7 +29,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-017 | todo | 2 | T-013 | KB: ch. 14 (microarray) |
 | T-018 | todo | 3 | T-013 | KB: ch. 10 & 12 (breakage, meiotic) |
 | T-019 | todo | 3 | T-017 | KB: ch. 15 & 16 (RSA, sequence-based) |
-| T-020 | discussion | 1 | T-013 | Tech stack for core library + desktop app |
+| T-020 | done | 1 | T-013 | Tech stack for core library + desktop app |
 | T-021 | discussion | 1 | T-013 | Pilot validator scope (notation types implemented in the pilot) |
 | T-022 | discussion | 1 | T-013 | Strictness & severity policy |
 | T-023 | todo | 1 | T-020, T-021, T-022 | Core design: data model, version profiles, result/diagnostic API, fix model |
@@ -241,12 +241,12 @@ All KB tasks share these steps and criteria:
 ## Decisions before code
 
 ### T-020 — Tech stack for core library + desktop app
-**Status:** discussion
+**Status:** done
 **Description:** Interview to choose the language/framework for the core library and desktop app.
 - Inputs: an error-recovering parser with spans; desktop now and web service later; loading the KB bundle at runtime; batch performance; Windows environment.
 - Postponed during initial planning until scope was clear.
 **Acceptance:** Decision and rationale in `docs/decisions.md`.
-**Notes:**
+**Notes:** Decided C#/.NET 10 LTS core library with a hand-written lexer + recursive-descent parser; Avalonia + AvaloniaEdit desktop with CommunityToolkit.Mvvm; xUnit v3; ASP.NET Core for the later web service (default, not asked). Recorded in `docs/decisions.md` (Product & architecture + 2026-11-17 log entry with rejected alternatives and the proposed T-024 layout); `CLAUDE.md`/`README.md` status updated; note added to T-024. No deviations from the plan.
 
 ### T-021 — Pilot validator scope
 **Status:** discussion
@@ -306,7 +306,7 @@ All KB tasks share these steps and criteria:
 **Status:** todo
 **Description:** Create the solution/packages for the core library, desktop app and tests, using the T-020 stack. Build/test/lint commands work from the command line.
 **Acceptance:** Build and an empty test run succeed; `CLAUDE.md` lists the exact commands, including how to run a single test.
-**Notes:**
+**Notes:** Stack from T-020: .NET 10 SDK (pin it in `global.json`), xUnit v3, Avalonia + AvaloniaEdit, CommunityToolkit.Mvvm. Proposed layout (the decision log, T-020 entry): `CytoLex.slnx`, `src/CytoLex.Core/`, `src/CytoLex.Desktop/`, `tests/CytoLex.Core.Tests/`, `Directory.Build.props`. Update `README.md` with `CLAUDE.md` (new top-level folders and commands).
 
 ### T-025 — KB-example test harness
 **Status:** todo
