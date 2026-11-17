@@ -13,6 +13,7 @@ rules:
       identified is a marker chromosome (mar, section 9.2.12), not a derivative.
     cite:
       - {section: "4.4", page: 44, para: "¶1"}
+      - {section: "9.2.3", page: 60, para: "¶1"}
     examples:
       valid: []
     review:
@@ -33,6 +34,8 @@ rules:
     cite:
       - {section: "4.4", page: 44, para: "¶2"}
       - {section: "4.4", page: 45, para: "¶3"}
+      - {section: "9.2.3", page: 60, para: "¶1"}
+      - {section: "9.2.3", page: 61, para: "¶5"}
     examples:
       valid:
         - text: "46,XX,der(5)t(2;5)(q21;q31)mat"
@@ -46,6 +49,19 @@ rules:
         - text: "46,XX,t(2;5)(q21;q31)"
           cite: {section: "4.4", page: 45, para: "¶3"}
           note: The balanced parental translocation whose derivatives are der(2) and der(5).
+        - text: "46,Y,der(X)t(X;8)(p22.3;q24.1)"
+          cite: {section: "9.2.3", page: 61, example: E9}
+        - text: "46,XX,der(1)t(1;3)(p22;q13.1)"
+          cite: {section: "9.2.3", page: 61, example: E10}
+        - text: "46,XX,der(1)(3qter→3q13.1::1p22→1qter)"
+          cite: {section: "9.2.3", page: 61, example: E10}
+        - text: "45,XY,der(1)t(1;3)(p22;q13.1),–3"
+          cite: {section: "9.2.3", page: 62, example: E11}
+        - text: "47,XY,+mos der(8)r(1;8;17)(p36.3p35;p12q13;q25q25)"
+          cite: {section: "9.2.3", page: 62, example: E17}
+          note: A ring of three chromosome segments; it is der(8) because it keeps the chromosome 8 centromere. Printed as +mos der(8).
+        - text: "47,XY,+mos der(8)r(1;8;17)(::1p36.3→1p35::8p12→8q13::17q25→17q25::)"
+          cite: {section: "9.2.3", page: 62, example: E17}
       invalid:
         - text: "46,XX,der(5)(2pter→2q21::5q31→5qter)"
           why: The chromosome contains the centromere of chromosome 2 (2pter→2q21), so it is der(2).
@@ -70,10 +86,13 @@ rules:
     cite:
       - {section: "4.4", page: 44, para: "¶2"}
       - {section: "4.3.2.2", page: 43, para: "¶1"}
+      - {section: "9.2.3", page: 62, para: "¶7"}
     examples:
       valid:
         - text: "der(1)t(1;3)(p32;q21)t(1;11)(q25;q13)"
           cite: {section: "4.4", page: 44, para: "¶2"}
+        - text: "46,XX,der(1)t(1;3)(p32;q21)t(1;11)(q25;q13)"
+          cite: {section: "9.2.3", page: 62, example: E12}
       invalid:
         - text: "46,XX,der(1)t(1;3)(p32;q21),t(1;11)(q25;q13)"
           why: The comma splits the derivative's second translocation off as a separate abnormality.
@@ -93,6 +112,7 @@ rules:
       - {section: "4.4", page: 44, para: "¶2"}
       - {section: "4.3.2.2", page: 43, para: "¶1"}
       - {section: "6", page: 50, example: E8}
+      - {section: "9.2.3", page: 62, para: "¶7"}
     examples:
       valid:
         - text: "der(1)t(1;3)(p32;q21)t(1;11)(q25;q13)"
@@ -100,6 +120,32 @@ rules:
         - text: "46,XX,der(8)ins(8;?)(p23;?)del(8)(q22)"
           cite: {section: "6", page: 50, example: E8}
           note: Distal p arm to distal q arm, not alphabetical (ORDER.HOMOLOGUES_ALPHABETICAL).
+        - text: "46,XX,der(1)t(1;3)(p32;q21)t(1;11)(q25;q13)"
+          cite: {section: "9.2.3", page: 62, example: E12}
+        - text: "46,XX,der(1)(3qter→3q21::1p32→1q25::11q13→11qter)"
+          cite: {section: "9.2.3", page: 62, example: E12}
+        - text: "46,XY,der(1)t(1;3)(p32;q21)t(3;7)(q28;q11.2)"
+          cite: {section: "9.2.3", page: 62, example: E13}
+          note: The second translocation joins 7q11.2qter onto the chromosome 3 segment, at its distal end.
+        - text: "46,XY,der(1)(7qter→7q11.2::3q28→3q21::1p32→1qter)"
+          cite: {section: "9.2.3", page: 62, example: E13}
+        - text: "46,XY,der(1)t(1;3)(p32;q21)dup(1)(q25q42)"
+          cite: {section: "9.2.3", page: 62, example: E14}
+        - text: "46,XY,der(1)(3qter→3q21::1p32→1q42::1q25→1qter)"
+          cite: {section: "9.2.3", page: 62, example: E14}
+        - text: "46,XY,der(9)del(9)(p12)t(9;13)(q34;q11)"
+          cite: {section: "9.2.3", page: 62, example: E15}
+        - text: "46,XY,der(9)(:9p12→9q34::13q11→13qter)"
+          cite: {section: "9.2.3", page: 62, example: E15}
+        - text: "46,XX,der(1)t(1;11)(p32;q13)t(1;3)(q25;q21)"
+          cite: {section: "9.2.3", page: 62, example: E16}
+          note: Listed by the 1p32 and 1q25 breakpoints, so t(1;11) comes before t(1;3).
+        - text: "46,XX,der(1)(11qter→11q13::1p32→1q25::3q21→3qter)"
+          cite: {section: "9.2.3", page: 62, example: E16}
+        - text: "46,XX,der(8)t(8;17)(p23;q21)inv(8)(p22q13)t(8;22)(q22;q12)"
+          cite: {section: "9.2.3", page: 63, example: E20}
+        - text: "46,XX,der(8)(22qter→22q12::8q22→8q13::8p22→8q13::8p22→8p23::17q21→17qter)"
+          cite: {section: "9.2.3", page: 63, example: E20}
       invalid:
         - text: "46,XX,der(1)t(1;11)(q25;q13)t(1;3)(p32;q21)"
           why: The 1p32 translocation is nearer pter than the 1q25 one and must be listed first.

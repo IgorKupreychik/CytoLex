@@ -56,5 +56,5 @@ rules:
     review:
       paraphrase_checked: true
       needs_review: false
-      note: Section 9.2.3 has further examples (der(?), T-012).
-    related: [UNCERTAIN.QUESTIONABLE_ITEM, BREAK.REGION_ONLY, KARYO.NO_ARM_LENGTH_SIGN]
+      note: der(?) for a derivative with an unknown centromere is DER.UNKNOWN_CENTROMERE (section 9.2.3).
+    related: [UNCERTAIN.QUESTIONABLE_ITEM, BREAK.REGION_ONLY, KARYO.NO_ARM_LENGTH_SIGN, DER.UNKNOWN_CENTROMERE]

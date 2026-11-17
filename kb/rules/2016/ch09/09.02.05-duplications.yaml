@@ -1,0 +1,39 @@
+version: "2016"
+section: "9.2.5"
+rules:
+  - id: DUP.FORMAT
+    title: dup - gain at the original site, orientation by band order
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      dup denotes a duplication: a gain of a chromosome segment at its original location (a gain
+      found elsewhere in the genome is written with der or ins). The orientation of the
+      duplicated segment is shown by the order of its two bands relative to the centromere
+      (dup(1)(q22q25) direct, dup(1)(q25q22) inverted); the short system uses no arrow.
+    cite:
+      - {section: "9.2.5", page: 67, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,dup(1)(q22q25)"
+          cite: {section: "9.2.5", page: 67, example: E1}
+        - text: "46,XX,dup(1)(pter→q25::q22→qter)"
+          cite: {section: "9.2.5", page: 67, example: E1}
+        - text: "46,XY,dup(1)(q25q22)"
+          cite: {section: "9.2.5", page: 67, example: E2}
+          note: Inverted duplication; only the detailed system shows where the duplicated segment lies.
+        - text: "46,XY,dup(1)(pter→q25::q25→q22::q25→qter)"
+          cite: {section: "9.2.5", page: 67, example: E2}
+        - text: "(pter→q22::q25→q22::q22→qter)"
+          cite: {section: "9.2.5", page: 67, example: E2}
+          note: Fragment - the alternative detailed form printed after "or" on the same line.
+      invalid:
+        - text: "46,XX,dup(1)(q22→q25)"
+          why: The short system uses no arrow; the band order alone gives the orientation.
+          corrected: "46,XX,dup(1)(q22q25)"
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Changed since ISCN 2013 (¶1 margin bar). Whether a gain is at its original location can't
+        be read from the string.
+    related: [STRUCT.PROXIMAL_BREAKPOINT_FIRST, INS.ORIENTATION]

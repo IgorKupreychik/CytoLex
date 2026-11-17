@@ -21,7 +21,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-009 | done | 1 | T-008 | KB: ch. 4 (karyotype designation, short/detailed systems, derivatives) |
 | T-010 | done | 1 | T-008 | KB: ch. 5–7 (uncertainty, order of abnormalities, variable features) |
 | T-011 | done | 1 | T-008 | KB: ch. 8 (numerical abnormalities) |
-| T-012 | todo | 1 | T-008 | KB: ch. 9.1–9.2.10 (structural, part 1) |
+| T-012 | done | 1 | T-008 | KB: ch. 9.1–9.2.10 (structural, part 1) |
 | T-013 | todo | 1 | T-008 | KB: ch. 9.2.11–9.3 (structural, part 2 incl. translocations) |
 | T-014 | todo | 2 | T-013 | KB: ch. 11 (neoplasia) |
 | T-015 | todo | 2 | T-013 | KB: ch. 13.1–13.2 (metaphase ish) |
@@ -189,16 +189,17 @@ All KB tasks share these steps and criteria:
 **Outcome (2026-11-17):** No sign-off needed. 8 new rules + quotes in `kb/rules/2016/ch08/` and `kb/source-quotes/2016/ch08/` (§8.1, §8.2, §8.4), new prefixes `NUM` (PLOIDY_REFERENCE, PLOIDY_IN_ANGLE_BRACKETS, COUNT_MATCHES_CHANGES), `SEX` (CONSTITUTIONAL_COMPLEMENT, ACQUIRED_GAIN_LOSS), `UPD.FORMAT`, `MAR.CONSTITUTIONAL_C_SPACE`, plus `KARYO.UNCERTAIN_CONSTITUTIONAL` (`?c`); all paraphrases approved by the user. All 35 ch. 8 example blocks are valid examples; `kb build` passes (90 rules, 126 quotes). Deviation: §8.3 has no rule file. Its content is already in ch. 4, so `KARYO.GAIN_LOSS_SIGN` (§8.1 ¶1, §8.3 ¶1, E1–E4) and `KARYO.CONSTITUTIONAL_C` (§8.2 ¶4, §8.3 ¶2, 7 examples; statement extended with the `mar c` exception and re-approved) were extended instead; `KARYO.CLONE_ORDER_CONSTITUTIONAL` gains §8.1 E4 and §8.4 E2. `needs_review`: `NUM.COUNT_MATCHES_CHANGES` (an inference, recorded as the user decided), `SEX.ACQUIRED_GAIN_LOSS` and `UPD.FORMAT`; notes added to T-022 and T-030. `SYM.LISTED_ONLY` notes that the ploidy symbols `n`/`2n`/`4n` are not listed. Decision entry in `docs/decisions.md`.
 
 ### T-012 — KB: ch. 9.1–9.2.10 (structural, part 1)
-**Status:** todo
+**Status:** done
 **Description:** General principles; add, del, der, dic, dup, fission, fra, hsr, ins, inv.
 **Acceptance:** Shared KB criteria.
 **Notes:** From T-010: the general fra format belongs to §9.2.7 (`FRA.*` prefix; `FRA.HERITABLE_VARIANT` and `FRA.HOMOLOGUE_UNDERLINING` from §7.2 exist); §9.2.3 has the `der(?)` examples that §5.1/§6 refer to (`UNCERTAIN.QUESTION_MARK_DESIGNATION`, `ORDER.UNKNOWN_CENTROMERE_DER`).
+**Outcome (2026-11-17):** No sign-off needed. 26 new rules + quotes in `kb/rules/2016/ch09/` and `kb/source-quotes/2016/ch09/` (11 section files, §9.1–9.2.10), new prefixes `ADD`, `DEL`, `DIC`, `DUP`, `FIS`, `HSR`, `INS`, `INV`, plus `FRA.FORMAT`, `REC.NOT_ACQUIRED`, `SEX.ABNORMAL_SEX_CHROMOSOME_IN_LIST` and nine `DER.*` rules; all paraphrases approved by the user. All 90 example blocks (149 printed lines) are valid examples (script-checked); `kb build` passes (116 rules, 181 quotes). "Several aberrations in one chromosome → der" is one rule (`DER.MULTIPLE_ABERRATIONS_ONE_CHROMOSOME`, 5 cites). 15 earlier rules gained §9 cites/examples; re-approved statement changes: `KARYO.PLOIDY_RELATIVE`, `KARYO.REPLACED_NORMAL_NOT_MISSING`, `BREAK.NOT_REPEATED_FOR_COPIES`, `STRUCT.PROXIMAL_BREAKPOINT_FIRST` (dup/ins exception). `needs_review`: `DER.HOMOLOGUE_UNDERLINING` (T-042). Printed oddities (§9.2.5 E2 "or" form, §9.2.3 E22 line wrap, ¶6 line-wrap space) handled as noted in `docs/decisions.md`. Notes added to T-013, T-022, T-042; `docs/extraction-review-2016.md` updated. No deviations from the plan.
 
 ### T-013 — KB: ch. 9.2.11–9.3 (structural, part 2)
 **Status:** todo
 **Description:** i, mar, neo, qdp, r, tas, translocations (reciprocal, whole-arm, Robertsonian, jumping), trc, trp, multiple copies of rearranged chromosomes.
 **Acceptance:** Shared KB criteria; rules affected by lost underlining are flagged (see T-003).
-**Notes:**
+**Notes:** From T-012: §9.2.3 ¶8 (ider) points to §9.2.11 - link `DER.ISODERIVATIVE` from the isochromosome rule; the sex-field convention for rearranged X/Y is `SEX.ABNORMAL_SEX_CHROMOSOME_IN_LIST` (add translocation examples such as `46,Y,t(X;…)`); `DIC.FORMAT` refers to whole-arm/Robertsonian translocations (§9.2.17.2–3) for the missing-chromosome convention; `KARYO.REPLACED_NORMAL_NOT_MISSING` and `STRUCT.PROXIMAL_BREAKPOINT_FIRST` (dup/ins exception) should get the §9.2.11–9.3 examples that apply.
 
 ### T-014 — KB: ch. 11 (neoplasia)
 **Status:** todo
@@ -259,7 +260,7 @@ All KB tasks share these steps and criteria:
 - How book-ambiguous rules are reported.
 - What "valid" means when there are only warnings.
 **Acceptance:** Policy in `docs/decisions.md`.
-**Notes:** From T-007: include the severity for band names that exist in the genome assemblies but not in the book's idiograms (`book: false` in band data, e.g. 9q34.12 in a karyotype string). From T-009: severities in the ch. 4 rules are provisional ("always/is/must/should not" → error, descriptive → info); decide `KARYO.ABBREVIATED_FORM` (abbreviations such as `46,XX,der(5)mat` and copies without breakpoints are only valid after an earlier full form, which a single string can't show) and `REC.KNOWN_PARENTAL_REARRANGEMENT` (warn on `rec` without mat/pat/inh?), both `needs_review`. From T-010: `ORDER.SHORTEST_STRING_PREFERRED` (§6 E6 note: `+inv(3)(…)` preferred over `+3,inv(3)(…)`; info hint or nothing?), `needs_review`. From T-011: `UPD.FORMAT` (is `upd(n)` without `mat`/`pat` valid? every book example has one), `SEX.ACQUIRED_GAIN_LOSS` / `SEX.CONSTITUTIONAL_COMPLEMENT` (the same string, e.g. `47,XXX` or `45,X,–X`, is valid in one context and not the other: how to report when the context is unknown), severity of `NUM.COUNT_MATCHES_CHANGES` (provisional warning), all `needs_review` where noted.
+**Notes:** From T-007: include the severity for band names that exist in the genome assemblies but not in the book's idiograms (`book: false` in band data, e.g. 9q34.12 in a karyotype string). From T-009: severities in the ch. 4 rules are provisional ("always/is/must/should not" → error, descriptive → info); decide `KARYO.ABBREVIATED_FORM` (abbreviations such as `46,XX,der(5)mat` and copies without breakpoints are only valid after an earlier full form, which a single string can't show) and `REC.KNOWN_PARENTAL_REARRANGEMENT` (warn on `rec` without mat/pat/inh?), both `needs_review`. From T-010: `ORDER.SHORTEST_STRING_PREFERRED` (§6 E6 note: `+inv(3)(…)` preferred over `+3,inv(3)(…)`; info hint or nothing?), `needs_review`. From T-011: `UPD.FORMAT` (is `upd(n)` without `mat`/`pat` valid? every book example has one), `SEX.ACQUIRED_GAIN_LOSS` / `SEX.CONSTITUTIONAL_COMPLEMENT` (the same string, e.g. `47,XXX` or `45,X,–X`, is valid in one context and not the other: how to report when the context is unknown), severity of `NUM.COUNT_MATCHES_CHANGES` (provisional warning), all `needs_review` where noted. From T-012: `ADD.FORMAT` (add recommended over `t(n;?)`) is a `warning`; `REC.NOT_ACQUIRED` and `REC.KNOWN_PARENTAL_REARRANGEMENT` need the clinical context (constitutional vs neoplastic) or parental information that a string may not carry; several §9 conventions are `info` explanations that cannot be checked from the string (`ADD.INSERTED_UNKNOWN_USE_INS`, `DER.INSERTION_POINT_CONVENTION`, `DIC.PSEUDODICENTRIC_ORDER`, `INS.ORIENTATION` long form recommended).
 
 ### T-053 — Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`?
 **Status:** discussion
@@ -466,7 +467,7 @@ All KB tasks share these steps and criteria:
 **Status:** todo
 **Description:** Underlining distinguishes homologous chromosomes, but plain text can't carry it. Decide on an input convention, then parse and validate it.
 **Acceptance:** Convention documented; related KB examples pass.
-**Notes:**
+**Notes:** KB rules with underlined examples (U+0332, `needs_review`): `FRA.HOMOLOGUE_UNDERLINING` (§7.2, T-010) and `DER.HOMOLOGUE_UNDERLINING` (§9.2.3 E32–E34, T-012); §9.2.17.1 follows in T-013.
 
 ### T-043 — Copyright cleanup before public deployment
 **Status:** discussion

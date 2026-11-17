@@ -20,3 +20,8 @@ quotes:
       The genome build or assembly must be specified when designating an aberration by
       nucleotide position defined by microarray, region-specific assay or sequencing (see
       Sections 14.1, 15.1 and 16.2).
+  - rule: STRUCT.SHORT_AND_DETAILED_SYSTEMS
+    cite: {section: "9.2", page: 59, para: "¶1"}
+    text: >-
+      Each abnormality is described first with the short system and, when appropriate, also with
+      the detailed system.

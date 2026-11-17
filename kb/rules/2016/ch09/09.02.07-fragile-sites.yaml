@@ -1,0 +1,32 @@
+version: "2016"
+section: "9.2.7"
+rules:
+  - id: FRA.FORMAT
+    title: fra(chromosome)(band) for fragile sites
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A fragile site is written fra(chromosome)(band). The same nomenclature is used whether the
+      fragile site is a normal variant (section 7.2) or associated with a disease or phenotypic
+      abnormality.
+    cite:
+      - {section: "9.2.7", page: 67, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,X,fra(X)(q27.3)"
+          cite: {section: "9.2.7", page: 67, example: E1}
+        - text: "46,Y,fra(X)(q27.3)"
+          cite: {section: "9.2.7", page: 67, example: E2}
+        - text: "45,fra(X)(q27.3)"
+          cite: {section: "9.2.7", page: 67, example: E3}
+        - text: "47,XY,fra(X)(q27.3)"
+          cite: {section: "9.2.7", page: 67, example: E4}
+      invalid:
+        - text: "46,X,fra(Xq27.3)"
+          why: The band goes in its own parentheses after the chromosome, as for other structural symbols.
+          corrected: "46,X,fra(X)(q27.3)"
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: How the sex chromosome field is written with fra(X) - see SEX.ABNORMAL_SEX_CHROMOSOME_IN_LIST.
+    related: [FRA.HERITABLE_VARIANT, FRA.HOMOLOGUE_UNDERLINING, SEX.ABNORMAL_SEX_CHROMOSOME_IN_LIST]

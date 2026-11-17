@@ -26,8 +26,8 @@ rules:
     review:
       paraphrase_checked: true
       needs_review: false
-      note: The general fra format is section 9.2.7 (T-012).
-    related: [FRA.HOMOLOGUE_UNDERLINING]
+      note: The general fra format is FRA.FORMAT (section 9.2.7).
+    related: [FRA.HOMOLOGUE_UNDERLINING, FRA.FORMAT]
 
   - id: FRA.HOMOLOGUE_UNDERLINING
     title: Fragile sites on different homologues told apart by underlining

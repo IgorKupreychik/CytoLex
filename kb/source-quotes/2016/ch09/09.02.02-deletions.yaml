@@ -1,0 +1,11 @@
+version: "2016"
+section: "9.2.2"
+quotes:
+  - rule: DEL.FORMAT
+    cite: {section: "9.2.2", page: 60, para: "¶1"}
+    text: >-
+      The symbol del is used to denote both terminal and interstitial deletions. A deletion is a
+      loss of a chromosome segment. No arrows are used in the short system to indicate the extent
+      of the deleted segment. This is apparent from the description of the breakpoints. Note that
+      designations such as “5q–” or “del(5q)”, which may be useful abbreviations in text, should
+      not be used in karyotypes.

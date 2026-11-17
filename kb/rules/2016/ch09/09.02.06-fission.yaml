@@ -1,0 +1,31 @@
+version: "2016"
+section: "9.2.6"
+rules:
+  - id: FIS.FORMAT
+    title: fis for centric fission
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      Centric fission is written fis. The two products are written separately, with the
+      breakpoint assigned to p10 or q10 according to their morphology (fis(10)(p10),
+      fis(10)(q10)).
+    cite:
+      - {section: "9.2.6", page: 67, para: "¶1"}
+      - {section: "9.2.6", page: 67, example: E1}
+    examples:
+      valid:
+        - text: "47,XY,–10,+fis(10)(p10),+fis(10)(q10)"
+          cite: {section: "9.2.6", page: 67, example: E1}
+        - text: "47,XY,–10,+fis(10)(pter→p10:),+fis(10)(qter→q10:)"
+          cite: {section: "9.2.6", page: 67, example: E1}
+      invalid:
+        - text: "47,XY,–10,+fis(10)(p11.1),+fis(10)(q11.1)"
+          why: The breakpoints of a centric fission are assigned to the centromeric bands p10 and q10.
+          corrected: "47,XY,–10,+fis(10)(p10),+fis(10)(q10)"
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Unlike other rearrangements, the book's only example writes the lost normal chromosome
+        (–10) and both products with +.
+    related: [BAND.CENTROMERE_10]

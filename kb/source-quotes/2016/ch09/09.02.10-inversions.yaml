@@ -1,0 +1,8 @@
+version: "2016"
+section: "9.2.10"
+quotes:
+  - rule: INV.FORMAT
+    cite: {section: "9.2.10", page: 69, para: "¶1"}
+    text: >-
+      The symbol inv is used. Whether it is a paracentric or pericentric inversion is apparent
+      from the band designations.

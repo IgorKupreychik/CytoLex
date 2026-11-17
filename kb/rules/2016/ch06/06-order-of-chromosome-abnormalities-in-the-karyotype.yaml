@@ -109,10 +109,14 @@ rules:
       abnormalities and precedes any unidentified ring, marker and double minute chromosomes.
     cite:
       - {section: "6", page: 51, para: "¶3"}
+      - {section: "9.2.3", page: 64, para: "¶11"}
     examples:
       valid:
         - text: "52,XX,…,+der(?)t(?;6)(?;q16),+r,+mar,5~9dmin"
           cite: {section: "6", page: 51, example: E10}
+          note: Partial string as printed; … stands for the omitted abnormalities.
+        - text: "53,XX,…,+der(?)t(?;9)(?;q22),+r,+mar,dmin"
+          cite: {section: "9.2.3", page: 64, example: E30}
           note: Partial string as printed; … stands for the omitted abnormalities.
       invalid:
         - text: "52,XX,…,+r,+der(?)t(?;6)(?;q16),+mar,5~9dmin"
@@ -120,7 +124,7 @@ rules:
           corrected: "52,XX,…,+der(?)t(?;6)(?;q16),+r,+mar,5~9dmin"
     fix: {level: 1, kind: reorder, hint: "Place der(?) after the identified abnormalities and before r, mar and dmin."}
     review: {paraphrase_checked: true, needs_review: false}
-    related: [ORDER.UNIDENTIFIED_LAST, UNCERTAIN.QUESTION_MARK_DESIGNATION]
+    related: [ORDER.UNIDENTIFIED_LAST, UNCERTAIN.QUESTION_MARK_DESIGNATION, DER.UNKNOWN_CENTROMERE]
 
   - id: ORDER.SHORTEST_STRING_PREFERRED
     title: Prefer the shortest equivalent string

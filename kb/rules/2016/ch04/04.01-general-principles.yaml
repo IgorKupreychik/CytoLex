@@ -204,6 +204,8 @@ rules:
     cite:
       - {section: "4.1", page: 38, para: "¶5"}
       - {section: "5.1", page: 47, example: E7}
+      - {section: "9.2.1", page: 59, para: "¶2"}
+      - {section: "9.2.2", page: 60, para: "¶1"}
     examples:
       valid: []
       invalid:
@@ -223,17 +225,45 @@ rules:
       When a structurally altered chromosome takes the place of a normal one, the normal
       chromosome is not written as missing. Dicentric chromosomes and derivatives of whole-arm
       translocations by convention replace both normal chromosomes involved, so neither is
-      written as missing.
+      written as missing. A loss is written only when a further normal homologue is missing as
+      well (45,XY,–10,der(10)t(10;17)(q22;p12)).
     cite:
       - {section: "4.1", page: 38, para: "¶6"}
+      - {section: "9.1", page: 58, para: "¶2"}
+      - {section: "9.1", page: 59, example: E11}
     examples:
       valid:
         - text: "46,XX,del(4)(p14)"
           note: Not a book example in this section.
+        - text: "46,XX,inv(3)(q21q26.2)"
+          cite: {section: "9.1", page: 58, example: E6}
+        - text: "45,XX,dic(13;15)(q22;q24)"
+          cite: {section: "9.1", page: 58, example: E7}
+        - text: "46,XY,der(1)t(1;3)(p22;q13.1)"
+          cite: {section: "9.1", page: 59, example: E9}
+        - text: "46,XX,der(1)ins(1;?)(p22;?)"
+          cite: {section: "9.1", page: 59, example: E10}
+        - text: "45,XY,–10,der(10)t(10;17)(q22;p12)"
+          cite: {section: "9.1", page: 59, example: E11}
+          note: The der(10) replaces one chromosome 10 and the homologous 10 is lost, so –10 is written.
+        - text: "45,XY,der(1)t(1;3)(p22;q13.1),–3"
+          cite: {section: "9.2.3", page: 62, example: E11}
+          note: Only one normal chromosome 3 is left, so its loss is written.
+        - text: "45,XX,dic(13;15)(q22;q24)"
+          cite: {section: "9.2.4", page: 65, example: E2}
+        - text: "46,XX,+13,dic(13;15)(q22;q24)"
+          cite: {section: "9.2.4", page: 65, example: E3}
+          note: Two normal chromosomes 13 are present besides the dic, which counts as a gain of 13.
+        - text: "45,XY,dic(14;21)(p11.2;p11.2)"
+          cite: {section: "9.2.4", page: 66, example: E4}
       invalid:
         - text: "46,XX,–4,del(4)(p14)"
           why: The del(4) replaces a normal chromosome 4, which must not also be written as missing.
           corrected: "46,XX,del(4)(p14)"
+        - text: "46,XX,–3,+inv(3)(q21q26.2)"
+          cite: {section: "9.1", page: 58, example: E6}
+          why: The book's own counter-example - the inv(3) replaces a chromosome 3, so –3 and + are not written.
+          corrected: "46,XX,inv(3)(q21q26.2)"
     fix: {level: 1, kind: delete, hint: Remove the loss of the normal chromosome that the rearranged one replaces.}
     review: {paraphrase_checked: true, needs_review: false}
 
@@ -393,15 +423,33 @@ rules:
     statement: >-
       Haploidy or polyploidy shows from the chromosome count and the rest of the designation
       (69,XXY). Gains and losses are stated relative to the relevant ploidy level (70,XXY,+21).
-      Sections 8.1 and 9.1 give the details.
+      Structural aberrations, constitutional or acquired, are also expressed relative to that
+      level: in a near-triploid karyotype, del(7) means one of three chromosomes 7 is deleted,
+      and +del(7) an abnormal chromosome 7 besides three normal ones. Sections 8.1 and 9.1 give
+      the details.
     cite:
       - {section: "4.1", page: 39, para: "¶11"}
+      - {section: "9.1", page: 58, para: "¶1"}
     examples:
       valid:
         - text: "69,XXY"
           cite: {section: "4.1", page: 39, para: "¶11"}
         - text: "70,XXY,+21"
           cite: {section: "4.1", page: 39, para: "¶11"}
+        - text: "69,XXX,del(7)(p11.2)"
+          cite: {section: "9.1", page: 58, example: E1}
+          note: Two normal chromosomes 7 and one deleted.
+        - text: "69,XXY,del(7)(q22),inv(7)(p13q22),t(7;14)(p15;q11.1)"
+          cite: {section: "9.1", page: 58, example: E2}
+          note: No normal chromosome 7 - all three are rearranged.
+        - text: "70,XXX,+del(7)(p11.2)"
+          cite: {section: "9.1", page: 58, example: E3}
+          note: Three normal chromosomes 7 and an extra deleted one.
+        - text: "92,XXYY,del(7)(p11.2),t(7;14)(p15;q11.1)"
+          cite: {section: "9.1", page: 58, example: E4}
+        - text: "92,XXYY,del(7)(p11.2),del(7)(q22),del(7)(q34)"
+          cite: {section: "9.1", page: 58, example: E5}
+          note: One normal chromosome 7 and three with different deletions.
     review: {paraphrase_checked: true, needs_review: false}
 
   - id: KARYO.ENDOREDUPLICATION

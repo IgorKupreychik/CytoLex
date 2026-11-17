@@ -11,3 +11,13 @@ quotes:
     text: >-
       When two breaks occur within the same arm, the breakpoint more proximal to the centromere
       is specified first.
+  - rule: STRUCT.PROXIMAL_BREAKPOINT_FIRST
+    cite: {section: "9.2.5", page: 67, para: "¶1"}
+    text: >-
+      The orientation of the duplicated segment is indicated by the order of the bands with
+      respect to the centromere.
+  - rule: STRUCT.PROXIMAL_BREAKPOINT_FIRST
+    cite: {section: "9.2.9", page: 68, para: "¶1"}
+    text: >-
+      The orientation of the inserted segment is indicated by the order of the bands of the
+      inserted segment with respect to the centromere.

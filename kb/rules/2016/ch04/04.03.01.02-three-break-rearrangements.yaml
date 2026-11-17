@@ -21,6 +21,18 @@ rules:
           cite: {section: "4.3.1.2", page: 41, example: E1}
         - text: "46,XY,ins(5;2)(p14;q22q32)"
           cite: {section: "4.3.1.2", page: 41, example: E1}
+        - text: "46,XX,ins(5;2)(p14;q22q32)"
+          cite: {section: "9.2.9", page: 69, example: E3}
+        - text: "46,XY,ins(5;2)(p14;q32q22)"
+          cite: {section: "9.2.9", page: 69, example: E4}
+        - text: "46,XX,ins(5;2)(q31;p13p23)"
+          cite: {section: "9.2.9", page: 69, example: E5}
+        - text: "46,XX,ins(5;2)(q31;p23p13)"
+          cite: {section: "9.2.9", page: 69, example: E6}
+        - text: "46,XY,der(5)ins(5;2)(q31;p23p13)mat"
+          cite: {section: "9.2.9", page: 69, example: E7}
+        - text: "46,X,der(X)ins(X;7)(p21;q21q22)"
+          cite: {section: "9.2.9", page: 69, example: E8}
       invalid:
         - text: "46,XY,ins(2;5)(q22q32;p14)"
           why: In an insertion the receiving chromosome (5) is listed first, even though chromosome 2 has the lower number.
@@ -47,6 +59,10 @@ rules:
         - text: "46,XX,ins(2)(q13p23p13)"
           cite: {section: "4.3.1.2", page: 42, example: E3}
           note: Inverted insertion of the same segment.
+        - text: "46,XX,ins(2)(p13q21q31)"
+          cite: {section: "9.2.9", page: 69, example: E1}
+        - text: "46,XY,ins(2)(p13q31q21)"
+          cite: {section: "9.2.9", page: 69, example: E2}
     review: {paraphrase_checked: true, needs_review: false}
     related: [STRUCT.INSERTION_RECEPTOR_FIRST]
 

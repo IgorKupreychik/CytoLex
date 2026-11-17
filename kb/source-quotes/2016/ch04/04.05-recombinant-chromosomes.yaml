@@ -32,3 +32,18 @@ quotes:
       The symbol rec should only be used when a parental inversion or insertion has been
       identified. If this is not known, an apparent recombinant chromosome should be written as
       a derivative.
+  - rule: REC.DEFINITION
+    cite: {section: "9.2.3", page: 60, para: "¶2"}
+    text: >-
+      A recombinant chromosome (rec) is a structurally rearranged chromosome with a new segmental
+      composition resulting from meiotic crossing-over
+  - rule: REC.KNOWN_PARENTAL_REARRANGEMENT
+    cite: {section: "9.2.3", page: 60, para: "¶2"}
+    text: >-
+      If parental karyotypes are unknown or a parental inversion has not been identified, the
+      abnormal chromosome should be designated as a der, not a rec.
+  - rule: REC.KNOWN_PARENTAL_REARRANGEMENT
+    cite: {section: "9.2.3", page: 61, para: "¶3"}
+    text: >-
+      When parental karyotypes are known and a parental inversion or an intra- or
+      interchromosomal insertion is identified, rec should be used.

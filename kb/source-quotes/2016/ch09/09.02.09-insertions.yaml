@@ -1,0 +1,9 @@
+version: "2016"
+section: "9.2.9"
+quotes:
+  - rule: INS.ORIENTATION
+    cite: {section: "9.2.9", page: 68, para: "¶1"}
+    text: >-
+      The symbol ins is used for insertions. The orientation of the inserted segment is indicated
+      by the order of the bands of the inserted segment with respect to the centromere. For
+      clarity, the use of the long form is recommended.

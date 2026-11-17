@@ -1,0 +1,34 @@
+version: "2016"
+section: "9.2.10"
+rules:
+  - id: INV.FORMAT
+    title: inv - para- or pericentric from the bands
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      An inversion is written inv(chromosome)(breakpoint breakpoint), with no separator between
+      the two breakpoints. Whether it is paracentric (both breaks in one arm) or pericentric (one
+      break in each arm) shows from the bands, so no further symbol is used.
+    cite:
+      - {section: "9.2.10", page: 69, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,inv(2)(p13p23)"
+          cite: {section: "9.2.10", page: 70, example: E1}
+        - text: "46,XX,inv(3)(q21q26.2)"
+          cite: {section: "9.2.10", page: 70, example: E2}
+        - text: "46,XX,inv(3)(pter→q21::q26.2→q21::q26.2→qter)"
+          cite: {section: "9.2.10", page: 70, example: E2}
+        - text: "46,XY,inv(3)(p13q21)"
+          cite: {section: "9.2.10", page: 70, example: E3}
+        - text: "46,XY,inv(3)(pter→p13::q21→p13::q21→qter)"
+          cite: {section: "9.2.10", page: 70, example: E3}
+      invalid:
+        - text: "46,XX,inv(3)(q21;q26.2)"
+          why: Both breakpoints are in one chromosome, so they are written together without a semicolon.
+          corrected: "46,XX,inv(3)(q21q26.2)"
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: Breakpoint order - STRUCT.PROXIMAL_BREAKPOINT_FIRST (paracentric) and STRUCT.SHORT_ARM_BREAKPOINT_FIRST (pericentric).
+    related: [STRUCT.PROXIMAL_BREAKPOINT_FIRST, STRUCT.SHORT_ARM_BREAKPOINT_FIRST, VAR.POPULATION_INVERSIONS]

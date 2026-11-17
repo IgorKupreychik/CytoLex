@@ -1,0 +1,9 @@
+version: "2016"
+section: "9.2.7"
+quotes:
+  - rule: FRA.FORMAT
+    cite: {section: "9.2.7", page: 67, para: "¶1"}
+    text: >-
+      Fragile sites, abbreviated fra, may occur as normal variants (see Section 7.2) or be
+      associated with specific diseases and/or phenotypic abnormalities. In both situations the
+      same nomenclature is used.

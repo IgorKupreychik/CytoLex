@@ -1,0 +1,48 @@
+version: "2016"
+section: "9.1"
+rules:
+  - id: SEX.ABNORMAL_SEX_CHROMOSOME_IN_LIST
+    title: Only normal sex chromosomes in the sex chromosome field
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      The sex chromosome field after the count lists only the structurally normal sex
+      chromosomes. A structurally abnormal X or Y is not written there; it appears only as an
+      abnormality in the list that follows (46,Y,t(X;8)(p22.3;q24.1) in a male; 46,X,fra(X)(q27.3)
+      in a female).
+    cite:
+      - {section: "9.1", page: 59, example: E8}
+    examples:
+      valid:
+        - text: "46,Y,t(X;8)(p22.3;q24.1)"
+          cite: {section: "9.1", page: 59, example: E8}
+        - text: "46,Y,del(X)(p21p21)"
+          cite: {section: "9.2.2", page: 60, example: E5}
+        - text: "46,Y,der(X)t(X;8)(p22.3;q24.1)"
+          cite: {section: "9.2.3", page: 61, example: E9}
+        - text: "46,X,idic(Y)(q12)"
+          cite: {section: "9.2.4", page: 66, example: E6}
+        - text: "46,X,fra(X)(q27.3)"
+          cite: {section: "9.2.7", page: 67, example: E1}
+        - text: "46,Y,fra(X)(q27.3)"
+          cite: {section: "9.2.7", page: 67, example: E2}
+        - text: "45,fra(X)(q27.3)"
+          cite: {section: "9.2.7", page: 67, example: E3}
+          note: Turner syndrome - the only X carries the fragile site, so the sex field is empty.
+        - text: "47,XY,fra(X)(q27.3)"
+          cite: {section: "9.2.7", page: 67, example: E4}
+          note: Klinefelter syndrome - one normal X and Y, plus the X with the fragile site.
+        - text: "46,X,der(X)ins(X;7)(p21;q21q22)"
+          cite: {section: "9.2.9", page: 69, example: E8}
+      invalid:
+        - text: "46,XY,t(X;8)(p22.3;q24.1)"
+          why: The X is involved in the translocation, so it is not a normal sex chromosome and must not be written in the sex field.
+          corrected: "46,Y,t(X;8)(p22.3;q24.1)"
+    fix: {level: 1, kind: delete, hint: Remove the rearranged sex chromosome from the sex chromosome field.}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The book states it in the E8 explanation ("the normal sex chromosome, in this case a Y, is
+        shown first"); every ch. 9 example with an abnormal X or Y follows it.
+    related: [KARYO.COUNT_SEX_ORDER, SEX.CONSTITUTIONAL_COMPLEMENT]

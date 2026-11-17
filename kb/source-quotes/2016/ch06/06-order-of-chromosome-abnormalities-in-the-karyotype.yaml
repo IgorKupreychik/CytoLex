@@ -39,3 +39,9 @@ quotes:
       Note that the karyotype can also be written as:
       49,X,inv(X)(p21q26),+inv(3)(q21q26.2),+7,+10,–20,del(20)(q11.2),+21 and is preferred as it
       gives the shortest karyotype string.
+  - rule: ORDER.UNKNOWN_CENTROMERE_DER
+    cite: {section: "9.2.3", page: 64, para: "¶11"}
+    text: >-
+      Derivative chromosomes whose centromeres are unknown should be placed after all identified
+      abnormalities but before unidentified ring chromosomes, marker chromosomes, and double
+      minute chromosomes (see Chapter 6).

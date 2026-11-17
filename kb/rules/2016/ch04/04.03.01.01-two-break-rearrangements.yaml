@@ -14,6 +14,8 @@ rules:
       valid:
         - text: "46,XX,inv(2)(p21q31)"
           cite: {section: "4.3.1.1", page: 41, example: E1}
+        - text: "46,XY,inv(3)(p13q21)"
+          cite: {section: "9.2.10", page: 70, example: E3}
       invalid:
         - text: "46,XX,inv(2)(q31p21)"
           why: The long-arm breakpoint q31 is given before the short-arm breakpoint p21.
@@ -28,15 +30,29 @@ rules:
     severity: error
     statement: >-
       When both breaks of a two-break rearrangement lie in the same arm, the breakpoint nearer
-      the centromere is given first.
+      the centromere is given first. Exception: in a duplication and in the segment of an
+      insertion the band order shows the orientation of the segment, so the distal band may come
+      first (dup(1)(q25q22), ins(5;2)(p14;q32q22)).
     cite:
       - {section: "4.3.1.1", page: 41, para: "¶2"}
+      - {section: "9.2.5", page: 67, para: "¶1"}
+      - {section: "9.2.9", page: 68, para: "¶1"}
     examples:
       valid:
         - text: "46,XX,inv(2)(p13p23)"
           cite: {section: "4.3.1.1", page: 41, example: E2}
         - text: "46,XX,inv(2)(q11.2q32)"
           cite: {section: "4.3.1.1", page: 41, example: E2}
+        - text: "46,XX,inv(2)(p13p23)"
+          cite: {section: "9.2.10", page: 70, example: E1}
+        - text: "46,XX,del(5)(q13q33)"
+          cite: {section: "9.2.2", page: 60, example: E2}
+        - text: "46,XY,dup(1)(q25q22)"
+          cite: {section: "9.2.5", page: 67, example: E2}
+          note: Exception - inverted duplication, distal band first.
+        - text: "46,XY,ins(5;2)(p14;q32q22)"
+          cite: {section: "9.2.9", page: 69, example: E4}
+          note: Exception - inverted inserted segment, distal band first.
       invalid:
         - text: "46,XX,inv(2)(p23p13)"
           why: 2p13 is nearer the centromere than 2p23 and must be given first.

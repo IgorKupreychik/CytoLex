@@ -1,0 +1,49 @@
+version: "2016"
+section: "9.2.2"
+rules:
+  - id: DEL.FORMAT
+    title: del for terminal and interstitial deletions
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A deletion (loss of a chromosome segment) is written del(chromosome)(breakpoints), whether
+      terminal or interstitial: one breakpoint means a terminal deletion, two breakpoints an
+      interstitial one (both may lie in the same band, as in q13q13). The short system uses no
+      arrows; the extent follows from the breakpoints. Forms such as del(5q) or 5q– may be used
+      in text, but not in a karyotype.
+    cite:
+      - {section: "9.2.2", page: 60, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,del(5)(q13)"
+          cite: {section: "9.2.2", page: 60, example: E1}
+        - text: "46,XX,del(5)(pter→q13:)"
+          cite: {section: "9.2.2", page: 60, example: E1}
+        - text: "46,XX,del(5)(q13q33)"
+          cite: {section: "9.2.2", page: 60, example: E2}
+        - text: "46,XX,del(5)(pter→q13::q33→qter)"
+          cite: {section: "9.2.2", page: 60, example: E2}
+        - text: "46,XX,del(5)(q13q13)"
+          cite: {section: "9.2.2", page: 60, example: E3}
+        - text: "46,XX,del(5)(pter→q13::q13→qter)"
+          cite: {section: "9.2.2", page: 60, example: E3}
+        - text: "46,XY,del(5)(q?)"
+          cite: {section: "9.2.2", page: 60, example: E4}
+          note: Arm known, type of deletion and breakpoints unknown (UNCERTAIN.QUESTION_MARK_DESIGNATION).
+        - text: "46,Y,del(X)(p21p21)"
+          cite: {section: "9.2.2", page: 60, example: E5}
+        - text: "69,XXX,del(7)(p11.2)"
+          cite: {section: "9.1", page: 58, example: E1}
+      invalid:
+        - text: "46,XX,del(5q)"
+          why: The arm-only form del(5q) is for running text; a karyotype gives the breakpoint(s) in a second pair of parentheses.
+        - text: "46,XX,del(5)(q13→q33)"
+          why: The short system uses no arrows between the breakpoints.
+          corrected: "46,XX,del(5)(q13q33)"
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Changed since ISCN 2013 (¶1 margin bar). The 5q– form is also covered by
+        KARYO.NO_ARM_LENGTH_SIGN.
+    related: [KARYO.NO_ARM_LENGTH_SIGN, DER.MULTIPLE_ABERRATIONS_ONE_CHROMOSOME, STRUCT.PROXIMAL_BREAKPOINT_FIRST]

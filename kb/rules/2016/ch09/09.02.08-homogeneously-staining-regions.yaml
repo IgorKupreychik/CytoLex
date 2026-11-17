@@ -1,0 +1,98 @@
+version: "2016"
+section: "9.2.8"
+rules:
+  - id: HSR.FORMAT
+    title: hsr(chromosome)(band) - presence, not size
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A homogeneously staining region is written hsr(chromosome)(band). It records that an hsr is
+      present in a chromosome arm, segment or band, not its size. In the detailed system the hsr
+      appears as a segment of the band composition (pter→p22::hsr::p22→qter).
+    cite:
+      - {section: "9.2.8", page: 68, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,hsr(1)(p22)"
+          cite: {section: "9.2.8", page: 68, example: E1}
+        - text: "46,XX,hsr(1)(pter→p22::hsr::p22→qter)"
+          cite: {section: "9.2.8", page: 68, example: E1}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+    related: [HSR.REPLACED_SEGMENT_PROXIMAL, HSR.INTERFACE_TWO_CHROMOSOMES, DER.MULTIPLE_ABERRATIONS_ONE_CHROMOSOME]
+
+  - id: HSR.REPLACED_SEGMENT_PROXIMAL
+    title: An hsr replacing a deleted segment sits at the proximal breakpoint
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      When an hsr replaces a deleted segment, it is by convention assigned to the proximal
+      breakpoint band of the deletion (der(1)del(1)(p21p33)hsr(1)(p21)).
+    cite:
+      - {section: "9.2.8", page: 68, example: E3}
+    examples:
+      valid:
+        - text: "46,XY,der(1)del(1)(p21p33)hsr(1)(p21)"
+          cite: {section: "9.2.8", page: 68, example: E3}
+        - text: "46,XY,der(1)(pter→p33::hsr::p21→qter)"
+          cite: {section: "9.2.8", page: 68, example: E3}
+      invalid:
+        - text: "46,XY,der(1)del(1)(p21p33)hsr(1)(p33)"
+          why: The hsr is assigned to the proximal deletion breakpoint, p21, not the distal one.
+          corrected: "46,XY,der(1)del(1)(p21p33)hsr(1)(p21)"
+    review:
+      paraphrase_checked: true
+      needs_review: false
+    related: [HSR.FORMAT]
+
+  - id: HSR.INTERFACE_TWO_CHROMOSOMES
+    title: hsr at a rearrangement interface names both chromosomes
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      An hsr at the interface between segments of two chromosomes in a rearrangement is assigned
+      to the breakpoints in both chromosomes, in the standard way: both chromosomes in the first
+      parentheses and the two breakpoints in the second (hsr(1;7)(q21;p11.2)).
+    cite:
+      - {section: "9.2.8", page: 68, para: "¶3"}
+    examples:
+      valid:
+        - text: "46,XX,der(1)ins(1;7)(q21;p11.2p21)hsr(1;7)(q21;p11.2)"
+          cite: {section: "9.2.8", page: 68, example: E4}
+          note: The hsr lies proximal to the inserted chromosome 7 segment.
+        - text: "46,XX,der(1)(1pter→1q21::hsr::7p11.2→7p21::1q21→1qter)"
+          cite: {section: "9.2.8", page: 68, example: E4}
+        - text: "46,XX,der(1)ins(1;7)(q21;p11.2p21)hsr(1;7)(q21;p21)"
+          cite: {section: "9.2.8", page: 68, example: E5}
+          note: The hsr lies distal to the inserted chromosome 7 segment.
+        - text: "46,XX,der(1)(1pter→1q21::7p11.2→7p21::hsr::1q21→1qter)"
+          cite: {section: "9.2.8", page: 68, example: E5}
+      invalid:
+        - text: "46,XX,der(1)ins(1;7)(q21;p11.2p21)hsr(1)(q21)"
+          why: An hsr at the interface of chromosomes 1 and 7 is assigned to the breakpoints in both chromosomes.
+    review:
+      paraphrase_checked: true
+      needs_review: false
+    related: [HSR.FORMAT, STRUCT.BREAKPOINT_GROUPS]
+
+  - id: HSR.NO_ABR_SYMBOL
+    title: No symbol for abnormally banded regions
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      Abnormally banded regions (another term used for regions with amplified genes) can't be
+      clearly told apart from hsr or from other regions of unknown origin, so until better
+      defined no symbol for them is used in karyotypes.
+    cite:
+      - {section: "9.2.8", page: 68, para: "¶4"}
+    examples:
+      valid: []
+      invalid:
+        - text: "46,XX,abr(1)(p22)"
+          why: There is no ISCN symbol for an abnormally banded region; abr is not used in karyotypes.
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: abr is not in the ch. 3 list either (SYM.LISTED_ONLY).
+    related: [SYM.LISTED_ONLY, HSR.FORMAT]

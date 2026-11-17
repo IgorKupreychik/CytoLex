@@ -15,6 +15,7 @@ rules:
       - {section: "4.5", page: 46, para: "¶1"}
       - {section: "4.5", page: 46, para: "¶2"}
       - {section: "4.5", page: 46, para: "¶4"}
+      - {section: "9.2.3", page: 60, para: "¶2"}
     examples:
       valid:
         - text: "46,XX,inv(2)(p21q31)"
@@ -26,7 +27,7 @@ rules:
       note: >-
         ¶4 refers to Fig. 9 (inversion loop diagram); the duplicated and deleted segments are
         spelled out in the text, so the rule does not depend on the diagram.
-    related: [REC.FORMAT, DER.DEFINITION]
+    related: [REC.FORMAT, DER.DEFINITION, REC.NOT_ACQUIRED]
 
   - id: REC.FORMAT
     title: rec(n) followed by its aberrations without commas
@@ -46,8 +47,15 @@ rules:
           note: The text layer has a line-wrap space after "rec(2)" (a line break on printed p.46, checked 2026-11-17).
         - text: "46,XX,rec(2)dup(2q)inv(2)(p21q31)mat"
           cite: {section: "4.5", page: 46, para: "¶4"}
+        - text: "46,XX,rec(6)dup(6p)inv(6)(p22.2q25.2)mat"
+          cite: {section: "9.2.3", page: 61, example: E2}
         - text: "46,XX,rec(6)(pter→q25.2::p22.2→pter)mat"
           cite: {section: "9.2.3", page: 61, example: E2}
+        - text: "46,XX,rec(21)del(21)ins(21)(p13q22.2q22.3)pat"
+          cite: {section: "9.2.3", page: 61, example: E3}
+        - text: "46,XY,rec(1)dup(5q)ins(1;5)(q32;q11.2q22)inh,rec(5)del(1q)ins(1;5)inh"
+          cite: {section: "9.2.3", page: 61, example: E4}
+          note: Two recombinants of one interchromosomal insertion; the breakpoints are not repeated for rec(5) (BREAK.NOT_REPEATED_FOR_COPIES).
       invalid:
         - text: "46,XX,rec(2),dup(2p),inv(2)(p21q31)mat"
           why: The aberrations following rec(2) are not separated by commas.
@@ -66,8 +74,16 @@ rules:
       described is the same.
     cite:
       - {section: "4.5", page: 46, para: "¶4"}
+      - {section: "9.2.3", page: 60, para: "¶2"}
+      - {section: "9.2.3", page: 61, para: "¶3"}
     examples:
       valid:
+        - text: "46,XX,der(6)(pter→q25.2::p22.2→pter)"
+          cite: {section: "9.2.3", page: 61, example: E1}
+          note: Parental karyotypes unknown, so der, not rec.
+        - text: "46,XX,rec(6)dup(6p)inv(6)(p22.2q25.2)mat"
+          cite: {section: "9.2.3", page: 61, example: E2}
+          note: The same chromosome with the maternal inversion identified.
         - text: "46,XX,rec(2)dup(2p)inv(2)(p21q31)mat"
           cite: {section: "4.5", page: 46, para: "¶4"}
           note: Recombinant from a known maternal inversion (text-layer line-wrap space removed).
@@ -81,4 +97,4 @@ rules:
         Whether the parent's rearrangement is known can't be read from the string; a validator
         could at most warn when rec carries no mat/pat/inh. Whether that heuristic is wanted is
         for T-022.
-    related: [REC.FORMAT]
+    related: [REC.FORMAT, REC.NOT_ACQUIRED]

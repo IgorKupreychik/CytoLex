@@ -1,0 +1,8 @@
+version: "2016"
+section: "9.1"
+quotes:
+  - rule: SEX.ABNORMAL_SEX_CHROMOSOME_IN_LIST
+    cite: {section: "9.1", page: 59, example: E8}
+    text: >-
+      Male karyotype showing a balanced translocation between the X chromosome and chromosome 8.
+      Note that the normal sex chromosome, in this case a Y, is shown first.

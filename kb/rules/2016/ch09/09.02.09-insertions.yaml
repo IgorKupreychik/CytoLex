@@ -1,0 +1,53 @@
+version: "2016"
+section: "9.2.9"
+rules:
+  - id: INS.ORIENTATION
+    title: ins - orientation by the band order of the inserted segment
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      An insertion is written ins. The orientation of the inserted segment is shown by the order
+      of its two bands relative to the centromere: proximal band first for a direct insertion,
+      distal band first for an inverted one. For clarity the detailed (long) form is recommended.
+    cite:
+      - {section: "9.2.9", page: 68, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,ins(2)(p13q21q31)"
+          cite: {section: "9.2.9", page: 69, example: E1}
+        - text: "46,XX,ins(2)(pter→p13::q31→q21::p13→q21::q31→qter)"
+          cite: {section: "9.2.9", page: 69, example: E1}
+        - text: "46,XY,ins(2)(p13q31q21)"
+          cite: {section: "9.2.9", page: 69, example: E2}
+        - text: "46,XY,ins(2)(pter→p13::q21→q31::p13→q21::q31→qter)"
+          cite: {section: "9.2.9", page: 69, example: E2}
+        - text: "46,XX,ins(5;2)(p14;q22q32)"
+          cite: {section: "9.2.9", page: 69, example: E3}
+        - text: "46,XX,ins(5;2)(5pter→5p14::2q32→2q22::5p14→5qter;2pter→2q22::2q32→2qter)"
+          cite: {section: "9.2.9", page: 69, example: E3}
+        - text: "46,XY,ins(5;2)(p14;q32q22)"
+          cite: {section: "9.2.9", page: 69, example: E4}
+        - text: "46,XY,ins(5;2)(5pter→5p14::2q22→2q32::5p14→5qter;2pter→2q22::2q32→2qter)"
+          cite: {section: "9.2.9", page: 69, example: E4}
+        - text: "46,XX,ins(5;2)(q31;p13p23)"
+          cite: {section: "9.2.9", page: 69, example: E5}
+        - text: "46,XX,ins(5;2)(5pter→5q31::2p13→2p23::5q31→5qter;2pter→2p23::2p13→2qter)"
+          cite: {section: "9.2.9", page: 69, example: E5}
+        - text: "46,XX,ins(5;2)(q31;p23p13)"
+          cite: {section: "9.2.9", page: 69, example: E6}
+        - text: "46,XX,ins(5;2)(5pter→5q31::2p23→2p13::5q31→5qter;2pter→2p23::2p13→2qter)"
+          cite: {section: "9.2.9", page: 69, example: E6}
+        - text: "46,XY,der(5)ins(5;2)(q31;p23p13)mat"
+          cite: {section: "9.2.9", page: 69, example: E7}
+          note: Unbalanced product of a maternal insertion - one der(5), one normal 5, two normal 2.
+        - text: "46,X,der(X)ins(X;7)(p21;q21q22)"
+          cite: {section: "9.2.9", page: 69, example: E8}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Changed since ISCN 2013 (¶1 margin bar). "Recommended" detailed form - not checked.
+        Two-chromosome detailed forms give both products, separated by a semicolon. Order of the
+        breakpoints: STRUCT.INSERTION_SITE_FIRST; receiving chromosome first:
+        STRUCT.INSERTION_RECEPTOR_FIRST.
+    related: [STRUCT.INSERTION_SITE_FIRST, STRUCT.INSERTION_RECEPTOR_FIRST, DUP.FORMAT]

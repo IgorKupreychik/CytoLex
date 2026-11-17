@@ -1,0 +1,30 @@
+version: "2016"
+section: "9.2.8"
+quotes:
+  - rule: HSR.FORMAT
+    cite: {section: "9.2.8", page: 68, para: "¶1"}
+    text: >-
+      The symbol hsr is used to describe the presence, but not the size, of a homogeneously
+      staining region in a chromosome arm, segment, or band.
+  - rule: HSR.REPLACED_SEGMENT_PROXIMAL
+    cite: {section: "9.2.8", page: 68, example: E3}
+    text: >-
+      The segment between bands 1p21 and 1p33 is replaced by a homogeneously staining region that
+      may be smaller or larger than the deleted segment. The hsr is by convention assigned to the
+      proximal deletion breakpoint band.
+  - rule: HSR.INTERFACE_TWO_CHROMOSOMES
+    cite: {section: "9.2.8", page: 68, para: "¶3"}
+    text: >-
+      When a homogeneously staining region is located at the interface between segments of
+      different chromosomes involved in a rearrangement, the hsr is assigned to the breakpoints
+      in both chromosomes according to the standard nomenclature for structural chromosome
+      aberrations, i.e., the two chromosomes involved are presented in the first parentheses and
+      the breakpoints in the second.
+  - rule: HSR.NO_ABR_SYMBOL
+    cite: {section: "9.2.8", page: 68, para: "¶4"}
+    text: >-
+      The distinction between homogeneously staining regions and abnormally banded regions,
+      another term that has been used to describe regions containing amplified genes, is
+      ambiguous. So is the distinction between abnormally banded regions and any region of
+      unknown origin within a derivative or marker chromosome. Therefore, until better defined,
+      no symbol to denote abnormally banded regions should be used in karyotype descriptions.

@@ -53,6 +53,26 @@ quotes:
       The + or – sign placed after a chromosome arm symbol (p or q) may be used in text to
       indicate an increase or decrease in the length of a chromosome arm (e.g., 4p+, 5q–) but
       should not be used in the description of karyotypes.
+  - rule: KARYO.NO_ARM_LENGTH_SIGN
+    cite: {section: "9.2.1", page: 59, para: "¶2"}
+    text: >-
+      Designations such as “1p+” or “1p–” may be used in text to describe such abnormal
+      chromosomes, but should not be used in the karyotype.
+  - rule: KARYO.NO_ARM_LENGTH_SIGN
+    cite: {section: "9.2.2", page: 60, para: "¶1"}
+    text: >-
+      Note that designations such as “5q–” or “del(5q)”, which may be useful abbreviations in
+      text, should not be used in karyotypes.
+  - rule: KARYO.REPLACED_NORMAL_NOT_MISSING
+    cite: {section: "9.1", page: 58, para: "¶2"}
+    text: >-
+      When normal chromosomes are replaced by structurally altered chromosomes, the normal ones
+      should not be recorded as missing.
+  - rule: KARYO.REPLACED_NORMAL_NOT_MISSING
+    cite: {section: "9.1", page: 59, example: E11}
+    text: >-
+      The der(10) replaces a normal chromosome 10; the homologous chromosome 10 is lost. In this
+      situation the missing chromosome 10 must be indicated.
   - rule: KARYO.REPLACED_NORMAL_NOT_MISSING
     cite: {section: "4.1", page: 38, para: "¶6"}
     text: >-
@@ -115,6 +135,14 @@ quotes:
       A haploid or polyploid karyotype will be evident from the chromosome number and from the
       further designations, e.g., 69,XXY. All chromosome changes should be expressed in relation
       to the appropriate ploidy level (see Sections 8.1 and 9.1), e.g., 70,XXY,+21.
+  - rule: KARYO.PLOIDY_RELATIVE
+    cite: {section: "9.1", page: 58, para: "¶1"}
+    text: >-
+      Structural aberrations, whether constitutional or acquired, should be expressed in relation
+      to the appropriate ploidy level (see Section 11.2), i.e., in near-haploid cells in relation
+      to one chromosome of each type, in near-diploid cells in relation to two chromosomes of
+      each type, in near-triploid cells in relation to three chromosomes of each type, in
+      near-tetraploid cells in relation to four chromosomes of each type, and so on.
   - rule: KARYO.ENDOREDUPLICATION
     cite: {section: "4.1", page: 39, para: "¶12"}
     text: >-

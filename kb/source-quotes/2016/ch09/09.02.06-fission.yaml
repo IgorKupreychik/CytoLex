@@ -1,0 +1,13 @@
+version: "2016"
+section: "9.2.6"
+quotes:
+  - rule: FIS.FORMAT
+    cite: {section: "9.2.6", page: 67, para: "¶1"}
+    text: >-
+      The symbol fis is used to denote centric fission.
+  - rule: FIS.FORMAT
+    cite: {section: "9.2.6", page: 67, example: E1}
+    text: >-
+      Break in the centromere resulting in two derivative chromosomes composed of the short and
+      long arms, respectively. The breakpoints (:) are assigned to p10 and q10 according to the
+      morphology of the derivative chromosomes.

@@ -1,0 +1,30 @@
+version: "2016"
+section: "9.2.4"
+quotes:
+  - rule: DIC.FORMAT
+    cite: {section: "9.2.4", page: 65, para: "¶1"}
+    text: >-
+      The symbol dic is used to describe dicentric chromosomes. Isodicentric chromosomes are
+      designated idic. It is apparent from the symbol and from the specification of the
+      chromosome(s) involved that the dicentric chromosome replaces one or two normal
+      chromosomes. There is no need to indicate the missing normal chromosome(s) (cf., whole-arm
+      and Robertsonian translocations, Sections 9.2.17.2 and 9.2.17.3). A dicentric chromosome is
+      counted as one chromosome.
+  - rule: DIC.FORMAT
+    cite: {section: "9.2.4", page: 65, example: E1}
+    text: >-
+      If it can be shown that the dicentric chromosome has originated through breakage and
+      reunion of sister chromatids, it may be designated, e.g., dic(13)(q14q32).
+  - rule: DIC.NO_DER_DIC
+    cite: {section: "9.2.4", page: 65, para: "¶1"}
+    text: >-
+      The term der may be used instead of dic, but the combination of der dic should never be
+      used.
+  - rule: DIC.PSEUDODICENTRIC_ORDER
+    cite: {section: "9.2.4", page: 66, para: "¶3"}
+    text: >-
+      A pseudodicentric chromosome is a dicentric structure in which only one centromere is
+      active. Such chromosomes are abbreviated psu dic (similarly, pseudotricentric, psu trc,
+      etc.), and the segment with the presumptively active centromere, based on the morphology in
+      the majority of cells, is always written first. If the active centromere cannot be
+      determined, the smallest chromosome number is written first.

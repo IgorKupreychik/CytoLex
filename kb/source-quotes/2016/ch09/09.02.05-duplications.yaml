@@ -1,0 +1,12 @@
+version: "2016"
+section: "9.2.5"
+quotes:
+  - rule: DUP.FORMAT
+    cite: {section: "9.2.5", page: 67, para: "¶1"}
+    text: >-
+      The symbol dup indicates a duplication. Duplications are a gain of a chromosome segment
+      observed at the original chromosome location. When a gain of a chromosome segment is found
+      elsewhere in the genome, der or ins should be used depending on the rearrangement. The
+      orientation of the duplicated segment is indicated by the order of the bands with respect
+      to the centromere. Note that no arrow is used in the short system to indicate the
+      orientation.

@@ -1,0 +1,124 @@
+version: "2016"
+section: "9.2.1"
+rules:
+  - id: ADD.FORMAT
+    title: add for extra material of unknown origin
+    applies_to: [karyotype]
+    severity: warning
+    statement: >-
+      Extra material of unknown origin attached to a chromosome band or region is written
+      add(chromosome)(band). add says nothing about the mechanism, so it is recommended over a
+      translocation with an unknown partner such as t(1;?)(p36;?). At a terminal band the
+      material lengthens the arm; elsewhere it replaces the segment distal to the band
+      (add(12)(q13) = 12q13→qter replaced).
+    cite:
+      - {section: "9.2.1", page: 59, para: "¶1"}
+      - {section: "9.2.1", page: 59, para: "¶2"}
+    examples:
+      valid:
+        - text: "46,XX,add(19)(p13.3)"
+          cite: {section: "9.2.1", page: 59, example: E1}
+        - text: "46,XX,add(19)(?::p13.3→qter)"
+          cite: {section: "9.2.1", page: 59, example: E1}
+        - text: "46,XY,add(12)(q13)"
+          cite: {section: "9.2.1", page: 59, example: E2}
+        - text: "46,XY,add(12)(pter→q13::?)"
+          cite: {section: "9.2.1", page: 59, example: E2}
+      invalid:
+        - text: "46,XX,t(1;?)(p36;?)"
+          why: Unknown material attached at 1p36 is recommended to be written with add, which implies no mechanism.
+          corrected: "46,XX,add(1)(p36)"
+    fix: {level: 1, kind: replace, hint: "Write t(n;?)(band;?) as add(n)(band)."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        "Recommended", not "must": severity warning (policy T-022). Section 9.2.3 E19 shows t(2;7)
+        combined with ins(7;?) inside a der, which is not the case this rule targets.
+    related: [ADD.INSERTED_UNKNOWN_USE_INS, DER.MULTIPLE_ABERRATIONS_ONE_CHROMOSOME, KARYO.NO_ARM_LENGTH_SIGN]
+
+  - id: ADD.INSERTED_UNKNOWN_USE_INS
+    title: Inserted unknown material is ins(n;?), not add
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      Material of unknown origin inserted into a chromosome arm is written with ins and ?, as
+      der(5)ins(5;?)(q13;?). add(5)(q13) would mean that the unknown material replaced the
+      whole segment 5q13→qter.
+    cite:
+      - {section: "9.2.1", page: 60, para: "¶4"}
+    examples:
+      valid:
+        - text: "46,XX,der(5)ins(5;?)(q13;?)"
+          cite: {section: "9.2.1", page: 60, example: E4}
+        - text: "46,XX,der(5)ins(5;?)(pter→q13::?::q13→qter)"
+          cite: {section: "9.2.1", page: 60, example: E4}
+        - text: "46,XX,der(1)ins(1;?)(p22;?)"
+          cite: {section: "9.1", page: 59, example: E10}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: Whether the material is inserted or replaces a segment can't be read from the string, so this is an explanation, not a check.
+    related: [ADD.FORMAT, DER.INSERTION_POINT_CONVENTION]
+
+  - id: DER.MULTIPLE_ABERRATIONS_ONE_CHROMOSOME
+    title: Several aberrations in one chromosome make it a der
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A chromosome with more than one aberration is a derivative chromosome and is written
+      der(n) followed by all its aberrations: added material on both arms or replacing more than
+      one segment, several deletions, several hsr or an hsr plus another change, and complex
+      dicentric chromosomes.
+    cite:
+      - {section: "9.2.1", page: 59, para: "¶3"}
+      - {section: "9.2.2", page: 60, para: "¶2"}
+      - {section: "9.2.3", page: 61, para: "¶4"}
+      - {section: "9.2.4", page: 66, para: "¶2"}
+      - {section: "9.2.8", page: 68, para: "¶2"}
+    examples:
+      valid:
+        - text: "46,XX,der(5)add(5)(p15.3)add(5)(q23)"
+          cite: {section: "9.2.1", page: 59, example: E3}
+        - text: "46,XX,der(5)(?::p15.3→q23::?)"
+          cite: {section: "9.2.1", page: 59, example: E3}
+        - text: "46,XY,der(9)del(9)(p12)del(9)(q31)"
+          cite: {section: "9.2.3", page: 61, example: E5}
+        - text: "46,XY,der(9)(:p12→q31:)"
+          cite: {section: "9.2.3", page: 61, example: E5}
+        - text: "46,XY,der(9)inv(9)(p13p23)del(9)(q22q33)"
+          cite: {section: "9.2.3", page: 61, example: E6}
+        - text: "46,XY,der(9)(pter→p23::p13→p23::p13→q22::q33→qter)"
+          cite: {section: "9.2.3", page: 61, example: E6}
+        - text: "46,XX,der(7)add(7)(p22)add(7)(q22)"
+          cite: {section: "9.2.3", page: 61, example: E7}
+        - text: "46,XX,der(7)(?::p22→q22::?)"
+          cite: {section: "9.2.3", page: 61, example: E7}
+        - text: "46,XX,der(5)add(5)(p15.1)del(5)(q13)"
+          cite: {section: "9.2.3", page: 61, example: E8}
+        - text: "46,XX,der(5)(?::p15.1→q13:)"
+          cite: {section: "9.2.3", page: 61, example: E8}
+        - text: "46,XX,der(1)hsr(1)(p22)hsr(1)(q31)"
+          cite: {section: "9.2.8", page: 68, example: E2}
+        - text: "46,XX,der(1)(pter→p22::hsr::p22→q31::hsr::q31→qter)"
+          cite: {section: "9.2.8", page: 68, example: E2}
+        - text: "46,XY,der(1)del(1)(p21p33)hsr(1)(p21)"
+          cite: {section: "9.2.8", page: 68, example: E3}
+        - text: "46,XY,der(1)(pter→p33::hsr::p21→qter)"
+          cite: {section: "9.2.8", page: 68, example: E3}
+      invalid:
+        - text: "46,XX,add(5)(p15.3)add(5)(q23)"
+          why: Two aberrations of one chromosome 5 without der(5) in front.
+          corrected: "46,XX,der(5)add(5)(p15.3)add(5)(q23)"
+        - text: "46,XY,del(9)(p12)del(9)(q31)"
+          why: Two deletions of one chromosome 9 must be written as a derivative chromosome.
+          corrected: "46,XY,der(9)del(9)(p12)del(9)(q31)"
+    fix: {level: 1, kind: insert, hint: "Insert der(n) before the aberrations of the same chromosome."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Written as separate comma-separated items (add(5)(p15.3),add(5)(q23)) the two aberrations
+        would describe two different chromosomes 5, which is valid; only the unseparated form
+        without der is an error.
+    related: [DER.DEFINITION, DER.ABERRATIONS_NO_COMMA, DER.ABERRATION_ORDER]
