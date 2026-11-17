@@ -16,7 +16,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-004 | done | 1 | T-001 | KB JSON Schema (rules, quotes, vocabularies, ID & citation conventions) |
 | T-005 | done | 1 | T-004 | KB build script (validate → SQLite FTS5 + JSON bundle; review reports) |
 | T-006 | done | 1 | T-001 | Band data generator from UCSC cytoBand (all resolutions, versioned) |
-| T-007 | todo | 1 | T-006, T-003 | Spot-check bands vs. ISCN 2016 ideograms; exceptions YAML |
+| T-007 | done | 1 | T-006, T-003 | Spot-check bands vs. ISCN 2016 ideograms; exceptions YAML |
 | T-008 | todo | 1 | T-003, T-005 | KB: ch. 2–3 (band nomenclature, symbols & abbreviated terms) |
 | T-009 | todo | 1 | T-008 | KB: ch. 4 (karyotype designation, short/detailed systems, derivatives) |
 | T-010 | todo | 1 | T-008 | KB: ch. 5–7 (uncertainty, order of abnormalities, variable features) |
@@ -63,6 +63,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-051 | todo | 2 | T-049, T-050 | Comparison engine + CLI report |
 | T-052 | todo | 3 | T-051, T-038 | Desktop: comparison view |
 | T-053 | discussion | 1 | T-003 | Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`? |
+| T-054 | discussion | 2 | T-021 | Literal translation of ISCN strings into plain language: scope, style, architecture |
 
 ---
 
@@ -138,7 +139,7 @@ From T-004: reuse `cytolex_tools.kb.schema` (`validate_file`, also behind `kb ch
 **Notes:** Done (2026-11-16). `kb bands [--version] [--out] [--cache] [--cache-only] [--update-pins]` → committed `kb/bands/2016/bands.yaml`: 1,150 names (NCBI 400/553/862 at 400/550/850 + 52 nesting ancestors), GRCh37/38 coordinates (1-based closed), stain, parent, levels; byte-identical re-runs. Code: `tools/src/cytolex_tools/bands/` (`fetch`, `parse`, `generate`, `lookup`, `sources/2016.yaml` with sha256 pins); tests `tools/tests/test_bands.py` + chr22 fixtures (121 pass). Docs: `CLAUDE.md`, `README.md`, `kb/README.md`, `docs/decisions.md`. Deviation (decided with the user): NCBI Genome Decoration Page ideograms are the primary source (UCSC has only the 850 level) and UCSC cytoBand is the cross-check; 300/700 have no public source → `levels_unavailable`, handed to T-007.
 
 ### T-007 — Spot-check bands vs. ideograms
-**Status:** todo
+**Status:** done
 **Description:** Compare generated band data against ISCN 2016 ideograms (book pp. 14–33) for a sample of chromosomes (e.g. 1, 9, 22, X). Record differences in a cited exceptions YAML.
 **Acceptance:**
 - Sample checked.
@@ -146,6 +147,7 @@ From T-004: reuse `cytolex_tools.kb.schema` (`validate_file`, also behind `kb ch
 - The generator applies the exceptions.
 **Notes:** Before starting, person sign-off of **Table 3** (landmarks, p.15): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`. See `docs/extraction-review-2016.md`.
 From T-006: `kb/bands/2016/bands.yaml` has the NCBI 400/550/850 band sets plus nesting ancestors; **300 and 700 have no public source** (`levels_unavailable`). Decide here whether to tag them from the book's ideograms (exceptions/level file) or leave them out. The exceptions file needs a format (and a schema), and it plugs into `cytolex_tools/bands/generate.py` (apply before `render`; bump `GENERATOR_VERSION`). Use `cytolex_tools.bands.lookup.load()` for spot checks.
+**Outcome:** Done (2026-11-17). Deviation from "sample only" (decided with the user): the Fig. 5 idiogram labels (pp.16–29) are text in a figure-only font, so the new `kb ideograms` decodes all 24 chromosomes × 300/400/550/700/850 (2,894 labels) into committed `kb/bands/2016/ideograms.yaml`, with review crops in `build/review/bands/2016/`. Spot-check of chr1, 9, 22, X signed off by the user (`spot_check` in `bands/sources/2016.yaml`). Full comparison with NCBI found 21 differing regions; all are in cited `kb/bands/2016/exceptions.yaml` (schema `kb/schema/band-exceptions.schema.json`, `kb check` accepts it). Policy: the book wins; 6 NCBI-only names (6p24.1–3, 9q34.11–13) are kept with `book: false` (§15.3 uses `9q34.11`). `kb bands` (generator v2) applies the exceptions, fails on unexplained/stale differences with a draft in `build/review/bands/2016/exceptions-draft.yaml`, and adds levels 300/700 from the book plus a `book` flag. `bands.yaml`: 1,165 names, 15 book-only sub-bands without coordinates. Code: `tools/src/cytolex_tools/bands/` (`ideograms.py`, `book.py`, `common.py`; `generate.py`, `cli.py`, `kb/schema.py` changed); tests `tools/tests/test_ideograms.py` + `test_bands.py` (152 pass). Docs: `CLAUDE.md`, `README.md`, `kb/README.md`, `docs/decisions.md`, `docs/extraction-review-2016.md`; follow-up notes added to T-022 and T-029.
 
 ## Knowledge base (ISCN 2016)
 
@@ -252,13 +254,26 @@ All KB tasks share these steps and criteria:
 - How book-ambiguous rules are reported.
 - What "valid" means when there are only warnings.
 **Acceptance:** Policy in `docs/decisions.md`.
-**Notes:**
+**Notes:** From T-007: include the severity for band names that exist in the genome assemblies but not in the book's idiograms (`book: false` in band data, e.g. 9q34.12 in a karyotype string).
 
 ### T-053 — Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`?
 **Status:** discussion
 **Description:** The book prints the minus sign as an en dash (`–5`, `arr(1–22)`), copy numbers with `×` (`×2`) and the arrow as `→`; users usually type `-`, `x` and `->`. The ch. 3 symbol list itself gives "arrow (→ or ->)" (p.34). Decide whether the validator treats the ASCII forms as equivalent, as a warning with a level-1 fix, or as an error, per edition. Found in T-003 (`docs/extraction-review-2016.md`, "Glyphs and characters"). Related: T-022 (strictness policy).
 **Acceptance:** Decision in `docs/decisions.md`; the KB rule(s) to write are named.
 **Notes:**
+
+### T-054 — Literal translation of ISCN strings into plain language
+**Status:** discussion
+**Description:** Render a valid ISCN string as plain-language text describing what it literally says, e.g. `46,XY,del(5)(q13q33)` → "46 chromosomes, XY sex chromosomes. Interstitial deletion of the long arm of chromosome 5 between bands 5q13 and 5q33." **Literal translation only:** no clinical interpretation or disease association (out of scope; a separate decision if ever wanted). Must work for any string the parser accepts, not only the book's examples. Questions to decide:
+- Scope: which notation types are translated in the pilot (follows T-021) and how partially valid strings are handled (translate the valid parts + list errors, or refuse).
+- Output style: a short summary and/or a per-abnormality breakdown; wording per context (constitutional vs. neoplastic: "46,XY" in a tumour sample is not "a male person"); clones, `idem`/`sl`/`sdl`, uncertainty (`?`, `~`, `or`).
+- Optional detail from band data: genomic coordinates and approximate size per segment (GRCh37/38; book-only bands have none); link to LGF (T-050).
+- Traceability: each phrase tied to the KB rule ID(s) of the notation it renders, with citation; version-aware like validation.
+- Architecture: a renderer in the core library working on the parser's structured output (T-027). T-023 must keep enough meaning in that model (event type, chromosomes, arms, breakpoints, derivative structure, clone membership).
+- Language(s): English only for the pilot, or localisable templates.
+- Tests: book examples with their printed explanations as expected outputs (KB tasks T-008+ should capture those explanations), plus a reviewed set of non-book strings.
+**Acceptance:** Decision in `docs/decisions.md`; follow-up `todo` task(s) for the implementation added with Pri and Depends; T-023 requirements noted.
+**Notes:** Raised 2026-11-17 (user). Should be decided before T-023 (core design), so the data model supports it.
 
 ## Core library
 
@@ -308,7 +323,7 @@ All KB tasks share these steps and criteria:
 **Status:** todo
 **Description:** Symbols, separators, chromosome identifiers, band existence and resolution (using band data from T-006/T-007).
 **Acceptance:** Related KB examples pass.
-**Notes:**
+**Notes:** From T-007: `kb/bands/2016/bands.yaml` entries carry `levels` (300–850, book-corrected) and `book`. `book: false` marks 6 NCBI-only names (6p24.1–3, 9q34.11–13) that are valid for genome-band contexts (arr/seq, e.g. §15.3 `9q34.11q34.3`) but absent from the book's idiograms. Decide with T-022 whether karyotype/ISH strings using them get a warning. 15 book-only 850 sub-bands (e.g. 1q32.11) have `grch37/grch38: null`.
 
 ### T-030 — Rules: numerical + sex chromosomes + ordering
 **Status:** todo

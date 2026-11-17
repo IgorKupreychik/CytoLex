@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cytolex.local/schema/band-exceptions.schema.json",
+  "title": "CytoLex — band exceptions (kb/bands/<version>/exceptions.yaml)",
+  "description": "Every difference between the book's idiograms (kb/bands/<version>/ideograms.yaml) and the NCBI band sets, per level, decided and cited (T-007). `kb bands` fails on a difference without an entry and on an entry that no longer matches a difference.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "exceptions"],
+  "properties": {
+    "version": { "$ref": "common.schema.json#/$defs/version" },
+    "exceptions": { "type": "array", "items": { "$ref": "#/$defs/exception" } }
+  },
+  "$defs": {
+    "band": {
+      "type": "string",
+      "pattern": "^([1-9]|1[0-9]|2[0-2]|X|Y)[pq][1-9][0-9]?(\\.[0-9]{1,2})?$",
+      "x-expected": "a band name such as 9q34.1 (no ranges, no arm-level terms)"
+    },
+    "bands": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/band" },
+      "uniqueItems": true
+    },
+    "exception": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "region", "book", "ncbi", "resolution", "cite", "note"],
+      "properties": {
+        "level": {
+          "description": "Band level compared (the NCBI sets exist for 400, 550 and 850).",
+          "enum": [400, 550, 850]
+        },
+        "region": {
+          "description": "The shortest name of the group: every name in `book` and `ncbi` is it or one of its sub-bands.",
+          "$ref": "#/$defs/band"
+        },
+        "book": {
+          "description": "Names the book shows at this level and NCBI doesn't (ranges expanded).",
+          "$ref": "#/$defs/bands"
+        },
+        "ncbi": {
+          "description": "Names NCBI has at this level and the book doesn't.",
+          "$ref": "#/$defs/bands"
+        },
+        "resolution": {
+          "description": "book: the level follows the book (book names gain it, NCBI-only names lose it). ncbi: the NCBI level is kept.",
+          "enum": ["book", "ncbi"]
+        },
+        "keep": {
+          "description": "With resolution book: NCBI-only names that no book level covers and that stay valid anyway, flagged `book: false` in bands.yaml with their NCBI levels.",
+          "$ref": "#/$defs/bands"
+        },
+        "cite": { "$ref": "common.schema.json#/$defs/cite" },
+        "note": { "$ref": "common.schema.json#/$defs/text" }
+      }
+    }
+  }
+}

@@ -113,7 +113,8 @@ Person check pending (`review.human: pending`).
 
 | Item | § | Page | Status |
 |---|---|---|---|
-| Fig. 1–4 karyograms, Fig. 5–6 idiograms | 2.2–2.5 | 9–32 | images; captions kept. Band data come from UCSC (T-006/T-007) |
+| Fig. 1–4 karyograms, Fig. 6 G/R-banded chromosomes | 2.2–2.5 | 9–13, 30–33 | images; captions kept |
+| Fig. 5 idiograms | 2.5 | 16–29 | drawings; their band labels (figure font, private-use glyphs) are dropped from the chunks and decoded separately by `kb ideograms` into `kb/bands/2016/ideograms.yaml` (T-007; spot-check of chr1, 9, 22, X signed off 2026-11-17) |
 | Fig. 7 endoreduplication | 4.1 | 39 | image; caption kept |
 | Fig. 8 pachytene diagram, Fig. 9 inversion loop | 4.3.2, 4.4 | 43, 45 | images; the text refers to their labels (A–D telomeres) |
 | Fig. 10 chromomere idiogram | 12.1.2 | 96–98 | image; "continued" note attached |

@@ -1,0 +1,179 @@
+# Differences between the ISCN 2016 idiograms (Fig. 5, decoded into ideograms.yaml) and the
+# NCBI Genome Decoration Page band sets, per level (T-007). `kb bands` fails on a difference
+# without an entry here and on an entry that no longer matches a difference; a draft of all
+# current differences is written to build/review/bands/2016/exceptions-draft.yaml.
+# Policy (decided 2026-11-16/17): the book wins (resolution: book), each case cited. NCBI names
+# that no book level shows stay valid only when listed under `keep` (flagged book: false).
+# Schema: kb/schema/band-exceptions.schema.json; check with `kb check kb/bands/2016/exceptions.yaml`.
+version: '2016'
+exceptions:
+  - level: 400
+    region: '15q26'
+    book: ['15q26.1', '15q26.2', '15q26.3']
+    ncbi: ['15q26']
+    resolution: book
+    cite: {section: '2.5', page: 26, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides 15q26 into 15q26.1, 15q26.2, 15q26.3 at the 400-band level; NCBI's 400 set has 15q26 only. Book wins: the sub-bands get level 400, 15q26 loses it.
+  - level: 400
+    region: '16q12'
+    book: ['16q12']
+    ncbi: ['16q12.1', '16q12.2']
+    resolution: book
+    cite: {section: '2.5', page: 26, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 prints the merged band '12–13' (16q12–q13) at the 400-band level, read as 16q12 and 16q13; NCBI's 400 set has 16q12.1, 16q12.2 (and 16q13). Book wins: 16q12 gets level 400, its sub-bands lose it.
+  - level: 400
+    region: '18q21'
+    book: ['18q21.1', '18q21.2', '18q21.3']
+    ncbi: ['18q21']
+    resolution: book
+    cite: {section: '2.5', page: 27, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides 18q21 into 18q21.1, 18q21.2, 18q21.3 at the 400-band level; NCBI's 400 set has 18q21 only. Book wins: the sub-bands get level 400, 18q21 loses it.
+  - level: 400
+    region: 'Yq11.2'
+    book: ['Yq11.21', 'Yq11.22', 'Yq11.23']
+    ncbi: ['Yq11.2']
+    resolution: book
+    cite: {section: '2.5', page: 29, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides Yq11.2 into Yq11.21, Yq11.22, Yq11.23 at the 400-band level; NCBI's 400 set has Yq11.2 only. Book wins: the sub-bands get level 400, Yq11.2 loses it.
+  - level: 550
+    region: '1q21'
+    book: ['1q21']
+    ncbi: ['1q21.1', '1q21.2', '1q21.3']
+    resolution: book
+    cite: {section: '2.5', page: 16, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 shows 1q21 undivided at the 550-band level; NCBI's 550 set has 1q21.1, 1q21.2, 1q21.3. Book wins: 1q21 gets level 550, the sub-bands lose it.
+  - level: 550
+    region: '1q23'
+    book: ['1q23.1', '1q23.2', '1q23.3']
+    ncbi: ['1q23']
+    resolution: book
+    cite: {section: '2.5', page: 16, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides 1q23 into 1q23.1, 1q23.2, 1q23.3 at the 550-band level; NCBI's 550 set has 1q23 only. Book wins: the sub-bands get level 550, 1q23 loses it.
+  - level: 550
+    region: '1q25'
+    book: ['1q25.1', '1q25.2', '1q25.3']
+    ncbi: ['1q25']
+    resolution: book
+    cite: {section: '2.5', page: 16, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides 1q25 into 1q25.1, 1q25.2, 1q25.3 at the 550-band level; NCBI's 550 set has 1q25 only. Book wins: the sub-bands get level 550, 1q25 loses it.
+  - level: 550
+    region: '3p11'
+    book: ['3p11.2', '3p11.1']
+    ncbi: ['3p11']
+    resolution: book
+    cite: {section: '2.5', page: 18, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides 3p11 into 3p11.2, 3p11.1 at the 550-band level; NCBI's 550 set has 3p11 only. Book wins: the sub-bands get level 550, 3p11 loses it.
+  - level: 550
+    region: '4p16'
+    book: ['4p16.3', '4p16.2', '4p16.1']
+    ncbi: ['4p16']
+    resolution: book
+    cite: {section: '2.5', page: 19, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides 4p16 into 4p16.3, 4p16.2, 4p16.1 at the 550-band level; NCBI's 550 set has 4p16 only. Book wins: the sub-bands get level 550, 4p16 loses it.
+  - level: 550
+    region: '8q24.2'
+    book: ['8q24.21', '8q24.22', '8q24.23']
+    ncbi: ['8q24.2']
+    resolution: book
+    cite: {section: '2.5', page: 22, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides 8q24.2 into 8q24.21, 8q24.22, 8q24.23 at the 550-band level; NCBI's 550 set has 8q24.2 only. Book wins: the sub-bands get level 550, 8q24.2 loses it.
+  - level: 550
+    region: '11q24'
+    book: ['11q24.1', '11q24.2', '11q24.3']
+    ncbi: ['11q24']
+    resolution: book
+    cite: {section: '2.5', page: 24, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides 11q24 into 11q24.1, 11q24.2, 11q24.3 at the 550-band level; NCBI's 550 set has 11q24 only. Book wins: the sub-bands get level 550, 11q24 loses it.
+  - level: 550
+    region: 'Xp22.3'
+    book: ['Xp22.33', 'Xp22.32', 'Xp22.31']
+    ncbi: ['Xp22.3']
+    resolution: book
+    cite: {section: '2.5', page: 29, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides Xp22.3 into Xp22.33, Xp22.32, Xp22.31 at the 550-band level; NCBI's 550 set has Xp22.3 only. Book wins: the sub-bands get level 550, Xp22.3 loses it.
+  - level: 550
+    region: 'Xq11'
+    book: ['Xq11.1', 'Xq11.2']
+    ncbi: ['Xq11']
+    resolution: book
+    cite: {section: '2.5', page: 29, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides Xq11 into Xq11.1, Xq11.2 at the 550-band level; NCBI's 550 set has Xq11 only. Book wins: the sub-bands get level 550, Xq11 loses it.
+  - level: 550
+    region: 'Yp11.3'
+    book: ['Yp11.32', 'Yp11.31']
+    ncbi: ['Yp11.3']
+    resolution: book
+    cite: {section: '2.5', page: 29, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides Yp11.3 into Yp11.32, Yp11.31 at the 550-band level; NCBI's 550 set has Yp11.3 only. Book wins: the sub-bands get level 550, Yp11.3 loses it.
+  - level: 850
+    region: '1q32.1'
+    book: ['1q32.11', '1q32.12', '1q32.13']
+    ncbi: ['1q32.1']
+    resolution: book
+    cite: {section: '2.5', page: 16, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides 1q32.1 into 1q32.11, 1q32.12, 1q32.13 at the 850-band level; NCBI's 850 set has 1q32.1 only. Book wins: the sub-bands get level 850, 1q32.1 loses it. No public source subdivides it, so the sub-bands have no coordinates or stain.
+  - level: 850
+    region: '2p21'
+    book: ['2p21.3', '2p21.2', '2p21.1']
+    ncbi: ['2p21']
+    resolution: book
+    cite: {section: '2.5', page: 17, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides 2p21 into 2p21.3, 2p21.2, 2p21.1 at the 850-band level; NCBI's 850 set has 2p21 only. Book wins: the sub-bands get level 850, 2p21 loses it. No public source subdivides it, so the sub-bands have no coordinates or stain.
+  - level: 850
+    region: '5q13.2'
+    book: ['5q13.21', '5q13.22', '5q13.23']
+    ncbi: ['5q13.2']
+    resolution: book
+    cite: {section: '2.5', page: 20, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides 5q13.2 into 5q13.21, 5q13.22, 5q13.23 at the 850-band level; NCBI's 850 set has 5q13.2 only. Book wins: the sub-bands get level 850, 5q13.2 loses it. No public source subdivides it, so the sub-bands have no coordinates or stain.
+  - level: 850
+    region: '6p24'
+    book: ['6p24']
+    ncbi: ['6p24.3', '6p24.2', '6p24.1']
+    resolution: book
+    keep: ['6p24.3', '6p24.2', '6p24.1']
+    cite: {section: '2.5', page: 21, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 shows 6p24 undivided at the 850-band level; NCBI's 850 set has 6p24.3, 6p24.2, 6p24.1. Book wins: 6p24 gets level 850. 6p24.3, 6p24.2, 6p24.1 appear in no idiogram of the book; listed under keep, they stay valid with their NCBI level 850 and book: false, since array/sequence notation uses genome-assembly bands.
+  - level: 850
+    region: '6p22.3'
+    book: ['6p22.33', '6p22.32', '6p22.31']
+    ncbi: ['6p22.3']
+    resolution: book
+    cite: {section: '2.5', page: 21, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides 6p22.3 into 6p22.33, 6p22.32, 6p22.31 at the 850-band level; NCBI's 850 set has 6p22.3 only. Book wins: the sub-bands get level 850, 6p22.3 loses it. No public source subdivides it, so the sub-bands have no coordinates or stain.
+  - level: 850
+    region: '6q21'
+    book: ['6q21.1', '6q21.2', '6q21.3']
+    ncbi: ['6q21']
+    resolution: book
+    cite: {section: '2.5', page: 21, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 subdivides 6q21 into 6q21.1, 6q21.2, 6q21.3 at the 850-band level; NCBI's 850 set has 6q21 only. Book wins: the sub-bands get level 850, 6q21 loses it. No public source subdivides it, so the sub-bands have no coordinates or stain.
+  - level: 850
+    region: '9q34.1'
+    book: ['9q34.1']
+    ncbi: ['9q34.11', '9q34.12', '9q34.13']
+    resolution: book
+    keep: ['9q34.11', '9q34.12', '9q34.13']
+    cite: {section: '2.5', page: 23, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 shows 9q34.1 undivided at the 850-band level; NCBI's 850 set has 9q34.11, 9q34.12, 9q34.13. Book wins: 9q34.1 gets level 850. 9q34.11, 9q34.12, 9q34.13 appear in no idiogram of the book; listed under keep, they stay valid with their NCBI level 850 and book: false, since array/sequence notation uses genome-assembly bands, e.g. ISCN 2016 §15.3 `9q34.11q34.3`.

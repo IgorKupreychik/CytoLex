@@ -3,12 +3,13 @@
 # NCBI Genome Decoration Page ideograms give the real 400/550/850 band sets per assembly
 # (GCF_000001305.13 = GRCh37, .16 = GRCh38; .14/.15 are byte-identical to .16).
 # UCSC cytoBand (850 level only) cross-checks names and coordinates and is the canonical
-# source of 850-level coordinates. No public source has the 300 or 700 level (see T-007).
+# source of 850-level coordinates. No public source has the 300 or 700 level; they come from
+# the book's idiograms (T-007, section `ideograms` below).
 #
 # sha256 pins the exact bytes downloaded; a mismatch fails the run. After a deliberate
 # upstream change, re-pin with `kb bands --update-pins` and review the band diff.
 version: '2016'
-levels_unavailable: [300, 700]
+levels_unavailable: []  # 300/700 come from the book's idiograms (T-007)
 files:
   - id: ncbi-grch37-400
     kind: ncbi_gdp
@@ -58,3 +59,36 @@ files:
     level: 850
     url: https://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/cytoBand.txt.gz
     sha256: 'e514e48b0a12a516fd5231b44241a20a282f290bdd6131cadcddc6276ee26082'
+
+# Book idiograms (T-007): `kb ideograms` decodes the band labels of Fig. 5 from the PDF text
+# layer into kb/bands/2016/ideograms.yaml; `kb bands` compares them with the NCBI sets and
+# applies kb/bands/2016/exceptions.yaml. Labels use a figure-only font whose glyphs map to
+# private-use code points; every mapping below was checked against rendered pages.
+ideograms:
+  figure: Fig. 5
+  section: '2.5'
+  pages: [16, 29]  # book pages
+  font: TTE2340D80t00
+  chromosome_font: MyriadPro-Bold  # chromosome number below each row
+  chromosome_min_size: 10
+  glyphs:
+    U+F001: '3'
+    U+F002: '6'
+    U+F003: '.'
+    U+F004: '2'
+    U+F005: '1'
+    U+F006: '5'
+    U+F007: '4'
+    U+F008: '–'  # range of merged bands at the 300 level ('22–24')
+    U+F009: p
+    U+F00A: q
+    U+F00B: '7'
+    U+F00C: '8'
+    U+F00D: '9'
+  # Visual sign-off (by a person) of the decoded labels against the rendered idiograms (`kb ideograms`
+  # writes build/review/bands/2016/chr<N>.png + .txt).
+  spot_check:
+    - {chrom: '1', page: 16, human: ok, date: '2026-11-17'}
+    - {chrom: '9', page: 23, human: ok, date: '2026-11-17'}
+    - {chrom: '22', page: 28, human: ok, date: '2026-11-17'}
+    - {chrom: 'X', page: 29, human: ok, date: '2026-11-17'}

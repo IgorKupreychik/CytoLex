@@ -13,6 +13,7 @@ SUBCOMMANDS = {
     "check": ("Check KB rule/quote YAML files against the schemas in kb/schema/", "T-004"),
     "build": ("Validate the KB and build SQLite (FTS5) + JSON bundle", "T-005"),
     "bands": ("Generate band data from NCBI GDP ideograms + UCSC cytoBand", "T-006"),
+    "ideograms": ("Decode the band labels of the book's idiograms from the ISCN PDF", "T-007"),
 }
 
 
@@ -35,15 +36,17 @@ def build_parser() -> argparse.ArgumentParser:
             )
             continue
         p.add_argument("--version", default="2016", help="ISCN edition (default: 2016)")
-        if name in ("extract", "tables"):
+        if name in ("extract", "tables", "ideograms"):
             p.add_argument(
                 "--pdf",
                 type=Path,
                 help="ISCN PDF (default: config/local.yaml or CYTOLEX_ISCN_PDF_<VERSION>)",
             )
-            default_out = (
-                "kb/source-text/<version>" if name == "extract" else "build/review/tables/<version>"
-            )
+            default_out = {
+                "extract": "kb/source-text/<version>",
+                "tables": "build/review/tables/<version>",
+                "ideograms": "kb/bands/<version>",
+            }[name]
             p.add_argument("--out", type=Path, help=f"output dir (default: {default_out})")
         if name == "bands":
             p.add_argument("--out", type=Path, help="output dir (default: kb/bands/<version>)")
@@ -61,6 +64,14 @@ def build_parser() -> argparse.ArgumentParser:
                 help="accept the current source files and rewrite their sha256 pins",
             )
             p.add_argument("--sources", type=Path, help=argparse.SUPPRESS)  # tests
+            p.add_argument("--book", type=Path, help=argparse.SUPPRESS)  # tests
+            p.add_argument("--review", type=Path, help=argparse.SUPPRESS)  # tests
+        if name == "ideograms":
+            p.add_argument(
+                "--review",
+                type=Path,
+                help="review crops dir (default: build/review/bands/<version>)",
+            )
     return parser
 
 
@@ -169,7 +180,16 @@ def cmd_bands(args: argparse.Namespace) -> int:
     out = args.out or REPO_ROOT / "kb" / "bands" / args.version
     cache = args.cache or REPO_ROOT / "build" / "cache" / "bands" / args.version
     try:
-        report = run(args.version, out, cache, args.cache_only, args.update_pins, args.sources)
+        report = run(
+            args.version,
+            out,
+            cache,
+            args.cache_only,
+            args.update_pins,
+            args.sources,
+            args.book,
+            args.review,
+        )
     except FileNotFoundError as exc:
         print(f"kb bands: {exc}", file=sys.stderr)
         return 1
@@ -180,17 +200,60 @@ def cmd_bands(args: argparse.Namespace) -> int:
     for pr in report.problems:
         print(f"  PROBLEM: {pr}", file=sys.stderr)
     if report.problems:
+        if report.draft:
+            print(f"  draft with every difference: {report.draft}", file=sys.stderr)
         print(
             f"kb bands: FAILED, {len(report.problems)} problem(s); nothing written",
             file=sys.stderr,
         )
         return 1
     c = report.counts
+    per_level = _per_level(c)
     print(
         f"kb bands: ISCN {args.version}: {c['bands']} band names "
-        f"({c['level_400']} at 400, {c['level_550']} at 550, {c['level_850']} at 850, "
-        f"{c['derived']} derived) -> {report.out}"
+        f"({per_level}, {c['derived']} derived) -> {report.out}"
     )
+    return 0
+
+
+def _per_level(counts: dict[str, int]) -> str:
+    return ", ".join(
+        f"{v} at {k.removeprefix('level_')}" for k, v in counts.items() if k.startswith("level_")
+    )
+
+
+def cmd_ideograms(args: argparse.Namespace) -> int:
+    from .bands.ideograms import run
+
+    out = args.out or REPO_ROOT / "kb" / "bands" / args.version
+    review = args.review or REPO_ROOT / "build" / "review" / "bands" / args.version
+    try:
+        pdf = args.pdf or iscn_pdf_path(args.version)
+        report = run(args.version, pdf, out, review)
+    except (FileNotFoundError, KeyError) as exc:
+        print(f"kb ideograms: {exc}", file=sys.stderr)
+        return 1
+    for w in report.warnings:
+        print(f"  warning: {w}")
+    for pr in report.problems:
+        print(f"  PROBLEM: {pr}", file=sys.stderr)
+    if report.problems:
+        print(
+            f"kb ideograms: FAILED, {len(report.problems)} problem(s); nothing written",
+            file=sys.stderr,
+        )
+        return 1
+    c = report.counts
+    per_level = _per_level(c)
+    print(
+        f"kb ideograms: ISCN {args.version}: {c['labels']} labels ({per_level}; "
+        f"{c['ranges']} ranges) -> {report.out}; review crops in {review}"
+    )
+    if c.get("split_by_centromere"):
+        print(
+            f"  {c['split_by_centromere']} idiograms had an ambiguous label order at the "
+            "centromere (p11 | q11.1); split at the drawn centromere"
+        )
     return 0
 
 
@@ -204,6 +267,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_check(args)
     if args.command == "build":
         return cmd_build(args)
+    if args.command == "ideograms":
+        return cmd_ideograms(args)
     return cmd_bands(args)
 
 

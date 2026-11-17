@@ -1,7 +1,8 @@
 """Validate KB rule and quote YAML files against the JSON Schemas in `kb/schema/`.
 
 A file's kind is taken from its top-level key: `rules` → rules.schema.json,
-`quotes` → quotes.schema.json. Only the schema is checked here; cross-file checks
+`quotes` → quotes.schema.json, `exceptions` → band-exceptions.schema.json (T-007).
+Only the schema is checked here; cross-file checks
 (unique IDs, quote ↔ rule links, version vs directory) belong to `kb build` (T-005).
 """
 
@@ -19,7 +20,11 @@ from ruamel.yaml.error import YAMLError
 from ..config import REPO_ROOT
 
 SCHEMA_DIR = REPO_ROOT / "kb" / "schema"
-SCHEMA_FILES = {"rules": "rules.schema.json", "quotes": "quotes.schema.json"}
+SCHEMA_FILES = {
+    "rules": "rules.schema.json",
+    "quotes": "quotes.schema.json",
+    "exceptions": "band-exceptions.schema.json",  # kb/bands/<version>/exceptions.yaml (T-007)
+}
 YAML_SUFFIXES = {".yaml", ".yml"}
 
 
@@ -46,7 +51,7 @@ def _registry(schema_dir: Path) -> Registry:
 
 @cache
 def validator(kind: str, schema_dir: Path = SCHEMA_DIR) -> Draft202012Validator:
-    """Validator for `kind` ('rules' or 'quotes'), with `$ref`s to sibling schemas resolved."""
+    """Validator for `kind` (a key of SCHEMA_FILES), with `$ref`s to sibling schemas resolved."""
     schema = json.loads((schema_dir / SCHEMA_FILES[kind]).read_text(encoding="utf-8"))
     Draft202012Validator.check_schema(schema)
     return Draft202012Validator(schema, registry=_registry(schema_dir))
@@ -76,16 +81,19 @@ def _message(error: ValidationError) -> str:
     return error.message
 
 
+_KINDS = ", ".join(f"'{k}'" for k in SCHEMA_FILES)
+
+
 def _sort_key(e: ValidationError) -> tuple:
     return (tuple(str(p) for p in e.absolute_path), e.message)
 
 
 def validate_data(data: object, file: Path, schema_dir: Path = SCHEMA_DIR) -> list[Problem]:
     if not isinstance(data, dict):
-        return [Problem(file, "", "expected a mapping with a top-level 'rules' or 'quotes' list")]
+        return [Problem(file, "", f"expected a mapping with a top-level {_KINDS} list")]
     kinds = [k for k in SCHEMA_FILES if k in data]
     if len(kinds) != 1:
-        return [Problem(file, "", "needs exactly one top-level key: 'rules' or 'quotes'")]
+        return [Problem(file, "", f"needs exactly one top-level key: {_KINDS}")]
     v = validator(kinds[0], schema_dir)
     errors = sorted(v.iter_errors(data), key=_sort_key)
     return [Problem(file, _where(e), _message(e)) for e in errors]

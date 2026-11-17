@@ -51,8 +51,8 @@ The KB is the single source for all validation decisions.
 
 ## Band data
 - **Hybrid approach:**
-  - A script (`kb bands`) generates bands from the NCBI Genome Decoration Page ideograms (real 400/550/850 sets) and UCSC cytoBand (850, cross-check), GRCh37/38; every nesting ancestor is a valid name. 300/700 have no public source (T-006 entry below; T-007).
-  - Spot-check against the book's ideograms; differences go in a cited YAML exceptions file.
+  - A script (`kb bands`) generates bands from the NCBI Genome Decoration Page ideograms (real 400/550/850 sets) and UCSC cytoBand (850, cross-check), GRCh37/38; every nesting ancestor is a valid name (T-006 entry below).
+  - The book's idiograms are decoded from the PDF (`kb ideograms`) and compared in full; every difference is decided in a cited YAML exceptions file, and 300/700 come from the book (T-007 entry below).
 - Stored per ISCN version. Coordinates are reused for `arr` checks.
 
 ## Workflow
@@ -143,3 +143,21 @@ _(entries added by `discussion` tasks: date — task — decision — rationale)
   - **Checks (any failure → exit 1, nothing written):** same names per level in both assemblies; NCBI 850 = UCSC names; NCBI vs UCSC coordinates within 1 bp (NCBI 850 files mix 0/1-based starts); every 400/550 name nests over 850 names and its coordinates equal the union of its sub-bands.
   - **Repeatability:** source URLs and sha256 pins in `tools/src/cytolex_tools/bands/sources/<version>.yaml`; a changed upstream file fails the run until re-pinned with `--update-pins`. Downloads are cached in `build/cache/bands/`. The output `kb/bands/<version>/bands.yaml` is committed (no network needed after a clone) and byte-identical across runs.
   - **Format:** YAML, one flow-style line per band (diff-friendly); stdlib `urllib` download, no new dependencies.
+
+- **2026-11-17 — T-007 — Book idiograms decoded from the PDF; full comparison; book wins with cited exceptions.**
+  - **Source (beyond the original "spot-check a sample" plan, decided with the user):** the Fig. 5 idiograms (book pp.16–29) are vector drawings whose band labels are text in a figure-only font (`TTE2340D80t00`) with private-use glyphs. `kb ideograms` decodes all 24 chromosomes × 5 levels (2,894 labels) deterministically:
+    - The glyph map (13 glyphs: digits, `.`, the range dash `–`, `p`, `q`) is in `bands/sources/2016.yaml` → `ideograms`.
+    - Glyphs are joined per baseline and adjacency, because word grouping merges stacked leader-line labels.
+    - Each label is assigned to the nearest idiogram to its right (columns from the drawn outlines; left to right = 300/400/550/700/850).
+    - Arms are split where the label order turns (p descending, q ascending). Where that is ambiguous (`p11 | q11.1`, 31 idiograms), the drawn centromere decides.
+  - **Output committed:** `kb/bands/2016/ideograms.yaml` (band labels only: factual names, no drawings), so `kb bands` runs without the PDF. Revisit under T-043 before any public release.
+  - **Spot-check:** the rendered crops of chr1, 9, 22 and X (`build/review/bands/2016/`) were compared label by label with the decoded lists at all five levels: all match. Signed off by the user on 2026-11-17 (`ideograms.spot_check[].human: ok`).
+  - **Ranges:** 300-level (and two 400-level) labels such as `22–24` are merged bands; they count for every band they span at the same depth (`22`, `23`, `24`).
+  - **Comparison:** at 400/550/850 the book and NCBI differ in 21 regions, grouped by the shortest differing name, e.g. 850 `9q34.1`: book [9q34.1] vs NCBI [9q34.11–13].
+    - Most are level moves only.
+    - 15 book-only 850 sub-bands have no public coordinates: 1q32.11–13, 2p21.1–3, 5q13.21–23, 6p22.31–33, 6q21.1–3.
+    - 6 NCBI 850 names appear in no idiogram: 6p24.1–3, 9q34.11–13.
+  - **Policy:** the book wins (`resolution: book`), each difference listed with citation (`§2.5, p.N, Fig. 5`) and note in `kb/bands/2016/exceptions.yaml` (schema `kb/schema/band-exceptions.schema.json`).
+    - `kb bands` fails on an unexplained or stale difference and writes a draft of all differences.
+    - The six NCBI-only names are **kept** (`keep:`) with `book: false`, because ISCN 2016 itself uses genome-assembly bands in array/sequence notation (§15.3 `9q34.11q34.3`). Whether to warn on them in karyotype/ISH context is for T-022/T-029.
+  - **bands.yaml (generator version 2):** levels 300–850, a `book` flag per name, book-only names with `null` coordinates and stain; 1,165 names.

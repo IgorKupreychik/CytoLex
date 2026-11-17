@@ -95,7 +95,7 @@ def test_float_labels_from_chunks_accepted(label):
 
 def test_file_without_rules_or_quotes_key():
     problems = validate_data({"version": "2016"}, Path("x.yaml"))
-    assert "'rules' or 'quotes'" in problems[0].message
+    assert "'rules', 'quotes', 'exceptions'" in problems[0].message
 
 
 def test_kb_check_cli_ok(capsys):
