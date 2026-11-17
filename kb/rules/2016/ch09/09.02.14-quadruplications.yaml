@@ -1,0 +1,27 @@
+version: "2016"
+section: "9.2.14"
+rules:
+  - id: QDP.FORMAT
+    title: qdp - quadruplication
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A quadruplication is written qdp(chromosome)(breakpoint breakpoint), with no separator between
+      the two breakpoints. The short system cannot show the orientation(s) of the segment; the
+      detailed system can.
+    cite:
+      - {section: "9.2.14", page: 72, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,qdp(1)(q23q32)"
+          cite: {section: "9.2.14", page: 72, example: E1}
+        - text: "46,XX,qdp(1)(pter→q32::q23→q32::q23→q32::q23→qter)"
+          cite: {section: "9.2.14", page: 72, example: E1}
+      invalid:
+        - text: "46,XX,qdp(1)(q23;q32)"
+          why: Both breakpoints are in one chromosome, so they are written together without a semicolon.
+          corrected: "46,XX,qdp(1)(q23q32)"
+    review:
+      paraphrase_checked: true
+      needs_review: false
+    related: [TRP.FORMAT, DUP.FORMAT, STRUCT.BREAKPOINT_GROUPS]

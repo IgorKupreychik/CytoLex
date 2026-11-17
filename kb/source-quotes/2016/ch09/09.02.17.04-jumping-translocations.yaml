@@ -1,0 +1,8 @@
+version: "2016"
+section: "9.2.17.4"
+quotes:
+  - rule: TRANSLOC.JUMPING
+    cite: {section: "9.2.17.4", page: 79, para: "¶1"}
+    text: >-
+      These can be described by the standard nomenclature for translocations. The clones are
+      presented in the same order as unrelated clones, i.e., in order of decreasing frequency

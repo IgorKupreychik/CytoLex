@@ -1,0 +1,55 @@
+version: "2016"
+section: "9.2.15"
+quotes:
+  - rule: RING.FORMAT
+    cite: {section: "9.2.15", page: 72, para: "¶1"}
+    text: >-
+      A ring, designated by the symbol r, may be composed of one or several chromosomes.
+  - rule: RING.FORMAT
+    cite: {section: "9.2.15", page: 73, para: "¶2"}
+    text: >-
+      As in other rearrangements affecting a single chromosome, there is no semicolon between the
+      band designations.
+  - rule: RING.MONOCENTRIC_AS_DER
+    cite: {section: "9.2.15", page: 73, para: "¶4"}
+    text: >-
+      Monocentric ring chromosomes are treated as derivative (der) chromosomes (see Section 9.2.3).
+      The chromosome that provides the centromere is listed first. The orientation of the acentric
+      segment is apparent from the order of the breakpoints.
+  - rule: RING.MONOCENTRIC_AS_DER
+    cite: {section: "9.2.15", page: 73, para: "¶5"}
+    text: >-
+      If the centromere of the ring chromosome is not known, but segments from other chromosomes
+      contained in the ring are recognized, the ring is designated der(?).
+  - rule: RING.DIC_TRC_ORDER
+    cite: {section: "9.2.15", page: 73, para: "¶6"}
+    text: >-
+      Dicentric or tricentric ring chromosomes are designated by the symbol r preceded by the
+      triplet dic or trc.
+  - rule: RING.DIC_TRC_ORDER
+    cite: {section: "9.2.15", page: 73, para: "¶7"}
+    text: >-
+      In dicentric ring chromosomes (dic r), the sex chromosomes or the autosome with the lowest
+      number is specified first.
+  - rule: RING.DIC_TRC_ORDER
+    cite: {section: "9.2.15", page: 74, para: "¶8"}
+    text: >-
+      In tricentric ring chromosomes (trc r), the sex chromosomes or the autosome with the lowest
+      number is specified first. The orientation of the chromosomes will be apparent from the order
+      of the breakpoints.
+  - rule: RING.UNIDENTIFIED
+    cite: {section: "9.2.15", page: 74, para: "¶9"}
+    text: >-
+      When the origin of the ring is known, the description of the ring is placed in the
+      appropriate chromosome number order.
+  - rule: RING.UNIDENTIFIED
+    cite: {section: "9.2.15", page: 74, para: "¶10"}
+    text: >-
+      When the origin of the ring is not known, the presence of the ring, preceded by a plus sign
+      (+), is indicated at the end of the karyotype, but before any other marker chromosome
+  - rule: RING.UNIDENTIFIED
+    cite: {section: "9.2.15", page: 74, para: "¶11"}
+    text: >-
+      Different rings may be indicated by an Arabic number after the symbol r, e.g., r1, r2, etc.,
+      whereas several copies of unidentified rings are indicated by the appropriate number before
+      the ring symbol, e.g., 5r.

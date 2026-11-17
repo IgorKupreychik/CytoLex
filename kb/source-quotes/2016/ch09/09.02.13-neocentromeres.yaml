@@ -1,0 +1,16 @@
+version: "2016"
+section: "9.2.13"
+quotes:
+  - rule: NEO.FORMAT
+    cite: {section: "9.2.13", page: 72, para: "¶1"}
+    text: >-
+      A chromosome with a neocentromere may be described with the symbol neo or as a derivative
+      chromosome with the assumption that a new centromere has arisen (or has been activated) within
+      the region(s) from which the chromosome segment was derived.
+  - rule: NEO.FORMAT
+    cite: {section: "9.2.13", page: 72, para: "¶2"}
+    text: >-
+      Unlike duplications in which the orientation of the duplicated segment is indicated by the
+      order of the bands with respect to the centromere, a supernumerary marker chromosome
+      containing a neocentromere may require the use of the detailed system depending on the
+      circumstance.

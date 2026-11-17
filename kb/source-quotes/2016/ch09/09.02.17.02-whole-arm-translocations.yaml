@@ -1,0 +1,16 @@
+version: "2016"
+section: "9.2.17.2"
+quotes:
+  - rule: TRANSLOC.WHOLE_ARM
+    cite: {section: "9.2.17.2", page: 77, para: "¶1"}
+    text: >-
+      Whole-arm translocations are described by assigning the breakpoints to the centromeric bands
+      p10 and q10 according to the morphology of the abnormal chromosomes. In balanced whole-arm
+      exchanges, the breakpoint in the chromosome which has the lowest number, or is a sex
+      chromosome, is assigned to p10.
+  - rule: DER.WHOLE_ARM_TWO_CHROMOSOMES
+    cite: {section: "9.2.17.2", page: 77, para: "¶2"}
+    text: >-
+      the derivative chromosome (der) replaces the two normal chromosomes involved in the
+      translocation. The two missing normal chromosomes are not specified. The imbalance(s) can be
+      inferred from the karyotype designation.

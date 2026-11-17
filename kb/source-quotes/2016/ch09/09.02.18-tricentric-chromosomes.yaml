@@ -1,0 +1,11 @@
+version: "2016"
+section: "9.2.18"
+quotes:
+  - rule: TRC.FORMAT
+    cite: {section: "9.2.18", page: 79, para: "¶1"}
+    text: >-
+      The symbol trc is used. The ‘end’ chromosome which has the lowest number, or is one of the sex
+      chromosomes, is specified first. The other chromosomes are listed in the order they are
+      attached to the chromosome listed first. The orientation of the chromosomes will be apparent
+      from the order of the breakpoints specified in the second parentheses. A tricentric
+      chromosome is counted as one chromosome.

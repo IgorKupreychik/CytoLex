@@ -34,7 +34,10 @@ rules:
         closed (see NUM.PLOIDY_IN_ANGLE_BRACKETS). Ch. 9.1–9.2.10 (T-012): every symbol used is
         listed (incl. ider, idic, psu, fis, hsr, Ph); the book itself rules out a symbol for
         abnormally banded regions (HSR.NO_ABR_SYMBOL), and Ph is listed but barred from
-        karyotypes (DER.NO_PH_SYMBOL).
+        karyotypes (DER.NO_PH_SYMBOL). Ch. 9.2.11–9.3 (T-013): every symbol used is listed (i,
+        idic, mar, dmin, ace, neo, qdp, r, dic r, trc r, tas, t, rob, trc, trp, ×); jt is not used.
+        "acro" (in "acro mar", which the book discourages, MAR.NO_SIZE_MORPHOLOGY) is not listed;
+        "min" is.
 
   - id: SYM.SPACE_BETWEEN_SYMBOLS
     title: Space between combined symbols

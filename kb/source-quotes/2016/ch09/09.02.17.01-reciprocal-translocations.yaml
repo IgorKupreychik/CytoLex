@@ -1,0 +1,23 @@
+version: "2016"
+section: "9.2.17.1"
+quotes:
+  - rule: TRANSLOC.FORMAT
+    cite: {section: "9.2.17.1", page: 76, example: E12}
+    text: >-
+      The orientations of the segments in relation to the centromere are apparent from the order of
+      the bands. The segment 14q21q24 is inverted.
+  - rule: TRANSLOC.FORMAT
+    cite: {section: "9.2.17.1", page: 77, para: "¶2"}
+    text: >-
+      The derivative chromosomes produced by malsegregation of a reciprocal translocation should be
+      described using the conventions outlined in Section 9.2.3.
+  - rule: TRANSLOC.HOMOLOGUE_UNDERLINING
+    cite: {section: "9.2.17.1", page: 75, para: "¶1"}
+    text: >-
+      In order to distinguish homologous chromosomes, one of the numerals may be underlined
+  - rule: TRANSLOC.HOMOLOGUE_UNDERLINING
+    cite: {section: "9.2.17.1", page: 76, example: E8}
+    text: >-
+      Underlining is used only to emphasize that the chromosomes are homologous. However, this is
+      usually not necessary since if the same chromosome 7 had been involved, the resulting
+      chromosome 7 would have to be described as a derivative chromosome.

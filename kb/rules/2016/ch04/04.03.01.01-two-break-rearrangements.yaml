@@ -7,15 +7,32 @@ rules:
     severity: error
     statement: >-
       In a two-break rearrangement of one chromosome with a break in each arm, the short-arm (p)
-      breakpoint is given before the long-arm (q) breakpoint.
+      breakpoint is given before the long-arm (q) breakpoint. This does not apply to a
+      chromosome's band group inside a rearrangement of several chromosomes whose band order shows
+      the orientation of that chromosome (multicentric rings, tas, trc); there the long-arm band
+      may come first (trc(4;12;9)(q31.2;q22p13;q34)).
     cite:
       - {section: "4.3.1.1", page: 41, para: "¶1"}
+      - {section: "9.2.15", page: 74, para: "¶8"}
+      - {section: "9.2.16", page: 74, para: "¶1"}
+      - {section: "9.2.18", page: 79, para: "¶1"}
     examples:
       valid:
         - text: "46,XX,inv(2)(p21q31)"
           cite: {section: "4.3.1.1", page: 41, example: E1}
         - text: "46,XY,inv(3)(p13q21)"
           cite: {section: "9.2.10", page: 70, example: E3}
+        - text: "46,XX,r(7)(p22q36)"
+          cite: {section: "9.2.15", page: 73, example: E1}
+        - text: "47,XX,+trc r(1;3;12)(p36.1q32;q26.3p24;p12q23)"
+          cite: {section: "9.2.15", page: 74, example: E7}
+          note: Exception - the chromosome 3 group q26.3p24 gives its orientation in the ring.
+        - text: "46,X,tas(1;X;12;7)(p36.3;q28p22.3;p13q24.3;p22)"
+          cite: {section: "9.2.16", page: 75, example: E3}
+          note: Exception - the X group q28p22.3 gives its orientation in the association.
+        - text: "44,XX,trc(4;12;9)(q31.2;q22p13;q34)"
+          cite: {section: "9.2.18", page: 79, example: E1}
+          note: Exception - the chromosome 12 group q22p13 gives its orientation.
       invalid:
         - text: "46,XX,inv(2)(q31p21)"
           why: The long-arm breakpoint q31 is given before the short-arm breakpoint p21.
@@ -30,13 +47,17 @@ rules:
     severity: error
     statement: >-
       When both breaks of a two-break rearrangement lie in the same arm, the breakpoint nearer
-      the centromere is given first. Exception: in a duplication and in the segment of an
-      insertion the band order shows the orientation of the segment, so the distal band may come
-      first (dup(1)(q25q22), ins(5;2)(p14;q32q22)).
+      the centromere is given first. Exception: wherever the band order shows the orientation of a
+      segment, the distal band may come first. That is the case in a duplication or triplication,
+      in an inserted segment, and in a segment exchanged in a complex translocation or built into
+      a ring (dup(1)(q25q22), trp(1)(q32q21), ins(5;2)(p14;q32q22), t(5;14;9)(q13q23;q24q21;p12p23),
+      der(1)r(1;3)(p36.1q23;q27q21)).
     cite:
       - {section: "4.3.1.1", page: 41, para: "¶2"}
       - {section: "9.2.5", page: 67, para: "¶1"}
       - {section: "9.2.9", page: 68, para: "¶1"}
+      - {section: "9.2.15", page: 73, para: "¶4"}
+      - {section: "9.2.17.1", page: 76, example: E12}
     examples:
       valid:
         - text: "46,XX,inv(2)(p13p23)"
@@ -53,6 +74,17 @@ rules:
         - text: "46,XY,ins(5;2)(p14;q32q22)"
           cite: {section: "9.2.9", page: 69, example: E4}
           note: Exception - inverted inserted segment, distal band first.
+        - text: "46,XX,trp(1)(q32q21)"
+          cite: {section: "9.2.19", page: 79, example: E2}
+          note: Exception - triplication in the opposite orientation (see TRP.FORMAT, needs_review).
+        - text: "46,XX,t(5;14;9)(q13q23;q24q21;p12p23)"
+          cite: {section: "9.2.17.1", page: 76, example: E12}
+          note: Exception - the exchanged segment 14q21q24 is inverted.
+        - text: "46,XX,der(1)r(1;3)(p36.1q23;q27q21)"
+          cite: {section: "9.2.15", page: 73, example: E3}
+          note: Exception - the acentric segment of the ring is reversed.
+        - text: "46,XX,qdp(1)(q23q32)"
+          cite: {section: "9.2.14", page: 72, example: E1}
       invalid:
         - text: "46,XX,inv(2)(p23p13)"
           why: 2p13 is nearer the centromere than 2p23 and must be given first.

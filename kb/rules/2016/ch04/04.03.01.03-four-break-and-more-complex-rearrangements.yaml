@@ -12,7 +12,8 @@ rules:
       description in words may still be needed for full clarity.
     cite:
       - {section: "4.3.1.3", page: 42, para: "¶2"}
+      - {section: "9.2.17.1", page: 77, para: "¶2"}
     examples:
       valid: []
     review: {paraphrase_checked: true, needs_review: false}
-    related: [STRUCT.DETAILED_SYSTEM, DER.DEFINITION]
+    related: [STRUCT.DETAILED_SYSTEM, DER.DEFINITION, TRANSLOC.FORMAT]

@@ -1,0 +1,105 @@
+version: "2016"
+section: "9.2.17.3"
+rules:
+  - id: ROB.FORMAT
+    title: rob or der for Robertsonian translocations
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      Robertsonian translocations join the acrocentric chromosomes 13–15 and 21–22 and may be
+      written either rob(chromosome;chromosome)(q10;q10) or der(chromosome;chromosome)(q10;q10).
+      Like other whole-arm derivatives, they replace both normal chromosomes, which are not written
+      as missing. When a single chromosome is involved (der(21;21)), the extra normal chromosome is
+      written with + and the count stays 46.
+    cite:
+      - {section: "9.2.17.3", page: 78, para: "¶1"}
+      - {section: "9.2.17.3", page: 78, para: "¶2"}
+    examples:
+      valid:
+        - text: "45,XX,der(13;21)(q10;q10)"
+          cite: {section: "9.2.17.3", page: 78, example: E1}
+        - text: "45,XX,rob(13;21)(q10;q10)"
+          cite: {section: "9.2.17.3", page: 78, example: E1}
+        - text: "46,XX,der(13;21)(q10;q10),+21"
+          cite: {section: "9.2.17.3", page: 78, example: E2}
+        - text: "46,XX,rob(13;21)(q10;q10),+21"
+          cite: {section: "9.2.17.3", page: 78, example: E2}
+        - text: "46,XX,+13,der(13;21)(q10;q10)"
+          cite: {section: "9.2.17.3", page: 78, example: E3}
+        - text: "46,XX,+13,rob(13;21)(q10;q10)"
+          cite: {section: "9.2.17.3", page: 78, example: E3}
+        - text: "46,XX,+21,der(21;21)(q10;q10)"
+          cite: {section: "9.2.17.3", page: 78, example: E4}
+          note: Alternative to 46,XX,i(21)(q10) (§9.2.11 E5).
+        - text: "46,XX,+21,rob(21;21)(q10;q10)"
+          cite: {section: "9.2.17.3", page: 78, example: E4}
+      invalid:
+        - text: "45,XX,rob(9;22)(q10;q10)"
+          why: Chromosome 9 is not acrocentric; rob is for translocations between chromosomes 13–15 and 21–22.
+          corrected: "45,XX,der(9;22)(q10;q10)"
+        - text: "45,XX,–13,–21,rob(13;21)(q10;q10)"
+          why: The Robertsonian chromosome replaces one chromosome 13 and one 21; they are not written as missing.
+          corrected: "45,XX,rob(13;21)(q10;q10)"
+    fix: {level: 1, kind: replace, hint: Use der for a whole-arm translocation between non-acrocentric chromosomes; drop the losses the rob replaces.}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The rob(9;22) invalid example is inferred from the definition (acrocentrics only); the book
+        gives no counter-example.
+    related: [DER.WHOLE_ARM_TWO_CHROMOSOMES, TRANSLOC.WHOLE_ARM, ISO.FORMAT, ROB.NOT_ACQUIRED, ROB.DICENTRIC_USE_DIC, KARYO.REPLACED_NORMAL_NOT_MISSING]
+
+  - id: ROB.NOT_ACQUIRED
+    title: No rob in acquired abnormalities
+    applies_to: [karyotype]
+    context: [neoplastic]
+    severity: error
+    statement: >-
+      The abbreviation rob is not used for acquired abnormalities; there the whole-arm derivative
+      is written with der.
+    cite:
+      - {section: "9.2.17.3", page: 78, para: "¶3"}
+    examples:
+      valid:
+        - text: "45,XX,der(13;21)(q10;q10)"
+          cite: {section: "9.2.17.3", page: 78, example: E1}
+      invalid:
+        - text: "45,XX,rob(13;21)(q10;q10)"
+          why: In an acquired (neoplastic) karyotype rob is not used.
+          corrected: "45,XX,der(13;21)(q10;q10)"
+    fix: {level: 1, kind: replace, hint: Replace rob with der.}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Only checkable when the context (neoplastic) is known; the invalid example is the book's E1
+        rob form read as an acquired karyotype (as in REC.NOT_ACQUIRED).
+    related: [ROB.FORMAT, REC.NOT_ACQUIRED]
+
+  - id: ROB.DICENTRIC_USE_DIC
+    title: Proven dicentric whole-arm derivative is a dic
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      When the derivative of a whole-arm translocation is proven to be dicentric (breakpoints
+      assigned to p11.2 or q11.2), it is written with dic and described as a dicentric chromosome
+      (section 9.2.4), not with rob or der.
+    cite:
+      - {section: "9.2.17.3", page: 79, para: "¶4"}
+    examples:
+      valid:
+        - text: "45,XY,dic(14;21)(p11.2;p11.2)"
+          cite: {section: "9.2.4", page: 66, example: E4}
+          note: Book example from §9.2.4.
+      invalid:
+        - text: "45,XY,rob(14;21)(p11.2;p11.2)"
+          why: Breakpoints at p11.2 make the chromosome dicentric, which is written with dic.
+          corrected: "45,XY,dic(14;21)(p11.2;p11.2)"
+        - text: "45,XY,der(14;21)(p11.2;p11.2)"
+          why: Breakpoints at p11.2 make the chromosome dicentric, which is written with dic.
+          corrected: "45,XY,dic(14;21)(p11.2;p11.2)"
+    fix: {level: 1, kind: replace, hint: Replace rob or der with dic.}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+    related: [DIC.FORMAT, DIC.NO_DER_DIC, ROB.FORMAT]

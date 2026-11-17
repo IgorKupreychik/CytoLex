@@ -1,0 +1,59 @@
+version: "2016"
+section: "9.3"
+rules:
+  - id: KARYO.MULTIPLY_SIGN_AFTER_ABNORMALITY
+    title: ×n goes after the rearranged chromosome
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      Two or more copies of a structurally rearranged chromosome are written with the
+      multiplication sign and the number of copies (×2, ×3, …) after the abnormality. Copies that
+      replace normal homologues need no loss sign; supernumerary copies are still written with a
+      plus sign (+del(6)(q13q23)×2), and the replacing and the extra copies may be listed
+      separately.
+    cite:
+      - {section: "9.3", page: 79, para: "¶1"}
+      - {section: "9.3", page: 80, example: E3}
+    examples:
+      valid:
+        - text: "46,XX,del(6)(q13q23)×2"
+          cite: {section: "9.3", page: 80, example: E1}
+        - text: "48,XY,+del(6)(q13q23)×2"
+          cite: {section: "9.3", page: 80, example: E2}
+        - text: "47,XX,del(6)(q13q23)×2,+del(6)(q13q23)"
+          cite: {section: "9.3", page: 80, example: E3}
+        - text: "48,XX,del(6)(q13q23)×2,+7,+7"
+          cite: {section: "9.3", page: 80, example: E4}
+        - text: "48,XX,t(8;14)(q24.1;q32),+der(14)t(8;14)×2"
+          cite: {section: "9.3", page: 80, example: E5}
+        - text: "92,XXXX,t(8;14)(q24.1;q32)×2"
+          cite: {section: "9.3", page: 80, example: E6}
+        - text: "94,XXYY,t(8;14)(q24.1;q32)×2,+der(14)t(8;14)×2"
+          cite: {section: "9.3", page: 80, example: E7}
+        - text: "93,XXXX,t(8;14)(q24.1;q32)×2,der(14)t(8;14)×2,+der(14)t(8;14)"
+          cite: {section: "9.3", page: 80, example: E8}
+        - text: "94,XXYY,t(8;14)(q24.1;q32)×2,+14,der(14)t(8;14)×2,+der(14)t(8;14)"
+          cite: {section: "9.3", page: 80, example: E9}
+        - text: "47,XX,+8,i(8)(q10)×2"
+          cite: {section: "9.3", page: 80, example: E10}
+        - text: "47,XX,i(8)(q10),+i(8)(q10)"
+          cite: {section: "9.3", page: 80, example: E10}
+          note: Alternative description of the same complement.
+      invalid:
+        - text: "46,XX,2del(6)(q13q23)"
+          why: The number of copies of a rearranged chromosome is written as ×n after the abnormality, not before it.
+          corrected: "46,XX,del(6)(q13q23)×2"
+        - text: "46,XX,del(6)×2(q13q23)"
+          why: The multiplication sign comes after the whole abnormality, including its breakpoints.
+          corrected: "46,XX,del(6)(q13q23)×2"
+        - text: "47,XX,del(6)(q13q23)×3"
+          why: Only two copies can replace the normal chromosomes 6; the supernumerary copy is written with a plus sign.
+          corrected: "47,XX,del(6)(q13q23)×2,+del(6)(q13q23)"
+    fix: {level: 1, kind: reorder, hint: Move the copy number to ×n after the abnormality.}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The third invalid example follows the E3 caption ("the supernumerary deleted chromosome 6
+        has to be preceded by a plus sign"). No × for normal chromosomes: KARYO.MULTIPLY_SIGN_REARRANGED_ONLY.
+    related: [KARYO.MULTIPLY_SIGN_REARRANGED_ONLY, KARYO.REPLACED_NORMAL_NOT_MISSING, KARYO.GAIN_LOSS_SIGN, MAR.NUMBERED]

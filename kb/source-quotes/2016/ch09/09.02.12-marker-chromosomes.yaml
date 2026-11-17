@@ -1,0 +1,39 @@
+version: "2016"
+section: "9.2.12"
+quotes:
+  - rule: MAR.PLUS_SIGN
+    cite: {section: "9.2.12", page: 70, para: "¶1"}
+    text: >-
+      A marker chromosome (mar) is a structurally abnormal chromosome that cannot be unambiguously
+      identified or characterized by conventional banding cytogenetics.
+  - rule: MAR.PLUS_SIGN
+    cite: {section: "9.2.12", page: 70, para: "¶1"}
+    text: >-
+      In the description of a karyotype, the presence of a mar must be preceded by a plus sign (+).
+  - rule: MAR.NO_SIZE_MORPHOLOGY
+    cite: {section: "9.2.12", page: 70, para: "¶1"}
+    text: >-
+      No attempt should be made to describe the morphology or size of markers in karyotypes. Using
+      min mar, A-size mar, acro mar, etc., is discouraged. If such information is relevant, it
+      should be described in words in the text.
+  - rule: MAR.NUMBERED
+    cite: {section: "9.2.12", page: 71, para: "¶2"}
+    text: >-
+      When several different markers are clonally present, they may be indicated by an Arabic
+      number after the symbol mar, e.g., mar1, mar2, etc. It must be stressed that this does not
+      mean derivation of the marker from chromosome 1, chromosome 2, and so on. Multiple copies of
+      the same marker are indicated by a multiplication sign after the mar designation, e.g.,
+      mar1×2 indicates two markers 1; mar1×3 indicates three markers 1, and so on.
+  - rule: DMIN.FORMAT
+    cite: {section: "9.2.12", page: 71, para: "¶4"}
+    text: >-
+      Double minutes, abbreviated dmin, represent a special kind of acentric structures that should
+      be recorded in the karyotype when present in more than one metaphase cell. Note that the dmin
+      should not be included in the chromosome count, and that the symbol should not be preceded by
+      a plus sign. It is placed after any centric marker. The number of dmin per cell should be
+      presented before the symbol either in absolute numbers or as a mean or a range.
+  - rule: ACE.NOT_IN_KARYOTYPE
+    cite: {section: "9.2.12", page: 72, para: "¶5"}
+    text: >-
+      Acentric fragments (ace) other than dmin, even if present in more than one cell, should not be
+      presented in the karyotype, but must be recorded in chromosome breakage studies

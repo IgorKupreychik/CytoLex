@@ -1,0 +1,28 @@
+version: "2016"
+section: "9.2.17.3"
+quotes:
+  - rule: ROB.FORMAT
+    cite: {section: "9.2.17.3", page: 78, para: "¶1"}
+    text: >-
+      These special types of translocations originate through translocation of the acrocentric
+      chromosomes 13–15 and 21–22.
+  - rule: ROB.FORMAT
+    cite: {section: "9.2.17.3", page: 78, para: "¶1"}
+    text: >-
+      Either rob or der can adequately describe these whole-arm translocations.
+  - rule: ROB.FORMAT
+    cite: {section: "9.2.17.3", page: 78, para: "¶2"}
+    text: >-
+      If only a single chromosome is involved in the rearrangement, the extra chromosome is
+      indicated by the 46 count in the presence of a whole-arm rearrangement and the addition of a
+      normal chromosome.
+  - rule: ROB.NOT_ACQUIRED
+    cite: {section: "9.2.17.3", page: 78, para: "¶3"}
+    text: >-
+      The abbreviation rob should not be used in the description of acquired abnormalities.
+  - rule: ROB.DICENTRIC_USE_DIC
+    cite: {section: "9.2.17.3", page: 79, para: "¶4"}
+    text: >-
+      If it is proven that the derivative chromosome resulting from a whole-arm translocation is
+      dicentric, i.e., the breakpoints have been assigned to p11.2 or q11.2, the abbreviation dic
+      should be used and the dicentric chromosome should be described accordingly

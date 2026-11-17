@@ -1,0 +1,30 @@
+version: "2016"
+section: "9.2.18"
+rules:
+  - id: TRC.FORMAT
+    title: trc - end chromosome first, then in attachment order
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A tricentric chromosome is written trc(chromosomes)(breakpoints). The first chromosome is the
+      end chromosome that is a sex chromosome or has the lowest number; the others follow in the
+      order they are attached to it. The order of the breakpoints shows the orientation of the
+      chromosomes. A tricentric chromosome counts as one chromosome.
+    cite:
+      - {section: "9.2.18", page: 79, para: "¶1"}
+    examples:
+      valid:
+        - text: "44,XX,trc(4;12;9)(q31.2;q22p13;q34)"
+          cite: {section: "9.2.18", page: 79, example: E1}
+          note: The chromosome 12 group q22p13 starts with the long arm; it gives the orientation.
+        - text: "44,XX,trc(4;12;9)(4pter→4q31.2::12q22→12p13::9q34→9pter)"
+          cite: {section: "9.2.18", page: 79, example: E1}
+      invalid:
+        - text: "44,XX,trc(9;12;4)(q34;p13q22;q31.2)"
+          why: Of the two end chromosomes (4 and 9), the lower-numbered chromosome 4 must be listed first.
+          corrected: "44,XX,trc(4;12;9)(q31.2;q22p13;q34)"
+    fix: {level: 1, kind: reorder, hint: Start with the lower-numbered (or sex) end chromosome and reverse the chain with its breakpoints.}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+    related: [TAS.FORMAT, RING.DIC_TRC_ORDER, DIC.FORMAT, STRUCT.SHORT_ARM_BREAKPOINT_FIRST]

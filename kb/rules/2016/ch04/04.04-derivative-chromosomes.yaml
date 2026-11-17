@@ -14,15 +14,20 @@ rules:
     cite:
       - {section: "4.4", page: 44, para: "¶1"}
       - {section: "9.2.3", page: 60, para: "¶1"}
+      - {section: "9.2.12", page: 70, para: "¶1"}
+      - {section: "9.2.12", page: 71, para: "¶3"}
     examples:
-      valid: []
+      valid:
+        - text: "47,XX,+der(?)t(?;15)(?;q22)"
+          cite: {section: "9.2.12", page: 71, example: E6}
+          note: Centromere unknown, but the 15q22→qter segment is recognized, so der(?) and not mar.
     review:
       paraphrase_checked: true
       needs_review: false
       note: >-
         Section listed in docs/extraction-review-2016.md because of Fig. 8/9; the text is
         complete in the chunk and does not depend on the diagrams.
-    related: [DER.CENTROMERE_CHROMOSOME, DER.UNBALANCED_USE_DER]
+    related: [DER.CENTROMERE_CHROMOSOME, DER.UNBALANCED_USE_DER, MAR.PLUS_SIGN]
 
   - id: DER.CENTROMERE_CHROMOSOME
     title: der(n) names the chromosome with the centromere

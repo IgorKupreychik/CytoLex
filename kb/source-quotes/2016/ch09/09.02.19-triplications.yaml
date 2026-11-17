@@ -1,0 +1,13 @@
+version: "2016"
+section: "9.2.19"
+quotes:
+  - rule: TRP.FORMAT
+    cite: {section: "9.2.19", page: 79, para: "¶1"}
+    text: >-
+      The symbol trp is used. It is not possible to indicate the orientation(s) of the segment in
+      the short system, but this can be done with the detailed system.
+  - rule: TRP.FORMAT
+    cite: {section: "9.2.19", page: 79, example: E2}
+    text: >-
+      Triplication of the segment between bands 1q21 and 1q32 in an opposite orientation to the
+      above example.

@@ -1,0 +1,48 @@
+version: "2016"
+section: "9.2.16"
+rules:
+  - id: TAS.FORMAT
+    title: tas - order of chromosomes and terminal bands
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A telomeric association is written tas(chromosomes)(terminal bands). With two chromosomes the
+      sex chromosome, or otherwise the lowest-numbered autosome, comes first. With more than two,
+      the first is the end chromosome of the chain that is a sex chromosome or has the lowest
+      number; the others follow in the order they are associated with it. The order of the
+      terminal bands shows the orientation of the chromosomes. The associated chromosomes are
+      counted as separate chromosomes.
+    cite:
+      - {section: "9.2.16", page: 74, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,tas(12;13)(q24.3;q34)"
+          cite: {section: "9.2.16", page: 74, example: E1}
+        - text: "46,XX,tas(12;13)(12pter→12qter→13qter→13pter)"
+          cite: {section: "9.2.16", page: 74, example: E1}
+        - text: "46,Y,tas(X;12;3)(q28;p13q24.3;q29)"
+          cite: {section: "9.2.16", page: 74, example: E2}
+        - text: "46,Y,tas(X;12;3)(Xpter→Xqter→12pter→12qter→3qter→3pter)"
+          cite: {section: "9.2.16", page: 74, example: E2}
+        - text: "46,X,tas(1;X;12;7)(p36.3;q28p22.3;p13q24.3;p22)"
+          cite: {section: "9.2.16", page: 75, example: E3}
+          note: >-
+            The end chromosomes are 1 and 7, so 1 comes first although X is in the chain; the X
+            group q28p22.3 starts with the long arm and gives the orientation.
+        - text: "46,X,tas(1;X;12;7)(1qter→1pter→Xqter→Xpter→12pter→12qter→7pter→7qter)"
+          cite: {section: "9.2.16", page: 75, example: E3}
+      invalid:
+        - text: "46,XX,tas(13;12)(q34;q24.3)"
+          why: Chromosome 12, the lower-numbered autosome, must be listed first.
+          corrected: "46,XX,tas(12;13)(q24.3;q34)"
+        - text: "46,Y,tas(3;12;X)(q29;q24.3p13;q28)"
+          why: The end chromosome that is a sex chromosome (X) must be listed first.
+          corrected: "46,Y,tas(X;12;3)(q28;p13q24.3;q29)"
+        - text: "45,XX,tas(12;13)(q24.3;q34)"
+          why: Chromosomes in a telomeric association are counted separately, so the count stays 46.
+          corrected: "46,XX,tas(12;13)(q24.3;q34)"
+    fix: {level: 1, kind: reorder, hint: "Start with the end chromosome that is a sex chromosome or has the lowest number, then follow the chain."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+    related: [STRUCT.CHROMOSOME_ORDER, TRC.FORMAT, NUM.COUNT_MATCHES_CHANGES, STRUCT.SHORT_ARM_BREAKPOINT_FIRST]

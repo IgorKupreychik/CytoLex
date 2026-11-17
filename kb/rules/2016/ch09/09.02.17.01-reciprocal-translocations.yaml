@@ -1,0 +1,111 @@
+version: "2016"
+section: "9.2.17.1"
+rules:
+  - id: TRANSLOC.FORMAT
+    title: t - one breakpoint group per chromosome
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A translocation is written t(chromosome;chromosome…)(breakpoints;breakpoints…), with one
+      breakpoint group per chromosome, in the order of the chromosomes. A chromosome that exchanges
+      an interstitial segment has two bands in its group; their order shows the orientation of the
+      segment relative to the centromere, so the distal band may come first. Derivatives from
+      malsegregation of a reciprocal translocation are written as der (section 9.2.3).
+    cite:
+      - {section: "9.2.17.1", page: 75, para: "¶1"}
+      - {section: "9.2.17.1", page: 76, example: E12}
+      - {section: "9.2.17.1", page: 77, para: "¶2"}
+    examples:
+      valid:
+        - text: "46,XY,t(2;5)(q21;q31)"
+          cite: {section: "9.2.17.1", page: 75, example: E1}
+        - text: "46,XY,t(2;5)(2pter→2q21::5q31→5qter;5pter→5q31::2q21→2qter)"
+          cite: {section: "9.2.17.1", page: 75, example: E1}
+        - text: "46,XY,t(2;5)(p12;q31)"
+          cite: {section: "9.2.17.1", page: 75, example: E2}
+        - text: "46,XY,t(2;5)(5qter→5q31::2p12→2qter;5pter→5q31::2p12→2pter)"
+          cite: {section: "9.2.17.1", page: 75, example: E2}
+        - text: "46,X,t(X;13)(q27;q12)"
+          cite: {section: "9.2.17.1", page: 75, example: E3}
+        - text: "46,X,t(X;13)(Xpter→Xq27::13q12→13qter;13pter→13q12::Xq27→Xqter)"
+          cite: {section: "9.2.17.1", page: 75, example: E3}
+        - text: "46,t(X;Y)(q22;q11.2)"
+          cite: {section: "9.2.17.1", page: 75, example: E4}
+        - text: "46,t(X;Y)(Xpter→Xq22::Yq11.2→Yqter;Ypter→Yq11.2::Xq22→Xqter)"
+          cite: {section: "9.2.17.1", page: 75, example: E4}
+        - text: "46,t(X;18)(p11.2;q11.2),t(Y;1)(q11.2;p31)"
+          cite: {section: "9.2.17.1", page: 75, example: E5}
+        - text: "46,t(X;18)(18qter→18q11.2::Xp11.2→Xqter;18pter→18q11.2::Xp11.2→Xpter),t(Y;1)(Ypter→Yq11.2::1p31→1pter;Yqter→Yq11.2::1p31→1qter)"
+          cite: {section: "9.2.17.1", page: 75, example: E5}
+          note: Printed over two lines (break before "(Ypter"); joined here without a space.
+        - text: "46,XX,t(2;7;5)(p21;q22;q23)"
+          cite: {section: "9.2.17.1", page: 75, example: E6}
+        - text: "46,XX,t(2;7;5)(5qter→5q23::2p21→2qter;7pter→7q22::2p21→2pter;5pter→5q23::7q22→7qter)"
+          cite: {section: "9.2.17.1", page: 75, example: E6}
+          note: Printed over two lines; joined here without a space.
+        - text: "46,X,t(X;22;1)(q24;q11.2;p33)"
+          cite: {section: "9.2.17.1", page: 76, example: E7}
+        - text: "46,X,t(X;22;1)(Xpter→Xq24::1p33→1pter;22pter→22q11.2::Xq24→Xqter;22qter→22q11.2::1p33→1qter)"
+          cite: {section: "9.2.17.1", page: 76, example: E7}
+          note: Printed over two lines; joined here without a space.
+        - text: "46,XX,t(3;9;22;21)(p13;q34;q11.2;q21)"
+          cite: {section: "9.2.17.1", page: 76, example: E9}
+        - text: "46,XX,t(3;9;22;21)(21qter→21q21::3p13→3qter;9pter→9q34::3p13→3pter;22pter→22q11.2::9q34→9qter;21pter→21q21::22q11.2→22qter)"
+          cite: {section: "9.2.17.1", page: 76, example: E9}
+          note: Printed over two lines; joined here without a space.
+        - text: "46,XY,t(5;6)(q13q23;q15q23)"
+          cite: {section: "9.2.17.1", page: 76, example: E11}
+        - text: "46,XY,t(5;6)(5pter→5q13::6q15→6q23::5q23→5qter;6pter→6q15::5q13→5q23::6q23→6qter)"
+          cite: {section: "9.2.17.1", page: 76, example: E11}
+          note: Printed over two lines; joined here without a space.
+        - text: "46,XX,t(5;14;9)(q13q23;q24q21;p12p23)"
+          cite: {section: "9.2.17.1", page: 76, example: E12}
+          note: The chromosome 14 segment is inverted, so its distal band q24 comes first.
+        - text: "46,XX,t(5;14;9)(5pter→5q13::9p12→9p23::5q23→5qter;14pter→14q21::5q13→5q23::14q24→14qter;9pter→9p23::14q21→14q24::9p12→9qter)"
+          cite: {section: "9.2.17.1", page: 76, example: E12}
+          note: Printed over three lines; joined here without spaces.
+      invalid:
+        - text: "46,XY,t(2;5)(q21)"
+          why: Each chromosome of the translocation needs its own breakpoint group.
+        - text: "46,XY,t(5;6)(q13;q23;q15;q23)"
+          why: The two bands of an exchanged interstitial segment form one group; semicolons separate the chromosomes' groups only.
+          corrected: "46,XY,t(5;6)(q13q23;q15q23)"
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Chromosome order: STRUCT.CHROMOSOME_ORDER (two chromosomes) and STRUCT.MULTI_CHROMOSOME_ORDER
+        (three or more); sex field: SEX.ABNORMAL_SEX_CHROMOSOME_IN_LIST; homologues:
+        TRANSLOC.HOMOLOGUE_UNDERLINING.
+    related: [STRUCT.CHROMOSOME_ORDER, STRUCT.MULTI_CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, STRUCT.PROXIMAL_BREAKPOINT_FIRST, DER.UNBALANCED_USE_DER, SEX.ABNORMAL_SEX_CHROMOSOME_IN_LIST, TRANSLOC.HOMOLOGUE_UNDERLINING]
+
+  - id: TRANSLOC.HOMOLOGUE_UNDERLINING
+    title: Underlining to tell homologues apart in a translocation
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      When two homologous chromosomes take part in a translocation, one of the numerals may be
+      underlined (single underlining) to tell them apart. This is usually not needed: if the same
+      chromosome were involved twice, the result would be described as a derivative chromosome.
+    cite:
+      - {section: "9.2.17.1", page: 75, para: "¶1"}
+      - {section: "9.2.17.1", page: 76, example: E8}
+    examples:
+      valid:
+        - text: "46,XX,t(2;7;7̲)(q21;q22;p13)"
+          cite: {section: "9.2.17.1", page: 76, example: E8}
+        - text: "46,XX,t(2;7;7̲)(2pter→2q21::7̲p13→7̲pter;7pter→7q22::2q21→2qter;7qter→7q22::7̲p13→7̲qter)"
+          cite: {section: "9.2.17.1", page: 76, example: E8}
+          note: Printed over two lines; joined here without a space.
+        - text: "46,XX,t(3;9;9̲;22)(p13;q22;q34;q11.2)"
+          cite: {section: "9.2.17.1", page: 76, example: E10}
+        - text: "46,XX,t(3;9;9̲;22)(22qter→22q11.2::3p13→3qter;9pter→9q22::3p13→3pter;9̲pter→9̲q34::9q22→9qter;22pter→22q11.2::9̲q34→9̲qter)"
+          cite: {section: "9.2.17.1", page: 76, example: E10}
+          note: Printed over two lines; joined here without a space.
+    review:
+      paraphrase_checked: true
+      needs_review: true
+      note: >-
+        Underlining is recovered as U+0332 after the underlined character (T-003); how the
+        validator reads and accepts it is T-042.
+    related: [DER.HOMOLOGUE_UNDERLINING, FRA.HOMOLOGUE_UNDERLINING, STRUCT.MULTI_CHROMOSOME_ORDER]

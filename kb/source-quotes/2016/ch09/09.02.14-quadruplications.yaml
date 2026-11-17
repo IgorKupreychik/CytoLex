@@ -1,0 +1,8 @@
+version: "2016"
+section: "9.2.14"
+quotes:
+  - rule: QDP.FORMAT
+    cite: {section: "9.2.14", page: 72, para: "¶1"}
+    text: >-
+      The symbol qdp is used. It is not possible to indicate the orientation(s) of the segment with
+      the short system.

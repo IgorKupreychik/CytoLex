@@ -1,0 +1,37 @@
+version: "2016"
+section: "9.2.13"
+rules:
+  - id: NEO.FORMAT
+    title: neo or der for a chromosome with a neocentromere
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      A chromosome with a neocentromere (a functional centromere arisen or activated where none is
+      known) may be written with neo or as a derivative chromosome. In the detailed system the
+      position of the neocentromere may be shown with neo in the band path (q28→neo→q28). The short
+      system may not be enough; a supernumerary marker with a neocentromere may need the detailed
+      system, since, unlike a duplication, the band order alone does not show the orientation.
+    cite:
+      - {section: "9.2.13", page: 72, para: "¶1"}
+      - {section: "9.2.13", page: 72, para: "¶2"}
+    examples:
+      valid:
+        - text: "47,XX,+der(3)(qter→q28:)"
+          cite: {section: "9.2.13", page: 72, example: E1}
+        - text: "47,XX,+neo(3)(qter→q28:)"
+          cite: {section: "9.2.13", page: 72, example: E1}
+          note: From the E1 explanation (neo used instead of der).
+        - text: "47,XX,+der(3)(qter→q28→neo→q28:)"
+          cite: {section: "9.2.13", page: 72, example: E1}
+          note: From the E1 explanation (position of the neocentromere shown).
+        - text: "47,XX,der(3)(:p11→q11:),+neo(3)(pter→p11::q11→q26→neo→q26→qter)"
+          cite: {section: "9.2.13", page: 72, example: E2}
+        - text: "47,XX,+dup(10)(qter→q25::q25→qter)"
+          cite: {section: "9.2.13", page: 72, example: E3}
+        - text: "47,XX,+dup(10)(qter→q25::q25→q26→neo→q26→qter)"
+          cite: {section: "9.2.13", page: 72, example: E3}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: ¶2 is marked as changed since ISCN 2013 (margin bar). No invalid form is given; the choice of neo vs der is free.
+    related: [DER.DEFINITION, STRUCT.DETAILED_SYSTEM, DUP.FORMAT]

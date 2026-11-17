@@ -1,0 +1,37 @@
+version: "2016"
+section: "9.2.19"
+rules:
+  - id: TRP.FORMAT
+    title: trp - triplication
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A triplication is written trp(chromosome)(breakpoint breakpoint), with no separator between
+      the two breakpoints. The book says the short system cannot show the orientation(s) of the
+      segment and the detailed system can; its own examples nevertheless distinguish the two
+      orientations in the short form by band order (q21q32, q32q21).
+    cite:
+      - {section: "9.2.19", page: 79, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,trp(1)(q21q32)"
+          cite: {section: "9.2.19", page: 79, example: E1}
+        - text: "46,XX,trp(1)(pter→q32::q21→q32::q21→qter)"
+          cite: {section: "9.2.19", page: 79, example: E1}
+        - text: "46,XX,trp(1)(q32q21)"
+          cite: {section: "9.2.19", page: 79, example: E2}
+          note: Opposite orientation; the distal band q32 comes first.
+        - text: "46,XX,trp(1)(pter→q32::q32→q21::q21→qter)"
+          cite: {section: "9.2.19", page: 79, example: E2}
+      invalid:
+        - text: "46,XX,trp(1)(q21;q32)"
+          why: Both breakpoints are in one chromosome, so they are written together without a semicolon.
+          corrected: "46,XX,trp(1)(q21q32)"
+    review:
+      paraphrase_checked: true
+      needs_review: true
+      note: >-
+        ¶1 says orientation cannot be shown in the short system, but E2 writes trp(1)(q32q21) for the
+        opposite orientation. Both examples are kept valid as printed; whether the short-form band
+        order carries orientation (as for dup) is left to T-022/T-031.
+    related: [QDP.FORMAT, DUP.FORMAT, STRUCT.PROXIMAL_BREAKPOINT_FIRST, STRUCT.BREAKPOINT_GROUPS]

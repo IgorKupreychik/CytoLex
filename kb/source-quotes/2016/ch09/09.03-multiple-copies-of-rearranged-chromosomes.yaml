@@ -1,0 +1,13 @@
+version: "2016"
+section: "9.3"
+quotes:
+  - rule: KARYO.MULTIPLY_SIGN_AFTER_ABNORMALITY
+    cite: {section: "9.3", page: 79, para: "¶1"}
+    text: >-
+      The multiplication sign (×) can be used to describe two or more copies of a structurally
+      rearranged chromosome. The number of copies (×2, ×3, etc.) should be placed after the
+      abnormality.
+  - rule: KARYO.MULTIPLY_SIGN_AFTER_ABNORMALITY
+    cite: {section: "9.3", page: 80, example: E3}
+    text: >-
+      Note that the supernumerary deleted chromosome 6 has to be preceded by a plus sign.

@@ -1,0 +1,157 @@
+version: "2016"
+section: "9.2.15"
+rules:
+  - id: RING.FORMAT
+    title: r - ring from one chromosome
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A ring chromosome is written with the symbol r and may be made of one or several chromosomes.
+      A ring from one chromosome is written r(chromosome)(breakpoint breakpoint), with no semicolon
+      between the two breakpoints.
+    cite:
+      - {section: "9.2.15", page: 72, para: "¶1"}
+      - {section: "9.2.15", page: 73, para: "¶2"}
+    examples:
+      valid:
+        - text: "46,XX,r(7)(p22q36)"
+          cite: {section: "9.2.15", page: 73, example: E1}
+        - text: "46,XX,r(7)(::p22→q36::)"
+          cite: {section: "9.2.15", page: 73, example: E1}
+      invalid:
+        - text: "46,XX,r(7)(p22;q36)"
+          why: Both breakpoints are in one chromosome, so they are written together without a semicolon.
+          corrected: "46,XX,r(7)(p22q36)"
+    fix: {level: 1, kind: delete, hint: Remove the semicolon between the breakpoints.}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+    related: [STRUCT.BREAKPOINT_GROUPS, RING.MONOCENTRIC_AS_DER, RING.DIC_TRC_ORDER, RING.UNIDENTIFIED]
+
+  - id: RING.MONOCENTRIC_AS_DER
+    title: Monocentric ring of several chromosomes is a der
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A ring with one centromere made of more than one chromosome is described as a derivative,
+      der(chromosome)r(chromosome;chromosome…), with the chromosome that provides the centromere
+      listed first. The order of the breakpoints shows the orientation of the acentric segment.
+      When the centromere's origin is unknown but other segments are recognized, the ring is
+      der(?)r(?;…).
+    cite:
+      - {section: "9.2.15", page: 73, para: "¶3"}
+      - {section: "9.2.15", page: 73, para: "¶4"}
+      - {section: "9.2.15", page: 73, para: "¶5"}
+    examples:
+      valid:
+        - text: "46,XX,der(1)r(1;3)(p36.1q23;q21q27)"
+          cite: {section: "9.2.15", page: 73, example: E2}
+        - text: "46,XX,der(1)(::1p36.1→1q23::3q21→3q27::)"
+          cite: {section: "9.2.15", page: 73, example: E2}
+        - text: "46,XX,der(1)r(1;3)(p36.1q23;q27q21)"
+          cite: {section: "9.2.15", page: 73, example: E3}
+          note: Same ring with the acentric segment reversed; the distal band q27 comes first.
+        - text: "46,XX,der(1)(::1p36.1→1q23::3q27→3q21::)"
+          cite: {section: "9.2.15", page: 73, example: E3}
+        - text: "46,XX,der(1)r(1;?)(p36.1q23;?)"
+          cite: {section: "9.2.15", page: 73, example: E4}
+        - text: "46,XX,der(1)(::1p36.1→1q23::?::)"
+          cite: {section: "9.2.15", page: 73, example: E4}
+        - text: "47,XX,+der(?)r(?;3;5)(?;q21q26.2;q13q33)"
+          cite: {section: "9.2.15", page: 73, example: E5}
+        - text: "47,XX,+der(?)(::?→cen→?::3q21→3q26.2::5q13→5q33::)"
+          cite: {section: "9.2.15", page: 73, example: E5}
+      invalid:
+        - text: "46,XX,der(1)r(3;1)(q21q27;p36.1q23)"
+          why: Chromosome 1 provides the centromere and must be listed first in the ring.
+          corrected: "46,XX,der(1)r(1;3)(p36.1q23;q21q27)"
+        - text: "46,XX,r(1;3)(p36.1q23;q21q27)"
+          why: A monocentric ring of two chromosomes is written as a derivative of the centromere's chromosome.
+          corrected: "46,XX,der(1)r(1;3)(p36.1q23;q21q27)"
+    fix: {level: 1, kind: reorder, hint: Write der(centromere chromosome) and list that chromosome first in the ring.}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+    related: [DER.CENTROMERE_CHROMOSOME, DER.UNKNOWN_CENTROMERE, RING.FORMAT, STRUCT.PROXIMAL_BREAKPOINT_FIRST]
+
+  - id: RING.DIC_TRC_ORDER
+    title: dic r and trc r - sex chromosome or lowest-numbered first
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A dicentric or tricentric ring is written dic r or trc r (the symbol r after the triplet,
+      separated by a space). A sex chromosome is listed first, otherwise the autosome with the
+      lowest number. The order of the breakpoints shows the orientation of the chromosomes.
+    cite:
+      - {section: "9.2.15", page: 73, para: "¶6"}
+      - {section: "9.2.15", page: 73, para: "¶7"}
+      - {section: "9.2.15", page: 74, para: "¶8"}
+    examples:
+      valid:
+        - text: "47,XX,+dic r(1;3)(p36.1q32;p24q26.2)"
+          cite: {section: "9.2.15", page: 73, example: E6}
+        - text: "47,XX,+dic r(1;3)(::1p36.1→1q32::3p24→3q26.2::)"
+          cite: {section: "9.2.15", page: 73, example: E6}
+        - text: "47,XX,+trc r(1;3;12)(p36.1q32;q26.3p24;p12q23)"
+          cite: {section: "9.2.15", page: 74, example: E7}
+          note: The chromosome 3 group q26.3p24 starts with the long arm; it gives the orientation.
+        - text: "47,XX,+trc r(1;3;12)(::1p36.1→1q32::3q26.3→3p24::12p12→12q23::)"
+          cite: {section: "9.2.15", page: 74, example: E7}
+      invalid:
+        - text: "47,XX,+dic r(3;1)(p24q26.2;p36.1q32)"
+          why: Chromosome 1, the lowest-numbered autosome, must be listed first.
+          corrected: "47,XX,+dic r(1;3)(p36.1q32;p24q26.2)"
+        - text: "47,XX,+dicr(1;3)(p36.1q32;p24q26.2)"
+          why: The triplet dic and the ring symbol r are separate symbols, written with a space between them.
+          corrected: "47,XX,+dic r(1;3)(p36.1q32;p24q26.2)"
+    fix: {level: 1, kind: reorder, hint: "List the sex chromosome or the lowest-numbered autosome first, with its breakpoints."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        For trc r the book does not say which chromosome follows the first; E7 follows the ring's
+        fusion order (1q32 to 3q26.3, 3p24 to 12p12).
+    related: [STRUCT.CHROMOSOME_ORDER, SYM.SPACE_BETWEEN_SYMBOLS, DIC.FORMAT, TRC.FORMAT, STRUCT.SHORT_ARM_BREAKPOINT_FIRST]
+
+  - id: RING.UNIDENTIFIED
+    title: Ring of unknown origin - +r at the end; r1, r2; 5r
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A ring of known origin is placed in chromosome number order. A ring of unknown origin is
+      written +r at the end of the karyotype, before any marker chromosome. Different rings may be
+      numbered after the symbol (r1, r2; the number does not mean chromosome 1 or 2), and several
+      unidentified rings are counted before the symbol (5r).
+    cite:
+      - {section: "9.2.15", page: 74, para: "¶9"}
+      - {section: "9.2.15", page: 74, para: "¶10"}
+      - {section: "9.2.15", page: 74, para: "¶11"}
+    examples:
+      valid:
+        - text: "49,XX,+1,+3,r(7),+8"
+          cite: {section: "9.2.15", page: 74, example: E8}
+        - text: "50,XX,+1,+3,+8,+r"
+          cite: {section: "9.2.15", page: 74, example: E9}
+        - text: "51,XY,+1,+3,+8,+r,+mar"
+          cite: {section: "9.2.15", page: 74, example: E9}
+        - text: "53,XX,…,+r1,+r2"
+          cite: {section: "9.2.15", page: 74, example: E10}
+          note: Partial string as printed.
+        - text: "53,XY,…,+5r"
+          cite: {section: "9.2.15", page: 74, example: E11}
+          note: Partial string as printed; five rings, not known to be identical.
+      invalid:
+        - text: "50,XX,+1,+3,+8,r"
+          why: A ring of unknown origin is preceded by a plus sign.
+          corrected: "50,XX,+1,+3,+8,+r"
+        - text: "51,XY,+1,+3,+8,+mar,+r"
+          why: The ring of unknown origin comes before the marker chromosome.
+          corrected: "51,XY,+1,+3,+8,+r,+mar"
+        - text: "49,XX,+1,+3,+8,r(7)"
+          why: A ring of known origin is placed in chromosome number order.
+          corrected: "49,XX,+1,+3,r(7),+8"
+    fix: {level: 1, kind: reorder, hint: "Place r(n) by chromosome number; write unknown rings as +r at the end, before mar."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+    related: [ORDER.UNIDENTIFIED_LAST, KARYO.ABNORMALITY_ORDER, MAR.NUMBERED, MAR.PLUS_SIGN]

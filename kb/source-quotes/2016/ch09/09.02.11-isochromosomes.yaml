@@ -1,0 +1,14 @@
+version: "2016"
+section: "9.2.11"
+quotes:
+  - rule: ISO.FORMAT
+    cite: {section: "9.2.11", page: 70, para: "¶1"}
+    text: >-
+      The symbol i (not iso) is used for isochromosomes and idic for isodicentric chromosomes. The
+      breakpoints in isochromosomes are assigned to the centromeric bands p10 and q10 according to
+      the morphology of the isochromosome.
+  - rule: ISO.FORMAT
+    cite: {section: "9.2.11", page: 70, example: E1}
+    text: >-
+      The shorter designation i(17q) may be used in text but not in the karyotype to describe this
+      isochromosome.

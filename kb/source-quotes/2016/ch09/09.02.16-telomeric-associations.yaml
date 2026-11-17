@@ -1,0 +1,14 @@
+version: "2016"
+section: "9.2.16"
+quotes:
+  - rule: TAS.FORMAT
+    cite: {section: "9.2.16", page: 74, para: "¶1"}
+    text: >-
+      The symbol tas is used. In telomeric associations between two chromosomes, the sex chromosome
+      or the autosome with the lowest number is specified first. When more than two chromosomes are
+      involved, the ‘end’ chromosome which has the lowest number, or is one of the sex chromosomes,
+      is specified first, followed by the other chromosomes in the order they are associated with
+      the chromosome listed first. The terminal bands of the chromosomes involved in telomeric
+      association(s) are given in the second parentheses; the orientation of the chromosomes will
+      be apparent from the order in which the bands are listed. Chromosomes involved in telomeric
+      associations are counted as separate chromosomes.
