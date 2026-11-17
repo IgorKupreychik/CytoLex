@@ -17,7 +17,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-005 | done | 1 | T-004 | KB build script (validate → SQLite FTS5 + JSON bundle; review reports) |
 | T-006 | done | 1 | T-001 | Band data generator from UCSC cytoBand (all resolutions, versioned) |
 | T-007 | done | 1 | T-006, T-003 | Spot-check bands vs. ISCN 2016 ideograms; exceptions YAML |
-| T-008 | todo | 1 | T-003, T-005 | KB: ch. 2–3 (band nomenclature, symbols & abbreviated terms) |
+| T-008 | done | 1 | T-003, T-005 | KB: ch. 2–3 (band nomenclature, symbols & abbreviated terms) |
 | T-009 | todo | 1 | T-008 | KB: ch. 4 (karyotype designation, short/detailed systems, derivatives) |
 | T-010 | todo | 1 | T-008 | KB: ch. 5–7 (uncertainty, order of abnormalities, variable features) |
 | T-011 | todo | 1 | T-008 | KB: ch. 8 (numerical abnormalities) |
@@ -64,6 +64,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-052 | todo | 3 | T-051, T-038 | Desktop: comparison view |
 | T-053 | discussion | 1 | T-003 | Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`? |
 | T-054 | discussion | 2 | T-021 | Literal translation of ISCN strings into plain language: scope, style, architecture |
+| T-055 | todo | 2 | T-007 | Tooling: LF line endings for committed generated files (CRLF checkout breaks the ideograms test) |
 
 ---
 
@@ -160,10 +161,11 @@ All KB tasks share these steps and criteria:
 - Acceptance: KB build passes; every book example in the section range is captured as a valid example; invalid examples include `why` and the corrected form where one exists.
 
 ### T-008 — KB: ch. 2–3 (band nomenclature, symbols & abbreviated terms)
-**Status:** todo
+**Status:** done
 **Description:** Band and region designation rules; full symbol/abbreviation table (ch. 3) as a vocabulary the parser can use.
 **Acceptance:** Shared KB criteria; symbol vocabulary file covers every ch. 3 entry.
 **Notes:** Before starting, person sign-off of the **ch. 3 symbol list** (pp.34–36; most important, it is the validator's vocabulary), **Table 2** (p.14) and **Table 3** (p.15): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`.
+**Outcome (2026-11-17):** Table 2 and the ch. 3 symbol list signed off (131 rows, not 134: header lines were counted). New vocabulary format: `kb/schema/vocab.schema.json`, `kb/vocab/2016/ch03/03-symbols.yaml` (131 entries) and `ch02/02.04-banding-codes.yaml` (22); `kb build` checks tokens and coverage of the printed tables, writes SQLite `vocab`/`vocab_tokens` and `vocab` in `kb.json` (format_version 2). 19 rules (CHROM/BAND/SYM) + quotes in `kb/rules/2016/ch02–ch03/`, all paraphrases reviewed; `SYM.LISTED_ONLY` stays `needs_review` (check in T-009–T-019); `BAND.MUST_EXIST` accepted. Deviations: sign-off moved before planning (skill updated); vocab files instead of one rule per symbol; book's hypothetical `1p31.11`/`1p31.12` kept as format-only examples. Follow-up: T-055 (CRLF test failure).
 
 ### T-009 — KB: ch. 4 (karyotype designation)
 **Status:** todo
@@ -276,6 +278,12 @@ All KB tasks share these steps and criteria:
 **Notes:** Raised 2026-11-17 (user). Should be decided before T-023 (core design), so the data model supports it.
 
 ## Core library
+
+### T-055 — Tooling: LF line endings for committed generated files
+**Status:** todo
+**Description:** With `core.autocrlf=true` (Windows), git checks out `kb/bands/2016/ideograms.yaml` with CRLF, while `kb ideograms` writes LF, so `tests/test_ideograms.py::test_pdf_decodes_every_chromosome_and_matches_committed` (byte comparison) fails. The same can happen to `bands.yaml` and any other generated, committed file.
+**Acceptance:** A `.gitattributes` that keeps `kb/**/*.yaml` (and other generated files) LF on checkout, or tests that compare text with normalised line endings (decide which); the full test suite passes on a Windows checkout with `core.autocrlf=true`.
+**Notes:** Found during T-008 (2026-11-17); unrelated to T-008's changes. After adding `.gitattributes`, re-normalise the working tree (`git add --renormalize .`).
 
 ### T-023 — Core design
 **Status:** todo

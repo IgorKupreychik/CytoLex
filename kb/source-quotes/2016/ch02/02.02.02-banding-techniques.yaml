@@ -1,0 +1,12 @@
+version: "2016"
+section: "2.2.2"
+quotes:
+  - rule: BAND.TECHNIQUE_CODE
+    cite: {section: "2.2.2", page: 8, para: "¶4"}
+    text: For the code to describe banding techniques, see Table 2.
+  - rule: BAND.TECHNIQUE_CODE
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+    text: >-
+      Table 2. Examples of the code used to describe banding techniques. In this one-, two-, or
+      three-letter code, the first letter denotes the type of banding, the second letter the
+      general technique, and the third letter the stain.

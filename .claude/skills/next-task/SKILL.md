@@ -16,7 +16,15 @@ Works on one task from `TASKS.md` at the repo root. Arguments: `$ARGUMENTS` (opt
    - If nothing is startable, say so and list the closest candidates with their blockers.
 4. Tell the user which task was picked and why, in one or two lines.
 
-## 2. Plan (always in plan mode)
+## 2. Sign-off first (before planning)
+If the task's **Notes** ask for a person sign-off (tables or figures with `review.human: pending` in `tools/src/cytolex_tools/extract/tables/<version>.yaml`), do it **before** entering plan mode. The plan depends on the signed-off data.
+1. Explain what the user is checking: the extracted table (chunk in `kb/source-text/`) must match the printed table. That means the same rows in the same order, each cell in its right column, and no missing or garbled characters. Explain why this matters (the KB and the parser rely on it).
+2. Use the review images in `build/review/tables/<version>/`. If they're missing or stale, ask the user to run `uv run --directory tools kb tables`.
+3. Go **one table at a time, page by page**. Show the image path, and show the extracted rows as a numbered table. Compare them yourself first and report any differences, row counts and oddities.
+4. Get an explicit confirmation per table (`ok` or `mismatch`). On a mismatch, apply the backup plan in `docs/extraction-review-<version>.md`.
+5. Record `review.human: ok` in the layout file and the sign-off date in `docs/extraction-review-<version>.md` (and remove the table from its `needs_review` list). Then ask the user to run `uv run --directory tools kb extract --version <version>` and wait until they have.
+
+## 3. Plan (always in plan mode)
 - Call `EnterPlanMode` (load it via ToolSearch if it's deferred) before doing anything else for the task.
 - Read only what the task needs:
   - `docs/decisions.md` for relevant earlier decisions.
@@ -27,7 +35,7 @@ Works on one task from `TASKS.md` at the repo root. Arguments: `$ARGUMENTS` (opt
 - **`todo` task:** write a plan that meets every acceptance criterion in the task's section.
 - Finish with `ExitPlanMode` for approval.
 
-## 3. Execute
+## 4. Execute
 1. On approval, set the task's status to `in_progress`, in **both** the Summary table and the task section.
 2. Do the work.
    - A `discussion` task records the decision (with a short rationale and the date) in `docs/decisions.md`, and updates `CLAUDE.md` if it changes how to work in the repo.
@@ -35,7 +43,7 @@ Works on one task from `TASKS.md` at the repo root. Arguments: `$ARGUMENTS` (opt
 3. Check each acceptance criterion and report it as ✅ or ❌, with evidence (command output, file paths).
 4. New open questions or follow-up work: add them to `TASKS.md` as new tasks with the next free ID (`discussion` for decisions, `todo` for work), with Pri, Depends and a section. Mention them to the user.
 
-## 4. Finish
+## 5. Finish
 - List any commands the user must run now (e.g. `uv sync --directory tools`, `kb extract`, `kb bands`, `kb build`) and why; see README.md → "When to run what".
 - Ask the user to confirm the task is done. Only after they confirm:
   - Set status `done` in both places.

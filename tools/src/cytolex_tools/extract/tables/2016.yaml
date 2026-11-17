@@ -47,7 +47,7 @@ tables:
 
   - id: Table 2
     kind: float
-    review: {image: ok, human: pending, fallback: none}
+    review: {image: ok, human: ok, fallback: none}
     regions:
       - book_page: 14
         top: 92
@@ -102,7 +102,7 @@ tables:
   # Ch. 3 symbol list: one ¶ per page, as before T-003.
   - id: Symbols
     kind: paragraph
-    review: {image: ok, human: pending, fallback: none}
+    review: {image: ok, human: ok, fallback: none}
     regions:
       - book_page: 34
         top: 340

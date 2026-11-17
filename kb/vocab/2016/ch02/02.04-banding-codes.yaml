@@ -1,0 +1,142 @@
+# ISCN 2016 Table 2 (p.14): examples of the banding-technique code (first letter = type of
+# banding, second = general technique, third = stain). Meanings are the book's own short
+# technique names. Format: kb/README.md.
+version: "2016"
+section: "2.4"
+vocabulary: banding_codes
+source:
+  - {section: "2.4", page: 14, float: "Table 2"}
+review: {paraphrase_checked: true, needs_review: false}
+entries:
+  - label: "Q"
+    tokens: ["Q"]
+    kind: code
+    meanings:
+      - text: "Q-bands"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "QF"
+    tokens: ["QF"]
+    kind: code
+    meanings:
+      - text: "Q-bands by fluorescence"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "QFQ"
+    tokens: ["QFQ"]
+    kind: code
+    meanings:
+      - text: "Q-bands by fluorescence using quinacrine"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "QFH"
+    tokens: ["QFH"]
+    kind: code
+    meanings:
+      - text: "Q-bands by fluorescence using Hoechst 33258"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "G"
+    tokens: ["G"]
+    kind: code
+    meanings:
+      - text: "G-bands"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "GT"
+    tokens: ["GT"]
+    kind: code
+    meanings:
+      - text: "G-bands by trypsin"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "GTG"
+    tokens: ["GTG"]
+    kind: code
+    meanings:
+      - text: "G-bands by trypsin using Giemsa"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "GTL"
+    tokens: ["GTL"]
+    kind: code
+    meanings:
+      - text: "G-bands by trypsin using Leishman"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "GTW"
+    tokens: ["GTW"]
+    kind: code
+    meanings:
+      - text: "G-bands by trypsin using Wright"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "GAG"
+    tokens: ["GAG"]
+    kind: code
+    meanings:
+      - text: "G-bands by acetic saline using Giemsa"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "C"
+    tokens: ["C"]
+    kind: code
+    meanings:
+      - text: "C-bands"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "CB"
+    tokens: ["CB"]
+    kind: code
+    meanings:
+      - text: "C-bands by barium hydroxide"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "CBG"
+    tokens: ["CBG"]
+    kind: code
+    meanings:
+      - text: "C-bands by barium hydroxide using Giemsa"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "R"
+    tokens: ["R"]
+    kind: code
+    meanings:
+      - text: "R-bands"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "RF"
+    tokens: ["RF"]
+    kind: code
+    meanings:
+      - text: "R-bands by fluorescence"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "RFA"
+    tokens: ["RFA"]
+    kind: code
+    meanings:
+      - text: "R-bands by fluorescence using acridine orange"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "RH"
+    tokens: ["RH"]
+    kind: code
+    meanings:
+      - text: "R-bands by heating"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "RHG"
+    tokens: ["RHG"]
+    kind: code
+    meanings:
+      - text: "R-bands by heating using Giemsa"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "RB"
+    tokens: ["RB"]
+    kind: code
+    meanings:
+      - text: "R-bands by BrdU"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "RBG"
+    tokens: ["RBG"]
+    kind: code
+    meanings:
+      - text: "R-bands by BrdU using Giemsa"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "RBA"
+    tokens: ["RBA"]
+    kind: code
+    meanings:
+      - text: "R-bands by BrdU using acridine orange"
+    cite: {section: "2.4", page: 14, float: "Table 2"}
+  - label: "DA-DAPI"
+    tokens: ["DA-DAPI"]
+    kind: code
+    meanings:
+      - text: "DAPI-bands by Distamycin A and 4′,6-diamidino-2-phenylindole"
+    cite: {section: "2.4", page: 14, float: "Table 2"}

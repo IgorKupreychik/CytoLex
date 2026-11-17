@@ -1,0 +1,24 @@
+version: "2016"
+section: "3"
+quotes:
+  - rule: SYM.LISTED_ONLY
+    cite: {section: "3", page: 34, para: "¶1"}
+    text: >-
+      All symbols and abbreviated terms used in the description of chromosomes and chromosome
+      abnormalities are listed below.
+  - rule: SYM.SPACE_BETWEEN_SYMBOLS
+    cite: {section: "3", page: 34, para: "¶1"}
+    text: >-
+      When more than one symbol or abbreviation is used together, a space is placed between the
+      two (e.g. psu dic).
+  - rule: SYM.SPACE_BEFORE_CHROMOSOME_COUNT
+    cite: {section: "3", page: 34, para: "¶1"}
+    text: >-
+      When the symbol or abbreviation precedes the total number of chromosomes and no
+      parenthesis is present, a space is placed between the symbol or abbreviation and the
+      number of chromosomes (e.g. mos 47,XXX[25]/46,XX[5]).
+  - rule: SYM.NO_SPACE_AT_PARENTHESIS
+    cite: {section: "3", page: 34, para: "¶1"}
+    text: >-
+      There is no space when a symbol or abbreviation immediately precedes or follows a
+      parenthesis.

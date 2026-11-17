@@ -1,0 +1,130 @@
+version: "2016"
+section: "2.3.2"
+rules:
+  - id: BAND.ARM_SYMBOL
+    title: Arms are p (short) and q (long)
+    applies_to: [general]
+    severity: error
+    statement: >-
+      The short arm of a chromosome is designated p and the long arm q.
+    cite:
+      - {section: "2.3.2", page: 11, para: "¶1"}
+    examples:
+      valid:
+        - text: "1p31"
+          cite: {section: "2.3.2", page: 11, para: "¶2"}
+        - text: "1q21"
+          note: Not a book example in this section.
+      invalid:
+        - text: "1P31"
+          why: The arm symbol is a lower-case p.
+          corrected: "1p31"
+    fix: {level: 1, kind: replace, hint: Write the arm symbol in lower case (p or q).}
+    review: {paraphrase_checked: true, needs_review: false}
+
+  - id: BAND.CENTROMERE_10
+    title: Centromere is band 10 (p10, q10)
+    applies_to: [general]
+    severity: info
+    statement: >-
+      The centromere (cen) has band number 10: its short-arm side is p10 and its long-arm side
+      q10. These two names are valid although the idiograms do not show them.
+    cite:
+      - {section: "2.3.2", page: 11, para: "¶1"}
+      - {section: "2.4", page: 14, para: "¶5"}
+    examples:
+      valid:
+        - text: "17q10"
+          note: Not a book example in this section; long-arm side of the chromosome 17 centromere.
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [BAND.MUST_EXIST]
+
+  - id: BAND.REGION_NUMBERING
+    title: Regions and bands numbered from the centromere
+    applies_to: [general]
+    severity: info
+    statement: >-
+      Regions and bands are numbered in sequence from the centromere outward along each arm. The
+      region next to the centromere is region 1 on each arm, the next one region 2, and so on. A
+      landmark band belongs entirely to the region distal to it and is band 1 of that region.
+    cite:
+      - {section: "2.3.2", page: 11, para: "¶1"}
+    examples:
+      valid: []
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [BAND.REGION_LANDMARKS]
+
+  - id: BAND.DESIGNATION_FORMAT
+    title: Band = chromosome, arm, region, band, no separators
+    applies_to: [general]
+    severity: error
+    statement: >-
+      A band designation has four parts in this order: chromosome number, arm symbol, region
+      number and band number, written together with no spaces or punctuation. In 1p31 the
+      chromosome is 1, the arm p, the region 3 and the band 1.
+    cite:
+      - {section: "2.3.2", page: 11, para: "¶2"}
+    examples:
+      valid:
+        - text: "1p31"
+          cite: {section: "2.3.2", page: 11, para: "¶2"}
+      invalid:
+        - text: "1p 31"
+          why: Space between the arm symbol and the region number.
+          corrected: "1p31"
+        - text: "1 p31"
+          why: Space between the chromosome number and the arm symbol.
+          corrected: "1p31"
+    fix: {level: 1, kind: delete, hint: Remove the spaces inside the band designation.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [BAND.SUBBAND_FORMAT]
+
+  - id: BAND.SUBBAND_FORMAT
+    title: Sub-bands after a single decimal point
+    applies_to: [general]
+    severity: error
+    statement: >-
+      A sub-band is written as the band designation, a decimal point and the sub-band number
+      (1p31.1). When a sub-band is divided again, more digits are added with no further
+      punctuation (1p31.11).
+    cite:
+      - {section: "2.3.2", page: 11, para: "¶3"}
+    examples:
+      valid:
+        - text: "1p31.1"
+          cite: {section: "2.3.2", page: 11, para: "¶3"}
+        - text: "1p31.3"
+          cite: {section: "2.3.2", page: 11, para: "¶3"}
+        - text: "1p31.11"
+          cite: {section: "2.3.2", page: 11, para: "¶3"}
+          note: >-
+            Format example only: the book describes a hypothetical subdivision, and 1p31.11 is
+            not a band of the 2016 idiograms (BAND.MUST_EXIST rejects it in a real string).
+        - text: "1p31.12"
+          cite: {section: "2.3.2", page: 11, para: "¶3"}
+          note: Format example only, like 1p31.11.
+        - text: "1p36.33"
+          note: Not a book example in this section; an existing 850-band-level sub-band.
+      invalid:
+        - text: "1p36.3.3"
+          why: A further subdivision adds digits, not a second decimal point.
+          corrected: "1p36.33"
+        - text: "1p31,1"
+          why: Sub-bands follow a decimal point, not a comma.
+          corrected: "1p31.1"
+    fix: {level: 1, kind: replace, hint: "Use one decimal point after the band number, then the sub-band digits."}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [BAND.DESIGNATION_FORMAT, BAND.SUBBAND_NUMBERING]
+
+  - id: BAND.SUBBAND_NUMBERING
+    title: Sub-bands numbered from the centromere
+    applies_to: [general]
+    severity: info
+    statement: >-
+      Sub-bands are numbered in sequence from the centromere outward: 1p31.1 is proximal and
+      1p31.3 distal. A band can be split into any number of sub-bands, but usually into three.
+    cite:
+      - {section: "2.3.2", page: 11, para: "¶3"}
+    examples:
+      valid: []
+    review: {paraphrase_checked: true, needs_review: false}

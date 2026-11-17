@@ -1,0 +1,90 @@
+version: "2016"
+section: "3"
+rules:
+  - id: SYM.LISTED_ONLY
+    title: Only listed symbols and abbreviations
+    applies_to: [general]
+    severity: error
+    statement: >-
+      Chapter 3 lists every symbol and abbreviated term used to describe chromosomes and their
+      abnormalities (vocabulary `symbols`, kb/vocab/2016/ch03/03-symbols.yaml). A symbol or
+      abbreviation outside that list is not ISCN. Chromosome and band names, numbers, cell
+      counts, probe and locus names and coordinates are not symbols.
+    cite:
+      - {section: "3", page: 34, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,del(5)(q13q33)"
+          note: Not a book example in this section.
+      invalid:
+        - text: "46,XX,dl(5)(q13q33)"
+          why: "'dl' is not a listed abbreviation (deletion is del)."
+          corrected: "46,XX,del(5)(q13q33)"
+    fix: {level: 3, hint: "Replace the term with the listed symbol or abbreviation for what is meant."}
+    review:
+      paraphrase_checked: true
+      needs_review: true
+      note: >-
+        Reading the list as closed is an inference from "All symbols … are listed below". Later
+        chapters may use terms that are not in the list; check this while writing T-009 to T-019.
+
+  - id: SYM.SPACE_BETWEEN_SYMBOLS
+    title: Space between combined symbols
+    applies_to: [general]
+    severity: error
+    statement: >-
+      When two symbols or abbreviations are used together, they are separated by a space
+      (psu dic).
+    cite:
+      - {section: "3", page: 34, para: "¶1"}
+    examples:
+      valid:
+        - text: "psu dic"
+          cite: {section: "3", page: 34, para: "¶1"}
+      invalid:
+        - text: "psudic"
+          why: The two abbreviations psu and dic must be separated by a space.
+          corrected: "psu dic"
+    fix: {level: 1, kind: insert, hint: Insert a space between the two abbreviations.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [SYM.NO_SPACE_AT_PARENTHESIS]
+
+  - id: SYM.SPACE_BEFORE_CHROMOSOME_COUNT
+    title: Space between a symbol and the chromosome count
+    applies_to: [general]
+    severity: error
+    statement: >-
+      When a symbol or abbreviation comes before the total number of chromosomes and there is no
+      parenthesis between them, a space separates the two (mos 47,XXX[25]/46,XX[5]).
+    cite:
+      - {section: "3", page: 34, para: "¶1"}
+    examples:
+      valid:
+        - text: "mos 47,XXX[25]/46,XX[5]"
+          cite: {section: "3", page: 34, para: "¶1"}
+      invalid:
+        - text: "mos47,XXX[25]/46,XX[5]"
+          why: A space is required between mos and the chromosome number 47.
+          corrected: "mos 47,XXX[25]/46,XX[5]"
+    fix: {level: 1, kind: insert, hint: Insert a space between the abbreviation and the chromosome number.}
+    review: {paraphrase_checked: true, needs_review: false}
+
+  - id: SYM.NO_SPACE_AT_PARENTHESIS
+    title: No space next to a parenthesis
+    applies_to: [general]
+    severity: error
+    statement: >-
+      No space is written between a symbol or abbreviation and a parenthesis that directly
+      precedes or follows it.
+    cite:
+      - {section: "3", page: 34, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,del(5)(q13q33)"
+          note: Not a book example in this section.
+      invalid:
+        - text: "46,XX,del (5)(q13q33)"
+          why: Space between del and the opening parenthesis.
+          corrected: "46,XX,del(5)(q13q33)"
+    fix: {level: 1, kind: delete, hint: Remove the space next to the parenthesis.}
+    review: {paraphrase_checked: true, needs_review: false}

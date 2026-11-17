@@ -1,0 +1,94 @@
+version: "2016"
+section: "2.4"
+rules:
+  - id: BAND.RESOLUTION_LEVELS
+    title: Resolution levels 300–850 bands
+    applies_to: [general]
+    severity: info
+    statement: >-
+      The resolution level is the number of bands seen in a haploid set (22 autosomes plus X and
+      Y). The standard idiograms (Fig. 5) show about 300, 400, 550, 700 and 850 bands.
+    cite:
+      - {section: "2.4", page: 12, para: "¶2"}
+      - {section: "2.5", page: 16, float: "Fig. 5"}
+    examples:
+      valid: []
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [BAND.MUST_EXIST]
+
+  - id: BAND.NUMBERING_SAME_ALL_STAINS
+    title: Same band numbers for G-, Q- and R-banding
+    applies_to: [general]
+    severity: info
+    statement: >-
+      The idiograms are drawn as G-band patterns but give the band positions for G-, Q- and
+      R-stained preparations alike: G- and R-bands may look different, but the order of the bands
+      is the same, so band names do not depend on the staining technique.
+    cite:
+      - {section: "2.4", page: 13, para: "¶3"}
+      - {section: "2.5", page: 16, float: "Fig. 5"}
+    examples:
+      valid: []
+    review: {paraphrase_checked: true, needs_review: false}
+
+  - id: BAND.MUST_EXIST
+    title: Band must exist in the ISCN idiograms
+    applies_to: [general]
+    severity: error
+    statement: >-
+      A band or sub-band name must be one defined by the ISCN idiograms (Fig. 5) at one of the
+      standard resolution levels. Besides these, p10 and q10 (the centromere) are valid. The
+      list of valid names is kb/bands/2016/bands.yaml (the book's idiograms, checked against
+      NCBI, with cited exceptions).
+    cite:
+      - {section: "2.4", page: 12, para: "¶2"}
+      - {section: "2.5", page: 16, float: "Fig. 5"}
+    examples:
+      valid:
+        - text: "9q34.1"
+          note: Not a book example in this section; 400/550-level sub-band.
+        - text: "9q34.11"
+          note: >-
+            Not in the book's idiograms, but kept from NCBI with book: false
+            (kb/bands/2016/exceptions.yaml; §15.3 uses it).
+      invalid:
+        - text: "9q35"
+          why: Chromosome 9 has no band q35; its long arm ends at region 3, band 4.
+        - text: "9q34.4"
+          why: Band 9q34 has only sub-bands 9q34.1–9q34.3.
+    fix: {level: 3, hint: "Name an existing band; check the idiogram of the chromosome at the resolution level used."}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [BAND.CENTROMERE_10, BAND.RESOLUTION_LEVELS]
+
+  - id: BAND.PERICENTROMERIC_11
+    title: Bands next to the centromere are 11, 11.1 or 11.11
+    applies_to: [general]
+    severity: info
+    statement: >-
+      The heterochromatic regions on either side of the centromere (band 10) are numbered 11,
+      11.1 or 11.11, depending on the resolution level.
+    cite:
+      - {section: "2.4", page: 14, para: "¶5"}
+    examples:
+      valid:
+        - text: "1p11"
+          note: Not a book example in this section.
+        - text: "1p11.1"
+          note: Not a book example in this section.
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [BAND.CENTROMERE_10]
+
+  - id: BAND.VARIABLE_REGIONS
+    title: Variable regions are not detailed in the idiograms
+    applies_to: [general]
+    severity: info
+    statement: >-
+      Two kinds of variable regions are cross-hatched in the idiograms: the pericentromeric
+      heterochromatin of every chromosome, and 1q12, 3q11.2, 9q12, 16q11.2, 19p12, 19q12, Yq12
+      and the short arms of the acrocentric chromosomes. They are drawn schematically, and bands
+      inside them are not shown because they vary (see chapter 7).
+    cite:
+      - {section: "2.4", page: 13, para: "¶4"}
+    examples:
+      valid: []
+    review: {paraphrase_checked: true, needs_review: false}

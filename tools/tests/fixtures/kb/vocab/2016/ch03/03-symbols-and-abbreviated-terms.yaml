@@ -1,0 +1,41 @@
+version: "2016"
+section: "3"
+vocabulary: symbols
+source:
+  - {section: "3", page: 34, para: "¶2"}
+  - {section: "3", page: 35, para: "¶3"}
+shared_tokens: ["."]
+review: {paraphrase_checked: false, needs_review: false}
+entries:
+  - label: "brackets, square ([ ])"
+    tokens: ["[", "]"]
+    pair: {open: "[", close: "]"}
+    kind: punctuation
+    meanings:
+      - {text: Enclose the cell count or the genome build., sections: ["4.1", "11.1.2", "14"]}
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "decimal point (.)"
+    tokens: ["."]
+    kind: punctuation
+    meanings:
+      - {text: Marks sub-bands., sections: ["2.3.2"]}
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: del
+    tokens: [del]
+    kind: abbreviation
+    meanings:
+      - {text: Deletion, sections: ["9.2.2", "16.3.1"]}
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "period (.)"
+    tokens: ["."]
+    kind: punctuation
+    meanings:
+      - {text: Separates different techniques., sections: ["13.2", "14.2", "16.2", "16.3"]}
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "underlining (single)"
+    tokens: []
+    kind: typographic
+    meanings:
+      - {text: Tells homologous chromosomes apart., sections: ["4.1", "9.2.3", "9.2.17.1"]}
+    cite: {section: "3", page: 35, para: "¶3"}
+    note: Formatting, not a typed character (U+0332 in the source text); see T-042.

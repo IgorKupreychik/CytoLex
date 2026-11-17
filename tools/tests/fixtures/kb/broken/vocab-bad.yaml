@@ -1,0 +1,13 @@
+version: "2016"
+section: "3"
+vocabulary: symbols
+source:
+  - {section: "3", page: 34, para: "¶2"}
+review: {paraphrase_checked: false, needs_review: false}
+entries:
+  - label: del
+    tokens: []
+    kind: abbreviation
+    meanings:
+      - {text: Deletion}
+    cite: {section: "3", page: 34, para: "¶2"}

@@ -13,13 +13,14 @@ from cytolex_tools.kb.cite import render_cite
 
 FIXTURES = Path(__file__).parent / "fixtures" / "kb"
 REL = Path("2016") / "ch09" / "09.02.17.01-reciprocal-translocations.yaml"
+VOCAB_REL = Path("2016") / "ch03" / "03-symbols-and-abbreviated-terms.yaml"
 
 
 @pytest.fixture
 def kb(tmp_path):
     """A copy of the sample KB + chunk excerpt; returns (kb_dir, source_text_root, out_dir)."""
     kb_dir = tmp_path / "kb"
-    for sub in ("rules", "source-quotes", "source-text"):
+    for sub in ("rules", "source-quotes", "source-text", "vocab"):
         shutil.copytree(FIXTURES / sub, kb_dir / sub)
     return kb_dir, kb_dir / "source-text", tmp_path / "build"
 
@@ -40,6 +41,10 @@ def rules_file(kb) -> Path:
 
 def quotes_file(kb) -> Path:
     return kb[0] / "source-quotes" / REL
+
+
+def vocab_file(kb) -> Path:
+    return kb[0] / "vocab" / VOCAB_REL
 
 
 def assert_fails(report, kb, where: str, fragment: str):
@@ -78,7 +83,7 @@ def test_build_ok(kb):
 
     data = json.loads((out / "kb.json").read_text(encoding="utf-8"))
     ed = data["editions"]["2016"]
-    assert data["format_version"] == 1
+    assert data["format_version"] == 2
     assert [r["id"] for r in ed["rules"]] == [
         "TRANSLOC.CHROMOSOME_ORDER",
         "TRANSLOC.THREE_WAY_ORDER",
@@ -86,10 +91,16 @@ def test_build_ok(kb):
     assert ed["rules"][0]["file"] == REL.relative_to("2016").as_posix()
     assert ed["rules"][0]["cite"][0]["rendered"] == "ISCN 2016 §9.2.17.1, p.75, ¶1"
     assert ed["quotes"][0]["rule"] == "TRANSLOC.CHROMOSOME_ORDER"
+    sym = ed["vocab"]["symbols"]
+    assert sym["file"] == VOCAB_REL.relative_to("2016").as_posix()
+    labels = [e["label"] for e in sym["entries"]]
+    assert labels[:3] == ["brackets, square ([ ])", "decimal point (.)", "del"]
+    assert sym["entries"][2]["cite"]["rendered"] == "ISCN 2016 §3, p.34, ¶2"
 
     review = (out / "review" / "kb-review.md").read_text(encoding="utf-8")
     assert "### `needs_review: true` (1)" in review
     assert "### `paraphrase_checked: false` (2)" in review
+    assert "`symbols` (ch03/03-symbols-and-abbreviated-terms.yaml, 5 entries)" in review
     assert [r["id"] for _, _, r in report.needs_review] == ["TRANSLOC.CHROMOSOME_ORDER"]
     assert len(report.unchecked) == 2
 
@@ -274,7 +285,8 @@ def test_cli_build(kb, monkeypatch, capsys):
     monkeypatch.setattr(cli, "REPO_ROOT", root)
     assert cli.main(["build"]) == 0
     out = capsys.readouterr().out
-    assert "ISCN 2016: 2 rules, 1 quotes (chunk checks: on)" in out
+    assert "ISCN 2016: 2 rules, 1 quotes, 1 vocabularies (5 entries) (chunk checks: on)" in out
+    assert "2016 symbols (ch03/03-symbols-and-abbreviated-terms.yaml)" in out
     assert "TRANSLOC.CHROMOSOME_ORDER (ch09/09.02.17.01-reciprocal-translocations.yaml)" in out
     assert "wrote build/kb.sqlite, build/kb.json, build/review/kb-review.md" in out
 
@@ -283,3 +295,77 @@ def test_cli_build(kb, monkeypatch, capsys):
     err = capsys.readouterr().err
     assert "quotes[0].rule: orphan quote: TRANSLOC.NOPE" in err
     assert "FAILED, 1 problem(s); nothing written" in err
+
+
+# --- vocab (T-008) -----------------------------------------------------------------------
+
+
+def test_vocab_sqlite(kb):
+    assert build(kb).errors == []
+    con = sqlite3.connect(kb[2] / "kb.sqlite")
+    assert con.execute("SELECT count(*) FROM vocab").fetchone() == (5,)
+    assert con.execute(
+        "SELECT label FROM vocab_tokens WHERE token = '.' ORDER BY label"
+    ).fetchall() == [("decimal point (.)",), ("period (.)",)]
+    assert con.execute(
+        "SELECT tokens, pair_open, pair_close FROM vocab WHERE label LIKE 'brackets%'"
+    ).fetchone() == ('["[", "]"]', "[", "]")
+    assert con.execute(
+        "SELECT tokens, note IS NOT NULL FROM vocab WHERE kind = 'typographic'"
+    ).fetchone() == ("[]", 1)
+    con.close()
+
+
+def test_vocab_missing_book_row(kb):
+    edit(vocab_file(kb), "  - label: del\n", "  - label: dl\n")
+    report = build(kb)
+    assert_fails(report, kb, "entries", "book row 'del' has no entry")
+    assert_fails(report, kb, "entries[2].label", "'dl' is not a row of the source table")
+
+
+def test_vocab_source_block_missing(kb):
+    edit(vocab_file(kb), '  - {section: "3", page: 35, para: "¶3"}\n', "")
+    report = build(kb)
+    assert_fails(report, kb, "entries[3].label", "'period (.)' is not a row of the source table")
+
+
+def test_vocab_entry_cites_wrong_block(kb):
+    old = '"16.3.1"]}\n    cite: {section: "3", page: 34, para: "¶2"}'
+    new = '"16.3.1"]}\n    cite: {section: "3", page: 35, para: "¶3"}'
+    edit(vocab_file(kb), old, new)
+    assert_fails(build(kb), kb, "entries[2].cite", "'del' is printed in another source block")
+
+
+def test_vocab_duplicate_token_needs_shared_tokens(kb):
+    edit(vocab_file(kb), 'shared_tokens: ["."]\n', "")
+    assert_fails(build(kb), kb, "entries[3].tokens", "token '.' also in entries[1]")
+
+
+def test_vocab_stale_shared_token(kb):
+    edit(vocab_file(kb), 'shared_tokens: ["."]', 'shared_tokens: [".", "del"]')
+    assert_fails(build(kb), kb, "shared_tokens", "'del' is not shared by two entries")
+
+
+def test_vocab_pair_not_in_tokens(kb):
+    edit(vocab_file(kb), 'pair: {open: "[", close: "]"}', 'pair: {open: "[", close: ")"}')
+    assert_fails(build(kb), kb, "entries[0].pair.close", "')' not in tokens")
+
+
+def test_vocab_duplicate_vocabulary(kb):
+    f = vocab_file(kb)
+    f.with_name("03-copy.yaml").write_text(f.read_text(encoding="utf-8"), encoding="utf-8")
+    assert_fails(build(kb), kb, "vocabulary", "duplicate vocabulary 'symbols'")
+
+
+def test_vocab_file_in_rules_dir(kb):
+    shutil.copy(vocab_file(kb), kb[0] / "rules" / "2016" / "03-x.yaml")
+    report = build(kb)
+    assert any("'entries' file in the rules directory" in e.message for e in report.errors)
+
+
+def test_first_column():
+    from cytolex_tools.kb.build import first_column
+
+    block = "\n|  |  |\n|---|---|\n| a (\\|) | x |\n| b | y \\| z |\n\n> note\n"
+    assert first_column(block) == ["a (|)", "b"]
+    assert first_column("| H | I |\n|---|---|\n| r | s |") == ["r"]

@@ -96,7 +96,7 @@ bar positions. These are the places where ISCN 2016 differs from 2013 — useful
 ### Tables
 
 All configured tables: text layer and image agree cell for cell (`review.image: ok`).
-Person check pending (`review.human: pending`).
+Person check (`review.human`): `ok` for Table 2, Table 3 and Symbols (Table 3 on 2026-11-16; Table 2 and Symbols on 2026-11-17, T-008); pending for the rest.
 
 | Table | § (chunk) | Page | Shape | Notes |
 |---|---|---|---|---|
@@ -105,7 +105,7 @@ Person check pending (`review.human: pending`).
 | Table 3 landmarks | 2.5 | 15 | 4 columns, 28 rows | two-level header joined (`Chromosome Number`, `Arm`) |
 | Table 4 unbalanced gametes | 4.3.2.2 | 44 | 4 columns, 16 rows | segregation pattern given on its first row only, as printed |
 | Ploidy table | 11.1.6 | 90 | 4 columns, 12 rows | no caption; §11.2 refers to it ("given above"). **Indentation (sub-levels) and bold (near-x levels) are lost** — the names carry the hierarchy (Near-/Hypo-/Hyper-) |
-| Symbols | 3 | 34–36 | 2 columns, 134 rows, one ¶ per page | was missing ` \| ` on wide rows; wrapped descriptions joined |
+| Symbols | 3 | 34–36 | 2 columns, 131 rows, one ¶ per page | was missing ` \| ` on wide rows; wrapped descriptions joined |
 | Aberration groups | 10.3 | 83 | 2 columns, 3 rows | was a ¶ of run-together words |
 | Alignment figure | 16.2 | 126 | 4 columns, 6 rows | **shading (chr2 light, chrX dark), bold (reference) and italic (alternative alignment) carry meaning and are lost** |
 
@@ -156,8 +156,6 @@ checked):
 | § | Page | Reason |
 |---|---|---|
 | 2.3.2 (Table 1) | 12 | table — until `review.human: ok` |
-| 2.4 (Table 2) | 14 | table — until `review.human: ok` (Table 3, §2.5 p.15: signed off 2026-11-16) |
-| 3 (Symbols) | 34–36 | table — until `review.human: ok` |
 | 4.3.2, 4.3.2.2, 4.4 | 43–45 | Table 4 and the Fig. 8/9 diagrams the text depends on |
 | 7.2, 9.2.3, 9.2.17.1, 16.3.7 | 53, 61–65, 75–76, 129 | underlined homologues (U+0332 in the source text; validator behaviour is T-042) |
 | 10.3 | 83 | small table — until `review.human: ok` |

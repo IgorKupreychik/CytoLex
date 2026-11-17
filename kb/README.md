@@ -3,7 +3,7 @@
 The KB is the single source for every validation decision. Rules are YAML, checked against the JSON Schemas (draft 2020-12) in [`schema/`](schema/). Check files with:
 
 ```sh
-uv run --directory tools kb check                 # all of kb/rules/ and kb/source-quotes/
+uv run --directory tools kb check                 # all of kb/rules/, kb/source-quotes/ and kb/vocab/
 uv run --directory tools kb check kb/rules/2016/ch09/09.02.17.01-reciprocal-translocations.yaml
 ```
 
@@ -17,9 +17,11 @@ uv run --directory tools kb check kb/rules/2016/ch09/09.02.17.01-reciprocal-tran
 | *With chunks:* every `cite` (rules, examples, quotes): the section exists, its `para`/`example`/`float` label is in the chunk front matter, and `page` is that label's page | error |
 | *With chunks:* quote `text` occurs verbatim in a cited label's block (whitespace, line breaks, `>` and code fences ignored) | error |
 | *With chunks:* a valid example with an `En` cite occurs in that example block (all whitespace ignored) | warning |
+| Vocab: names unique per edition; labels unique; a token in one entry only, unless listed in `shared_tokens` (a listed token must be shared); `pair` tokens are in `tokens` | error |
+| *With chunks:* vocab coverage: the entry labels equal the first-column cells of the `source` tables, and each entry cites the block its row is printed in | error |
 | No chunks for the edition (`kb extract` not run): the chunk checks above are skipped | warning |
 
-Any error → exit 1 and nothing written. Otherwise it writes `build/kb.sqlite` (tables `rules`, `citations`, `examples`, `quotes`, `rule_applies_to`, `rule_context`, `rule_related`, `meta`; FTS5 `rules_fts`, `quotes_fts`), `build/kb.json` (`{format_version, editions: {"2016": {chunks_checked, rules, quotes}}}`, each cite with a `rendered` string) and `build/review/kb-review.md`.
+Any error → exit 1 and nothing written. Otherwise it writes `build/kb.sqlite` (tables `rules`, `citations`, `examples`, `quotes`, `rule_applies_to`, `rule_context`, `rule_related`, `vocab`, `vocab_tokens`, `meta`; FTS5 `rules_fts`, `quotes_fts`), `build/kb.json` (`{format_version: 2, editions: {"2016": {chunks_checked, rules, quotes, vocab}}}`, each cite with a `rendered` string) and `build/review/kb-review.md`.
 
 ## Layout
 | Path | Content |
@@ -29,6 +31,8 @@ Any error → exit 1 and nothing written. Otherwise it writes `build/kb.sqlite` 
 | `schema/quotes.schema.json` | Quote files |
 | `rules/<version>/chNN/<section-file>.yaml` | Rules for one ISCN section |
 | `source-quotes/<version>/chNN/<section-file>.yaml` | Verbatim quotes for the same section (same relative path) |
+| `schema/vocab.schema.json` | Vocabulary files |
+| `vocab/<version>/chNN/<section>-<name>.yaml` | A printed list as a parser vocabulary (ch. 3 symbols, Table 2 banding codes) |
 | `source-text/<version>/` | Extracted chunks (gitignored; `kb extract`) |
 | `schema/band-exceptions.schema.json` | `bands/<version>/exceptions.yaml` |
 | `bands/<version>/bands.yaml` | Generated band data (`kb bands`; committed, don't edit by hand) |
@@ -101,7 +105,7 @@ quotes:
 ## Conventions
 ### Rule IDs
 - Pattern: dot-separated `UPPER_SNAKE` segments, at least two: `TOPIC.CONCEPT` or `TOPIC.SUBTOPIC.CONCEPT` (`TRANSLOC.CHROMOSOME_ORDER`, `BAND.SUBBAND_FORMAT`).
-- The first segment is a topic prefix, e.g. `GEN` (general), `BAND`, `SYM`, `KARYO`, `SEX`, `NUM`, `STRUCT`, `DEL`, `DER`, `DUP`, `INS`, `INV`, `ISO`, `MAR`, `RING`, `TRANSLOC`, `CLONE`, `ISH`, `ARR`, … Use readable words rather than one-letter ISCN symbols (`ISO`, not `I`). New prefixes are fine.
+- The first segment is a topic prefix, e.g. `GEN` (general), `CHROM` (chromosome identifiers), `BAND`, `SYM`, `KARYO`, `SEX`, `NUM`, `STRUCT`, `DEL`, `DER`, `DUP`, `INS`, `INV`, `ISO`, `MAR`, `RING`, `TRANSLOC`, `CLONE`, `ISH`, `ARR`, … Use readable words rather than one-letter ISCN symbols (`ISO`, not `I`). New prefixes are fine.
 - IDs name a **concept**, not a section or edition, so they stay valid across editions. **Never rename** an ID once used; retire it via the edition directories instead.
 
 ### Citations
@@ -130,6 +134,34 @@ Structured in YAML, rendered as text in diagnostics:
 Type assignment: the chapter sets the default `applies_to`/`context`; explicit book text overrides it; ambiguous cases get `needs_review` (see `docs/decisions.md`).
 
 Changing a vocabulary means editing `schema/common.schema.json` (and this table) and logging the decision in `docs/decisions.md`.
+
+## Vocabulary file (`vocab/<version>/`)
+A list the book prints (ch. 3 symbols, Table 2 banding codes) as data the parser can use. The file name starts with its section (`ch03/03-symbols.yaml`, `ch02/02.04-banding-codes.yaml`).
+```yaml
+version: "2016"
+section: "3"
+vocabulary: symbols              # unique per edition
+source:                          # every chunk block holding the printed table
+  - {section: "3", page: 34, para: "¶2"}
+shared_tokens: ["."]             # tokens allowed in more than one entry
+review: {paraphrase_checked: false, needs_review: false}   # note required when needs_review
+entries:
+  - label: "plus sign, single (+)"   # first-column text exactly as in the chunk
+    tokens: ["+"]                    # what appears in a notation string
+    kind: punctuation                # abbreviation · punctuation · typographic · code
+    meanings:                        # one per ';'-part of the book's description
+      - {text: Additional normal or abnormal chromosome., sections: ["4.1", "8.1"]}
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "parentheses ( )"
+    tokens: ["(", ")"]
+    pair: {open: "(", close: ")"}    # bracket pairs
+    ...
+```
+- `label` is only for the coverage check: `kb build` fails if a book row has no entry or an entry has no book row. It never appears in a string.
+- `tokens`: as printed (`→`, `–`, `×`), plus alternatives only when the book itself gives them (`->`). Typed ASCII forms are T-053. Several tokens for one row are fine (`I`, `II`, `III`, `IV`). Empty only for `kind: typographic` (underlining, T-042).
+- `meanings[].text` is a paraphrase; single-term names (`Deletion`) may equal the book. `sections` are the book's cross-references.
+- Which meaning applies at a position (`.` = sub-band or technique separator; `p` = arm or nothing else) is the parser's job; the vocab lists all meanings.
+- `note`: hints for parser authors (e.g. the en dash vs hyphen question).
 
 ## Band data (`bands/<version>/`)
 `bands.yaml` is generated by `kb bands` (T-006, T-007) from the NCBI Genome Decoration Page ideograms (400/550/850 band sets), UCSC cytoBand and the book's idiograms; sources and sha256 pins are in `tools/src/cytolex_tools/bands/sources/<version>.yaml`. Don't edit it by hand; book-based decisions go in `exceptions.yaml`.

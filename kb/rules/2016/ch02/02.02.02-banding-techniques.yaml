@@ -1,0 +1,24 @@
+version: "2016"
+section: "2.2.2"
+rules:
+  - id: BAND.TECHNIQUE_CODE
+    title: Banding technique code (up to three letters)
+    applies_to: [general]
+    severity: info
+    statement: >-
+      A banding technique is described by a code of one to three letters: the first gives the
+      type of banding, the second the general technique and the third the stain (GTG = G-bands
+      by trypsin using Giemsa). Table 2 lists examples only (vocabulary `banding_codes`), so a
+      code missing from it is not by itself wrong.
+    cite:
+      - {section: "2.2.2", page: 8, para: "¶4"}
+      - {section: "2.4", page: 14, float: "Table 2"}
+    examples:
+      valid:
+        - text: "GTG"
+          cite: {section: "2.4", page: 14, float: "Table 2"}
+        - text: "QFQ"
+          cite: {section: "2.4", page: 14, float: "Table 2"}
+        - text: "RBA"
+          cite: {section: "2.4", page: 14, float: "Table 2"}
+    review: {paraphrase_checked: true, needs_review: false}

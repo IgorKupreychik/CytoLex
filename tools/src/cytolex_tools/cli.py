@@ -10,7 +10,7 @@ from .config import REPO_ROOT, iscn_pdf_path
 SUBCOMMANDS = {
     "extract": ("Extract per-section source text from the ISCN PDF", "T-002"),
     "tables": ("Render the configured table regions to PNG for review", "T-003"),
-    "check": ("Check KB rule/quote YAML files against the schemas in kb/schema/", "T-004"),
+    "check": ("Check KB rule/quote/vocab YAML files against the schemas in kb/schema/", "T-004"),
     "build": ("Validate the KB and build SQLite (FTS5) + JSON bundle", "T-005"),
     "bands": ("Generate band data from NCBI GDP ideograms + UCSC cytoBand", "T-006"),
     "ideograms": ("Decode the band labels of the book's idiograms from the ISCN PDF", "T-007"),
@@ -27,7 +27,7 @@ def build_parser() -> argparse.ArgumentParser:
                 "paths",
                 nargs="*",
                 type=Path,
-                help="files or directories (default: kb/rules/ and kb/source-quotes/)",
+                help="files or directories (default: kb/rules/, kb/source-quotes/ and kb/vocab/)",
             )
             continue
         if name == "build":
@@ -118,6 +118,7 @@ def cmd_check(args: argparse.Namespace) -> int:
     paths = [p if p.is_absolute() or p.exists() else REPO_ROOT / p for p in args.paths] or [
         REPO_ROOT / "kb" / "rules",
         REPO_ROOT / "kb" / "source-quotes",
+        REPO_ROOT / "kb" / "vocab",
     ]
     missing = [p for p in paths if not p.exists() and args.paths]
     for p in missing:
@@ -144,14 +145,15 @@ def cmd_build(args: argparse.Namespace) -> int:
         [args.version] if args.version else None,
     )
     if not report.editions:
-        print("kb build: no editions under kb/rules/ or kb/source-quotes/ (empty KB)")
+        print("kb build: no editions under kb/rules/, kb/source-quotes/ or kb/vocab/ (empty KB)")
     for ed in report.editions:
         n_rules = sum(len(f.data["rules"]) for f in ed.rule_files)
         n_quotes = sum(len(f.data["quotes"]) for f in ed.quote_files)
+        n_vocab = sum(len(f.data["entries"]) for f in ed.vocab_files)
         checks = "on" if ed.chunks_checked else "skipped"
         print(
-            f"kb build: ISCN {ed.version}: {n_rules} rules, {n_quotes} quotes "
-            f"(chunk checks: {checks})"
+            f"kb build: ISCN {ed.version}: {n_rules} rules, {n_quotes} quotes, "
+            f"{len(ed.vocab_files)} vocabularies ({n_vocab} entries) (chunk checks: {checks})"
         )
     for w in report.warnings:
         print(f"  warning: {w}")
@@ -169,6 +171,10 @@ def cmd_build(args: argparse.Namespace) -> int:
     print(f"review: {len(unchecked)} rule(s) with paraphrase_checked: false")
     for v, f, r in unchecked:
         print(f"  {v} {r['id']} ({f.rel})")
+    vocab = report.vocab_unchecked
+    print(f"review: {len(vocab)} vocabulary file(s) not yet checked or needing review")
+    for v, f in vocab:
+        print(f"  {v} {f.data['vocabulary']} ({f.rel})")
     rel = ", ".join(p.relative_to(REPO_ROOT).as_posix() for p in report.outputs)
     print(f"kb build: wrote {rel}")
     return 0

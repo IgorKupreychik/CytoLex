@@ -1,0 +1,58 @@
+version: "2016"
+section: "2.3.2"
+quotes:
+  - rule: BAND.ARM_SYMBOL
+    cite: {section: "2.3.2", page: 11, para: "¶1"}
+    text: >-
+      The symbols p and q are used to designate, respectively, the short and long arms of each
+      chromosome.
+  - rule: BAND.CENTROMERE_10
+    cite: {section: "2.3.2", page: 11, para: "¶1"}
+    text: >-
+      The centromere (cen) itself is designated 10; the part facing the short arm is p10, the
+      part facing the long arm is q10. These are not shown in the idiograms.
+  - rule: BAND.CENTROMERE_10
+    cite: {section: "2.4", page: 14, para: "¶5"}
+    text: >-
+      The lowest band number of 10 is assigned to the centromere (not shown on idiograms).
+  - rule: BAND.REGION_NUMBERING
+    cite: {section: "2.3.2", page: 11, para: "¶1"}
+    text: >-
+      Regions and bands are numbered consecutively from the centromere outward along each
+      chromosome arm.
+  - rule: BAND.REGION_NUMBERING
+    cite: {section: "2.3.2", page: 11, para: "¶1"}
+    text: >-
+      The two regions adjacent to the centromere are labeled as 1 in each arm; the next, more
+      distal regions as 2, and so on. A band used as a landmark is considered as belonging
+      entirely to the region distal to the landmark and is accorded the band number of 1 in that
+      region.
+  - rule: BAND.DESIGNATION_FORMAT
+    cite: {section: "2.3.2", page: 11, para: "¶2"}
+    text: >-
+      In designating a particular band, four items are required: (1) the chromosome number, (2)
+      the arm symbol, (3) the region number, and (4) the band number within that region. These
+      items are given in order without spacing or punctuation. For example, 1p31 indicates
+      chromosome 1, short arm, region 3, band 1.
+  - rule: BAND.SUBBAND_FORMAT
+    cite: {section: "2.3.2", page: 11, para: "¶3"}
+    text: >-
+      Whenever an existing band is subdivided, a decimal point is placed after the original band
+      designation and is followed by the number assigned to each sub-band.
+  - rule: BAND.SUBBAND_FORMAT
+    cite: {section: "2.3.2", page: 11, para: "¶3"}
+    text: >-
+      If a sub-band is subdivided, additional digits, but no further punctuation, are used; e.g.,
+      sub-band 1p31.1 might be further subdivided into 1p31.11, 1p31.12, etc.
+  - rule: BAND.SUBBAND_NUMBERING
+    cite: {section: "2.3.2", page: 11, para: "¶3"}
+    text: >-
+      The sub-bands are numbered sequentially from the centromere outward. For example, if the
+      original band 1p31 is subdivided into three equal or unequal sub-bands, the sub-bands are
+      labeled 1p31.1, 1p31.2, and 1p31.3, sub-band 1p31.1 being proximal and 1p31.3 distal to the
+      centromere.
+  - rule: BAND.SUBBAND_NUMBERING
+    cite: {section: "2.3.2", page: 11, para: "¶3"}
+    text: >-
+      Although in principle a band can be subdivided into any number of new bands at any one
+      stage, a band is usually subdivided into three sub-bands.

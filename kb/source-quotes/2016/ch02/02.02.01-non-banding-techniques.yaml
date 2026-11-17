@@ -1,0 +1,15 @@
+version: "2016"
+section: "2.2.1"
+quotes:
+  - rule: CHROM.IDENTIFIERS
+    cite: {section: "2.2.1", page: 7, para: "¶1"}
+    text: >-
+      the autosomes are numbered from 1 to 22 in order of decreasing length (one exception is
+      that chromosome 21 is shorter than chromosome 22). The sex chromosomes are referred to as
+      X and Y.
+  - rule: CHROM.GROUPS
+    cite: {section: "2.2.1", page: 7, para: "¶1"}
+    text: >-
+      When the chromosomes are stained by methods that do not produce bands, they can be
+      arranged into seven readily distinguishable groups (A–G) based on descending order of
+      size and the position of the centromere.

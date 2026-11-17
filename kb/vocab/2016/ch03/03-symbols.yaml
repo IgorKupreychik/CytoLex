@@ -1,0 +1,962 @@
+# ISCN 2016 ch. 3 symbols and abbreviated terms (pp.34–36) as the parser's vocabulary.
+# Labels must equal the book's first column (kb build checks coverage); tokens are what
+# appears in a notation string; meanings paraphrase the book. Format: kb/README.md.
+version: "2016"
+section: "3"
+vocabulary: symbols
+source:
+  - {section: "3", page: 34, para: "¶2"}
+  - {section: "3", page: 35, para: "¶3"}
+  - {section: "3", page: 36, para: "¶4"}
+shared_tokens: ["."]
+review: {paraphrase_checked: true, needs_review: false}
+entries:
+  - label: "AI"
+    tokens: ["AI"]
+    kind: abbreviation
+    meanings:
+      - text: "First meiotic anaphase."
+        sections: ["12.1"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "AII"
+    tokens: ["AII"]
+    kind: abbreviation
+    meanings:
+      - text: "Second meiotic anaphase."
+        sections: ["12.1"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "ace"
+    tokens: ["ace"]
+    kind: abbreviation
+    meanings:
+      - text: "Acentric fragment"
+        sections: ["9.2.12", "10.2.1"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "add"
+    tokens: ["add"]
+    kind: abbreviation
+    meanings:
+      - text: "Extra material whose origin is unknown."
+        sections: ["9.2.1", "16.2"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "amp"
+    tokens: ["amp"]
+    kind: abbreviation
+    meanings:
+      - text: "An amplified signal."
+        sections: ["13.3.2"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "approximate sign (~)"
+    tokens: ["~"]
+    kind: punctuation
+    meanings:
+      - text: "Marks approximate intervals or segment boundaries, or an approximate number of chromosomes, fragments or markers."
+        sections: ["5.2"]
+      - text: "A range of copy numbers of a region when the exact number cannot be determined."
+        sections: ["14.2"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "arr"
+    tokens: ["arr"]
+    kind: abbreviation
+    meanings:
+      - text: "Microarray"
+        sections: ["14.2"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "arrow (→ or ->)"
+    tokens: ["→", "->"]
+    kind: punctuation
+    meanings:
+      - text: "'From … to' in the detailed system."
+        sections: ["4.3.2.1"]
+    cite: {section: "3", page: 34, para: "¶2"}
+    note: "The book itself gives both forms."
+  - label: "b"
+    tokens: ["b"]
+    kind: abbreviation
+    meanings:
+      - text: "Break"
+        sections: ["10.1.1", "10.2.1"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "brackets, angle (< >)"
+    tokens: ["<", ">"]
+    pair: {open: "<", close: ">"}
+    kind: punctuation
+    meanings:
+      - text: "Enclose the ploidy level."
+        sections: ["8.1"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "brackets, square ([ ])"
+    tokens: ["[", "]"]
+    pair: {open: "[", close: "]"}
+    kind: punctuation
+    meanings:
+      - text: "Enclose the number of cells, or the genome build."
+        sections: ["4.1", "11.1.2", "14"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "c"
+    tokens: ["c"]
+    kind: abbreviation
+    meanings:
+      - text: "Constitutional anomaly."
+        sections: ["4.1", "8.3", "11.3"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "cen"
+    tokens: ["cen"]
+    kind: abbreviation
+    meanings:
+      - text: "Centromere"
+        sections: ["2.3.2", "4.3.2.1", "16.2"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "cgh"
+    tokens: ["cgh"]
+    kind: abbreviation
+    meanings:
+      - text: "Comparative genomic hybridization"
+        sections: ["13.6"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "chi"
+    tokens: ["chi"]
+    kind: abbreviation
+    meanings:
+      - text: "Chimera"
+        sections: ["4.1"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "chr"
+    tokens: ["chr"]
+    kind: abbreviation
+    meanings:
+      - text: "Chromosome"
+        sections: ["10.2"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "cht"
+    tokens: ["cht"]
+    kind: abbreviation
+    meanings:
+      - text: "Chromatid"
+        sections: ["10.1"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "colon, single (:)"
+    tokens: [":"]
+    kind: punctuation
+    meanings:
+      - text: "A break, in the detailed system."
+        sections: ["4.3.2.1"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "colon, double (::)"
+    tokens: ["::"]
+    kind: punctuation
+    meanings:
+      - text: "Break and reunion, in the detailed system."
+        sections: ["4.3.2.1", "16.2"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "comma (,)"
+    tokens: [","]
+    kind: punctuation
+    meanings:
+      - text: "Separates the chromosome number, the sex chromosomes and the individual abnormalities."
+        sections: ["4.1", "14.2"]
+      - text: "Separates locus designations."
+        sections: ["13.2", "13.3.1"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "con"
+    tokens: ["con"]
+    kind: abbreviation
+    meanings:
+      - text: "Signals that are connected."
+        sections: ["13.3.2"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "cp"
+    tokens: ["cp"]
+    kind: abbreviation
+    meanings:
+      - text: "Composite karyotype"
+        sections: ["11.1.5"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "cth"
+    tokens: ["cth"]
+    kind: abbreviation
+    meanings:
+      - text: "Chromothripsis"
+        sections: ["14.2.2"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "curly braces ({ })"
+    tokens: ["{", "}"]
+    pair: {open: "{", close: "}"}
+    kind: punctuation
+    meanings:
+      - text: "Show how the altered segment differs from the reference sequence, e.g. in duplications, inversions, conversions or insertions."
+        sections: ["16.2"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "cx"
+    tokens: ["cx"]
+    kind: abbreviation
+    meanings:
+      - text: "Complex rearrangements"
+        sections: ["10.1.1", "14.2.2"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "decimal point (.)"
+    tokens: ["."]
+    kind: punctuation
+    meanings:
+      - text: "Introduces a sub-band number."
+        sections: ["2.3.2"]
+    cite: {section: "3", page: 34, para: "¶2"}
+    note: "Same character as 'period (.)'; the position in the string tells them apart."
+  - label: "del"
+    tokens: ["del"]
+    kind: abbreviation
+    meanings:
+      - text: "Deletion"
+        sections: ["9.2.2", "16.3.1"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "der"
+    tokens: ["der"]
+    kind: abbreviation
+    meanings:
+      - text: "Derivative chromosome"
+        sections: ["4.4", "9.2.3", "9.2.17.2", "9.2.17.3", "16.3.2"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "dia"
+    tokens: ["dia"]
+    kind: abbreviation
+    meanings:
+      - text: "Diakinesis"
+        sections: ["12.1"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "dic"
+    tokens: ["dic"]
+    kind: abbreviation
+    meanings:
+      - text: "Dicentric"
+        sections: ["9.2.4"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "dim"
+    tokens: ["dim"]
+    kind: abbreviation
+    meanings:
+      - text: "Diminished"
+        sections: ["13.2.1", "13.5"]
+    cite: {section: "3", page: 34, para: "¶2"}
+  - label: "dip"
+    tokens: ["dip"]
+    kind: abbreviation
+    meanings:
+      - text: "Diplotene"
+        sections: ["12.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "dis"
+    tokens: ["dis"]
+    kind: abbreviation
+    meanings:
+      - text: "Distal"
+        sections: ["12.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "dit"
+    tokens: ["dit"]
+    kind: abbreviation
+    meanings:
+      - text: "Dictyotene"
+        sections: ["12.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "dmin"
+    tokens: ["dmin"]
+    kind: abbreviation
+    meanings:
+      - text: "Double minute"
+        sections: ["9.2.12", "10.2.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "dn"
+    tokens: ["dn"]
+    kind: abbreviation
+    meanings:
+      - text: "An abnormality that was not inherited (de novo)."
+        sections: ["4.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "dup"
+    tokens: ["dup"]
+    kind: abbreviation
+    meanings:
+      - text: "Duplication"
+        sections: ["9.2.5", "16.3.3"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "e"
+    tokens: ["e"]
+    kind: abbreviation
+    meanings:
+      - text: "Exchange"
+        sections: ["10.1.1", "10.2.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "end"
+    tokens: ["end"]
+    kind: abbreviation
+    meanings:
+      - text: "Endoreduplication"
+        sections: ["4.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "enh"
+    tokens: ["enh"]
+    kind: abbreviation
+    meanings:
+      - text: "Enhanced"
+        sections: ["13.2.1", "13.5"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "equal sign (=)"
+    tokens: ["="]
+    kind: punctuation
+    meanings:
+      - text: "Number of chiasmata."
+        sections: ["12.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "fem"
+    tokens: ["fem"]
+    kind: abbreviation
+    meanings:
+      - text: "Female"
+        sections: ["12.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "fib"
+    tokens: ["fib"]
+    kind: abbreviation
+    meanings:
+      - text: "Extended chromatin or DNA fiber."
+        sections: ["13.4"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "fis"
+    tokens: ["fis"]
+    kind: abbreviation
+    meanings:
+      - text: "Fission at the centromere."
+        sections: ["9.2.6"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "fra"
+    tokens: ["fra"]
+    kind: abbreviation
+    meanings:
+      - text: "Fragile site"
+        sections: ["7.2", "9.2.7"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "g"
+    tokens: ["g"]
+    kind: abbreviation
+    meanings:
+      - text: "Gap"
+        sections: ["10.1.1", "10.2.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "GRCh"
+    tokens: ["GRCh"]
+    kind: abbreviation
+    meanings:
+      - text: "Genome Reference Consortium human: the human genome build (assembly)."
+        sections: ["4.3", "14", "15", "16"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "h"
+    tokens: ["h"]
+    kind: abbreviation
+    meanings:
+      - text: "Constitutive heterochromatin."
+        sections: ["7.1.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "hmz"
+    tokens: ["hmz"]
+    kind: abbreviation
+    meanings:
+      - text: "Homozygous or homozygosity: one or two copies of a genome are detected where earlier known heterozygosity has been reduced to homozygosity by some mechanism, such as loss of heterozygosity (LOH)."
+        sections: ["14.2.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "hsr"
+    tokens: ["hsr"]
+    kind: abbreviation
+    meanings:
+      - text: "Homogeneously staining region"
+        sections: ["9.2.8"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "htz"
+    tokens: ["htz"]
+    kind: abbreviation
+    meanings:
+      - text: "Heterozygous or heterozygosity."
+        sections: ["14.2.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "i"
+    tokens: ["i"]
+    kind: abbreviation
+    meanings:
+      - text: "Isochromosome"
+        sections: ["9.2.11"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "idem"
+    tokens: ["idem"]
+    kind: abbreviation
+    meanings:
+      - text: "Stands for the stemline karyotype within a subclone."
+        sections: ["11.1.4"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "ider"
+    tokens: ["ider"]
+    kind: abbreviation
+    meanings:
+      - text: "Isoderivative chromosome"
+        sections: ["9.2.3"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "idic"
+    tokens: ["idic"]
+    kind: abbreviation
+    meanings:
+      - text: "Isodicentric chromosome"
+        sections: ["9.2.4", "9.2.11"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "inc"
+    tokens: ["inc"]
+    kind: abbreviation
+    meanings:
+      - text: "Incomplete karyotype"
+        sections: ["5.4"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "inh"
+    tokens: ["inh"]
+    kind: abbreviation
+    meanings:
+      - text: "Inherited"
+        sections: ["4.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "ins"
+    tokens: ["ins"]
+    kind: abbreviation
+    meanings:
+      - text: "Insertion"
+        sections: ["9.2.9", "16.3.4"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "inv"
+    tokens: ["inv"]
+    kind: abbreviation
+    meanings:
+      - text: "Inversion"
+        sections: ["9.2.10", "16.2", "16.3.5"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "ish"
+    tokens: ["ish"]
+    kind: abbreviation
+    meanings:
+      - text: "In situ hybridization; with no prefix it refers to metaphase or prometaphase chromosomes of dividing cells."
+        sections: ["13.2"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "lep"
+    tokens: ["lep"]
+    kind: abbreviation
+    meanings:
+      - text: "Leptotene"
+        sections: ["12.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "MI"
+    tokens: ["MI"]
+    kind: abbreviation
+    meanings:
+      - text: "First meiotic metaphase"
+        sections: ["12.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "MII"
+    tokens: ["MII"]
+    kind: abbreviation
+    meanings:
+      - text: "Second meiotic metaphase"
+        sections: ["12.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "mal"
+    tokens: ["mal"]
+    kind: abbreviation
+    meanings:
+      - text: "Male"
+        sections: ["12.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "mar"
+    tokens: ["mar"]
+    kind: abbreviation
+    meanings:
+      - text: "Marker chromosome"
+        sections: ["9.2.12"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "mat"
+    tokens: ["mat"]
+    kind: abbreviation
+    meanings:
+      - text: "Maternal origin"
+        sections: ["4.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "med"
+    tokens: ["med"]
+    kind: abbreviation
+    meanings:
+      - text: "Medial"
+        sections: ["12.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "min"
+    tokens: ["min"]
+    kind: abbreviation
+    meanings:
+      - text: "Minute acentric fragment"
+        sections: ["10.2.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "minus sign (–)"
+    tokens: ["–"]
+    kind: punctuation
+    meanings:
+      - text: "Loss."
+        sections: ["4.1", "8.1"]
+      - text: "Decrease in length."
+        sections: ["7.1.1"]
+      - text: "A locus absent from a particular chromosome."
+        sections: ["13.2"]
+    cite: {section: "3", page: 35, para: "¶3"}
+    note: "Printed as an en dash; whether a typed hyphen-minus is accepted is T-053."
+  - label: "mos"
+    tokens: ["mos"]
+    kind: abbreviation
+    meanings:
+      - text: "Mosaic"
+        sections: ["4.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "multiplication sign (×)"
+    tokens: ["×"]
+    kind: punctuation
+    meanings:
+      - text: "Multiple copies of a rearranged chromosome."
+        sections: ["9.3"]
+      - text: "Marks aberrant polyploid clones in neoplasia."
+        sections: ["11.1.4"]
+      - text: "Followed by a number: how many signals were seen."
+        sections: ["13.2", "13.3.1"]
+      - text: "Multiple copies of a chromosome or chromosomal region."
+        sections: ["14.2"]
+    cite: {section: "3", page: 35, para: "¶3"}
+    note: "Printed as ×; whether a typed letter x is accepted is T-053."
+  - label: "neg"
+    tokens: ["neg"]
+    kind: abbreviation
+    meanings:
+      - text: "The rearrangement that was tested for is not present."
+        sections: ["15.3"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "neo"
+    tokens: ["neo"]
+    kind: abbreviation
+    meanings:
+      - text: "Neocentromere"
+        sections: ["9.2.13"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "nuc"
+    tokens: ["nuc"]
+    kind: abbreviation
+    meanings:
+      - text: "Nuclear (interphase)."
+        sections: ["13.3"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "oom"
+    tokens: ["oom"]
+    kind: abbreviation
+    meanings:
+      - text: "Oogonial metaphase"
+        sections: ["12.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "or"
+    tokens: ["or"]
+    kind: abbreviation
+    meanings:
+      - text: "An alternative interpretation."
+        sections: ["5.3"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "p"
+    tokens: ["p"]
+    kind: abbreviation
+    meanings:
+      - text: "Short arm of a chromosome."
+        sections: ["2.3.2"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "PI"
+    tokens: ["PI"]
+    kind: abbreviation
+    meanings:
+      - text: "First meiotic prophase"
+        sections: ["12.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "pac"
+    tokens: ["pac"]
+    kind: abbreviation
+    meanings:
+      - text: "Pachytene"
+        sections: ["12.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "parentheses ( )"
+    tokens: ["(", ")"]
+    pair: {open: "(", close: ")"}
+    kind: punctuation
+    meanings:
+      - text: "Enclose structurally altered chromosomes and their breakpoints."
+        sections: ["4.1"]
+      - text: "Enclose chromosome numbers, X and Y in normal and abnormal results."
+      - text: "Enclose coordinates (or nucleotide positions) in abnormal results."
+        sections: ["14.2"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "pat"
+    tokens: ["pat"]
+    kind: abbreviation
+    meanings:
+      - text: "Paternal origin"
+        sections: ["4.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "pcc"
+    tokens: ["pcc"]
+    kind: abbreviation
+    meanings:
+      - text: "Premature chromosome condensation"
+        sections: ["10.2.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "pcd"
+    tokens: ["pcd"]
+    kind: abbreviation
+    meanings:
+      - text: "Premature centromere division"
+        sections: ["10.2.1"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "pcp"
+    tokens: ["pcp"]
+    kind: abbreviation
+    meanings:
+      - text: "Partial chromosome paint"
+        sections: ["13.8"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "period (.)"
+    tokens: ["."]
+    kind: punctuation
+    meanings:
+      - text: "Separates the different techniques."
+        sections: ["13.2", "14.2", "16.2", "16.3"]
+    cite: {section: "3", page: 35, para: "¶3"}
+    note: "Same character as 'decimal point (.)'; the position in the string tells them apart."
+  - label: "Ph"
+    tokens: ["Ph"]
+    kind: abbreviation
+    meanings:
+      - text: "Philadelphia chromosome"
+        sections: ["9.2.3"]
+    cite: {section: "3", page: 35, para: "¶3"}
+  - label: "plus sign, single (+)"
+    tokens: ["+"]
+    kind: punctuation
+    meanings:
+      - text: "Additional normal or abnormal chromosome."
+        sections: ["4.1", "8.1"]
+      - text: "Increase in length."
+        sections: ["7.1.1"]
+      - text: "A locus present on a particular chromosome."
+        sections: ["13.2"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "plus sign, double (++)"
+    tokens: ["++"]
+    kind: punctuation
+    meanings:
+      - text: "Two hybridization signals or regions on a particular chromosome."
+        sections: ["13.2"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "pos"
+    tokens: ["pos"]
+    kind: abbreviation
+    meanings:
+      - text: "The rearrangement that was tested for is detected."
+        sections: ["15.3"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "prx"
+    tokens: ["prx"]
+    kind: abbreviation
+    meanings:
+      - text: "Proximal"
+        sections: ["12.1"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "ps"
+    tokens: ["ps"]
+    kind: abbreviation
+    meanings:
+      - text: "Short arm carrying satellites."
+        sections: ["7.1.1", "7.1.2"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "psu"
+    tokens: ["psu"]
+    kind: abbreviation
+    meanings:
+      - text: "Pseudo-."
+        sections: ["9.2.4"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "pter"
+    tokens: ["pter"]
+    kind: abbreviation
+    meanings:
+      - text: "End of the short arm."
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "pvz"
+    tokens: ["pvz"]
+    kind: abbreviation
+    meanings:
+      - text: "Pulverization"
+        sections: ["10.2.1"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "q"
+    tokens: ["q"]
+    kind: abbreviation
+    meanings:
+      - text: "Long arm of a chromosome."
+        sections: ["2.3.2"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "qdp"
+    tokens: ["qdp"]
+    kind: abbreviation
+    meanings:
+      - text: "Quadruplication"
+        sections: ["9.2.14"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "qr"
+    tokens: ["qr"]
+    kind: abbreviation
+    meanings:
+      - text: "Quadriradial"
+        sections: ["10.1.1"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "qs"
+    tokens: ["qs"]
+    kind: abbreviation
+    meanings:
+      - text: "Long arm carrying satellites."
+        sections: ["7.1.1", "7.1.2"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "qter"
+    tokens: ["qter"]
+    kind: abbreviation
+    meanings:
+      - text: "End of the long arm."
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "question mark (?)"
+    tokens: ["?"]
+    kind: punctuation
+    meanings:
+      - text: "Uncertain identification of a chromosome or a chromosome structure."
+        sections: ["5.1"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "r"
+    tokens: ["r"]
+    kind: abbreviation
+    meanings:
+      - text: "Ring chromosome"
+        sections: ["9.2.15", "16.3.6"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "rec"
+    tokens: ["rec"]
+    kind: abbreviation
+    meanings:
+      - text: "Recombinant chromosome"
+        sections: ["4.5", "9.2.3"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "rev"
+    tokens: ["rev"]
+    kind: abbreviation
+    meanings:
+      - text: "Reverse (also for comparative genomic hybridization)."
+        sections: ["13.5"]
+    cite: {section: "3", page: 36, para: "¶4"}
+    note: "The book's wording ('Reverse, including comparative genomic') looks truncated; see §13.5."
+  - label: "rob"
+    tokens: ["rob"]
+    kind: abbreviation
+    meanings:
+      - text: "Robertsonian translocation"
+        sections: ["9.2.17.3"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "Roman numerals I–IV"
+    tokens: ["I", "II", "III", "IV"]
+    kind: abbreviation
+    meanings:
+      - text: "Univalent, bivalent, trivalent and quadrivalent structures."
+        sections: ["12.1"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "rsa"
+    tokens: ["rsa"]
+    kind: abbreviation
+    meanings:
+      - text: "Region-specific assay"
+        sections: ["15"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "s"
+    tokens: ["s"]
+    kind: abbreviation
+    meanings:
+      - text: "Satellite"
+        sections: ["7.1.1", "7.1.2"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "sce"
+    tokens: ["sce"]
+    kind: abbreviation
+    meanings:
+      - text: "Sister chromatid exchange"
+        sections: ["10.1.1"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "sdl"
+    tokens: ["sdl"]
+    kind: abbreviation
+    meanings:
+      - text: "Sideline"
+        sections: ["11.1.4"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "semicolon (;)"
+    tokens: [";"]
+    kind: punctuation
+    meanings:
+      - text: "Separates the altered chromosomes and their breakpoints in rearrangements involving more than one chromosome."
+        sections: ["4.1", "4.3.1", "12.1"]
+      - text: "Separates probes on different derivative chromosomes."
+        sections: ["13.2"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "sep"
+    tokens: ["sep"]
+    kind: abbreviation
+    meanings:
+      - text: "Separated signals"
+        sections: ["13.3.2"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "seq"
+    tokens: ["seq"]
+    kind: abbreviation
+    meanings:
+      - text: "Sequencing"
+        sections: ["16.2", "16.3"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "sl"
+    tokens: ["sl"]
+    kind: abbreviation
+    meanings:
+      - text: "Stemline"
+        sections: ["11.1.4"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "slant line, single (/)"
+    tokens: ["/"]
+    kind: punctuation
+    meanings:
+      - text: "Separates clones, or contiguous probes."
+        sections: ["4.1", "11.1.1", "11.1.6", "11.3", "13.2", "13.3"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "slant line, double (//)"
+    tokens: ["//"]
+    kind: punctuation
+    meanings:
+      - text: "Separates chimeric clones."
+        sections: ["4.1", "13.3.1"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "spm"
+    tokens: ["spm"]
+    kind: abbreviation
+    meanings:
+      - text: "Spermatogonial metaphase"
+        sections: ["12.1"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "stk"
+    tokens: ["stk"]
+    kind: abbreviation
+    meanings:
+      - text: "Satellite stalk"
+        sections: ["7.1.1", "7.1.2"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "subtel"
+    tokens: ["subtel"]
+    kind: abbreviation
+    meanings:
+      - text: "Subtelomeric region"
+        sections: ["13.2.2"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "t"
+    tokens: ["t"]
+    kind: abbreviation
+    meanings:
+      - text: "Translocation"
+        sections: ["9.2.17", "16.3.7"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "tas"
+    tokens: ["tas"]
+    kind: abbreviation
+    meanings:
+      - text: "Telomeric association"
+        sections: ["9.2.16"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "ter"
+    tokens: ["ter"]
+    kind: abbreviation
+    meanings:
+      - text: "Terminal end of a chromosome, or telomere."
+        sections: ["4.3.2.1"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "tr"
+    tokens: ["tr"]
+    kind: abbreviation
+    meanings:
+      - text: "Triradial"
+        sections: ["10.1.1"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "trc"
+    tokens: ["trc"]
+    kind: abbreviation
+    meanings:
+      - text: "Tricentric chromosome"
+        sections: ["9.2.18"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "trp"
+    tokens: ["trp"]
+    kind: abbreviation
+    meanings:
+      - text: "Triplication"
+        sections: ["9.2.19"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "underlining (single)"
+    tokens: []
+    kind: typographic
+    meanings:
+      - text: "Distinguishes homologous chromosomes."
+        sections: ["4.1", "9.2.3", "9.2.17.1"]
+    cite: {section: "3", page: 36, para: "¶4"}
+    note: "Formatting under a chromosome number, not a typed character (U+0332 in the source text); handling of plain-text input is T-042."
+  - label: "underscore (_)"
+    tokens: ["_"]
+    kind: punctuation
+    meanings:
+      - text: "Marks a range of nucleotide positions."
+        sections: ["14.1", "15.1", "16.2"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "upd"
+    tokens: ["upd"]
+    kind: abbreviation
+    meanings:
+      - text: "Uniparental disomy"
+        sections: ["8.4", "14.2.1"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "var"
+    tokens: ["var"]
+    kind: abbreviation
+    meanings:
+      - text: "Variant or variable region."
+        sections: ["2.4", "7.1"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "wcp"
+    tokens: ["wcp"]
+    kind: abbreviation
+    meanings:
+      - text: "Whole chromosome paint"
+        sections: ["13.2"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "xma"
+    tokens: ["xma"]
+    kind: abbreviation
+    meanings:
+      - text: "Chiasma(ta)"
+        sections: ["12.1"]
+    cite: {section: "3", page: 36, para: "¶4"}
+  - label: "zyg"
+    tokens: ["zyg"]
+    kind: abbreviation
+    meanings:
+      - text: "Zygotene"
+        sections: ["12.1"]
+    cite: {section: "3", page: 36, para: "¶4"}

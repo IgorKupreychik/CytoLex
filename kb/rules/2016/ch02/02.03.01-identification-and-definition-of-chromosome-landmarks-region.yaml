@@ -1,0 +1,21 @@
+version: "2016"
+section: "2.3.1"
+rules:
+  - id: BAND.REGION_LANDMARKS
+    title: Regions lie between landmarks
+    applies_to: [general]
+    severity: info
+    statement: >-
+      A chromosome is a continuous series of bands with no unbanded parts. Landmarks (the arm
+      ends, the centromere and certain bands) divide each arm into regions; a region is the part
+      between two neighbouring landmarks. Regions and bands are numbered from the centromere
+      outward. Table 3 lists the landmark bands and the number of regions per arm; an arm not
+      listed has a single region.
+    cite:
+      - {section: "2.3.1", page: 9, para: "¶1"}
+      - {section: "2.3.1", page: 10, para: "¶2"}
+      - {section: "2.5", page: 15, float: "Table 3"}
+    examples:
+      valid: []
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [BAND.REGION_NUMBERING]

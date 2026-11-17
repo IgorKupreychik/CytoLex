@@ -13,15 +13,18 @@ FIXTURES = Path(__file__).parent / "fixtures" / "kb"
 SAMPLE_RULES = FIXTURES / "rules" / "2016" / "ch09" / "09.02.17.01-reciprocal-translocations.yaml"
 SAMPLE_QUOTES = SAMPLE_RULES.parents[3] / "source-quotes" / "2016" / "ch09" / SAMPLE_RULES.name
 BROKEN = FIXTURES / "broken"
+SAMPLE_VOCAB = FIXTURES / "vocab" / "2016" / "ch03" / "03-symbols-and-abbreviated-terms.yaml"
 
 
-@pytest.mark.parametrize("name", ["common", "rules", "quotes"])
+@pytest.mark.parametrize("name", ["common", "rules", "quotes", "vocab"])
 def test_schemas_are_valid_draft_2020_12(name):
     schema = json.loads((SCHEMA_DIR / f"{name}.schema.json").read_text(encoding="utf-8"))
     Draft202012Validator.check_schema(schema)
 
 
-@pytest.mark.parametrize("path", [SAMPLE_RULES, SAMPLE_QUOTES], ids=["rules", "quotes"])
+@pytest.mark.parametrize(
+    "path", [SAMPLE_RULES, SAMPLE_QUOTES, SAMPLE_VOCAB], ids=["rules", "quotes", "vocab"]
+)
 def test_samples_validate(path):
     assert validate_file(path) == []
 
@@ -35,6 +38,7 @@ EXPECTED = {
     "cite-no-anchor.yaml": ("rules[0].cite[0]", "needs at least one of: para, example, float"),
     "kind-on-level-3.yaml": ("rules[1].fix", "'kind' is only allowed with fix level 1"),
     "duplicate-key.yaml": ("line 31", 'duplicate key "needs_review"'),
+    "vocab-bad.yaml": ("entries[0].tokens", "should be non-empty"),
 }
 
 
@@ -95,7 +99,7 @@ def test_float_labels_from_chunks_accepted(label):
 
 def test_file_without_rules_or_quotes_key():
     problems = validate_data({"version": "2016"}, Path("x.yaml"))
-    assert "'rules', 'quotes', 'exceptions'" in problems[0].message
+    assert "'rules', 'quotes', 'exceptions', 'entries'" in problems[0].message
 
 
 def test_kb_check_cli_ok(capsys):
@@ -107,9 +111,46 @@ def test_kb_check_cli_broken(capsys):
     assert main(["check", str(BROKEN)]) == 1
     captured = capsys.readouterr()
     assert "bad-rule-id.yaml:rules[0].id" in captured.err
-    assert "9 file(s), 9 with problems" in captured.out
+    assert "10 file(s), 10 with problems" in captured.out
 
 
 def test_kb_check_cli_missing_path(tmp_path, capsys):
     assert main(["check", str(tmp_path / "nope")]) == 1
     assert "not found" in capsys.readouterr().err
+
+
+def _vocab(**entry) -> dict:
+    base = {
+        "label": "underlining (single)",
+        "tokens": [],
+        "kind": "typographic",
+        "meanings": [{"text": "x", "sections": ["4.1"]}],
+        "cite": {"section": "3", "page": 35, "para": "¶3"},
+    }
+    return {
+        "version": "2016",
+        "section": "3",
+        "vocabulary": "symbols",
+        "source": [{"section": "3", "page": 35, "para": "¶3"}],
+        "review": {"paraphrase_checked": False, "needs_review": False},
+        "entries": [{**base, **entry}],
+    }
+
+
+def test_vocab_typographic_may_have_no_tokens():
+    assert validate_data(_vocab(), Path("v.yaml")) == []
+
+
+@pytest.mark.parametrize(
+    ("entry", "where"),
+    [
+        ({"kind": "glyph", "tokens": ["x"]}, "entries[0].kind"),
+        ({"tokens": ["a b"], "kind": "abbreviation"}, "entries[0].tokens[0]"),
+        ({"pair": {"open": "("}}, "entries[0].pair"),
+        ({"meanings": []}, "entries[0].meanings"),
+        ({"symbol": "x"}, "entries[0]"),
+    ],
+)
+def test_vocab_schema_rejects(entry, where):
+    problems = validate_data(_vocab(**entry), Path("v.yaml"))
+    assert [p.where for p in problems] == [where], problems

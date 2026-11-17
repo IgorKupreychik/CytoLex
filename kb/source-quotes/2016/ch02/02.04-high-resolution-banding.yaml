@@ -1,0 +1,44 @@
+version: "2016"
+section: "2.4"
+quotes:
+  - rule: BAND.RESOLUTION_LEVELS
+    cite: {section: "2.4", page: 12, para: "¶2"}
+    text: >-
+      The level of resolution is determined by the number of bands seen in a haploid set (22
+      autosomes + X and Y). The standard idiograms shown in Fig. 5 provide schematic
+      representations of chromosomes corresponding to approximately 300, 400, 550, 700 and 850
+      bands.
+  - rule: BAND.NUMBERING_SAME_ALL_STAINS
+    cite: {section: "2.4", page: 13, para: "¶3"}
+    text: >-
+      The idiograms, which show a G-band pattern, are provided to represent the position of
+      bands in G-, Q- and R-stained preparations. Although the appearance of bands visualized by
+      G-staining may differ from that revealed by R-staining (Fig. 6), the sequence of the bands
+      is the same.
+  - rule: BAND.NUMBERING_SAME_ALL_STAINS
+    cite: {section: "2.5", page: 16, float: "Fig. 5"}
+    text: >-
+      The numbering of R-banded chromosomes is exactly the same, with a reversal of light and
+      dark bands.
+  - rule: BAND.MUST_EXIST
+    cite: {section: "2.5", page: 16, float: "Fig. 5"}
+    text: >-
+      Fig. 5. Idiograms of G-banding patterns for normal human chromosomes at five different
+      levels of resolution.
+  - rule: BAND.PERICENTROMERIC_11
+    cite: {section: "2.4", page: 14, para: "¶5"}
+    text: >-
+      The adjacent heterochromatic regions carry band designations of 11, 11.1 or 11.11
+      depending on the level of resolution.
+  - rule: BAND.VARIABLE_REGIONS
+    cite: {section: "2.4", page: 13, para: "¶4"}
+    text: >-
+      Two kinds of variable regions are indicated by different cross-hatching patterns, one
+      involving the pericentromeric heterochromatin regions on all chromosomes and the other
+      involving the variable regions 1q12, 3q11.2, 9q12, 16q11.2, 19p12, 19q12, Yq12, and the
+      short arms of all acrocentric chromosomes.
+  - rule: BAND.VARIABLE_REGIONS
+    cite: {section: "2.4", page: 13, para: "¶4"}
+    text: >-
+      Banded structures can be seen within the variable regions, in particular in 1q12, 9q12 and
+      Yq12, but since they are variable they have not been detailed in the idiograms.

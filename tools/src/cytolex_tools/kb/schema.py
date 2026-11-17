@@ -1,7 +1,8 @@
 """Validate KB rule and quote YAML files against the JSON Schemas in `kb/schema/`.
 
 A file's kind is taken from its top-level key: `rules` → rules.schema.json,
-`quotes` → quotes.schema.json, `exceptions` → band-exceptions.schema.json (T-007).
+`quotes` → quotes.schema.json, `exceptions` → band-exceptions.schema.json (T-007),
+`entries` → vocab.schema.json (T-008).
 Only the schema is checked here; cross-file checks
 (unique IDs, quote ↔ rule links, version vs directory) belong to `kb build` (T-005).
 """
@@ -24,6 +25,7 @@ SCHEMA_FILES = {
     "rules": "rules.schema.json",
     "quotes": "quotes.schema.json",
     "exceptions": "band-exceptions.schema.json",  # kb/bands/<version>/exceptions.yaml (T-007)
+    "entries": "vocab.schema.json",  # kb/vocab/<version>/*.yaml (T-008)
 }
 YAML_SUFFIXES = {".yaml", ".yml"}
 

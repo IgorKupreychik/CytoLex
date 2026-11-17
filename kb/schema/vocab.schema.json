@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cytolex.local/schema/vocab.schema.json",
+  "title": "CytoLex KB — vocabulary file",
+  "description": "A list printed in the book (ch. 3 symbols, Table 2 banding codes) as a machine-usable vocabulary: kb/vocab/<version>/<section-file>.yaml. kb build checks that the entry labels equal the first column of the cited source table. Conventions: kb/README.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "section", "vocabulary", "source", "review", "entries"],
+  "properties": {
+    "version": { "$ref": "common.schema.json#/$defs/version" },
+    "section": { "$ref": "common.schema.json#/$defs/section" },
+    "vocabulary": {
+      "description": "Name of the vocabulary; unique per edition.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-expected": "a lower_snake name, e.g. symbols"
+    },
+    "source": {
+      "description": "Every chunk block holding the printed list (¶ per page, or a table float). Their first-column cells must equal the set of entry labels.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "common.schema.json#/$defs/cite" }
+    },
+    "shared_tokens": {
+      "description": "Tokens that may belong to more than one entry (e.g. '.' = decimal point and period). Any other token used twice is an error.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "review": {
+      "description": "Review state of the whole file: paraphrase_checked = a person approved the meanings against the book.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paraphrase_checked", "needs_review"],
+      "properties": {
+        "paraphrase_checked": { "type": "boolean" },
+        "needs_review": { "type": "boolean" },
+        "note": { "$ref": "common.schema.json#/$defs/text" }
+      },
+      "if": { "properties": { "needs_review": { "const": true } } },
+      "then": { "required": ["note"] }
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "tokens", "kind", "meanings", "cite"],
+        "properties": {
+          "label": {
+            "description": "First-column text exactly as in the chunk table (e.g. 'plus sign, single (+)'). Used for the coverage check; never part of a notation string.",
+            "$ref": "common.schema.json#/$defs/text"
+          },
+          "tokens": {
+            "description": "What appears in a notation string, as the book prints it (e.g. ['+'], ['I', 'II', 'III', 'IV'], ['→', '->']). Empty only for kind typographic.",
+            "type": "array",
+            "items": { "type": "string", "minLength": 1, "pattern": "^\\S+$", "x-expected": "a token without spaces" },
+            "uniqueItems": true
+          },
+          "pair": {
+            "description": "Opening and closing token of a bracket pair; both must be in tokens.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["open", "close"],
+            "properties": {
+              "open": { "type": "string", "minLength": 1 },
+              "close": { "type": "string", "minLength": 1 }
+            }
+          },
+          "kind": {
+            "description": "abbreviation (letters: del, GRCh), punctuation (signs: +, ::, ( )), typographic (formatting with no typed token: underlining), code (banding technique codes).",
+            "enum": ["abbreviation", "punctuation", "typographic", "code"]
+          },
+          "meanings": {
+            "description": "One item per meaning in the book's description (split at ';'). text is a paraphrase; sections are the book's cross-references.",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["text"],
+              "properties": {
+                "text": { "$ref": "common.schema.json#/$defs/text" },
+                "sections": {
+                  "type": "array",
+                  "items": { "$ref": "common.schema.json#/$defs/section" },
+                  "uniqueItems": true
+                }
+              }
+            }
+          },
+          "cite": { "$ref": "common.schema.json#/$defs/cite" },
+          "note": { "description": "Remarks for parser authors (e.g. the token is not typeable).", "$ref": "common.schema.json#/$defs/text" }
+        },
+        "if": { "properties": { "kind": { "not": { "const": "typographic" } } } },
+        "then": { "properties": { "tokens": { "minItems": 1 } } }
+      }
+    }
+  }
+}

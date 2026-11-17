@@ -1,0 +1,39 @@
+version: "2016"
+section: "2.2.1"
+rules:
+  - id: CHROM.IDENTIFIERS
+    title: Chromosomes are 1–22, X and Y
+    applies_to: [general]
+    severity: error
+    statement: >-
+      The autosomes are numbered 1 to 22, by decreasing length (except that chromosome 21 is
+      shorter than chromosome 22); the sex chromosomes are named X and Y. A chromosome
+      identifier is therefore one of 1–22, X or Y.
+    cite:
+      - {section: "2.2.1", page: 7, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XY"
+          note: Not a book example in this section; normal male karyotype.
+      invalid:
+        - text: "47,XY,+23"
+          why: There is no chromosome 23; the autosomes are 1–22.
+        - text: "45,Z"
+          why: Z is not a human chromosome; the sex chromosomes are X and Y.
+    review: {paraphrase_checked: true, needs_review: false}
+
+  - id: CHROM.GROUPS
+    title: Chromosome groups A–G
+    applies_to: [general]
+    severity: info
+    statement: >-
+      Without banding, chromosomes can be sorted into seven groups by size and centromere
+      position: A (1–3), B (4–5), C (6–12 and X), D (13–15), E (16–18), F (19–20) and
+      G (21–22 and Y).
+    cite:
+      - {section: "2.2.1", page: 7, para: "¶1"}
+      - {section: "2.2.1", page: 8, para: "¶5"}
+      - {section: "2.2.1", page: 8, para: "¶11"}
+    examples:
+      valid: []
+    review: {paraphrase_checked: true, needs_review: false}

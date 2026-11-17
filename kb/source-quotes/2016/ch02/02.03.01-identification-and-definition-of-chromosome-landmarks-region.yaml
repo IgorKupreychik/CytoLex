@@ -1,0 +1,20 @@
+version: "2016"
+section: "2.3.1"
+quotes:
+  - rule: BAND.REGION_LANDMARKS
+    cite: {section: "2.3.1", page: 9, para: "¶1"}
+    text: >-
+      Each chromosome in the human somatic cell complement is considered to consist of a
+      continuous series of bands, with no unbanded areas.
+  - rule: BAND.REGION_LANDMARKS
+    cite: {section: "2.3.1", page: 9, para: "¶1"}
+    text: >-
+      Landmarks include the ends of the chromosome arms, the centromere, and certain bands. The
+      bands and the regions are numbered from the centromere outward. A region is defined as an
+      area of a chromosome lying between two adjacent landmarks.
+  - rule: BAND.REGION_LANDMARKS
+    cite: {section: "2.5", page: 15, float: "Table 3"}
+    text: >-
+      The omission of an entire chromosome or chromosome arm indicates that either both arms or
+      the arm in question consists of only one region, delimited by the centromere and the end of
+      the chromosome arm.

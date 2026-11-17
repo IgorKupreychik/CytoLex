@@ -9,6 +9,9 @@ Checks (errors fail the build; nothing is written then):
      and quote `rule` IDs exist in that rule file
   6. (chunks present) every cite's section, label and page match the chunk front matter
   7. (chunks present) quote text occurs verbatim (whitespace-normalised) in a cited block
+  8. vocab files (T-008): unique vocabulary names, labels and tokens (except `shared_tokens`),
+     `pair` tokens listed in `tokens`; (chunks present) the labels equal the first-column
+     cells of the `source` tables, and each entry's label is in its own cited block
 Warnings: chunks missing (6-7 skipped); a valid example's text not found in its cited E block.
 """
 
@@ -24,10 +27,13 @@ from .chunks import Section, load_sections, normalise, squash
 from .cite import render_cite
 from .schema import Problem, iter_yaml_files, load_yaml, validate_file
 
-FORMAT_VERSION = 1
+FORMAT_VERSION = 2  # 2: `vocab` (T-008)
 EDITION_RE = re.compile(r"^[0-9]{4}$")
 FILE_SECTION_RE = re.compile(r"^(\d+(?:\.\d+)*)-")
+SEPARATOR_RE = re.compile(r"^\|(\s*:?-+:?\s*\|)+$")
+PIPE_RE = re.compile(r"(?<!\\)\|")
 ANCHORS = ("para", "example", "float")
+KIND_DIRS = {"rules": "rules", "quotes": "source-quotes", "entries": "vocab"}
 
 
 @dataclass
@@ -42,6 +48,7 @@ class Edition:
     version: str
     rule_files: list[KbFile] = field(default_factory=list)
     quote_files: list[KbFile] = field(default_factory=list)
+    vocab_files: list[KbFile] = field(default_factory=list)
     chunks_checked: bool = False
 
 
@@ -57,6 +64,19 @@ class BuildReport:
             for f in ed.rule_files:
                 for rule in f.data["rules"]:
                     yield ed.version, f, rule
+
+    def vocab_files(self) -> Iterable[tuple[str, KbFile]]:
+        for ed in self.editions:
+            for f in ed.vocab_files:
+                yield ed.version, f
+
+    @property
+    def vocab_unchecked(self) -> list[tuple[str, KbFile]]:
+        return [
+            (v, f)
+            for v, f in self.vocab_files()
+            if f.data["review"]["needs_review"] or not f.data["review"]["paraphrase_checked"]
+        ]
 
     def quotes(self) -> Iterable[tuple[str, KbFile, dict]]:
         for ed in self.editions:
@@ -78,7 +98,7 @@ class BuildReport:
 
 def find_editions(kb_dir: Path) -> list[str]:
     found = set()
-    for sub in ("rules", "source-quotes"):
+    for sub in KIND_DIRS.values():
         d = kb_dir / sub
         if d.is_dir():
             found |= {p.name for p in d.iterdir() if p.is_dir() and EDITION_RE.match(p.name)}
@@ -96,8 +116,8 @@ def _load_dir(directory: Path, kind: str, errors: list[Problem]) -> list[KbFile]
             continue
         data = load_yaml(path)
         if kind not in data:
-            other = "rules" if kind == "quotes" else "quotes"
-            errors.append(Problem(path, "", f"a '{other}' file in the {kind} directory"))
+            other = next(k for k in KIND_DIRS if k in data)
+            errors.append(Problem(path, "", f"a '{other}' file in the {KIND_DIRS[kind]} directory"))
             continue
         out.append(KbFile(path, path.relative_to(directory).as_posix(), data))
     return out
@@ -134,9 +154,14 @@ def _iter_cites(f: KbFile) -> Iterable[tuple[str, dict]]:
                 for j, ex in enumerate(rule["examples"].get(kind) or []):
                     if "cite" in ex:
                         yield f"rules[{i}].examples.{kind}[{j}].cite", ex["cite"]
-    else:
+    elif "quotes" in f.data:
         for i, q in enumerate(f.data["quotes"]):
             yield f"quotes[{i}].cite", q["cite"]
+    else:
+        for i, c in enumerate(f.data["source"]):
+            yield f"source[{i}]", c
+        for i, e in enumerate(f.data["entries"]):
+            yield f"entries[{i}].cite", e["cite"]
 
 
 def _check_cite(
@@ -166,9 +191,107 @@ def _check_cite(
     return sec if ok else None
 
 
+def _block_key(cite: dict) -> tuple:
+    return (cite["section"], *(cite.get(k) for k in ANCHORS))
+
+
+def first_column(block: str) -> list[str]:
+    """First-column cells of the Markdown table in a chunk block (rows above `|---|` are header)."""
+    rows: list[str] = []
+    for line in block.splitlines():
+        s = line.strip()
+        if len(s) < 2 or not (s.startswith("|") and s.endswith("|")):
+            continue
+        if SEPARATOR_RE.match(s):
+            rows = []
+            continue
+        rows.append(PIPE_RE.split(s[1:-1])[0].strip().replace("\\|", "|"))
+    return rows
+
+
+def _check_vocab_tokens(f: KbFile, errors: list[Problem]) -> dict[str, int]:
+    """Unique labels and tokens, pair tokens in `tokens`; returns label -> entry index."""
+    labels: dict[str, int] = {}
+    owners: dict[str, list[int]] = {}
+    for i, e in enumerate(f.data["entries"]):
+        if e["label"] in labels:
+            errors.append(
+                Problem(
+                    f.path,
+                    f"entries[{i}].label",
+                    f"duplicate label {e['label']!r} (first at entries[{labels[e['label']]}])",
+                )
+            )
+        labels.setdefault(e["label"], i)
+        for tok in e["tokens"]:
+            owners.setdefault(tok, []).append(i)
+        for k, tok in (e.get("pair") or {}).items():
+            if tok not in e["tokens"]:
+                errors.append(Problem(f.path, f"entries[{i}].pair.{k}", f"{tok!r} not in tokens"))
+    shared = set(f.data.get("shared_tokens") or [])
+    for tok, idx in owners.items():
+        if len(idx) > 1 and tok not in shared:
+            errors.append(
+                Problem(
+                    f.path,
+                    f"entries[{idx[1]}].tokens",
+                    f"token {tok!r} also in entries[{idx[0]}] "
+                    "(list it in shared_tokens if intended)",
+                )
+            )
+    for tok in sorted(shared):
+        if len(owners.get(tok, [])) < 2:
+            errors.append(Problem(f.path, "shared_tokens", f"{tok!r} is not shared by two entries"))
+    return labels
+
+
+def _check_vocab_coverage(
+    f: KbFile, labels: dict[str, int], sections: dict[str, Section], errors: list[Problem]
+) -> None:
+    """The entry labels equal the first-column cells of the `source` blocks."""
+    printed: dict[str, tuple] = {}  # book row -> block it is printed in
+    for i, c in enumerate(f.data["source"]):
+        sec = sections.get(c["section"])
+        names = [c[k] for k in ANCHORS if k in c]
+        if sec is None or any(n not in sec.blocks for n in names):
+            continue  # reported by the cite check
+        cells = [x for n in names for x in first_column(sec.blocks[n])]
+        if not cells:
+            errors.append(Problem(f.path, f"source[{i}]", "no table rows in the cited block"))
+        for x in cells:
+            printed.setdefault(x, _block_key(c))
+    for x in printed:
+        if x not in labels:
+            errors.append(Problem(f.path, "entries", f"book row {x!r} has no entry (coverage)"))
+    for x, i in labels.items():
+        cite = f.data["entries"][i]["cite"]
+        if x not in printed:
+            errors.append(
+                Problem(f.path, f"entries[{i}].label", f"{x!r} is not a row of the source table")
+            )
+        elif printed[x] != _block_key(cite):
+            errors.append(
+                Problem(f.path, f"entries[{i}].cite", f"{x!r} is printed in another source block")
+            )
+
+
+def _check_vocab_files(ed: Edition, sections: dict[str, Section], errors: list[Problem]) -> None:
+    names: dict[str, Path] = {}
+    for f in ed.vocab_files:
+        name = f.data["vocabulary"]
+        if name in names:
+            errors.append(
+                Problem(f.path, "vocabulary", f"duplicate vocabulary {name!r} (also {names[name]})")
+            )
+        names.setdefault(name, f.path)
+        labels = _check_vocab_tokens(f, errors)
+        if sections:
+            _check_vocab_coverage(f, labels, sections, errors)
+
+
 def _check_edition(ed: Edition, source_dir: Path, report: BuildReport) -> None:
     errors = report.errors
-    for f in ed.rule_files + ed.quote_files:
+    for f in ed.rule_files + ed.quote_files + ed.vocab_files:
         _check_file_header(f, ed.version, errors)
 
     # 3. unique IDs; 4. related IDs exist
@@ -228,6 +351,7 @@ def _check_edition(ed: Edition, source_dir: Path, report: BuildReport) -> None:
 
     # 6-7. against the chunks
     sections = load_sections(source_dir) if source_dir.is_dir() else {}
+    _check_vocab_files(ed, sections, errors)
     if not sections:
         report.warnings.append(
             f"ISCN {ed.version}: no chunks in {source_dir}; citation and quote checks skipped "
@@ -235,7 +359,7 @@ def _check_edition(ed: Edition, source_dir: Path, report: BuildReport) -> None:
         )
         return
     ed.chunks_checked = True
-    for f in ed.rule_files + ed.quote_files:
+    for f in ed.rule_files + ed.quote_files + ed.vocab_files:
         for where, cite in _iter_cites(f):
             _check_cite(f, where, cite, sections, errors)
     for qf in ed.quote_files:
@@ -290,6 +414,12 @@ CREATE TABLE examples (
 CREATE TABLE quotes (
   version TEXT, rule_id TEXT, ord INTEGER, section TEXT, page INTEGER,
   para TEXT, example TEXT, float TEXT, rendered TEXT, text TEXT);
+CREATE TABLE vocab (
+  version TEXT, vocabulary TEXT, file TEXT, ord INTEGER, label TEXT, kind TEXT,
+  tokens TEXT, pair_open TEXT, pair_close TEXT, meanings TEXT, note TEXT, cite_rendered TEXT,
+  PRIMARY KEY (version, vocabulary, label));
+CREATE TABLE vocab_tokens (version TEXT, vocabulary TEXT, token TEXT, label TEXT);
+CREATE INDEX vocab_tokens_token ON vocab_tokens (version, token);
 CREATE VIRTUAL TABLE rules_fts USING fts5(
   version UNINDEXED, id, title, statement, examples, tokenize = 'unicode61');
 CREATE VIRTUAL TABLE quotes_fts USING fts5(
@@ -378,6 +508,31 @@ def write_sqlite(report: BuildReport, path: Path) -> None:
                 (v, q["rule"], n, *_cite_row(c), render_cite(v, c), q["text"]),
             )
             con.execute("INSERT INTO quotes_fts VALUES (?,?,?)", (v, q["rule"], q["text"]))
+        for v, f in report.vocab_files():
+            name = f.data["vocabulary"]
+            for i, e in enumerate(f.data["entries"]):
+                pair = e.get("pair") or {}
+                con.execute(
+                    "INSERT INTO vocab VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+                    (
+                        v,
+                        name,
+                        f.rel,
+                        i,
+                        e["label"],
+                        e["kind"],
+                        json.dumps(e["tokens"], ensure_ascii=False),
+                        pair.get("open"),
+                        pair.get("close"),
+                        json.dumps(e["meanings"], ensure_ascii=False),
+                        e.get("note"),
+                        render_cite(v, e["cite"]),
+                    ),
+                )
+                for tok in e["tokens"]:
+                    con.execute(
+                        "INSERT INTO vocab_tokens VALUES (?,?,?,?)", (v, name, tok, e["label"])
+                    )
         con.commit()
     finally:
         con.close()
@@ -409,10 +564,22 @@ def bundle(report: BuildReport) -> dict:
         for f in ed.quote_files:
             for q in f.data["quotes"]:
                 quotes.append({**q, "file": f.rel, "cite": _with_rendered(ed.version, q["cite"])})
+        vocab = {}
+        for f in ed.vocab_files:
+            d = f.data
+            vocab[d["vocabulary"]] = {
+                **{k: d[k] for k in d if k not in ("version", "vocabulary", "entries")},
+                "file": f.rel,
+                "source": [_with_rendered(ed.version, c) for c in d["source"]],
+                "entries": [
+                    {**e, "cite": _with_rendered(ed.version, e["cite"])} for e in d["entries"]
+                ],
+            }
         editions[ed.version] = {
             "chunks_checked": ed.chunks_checked,
             "rules": rules,
             "quotes": quotes,
+            "vocab": vocab,
         }
     return {"format_version": FORMAT_VERSION, "editions": editions}
 
@@ -434,6 +601,18 @@ def review_markdown(report: BuildReport) -> str:
         lines += [f"- `{r['id']}` ({f.rel}): {r['review'].get('note', '')}" for _, f, r in needs]
         lines += ["", f"### `paraphrase_checked: false` ({len(unchecked)})", ""]
         lines += [f"- `{r['id']}` ({f.rel})" for _, f, r in unchecked]
+        vocab = [f for v, f in report.vocab_files() if v == ed.version]
+        if vocab:
+            lines += ["", f"### Vocabularies ({len(vocab)})", ""]
+            for f in vocab:
+                rv = f.data["review"]
+                state = (
+                    "paraphrase checked" if rv["paraphrase_checked"] else "paraphrase not checked"
+                )
+                if rv["needs_review"]:
+                    state += f"; needs review: {rv['note']}"
+                n = len(f.data["entries"])
+                lines.append(f"- `{f.data['vocabulary']}` ({f.rel}, {n} entries): {state}")
         lines.append("")
     return "\n".join(lines)
 
@@ -463,6 +642,7 @@ def run(
         ed = Edition(v)
         ed.rule_files = _load_dir(kb_dir / "rules" / v, "rules", report.errors)
         ed.quote_files = _load_dir(kb_dir / "source-quotes" / v, "quotes", report.errors)
+        ed.vocab_files = _load_dir(kb_dir / "vocab" / v, "entries", report.errors)
         report.editions.append(ed)
     if report.errors:  # cross-file checks need schema-valid files
         return report
