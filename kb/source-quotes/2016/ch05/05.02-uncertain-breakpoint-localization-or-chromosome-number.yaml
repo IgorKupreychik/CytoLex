@@ -1,0 +1,9 @@
+version: "2016"
+section: "5.2"
+quotes:
+  - rule: UNCERTAIN.APPROX_INTERVAL
+    cite: {section: "5.2", page: 48, para: "¶1"}
+    text: >-
+      An approximate sign (~) is used to denote intervals and to express uncertainty about
+      breakpoint localizations in that it indicates the boundaries of a chromosome segment in
+      which the breaks may have occurred.

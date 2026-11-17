@@ -16,14 +16,14 @@ rules:
     review: {paraphrase_checked: true, needs_review: false}
 
   - id: BREAK.ALTERNATIVE_BANDS
-    title: Two adjacent candidate bands or regions joined by or
+    title: Two candidate bands or regions joined by or
     applies_to: [karyotype]
     severity: error
     statement: >-
-      When a break may lie in either of two consecutive bands (or, if only the region is known,
-      in either of two adjacent regions), both are given, joined by the term or; the second is
-      written without the chromosome number (1q23 or q24; 1q2 or q3). Section 5.3 gives the
-      details.
+      When a break cannot be placed in one of two bands (typically two adjacent bands, or, if
+      only the region is known, two adjacent regions), both are given, joined by the term or;
+      the second is written without the chromosome number (1q23 or q24; 1q2 or q3). Section 5.3
+      uses or more generally, for any alternative interpretations (UNCERTAIN.OR_ALTERNATIVE).
     cite:
       - {section: "4.2", page: 40, para: "¶2"}
     examples:
@@ -32,12 +32,15 @@ rules:
           cite: {section: "4.2", page: 40, para: "¶2"}
         - text: "1q2 or q3"
           cite: {section: "4.2", page: 40, para: "¶2"}
-      invalid:
-        - text: "1q21 or q24"
-          why: The two alternatives must be consecutive bands; 1q21 and 1q24 are not adjacent.
-    fix: {level: 3, hint: "Give two adjacent bands (or regions) as the alternatives, or use another uncertainty notation (chapter 5)."}
-    review: {paraphrase_checked: true, needs_review: false}
-    related: [BREAK.REGION_ONLY]
+    fix: {level: 3, hint: "Give both candidate bands (or regions) joined by or, the second without the chromosome number."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        T-010 (2026-11-17): the invalid example "1q21 or q24" (non-adjacent bands) was dropped,
+        because §5.3 E1 prints add(19)(p13 or q13) as valid; adjacency is the typical case in
+        §4.2, not a requirement.
+    related: [BREAK.REGION_ONLY, UNCERTAIN.OR_ALTERNATIVE]
 
   - id: BREAK.REGION_ONLY
     title: Region-only breakpoints are allowed

@@ -1,0 +1,43 @@
+version: "2016"
+section: "5.4"
+rules:
+  - id: UNCERTAIN.INC_AT_END
+    title: inc at the end, after the identified abnormalities
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      inc marks an incomplete karyotype, one likely to hold unidentified changes besides those
+      listed (usually because of poor chromosome quality). It is written at the end of the
+      string, after all identifiable abnormalities; as the examples show, a cell count in square
+      brackets follows it.
+    cite:
+      - {section: "5.4", page: 48, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,del(1)(q21),inc[4]"
+          cite: {section: "5.4", page: 48, example: E1}
+        - text: "53~57,XY,+1,+3,+6,t(9;22)(q34;q11.2),+21,+3mar,inc[cp10]"
+          cite: {section: "5.4", page: 49, example: E2}
+      invalid:
+        - text: "46,XX,inc,del(1)(q21)[4]"
+          why: inc comes before an identified abnormality; it goes last.
+          corrected: "46,XX,del(1)(q21),inc[4]"
+    fix: {level: 1, kind: reorder, hint: "Move inc to the end, after the last abnormality and before the cell count."}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [UNCERTAIN.INC_EXCEPTIONAL, ORDER.UNIDENTIFIED_LAST]
+
+  - id: UNCERTAIN.INC_EXCEPTIONAL
+    title: inc only in exceptional cases
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      Every abnormality should be identified where possible; inc is meant for exceptional
+      situations only.
+    cite:
+      - {section: "5.4", page: 49, para: "¶2"}
+    examples:
+      valid:
+        - text: "46,XX,del(1)(q21),inc[4]"
+          cite: {section: "5.4", page: 48, example: E1}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [UNCERTAIN.INC_AT_END]

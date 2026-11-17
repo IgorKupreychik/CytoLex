@@ -26,7 +26,7 @@
 tables:
   - id: Table 1
     kind: float
-    review: {image: ok, human: pending, fallback: none}
+    review: {image: ok, human: ok, fallback: none}
     regions:
       - book_page: 12
         top: 80

@@ -1,0 +1,8 @@
+version: "2016"
+section: "7.1"
+quotes:
+  - rule: VAR.DEFINITION
+    cite: {section: "7.1", page: 52, para: "¶1"}
+    text: >-
+      Variation refers to the differences in size or staining of chromosomal segments in the
+      population (see Wyandt and Tonk, 2008).

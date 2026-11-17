@@ -1,0 +1,10 @@
+version: "2016"
+section: "7.1.1"
+quotes:
+  - rule: VAR.LENGTH_SIGN
+    cite: {section: "7.1.1", page: 52, para: "¶1"}
+    text: >-
+      Variation in length of heterochromatic segments (h), stalks (stk) or satellites (s) should
+      be distinguished from increases or decreases in arm length as a result of other structural
+      alterations by placing a plus (+) or minus (–) sign after the symbols h, stk or s following
+      the appropriate chromosome and arm designation.

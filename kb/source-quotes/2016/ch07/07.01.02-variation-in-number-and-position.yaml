@@ -1,0 +1,21 @@
+version: "2016"
+section: "7.1.2"
+quotes:
+  - rule: VAR.POSITION_AND_NUMBER
+    cite: {section: "7.1.2", page: 53, para: "¶1"}
+    text: >-
+      The same nomenclature symbols as described above are used to describe variation in position
+      of heterochromatic segments, satellite stalks, and satellites.
+  - rule: VAR.DUPLICATED_STRUCTURE_REPEATED
+    cite: {section: "7.1.2", page: 53, para: "¶3"}
+    text: >-
+      Duplicated chromosome structures are indicated by repeating the appropriate designation:
+  - rule: VAR.POPULATION_INVERSIONS
+    cite: {section: "7.1.2", page: 53, para: "¶5"}
+    text: >-
+      In contrast, the common population inversion variants (see Table 1) are specified by their
+      euchromatic breakpoints.
+  - rule: VAR.POPULATION_INVERSIONS
+    cite: {section: "2.3.2", page: 12, float: "Table 1"}
+    text: >-
+      Table 1. Examples of heteromorphisms with various stains^a.

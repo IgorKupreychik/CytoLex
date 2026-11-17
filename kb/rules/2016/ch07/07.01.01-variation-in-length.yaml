@@ -1,0 +1,49 @@
+version: "2016"
+section: "7.1.1"
+rules:
+  - id: VAR.LENGTH_SIGN
+    title: "+ / – after h, stk or s for variation in length"
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A longer or shorter heterochromatic segment (h), stalk (stk) or satellite (s) is shown by a
+      plus or minus sign written after that symbol, which itself follows the chromosome and arm
+      (or cen) designation: 16qh+, Yqh–, 21ps+, 22pstk+, 13cenh+. This keeps normal variation
+      apart from arm-length changes caused by other structural rearrangements. Several variants
+      of one chromosome are written in a row (14cenh+pstk+ps+); variants of different chromosomes
+      are separated by commas; mat/pat follows the variant it applies to.
+    cite:
+      - {section: "7.1.1", page: 52, para: "¶1"}
+      - {section: "7.1.1", page: 52, para: "¶2"}
+    examples:
+      valid:
+        - text: "16qh+"
+          cite: {section: "7.1.1", page: 52, para: "¶2"}
+        - text: "Yqh–"
+          cite: {section: "7.1.1", page: 52, para: "¶2"}
+        - text: "21ps+"
+          cite: {section: "7.1.1", page: 52, para: "¶2"}
+        - text: "22pstk+"
+          cite: {section: "7.1.1", page: 52, para: "¶2"}
+        - text: "13cenh+pat"
+          cite: {section: "7.1.1", page: 52, para: "¶2"}
+        - text: "1qh–,13cenh+,22ps+"
+          cite: {section: "7.1.1", page: 52, para: "¶2"}
+        - text: "15cenh+mat,15ps+pat"
+          cite: {section: "7.1.1", page: 52, para: "¶2"}
+        - text: "14cenh+pstk+ps+"
+          cite: {section: "7.1.1", page: 52, para: "¶2"}
+      invalid:
+        - text: "16hq+"
+          why: The arm comes before the heterochromatin symbol (chromosome, arm, h, sign).
+          corrected: "16qh+"
+        - text: "16q+"
+          why: "A sign straight after the arm means an arm-length change, not normal variation; for heterochromatin write 16qh+."
+    fix: {level: 3, hint: "Write chromosome, arm (or cen), then h, stk or s, then + or –."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The ¶2 list has no example-block label, so its strings are cited by paragraph. The
+        comma and mat/pat conventions are read from the listed strings.
+    related: [KARYO.NO_ARM_LENGTH_SIGN, KARYO.PARENTAL_ORIGIN, VAR.POSITION_AND_NUMBER]

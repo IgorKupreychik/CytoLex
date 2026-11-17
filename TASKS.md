@@ -19,7 +19,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-007 | done | 1 | T-006, T-003 | Spot-check bands vs. ISCN 2016 ideograms; exceptions YAML |
 | T-008 | done | 1 | T-003, T-005 | KB: ch. 2–3 (band nomenclature, symbols & abbreviated terms) |
 | T-009 | done | 1 | T-008 | KB: ch. 4 (karyotype designation, short/detailed systems, derivatives) |
-| T-010 | todo | 1 | T-008 | KB: ch. 5–7 (uncertainty, order of abnormalities, variable features) |
+| T-010 | done | 1 | T-008 | KB: ch. 5–7 (uncertainty, order of abnormalities, variable features) |
 | T-011 | todo | 1 | T-008 | KB: ch. 8 (numerical abnormalities) |
 | T-012 | todo | 1 | T-008 | KB: ch. 9.1–9.2.10 (structural, part 1) |
 | T-013 | todo | 1 | T-008 | KB: ch. 9.2.11–9.3 (structural, part 2 incl. translocations) |
@@ -175,10 +175,11 @@ All KB tasks share these steps and criteria:
 **Outcome (2026-11-17):** Table 4 (p.44, 16 rows) signed off before planning. 44 rules + quotes in `kb/rules/2016/ch04/` and `kb/source-quotes/2016/ch04/` (12 section files, §4.1–4.5), prefixes `KARYO`, `STRUCT`, `BREAK`, `DER`, `REC`, plus `GEN.GENOME_BUILD_REQUIRED`; all paraphrases approved by the user. All 35 printed example strings (19 example-block lines + 16 Table 4 rows) and the inline e.g. strings are valid examples; `kb build` passes with chunk checks (63 rules, 89 quotes). Fig. 8/9 and the p.46 line-wrap spaces were checked on the printed pages: no rule depends on the diagrams (`docs/extraction-review-2016.md` updated). Also: §4.1 ¶9 cite added to `SYM.SPACE_BEFORE_CHROMOSOME_COUNT`; `SYM.LISTED_ONLY` notes ch. 4 checked (all symbols listed). Decision entry in `docs/decisions.md`. Deviation: `REC.KNOWN_PARENTAL_REARRANGEMENT` is `needs_review` too (with `KARYO.ABBREVIATED_FORM`), both handed to T-022 (note added there). Severities are provisional until T-022.
 
 ### T-010 — KB: ch. 5–7
-**Status:** todo
+**Status:** done
 **Description:** Uncertainty (`?`, `~`, `or`, `inc`), order of abnormalities, normal variable features (heteromorphisms, fragile sites).
 **Acceptance:** Shared KB criteria.
 **Notes:** Before starting, person sign-off of **Table 1** (heteromorphisms, p.12): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`. §7.2 has underlined homologues (U+0332).
+**Outcome (2026-11-17):** Table 1 (p.12, 2 parts, 14 rows + footnotes) signed off before planning. 19 rules + quotes in `kb/rules/2016/ch05–ch07/` and `kb/source-quotes/2016/ch05–ch07/` (9 section files), new prefixes `UNCERTAIN` (?, ~, or, inc), `ORDER` (§6), `VAR` (§7.1), `FRA` (§7.2); all paraphrases approved by the user. Every example block and inline example list in §5.1–7.2 is a valid example; `kb build` passes (82 rules, 113 quotes). Table 1 (decided with the user) is one info rule, `VAR.POPULATION_INVERSIONS`, holding its 7 inversion variants, not a vocabulary. Changes to earlier rules: `BREAK.ALTERNATIVE_BANDS` lost its invalid `1q21 or q24` (§5.3 E1 `add(19)(p13 or q13)` is valid; re-approved); `KARYO.ABNORMALITY_ORDER` cites §6 ¶1 + E2; `DER.ABERRATION_ORDER` gains §6 E8; `KARYO.NO_ARM_LENGTH_SIGN` cites §5.1 E7; `SYM.LISTED_ONLY` notes ch. 5–7 checked. `needs_review`: `ORDER.SHORTEST_STRING_PREFERRED` (T-022, note added there) and `FRA.HOMOLOGUE_UNDERLINING` (T-042). Book fragments with `…` kept as printed (T-025 must treat them as fragments). Notes added to T-012 and T-022; decision entry in `docs/decisions.md`.
 
 ### T-011 — KB: ch. 8 (numerical abnormalities)
 **Status:** todo
@@ -190,7 +191,7 @@ All KB tasks share these steps and criteria:
 **Status:** todo
 **Description:** General principles; add, del, der, dic, dup, fission, fra, hsr, ins, inv.
 **Acceptance:** Shared KB criteria.
-**Notes:**
+**Notes:** From T-010: the general fra format belongs to §9.2.7 (`FRA.*` prefix; `FRA.HERITABLE_VARIANT` and `FRA.HOMOLOGUE_UNDERLINING` from §7.2 exist); §9.2.3 has the `der(?)` examples that §5.1/§6 refer to (`UNCERTAIN.QUESTION_MARK_DESIGNATION`, `ORDER.UNKNOWN_CENTROMERE_DER`).
 
 ### T-013 — KB: ch. 9.2.11–9.3 (structural, part 2)
 **Status:** todo
@@ -257,7 +258,7 @@ All KB tasks share these steps and criteria:
 - How book-ambiguous rules are reported.
 - What "valid" means when there are only warnings.
 **Acceptance:** Policy in `docs/decisions.md`.
-**Notes:** From T-007: include the severity for band names that exist in the genome assemblies but not in the book's idiograms (`book: false` in band data, e.g. 9q34.12 in a karyotype string). From T-009: severities in the ch. 4 rules are provisional ("always/is/must/should not" → error, descriptive → info); decide `KARYO.ABBREVIATED_FORM` (abbreviations such as `46,XX,der(5)mat` and copies without breakpoints are only valid after an earlier full form, which a single string can't show) and `REC.KNOWN_PARENTAL_REARRANGEMENT` (warn on `rec` without mat/pat/inh?), both `needs_review`.
+**Notes:** From T-007: include the severity for band names that exist in the genome assemblies but not in the book's idiograms (`book: false` in band data, e.g. 9q34.12 in a karyotype string). From T-009: severities in the ch. 4 rules are provisional ("always/is/must/should not" → error, descriptive → info); decide `KARYO.ABBREVIATED_FORM` (abbreviations such as `46,XX,der(5)mat` and copies without breakpoints are only valid after an earlier full form, which a single string can't show) and `REC.KNOWN_PARENTAL_REARRANGEMENT` (warn on `rec` without mat/pat/inh?), both `needs_review`. From T-010: `ORDER.SHORTEST_STRING_PREFERRED` (§6 E6 note: `+inv(3)(…)` preferred over `+3,inv(3)(…)`; info hint or nothing?), `needs_review`.
 
 ### T-053 — Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`?
 **Status:** discussion

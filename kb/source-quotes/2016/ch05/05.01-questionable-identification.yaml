@@ -1,0 +1,14 @@
+version: "2016"
+section: "5.1"
+quotes:
+  - rule: UNCERTAIN.QUESTIONABLE_ITEM
+    cite: {section: "5.1", page: 47, para: "¶1"}
+    text: >-
+      A question mark (?) indicates questionable identification of a chromosome or chromosome
+      structure. It is placed either before the uncertain item, or it may replace a chromosome,
+      region, or band designation (see also examples in Section 9.2.3).
+  - rule: UNCERTAIN.QUESTION_MARK_DESIGNATION
+    cite: {section: "5.1", page: 47, para: "¶1"}
+    text: >-
+      It is placed either before the uncertain item, or it may replace a chromosome, region, or
+      band designation (see also examples in Section 9.2.3).

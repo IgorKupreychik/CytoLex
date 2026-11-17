@@ -1,0 +1,41 @@
+version: "2016"
+section: "6"
+quotes:
+  - rule: ORDER.X_BEFORE_Y
+    cite: {section: "6", page: 50, para: "¶1"}
+    text: >-
+      Sex chromosome aberrations are specified first (X chromosome abnormalities are presented
+      before those involving Y), followed by abnormalities of the autosomes listed in numerical
+      order irrespective of aberration type.
+  - rule: ORDER.NUMERICAL_BEFORE_STRUCTURAL
+    cite: {section: "6", page: 50, para: "¶1"}
+    text: >-
+      For each chromosome, numerical abnormalities are listed before structural changes.
+  - rule: ORDER.HOMOLOGUES_ALPHABETICAL
+    cite: {section: "6", page: 50, para: "¶1"}
+    text: >-
+      Multiple structural changes of homologous chromosomes are presented in alphabetical order
+      according to the abbreviated term of the abnormality.
+  - rule: ORDER.HOMOLOGUES_ALPHABETICAL
+    cite: {section: "6", page: 50, example: E8}
+    text: >-
+      The chromosome 8 is described as a derivative with the structural aberrations listed from
+      the distal p arm to the distal q arm, rather than in alphabetical order, because the
+      insertion and deletion are present on the same derivative chromosome.
+  - rule: ORDER.UNIDENTIFIED_LAST
+    cite: {section: "6", page: 51, para: "¶2"}
+    text: >-
+      Unidentified ring chromosomes (r), marker chromosomes (mar), and double minute chromosomes
+      (dmin) are listed last, in that order.
+  - rule: ORDER.UNKNOWN_CENTROMERE_DER
+    cite: {section: "6", page: 51, para: "¶3"}
+    text: >-
+      Derivative chromosomes whose centromere is unknown (see Section 9.2.3) should be placed
+      after all identified abnormalities but before unidentified ring chromosomes, marker
+      chromosomes, and double minute chromosomes.
+  - rule: ORDER.SHORTEST_STRING_PREFERRED
+    cite: {section: "6", page: 50, example: E6}
+    text: >-
+      Note that the karyotype can also be written as:
+      49,X,inv(X)(p21q26),+inv(3)(q21q26.2),+7,+10,–20,del(20)(q11.2),+21 and is preferred as it
+      gives the shortest karyotype string.

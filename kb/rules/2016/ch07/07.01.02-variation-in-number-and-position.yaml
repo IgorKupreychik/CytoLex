@@ -1,0 +1,98 @@
+version: "2016"
+section: "7.1.2"
+rules:
+  - id: VAR.POSITION_AND_NUMBER
+    title: h, s, stk, var for the position of variable features
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      The same symbols (h, s, stk, and var for a variable presentation) describe where
+      heterochromatin, satellites and stalks are found, written after the chromosome and arm or
+      band: 17ps, Yqs, 9ph, 9phqh (both arms), 1q41h (at a band), 22pvar.
+    cite:
+      - {section: "7.1.2", page: 53, para: "¶1"}
+      - {section: "7.1.2", page: 53, para: "¶2"}
+    examples:
+      valid:
+        - text: "22pvar"
+          cite: {section: "7.1.2", page: 53, para: "¶2"}
+        - text: "17ps"
+          cite: {section: "7.1.2", page: 53, para: "¶2"}
+        - text: "Yqs"
+          cite: {section: "7.1.2", page: 53, para: "¶2"}
+        - text: "9phqh"
+          cite: {section: "7.1.2", page: 53, para: "¶2"}
+        - text: "9ph"
+          cite: {section: "7.1.2", page: 53, para: "¶2"}
+        - text: "1q41h"
+          cite: {section: "7.1.2", page: 53, para: "¶2"}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [VAR.LENGTH_SIGN, VAR.DUPLICATED_STRUCTURE_REPEATED]
+
+  - id: VAR.DUPLICATED_STRUCTURE_REPEATED
+    title: Doubled satellites or stalks by repeating the symbol
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A duplicated variable structure is written by repeating its symbol: 21pss (double
+      satellites), 14pstkstk (double stalks).
+    cite:
+      - {section: "7.1.2", page: 53, para: "¶3"}
+      - {section: "7.1.2", page: 53, para: "¶4"}
+    examples:
+      valid:
+        - text: "21pss"
+          cite: {section: "7.1.2", page: 53, para: "¶4"}
+        - text: "14pstkstk"
+          cite: {section: "7.1.2", page: 53, para: "¶4"}
+      invalid:
+        - text: "21ps×2"
+          why: "× is for copies of rearranged chromosomes; a doubled satellite is written by repeating s."
+          corrected: "21pss"
+    fix: {level: 1, kind: replace, hint: Repeat the symbol (ss or stkstk) instead.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [VAR.POSITION_AND_NUMBER, KARYO.MULTIPLY_SIGN_REARRANGED_ONLY]
+
+  - id: VAR.POPULATION_INVERSIONS
+    title: Common population inversions by euchromatic breakpoints
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      The common population inversion variants are not written with the h/s/stk symbols but as
+      ordinary inversions with their euchromatic breakpoints, e.g. inv(9)(p12q13). Table 1 lists
+      the most commonly seen ones (G-banding): inv(1)(p13q21), inv(2)(p11.2q13),
+      inv(3)(p11.2q12), inv(9)(p12q13), inv(10)(p11.2q21.2), inv(16)(p11.2q12.1),
+      inv(Y)(p11.2q11.2). The list is not closed.
+    cite:
+      - {section: "7.1.2", page: 53, para: "¶5"}
+      - {section: "2.3.2", page: 12, float: "Table 1"}
+    examples:
+      valid:
+        - text: "inv(9)(p12q13)"
+          cite: {section: "7.1.2", page: 53, example: E1}
+        - text: "inv(2)(p11.2q13)"
+          cite: {section: "7.1.2", page: 53, example: E1}
+        - text: "inv(1)(p13q21)"
+          cite: {section: "2.3.2", page: 12, float: "Table 1"}
+          note: Table 1 cell inv(p13q21) under chromosome 1, written as a full inversion.
+        - text: "inv(3)(p11.2q12)"
+          cite: {section: "2.3.2", page: 12, float: "Table 1"}
+          note: Table 1 cell inv(p11.2q12) under chromosome 3.
+        - text: "inv(10)(p11.2q21.2)"
+          cite: {section: "2.3.2", page: 12, float: "Table 1"}
+          note: Table 1 cell inv(p11.2q21.2) under chromosome 10.
+        - text: "inv(16)(p11.2q12.1)"
+          cite: {section: "2.3.2", page: 12, float: "Table 1"}
+          note: Table 1 cell inv(p11.2q12.1) under chromosome 16.
+        - text: "inv(Y)(p11.2q11.2)"
+          cite: {section: "2.3.2", page: 12, float: "Table 1"}
+          note: Table 1 cell inv(p11.2q11.2) under chromosome Y.
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Table 1 (signed off 2026-11-17, T-010) is cited only for its inversion cells; its other
+        cells (h, cen, NOR, stain-specific bands) are examples of where heteromorphisms occur and
+        are not encoded. A validator may use this list for an info note ("known population
+        variant"), never to reject other inversions.
+    related: [VAR.POSITION_AND_NUMBER]

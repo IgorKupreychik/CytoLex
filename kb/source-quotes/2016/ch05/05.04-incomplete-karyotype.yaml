@@ -1,0 +1,18 @@
+version: "2016"
+section: "5.4"
+quotes:
+  - rule: UNCERTAIN.INC_AT_END
+    cite: {section: "5.4", page: 48, para: "¶1"}
+    text: >-
+      The symbol inc denotes that the karyotype presented is incomplete, usually because of poor
+      chromosome quality.
+  - rule: UNCERTAIN.INC_AT_END
+    cite: {section: "5.4", page: 48, para: "¶1"}
+    text: >-
+      The symbol inc is placed at the end of the nomenclature string, after the description of
+      identifiable abnormalities.
+  - rule: UNCERTAIN.INC_EXCEPTIONAL
+    cite: {section: "5.4", page: 49, para: "¶2"}
+    text: >-
+      Every attempt should be made to present karyotypes in which each abnormality has been
+      identified. The use of inc should be restricted to exceptional situations.

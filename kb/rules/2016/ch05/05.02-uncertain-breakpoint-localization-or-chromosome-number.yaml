@@ -1,0 +1,32 @@
+version: "2016"
+section: "5.2"
+rules:
+  - id: UNCERTAIN.APPROX_INTERVAL
+    title: "~ for an interval of possible breakpoints or chromosome numbers"
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      The approximate sign ~ expresses an interval. Between two bands it gives the boundaries of
+      the segment in which a break lies (q21~24 = in 1q21, q22, q23 or q24); the second band is
+      written without the arm when the arm is the same. Between two numbers it gives a range for
+      the chromosome count (43~47).
+    cite:
+      - {section: "5.2", page: 48, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,del(1)(q21~24)"
+          cite: {section: "5.2", page: 48, example: E1}
+        - text: "46,XY,dup(1)(q22~24q44)"
+          cite: {section: "5.2", page: 48, example: E2}
+        - text: "46,XX,t(3;12)(q27~29;q13~15)"
+          cite: {section: "5.2", page: 48, example: E3}
+        - text: "43~47,XX,…"
+          cite: {section: "5.2", page: 48, example: E4}
+          note: Partial string as printed; … stands for the omitted abnormalities.
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Omitting the arm in the second band (q21~24, not q21~q24) is read from the examples; the
+        text does not state it.
+    related: [UNCERTAIN.OR_ALTERNATIVE]

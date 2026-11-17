@@ -1,0 +1,14 @@
+version: "2016"
+section: "5.3"
+quotes:
+  - rule: UNCERTAIN.OR_ALTERNATIVE
+    cite: {section: "5.3", page: 48, para: "¶1"}
+    text: >-
+      The symbol or is used to indicate alternative interpretations of an aberration. Note that
+      there should be a space before and after the symbol.
+  - rule: UNCERTAIN.OR_ALTERNATIVE
+    cite: {section: "5.3", page: 48, example: E3}
+    text: >-
+      This is in principle a different situation than t(12;14)(q13~15;q22~24), which means that
+      the breakpoint localizations in the t(12;14) are less certain and a variety of combinations
+      are possible.

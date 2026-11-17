@@ -1,0 +1,21 @@
+version: "2016"
+section: "7.2"
+quotes:
+  - rule: FRA.HERITABLE_VARIANT
+    cite: {section: "7.2", page: 53, para: "¶1"}
+    text: >-
+      Fragile sites (fra) associated with a specific disease or phenotype are referred to in
+      Section 9.2.7.
+  - rule: FRA.HERITABLE_VARIANT
+    cite: {section: "7.2", page: 53, para: "¶2"}
+    text: >-
+      Fragile sites associated with specific chromosome bands can occur as normal variants with no
+      phenotypic consequences. These fragile sites are inherited in a co-dominant Mendelian
+      fashion and may result in chromosome abnormalities such as deletions, multiradial figures,
+      and acentric fragments. While there may be several different types of fragile sites
+      inducible by culturing cells in media containing different components, all these will be
+      covered by a single nomenclature.
+  - rule: FRA.HOMOLOGUE_UNDERLINING
+    cite: {section: "7.2", page: 53, example: E1}
+    text: >-
+      fra(10)(q22.1),fra(1̲0̲)(q25.2) | Two fragile sites on different homologous chromosomes.

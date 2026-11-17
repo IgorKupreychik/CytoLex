@@ -92,14 +92,18 @@ rules:
     cite:
       - {section: "4.4", page: 44, para: "¶2"}
       - {section: "4.3.2.2", page: 43, para: "¶1"}
+      - {section: "6", page: 50, example: E8}
     examples:
       valid:
         - text: "der(1)t(1;3)(p32;q21)t(1;11)(q25;q13)"
           cite: {section: "4.4", page: 44, para: "¶2"}
+        - text: "46,XX,der(8)ins(8;?)(p23;?)del(8)(q22)"
+          cite: {section: "6", page: 50, example: E8}
+          note: Distal p arm to distal q arm, not alphabetical (ORDER.HOMOLOGUES_ALPHABETICAL).
       invalid:
         - text: "46,XX,der(1)t(1;11)(q25;q13)t(1;3)(p32;q21)"
           why: The 1p32 translocation is nearer pter than the 1q25 one and must be listed first.
           corrected: "46,XX,der(1)t(1;3)(p32;q21)t(1;11)(q25;q13)"
     fix: {level: 1, kind: reorder, hint: "Order the aberrations by their breakpoints on the derivative, from pter to qter."}
     review: {paraphrase_checked: true, needs_review: false}
-    related: [DER.ABERRATIONS_NO_COMMA]
+    related: [DER.ABERRATIONS_NO_COMMA, ORDER.HOMOLOGUES_ALPHABETICAL]

@@ -1,0 +1,56 @@
+version: "2016"
+section: "7.2"
+rules:
+  - id: FRA.HERITABLE_VARIANT
+    title: Heritable fragile sites as normal variants, one nomenclature
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      Fragile sites at specific bands can be normal, co-dominantly inherited variants without
+      phenotypic effect, though they may give rise to deletions, multiradials or acentric
+      fragments. They are written fra(chromosome)(band), one nomenclature whatever culture
+      condition induces them; fragile sites tied to a disease or phenotype are covered in section
+      9.2.7.
+    cite:
+      - {section: "7.2", page: 53, para: "¶1"}
+      - {section: "7.2", page: 53, para: "¶2"}
+    examples:
+      valid:
+        - text: "fra(10)(q25.2)"
+          cite: {section: "7.2", page: 53, example: E1}
+        - text: "fra(10)(q22.1),fra(10)(q25.2)"
+          cite: {section: "7.2", page: 53, example: E1}
+          note: Two fragile sites on the same chromosome 10.
+        - text: "fra(10)(q25.2),fra(16)(q22.1)"
+          cite: {section: "7.2", page: 53, example: E1}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: The general fra format is section 9.2.7 (T-012).
+    related: [FRA.HOMOLOGUE_UNDERLINING]
+
+  - id: FRA.HOMOLOGUE_UNDERLINING
+    title: Fragile sites on different homologues told apart by underlining
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      Two fragile sites written for the same chromosome number are on one chromosome unless the
+      second chromosome number is underlined, which marks the other homologue:
+      fra(10)(q22.1),fra(1̲0̲)(q25.2).
+    cite:
+      - {section: "7.2", page: 53, example: E1}
+    examples:
+      valid:
+        - text: "fra(10)(q22.1),fra(1̲0̲)(q25.2)"
+          cite: {section: "7.2", page: 53, example: E1}
+          note: Underlining recovered as U+0332 after each underlined character.
+        - text: "fra(10)(q22.1),fra(10)(q25.2)"
+          cite: {section: "7.2", page: 53, example: E1}
+          note: Without underlining, both sites are on the same chromosome 10.
+    review:
+      paraphrase_checked: true
+      needs_review: true
+      note: >-
+        §7.2 is on the underlined-homologue list (docs/extraction-review-2016.md); typed input
+        cannot carry underlining, so validator behaviour is T-042.
+    related: [FRA.HERITABLE_VARIANT]

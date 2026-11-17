@@ -27,7 +27,8 @@ rules:
       note: >-
         Reading the list as closed is an inference from "All symbols … are listed below". Later
         chapters may use terms that are not in the list; check this while writing T-009 to T-019.
-        Checked so far: ch. 4 (T-009), where every symbol used is listed.
+        Checked so far: ch. 4 (T-009) and ch. 5–7 (T-010), where every symbol used is listed
+        (ch. 7 strings such as 13cenh+ or 14pstk+ are concatenations of listed symbols).
 
   - id: SYM.SPACE_BETWEEN_SYMBOLS
     title: Space between combined symbols

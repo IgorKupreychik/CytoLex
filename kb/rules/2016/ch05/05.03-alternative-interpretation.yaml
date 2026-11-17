@@ -1,0 +1,32 @@
+version: "2016"
+section: "5.3"
+rules:
+  - id: UNCERTAIN.OR_ALTERNATIVE
+    title: "or between alternative interpretations, with spaces"
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      The term or separates alternative interpretations: of a breakpoint (p13 or q13) or of a
+      whole aberration (del(8)(q21.1) or i(8)(p10)). It is written with a space on each side.
+      Alternatives joined by or are distinct readings, unlike an interval with ~, which allows any
+      combination of the bands it spans.
+    cite:
+      - {section: "5.3", page: 48, para: "¶1"}
+      - {section: "5.3", page: 48, example: E3}
+    examples:
+      valid:
+        - text: "46,XX,add(19)(p13 or q13)"
+          cite: {section: "5.3", page: 48, example: E1}
+        - text: "46,XY,del(8)(q21.1) or i(8)(p10)"
+          cite: {section: "5.3", page: 48, example: E2}
+        - text: "46,XX,t(12;14)(q15;q24) or t(12;14)(q13;q22)"
+          cite: {section: "5.3", page: 48, example: E3}
+        - text: "46,XY,der(1)t(1;10)(q44;q22) or dup(1)(q32q44)"
+          cite: {section: "5.3", page: 48, example: E4}
+      invalid:
+        - text: "46,XX,add(19)(p13orq13)"
+          why: The term or has no space before and after it.
+          corrected: "46,XX,add(19)(p13 or q13)"
+    fix: {level: 1, kind: insert, hint: Put a space before and after or.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [BREAK.ALTERNATIVE_BANDS, UNCERTAIN.APPROX_INTERVAL, SYM.SPACE_BETWEEN_SYMBOLS]

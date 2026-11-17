@@ -38,10 +38,13 @@ rules:
       the type of aberration. Chapter 6 gives the details.
     cite:
       - {section: "4.1", page: 37, para: "¶2"}
+      - {section: "6", page: 50, para: "¶1"}
     examples:
       valid:
         - text: "47,XY,del(5)(q13q33),+21"
           note: Not a book example in this section.
+        - text: "47,X,t(X;13)(q27;q12),inv(10)(p13q22),+21"
+          cite: {section: "6", page: 50, example: E2}
       invalid:
         - text: "47,XY,+21,del(5)(q13q33)"
           why: The chromosome 21 abnormality is listed before the chromosome 5 abnormality.
@@ -51,7 +54,7 @@ rules:
           corrected: "47,XY,del(5)(q13q33),+21"
     fix: {level: 1, kind: reorder, hint: Reorder the abnormalities by chromosome (sex chromosomes first) and separate them with commas.}
     review: {paraphrase_checked: true, needs_review: false}
-    related: [KARYO.COUNT_SEX_ORDER]
+    related: [KARYO.COUNT_SEX_ORDER, ORDER.X_BEFORE_Y, ORDER.NUMERICAL_BEFORE_STRUCTURAL]
 
   - id: KARYO.CHROMOSOME_IN_PARENTHESES
     title: Chromosome in parentheses right after the rearrangement symbol
@@ -190,6 +193,7 @@ rules:
       (section 7.1).
     cite:
       - {section: "4.1", page: 38, para: "¶5"}
+      - {section: "5.1", page: 47, example: E7}
     examples:
       valid: []
       invalid:
@@ -199,7 +203,7 @@ rules:
           why: "'4p+' is text-only shorthand; describe the change with the proper rearrangement (e.g. add, der)."
     fix: {level: 3, hint: Replace the arm-length shorthand with the designation of the actual rearrangement and its breakpoints.}
     review: {paraphrase_checked: true, needs_review: false}
-    related: [KARYO.GAIN_LOSS_SIGN]
+    related: [KARYO.GAIN_LOSS_SIGN, VAR.LENGTH_SIGN, UNCERTAIN.QUESTION_MARK_DESIGNATION]
 
   - id: KARYO.REPLACED_NORMAL_NOT_MISSING
     title: Normal chromosome replaced by a rearranged one is not recorded as missing

@@ -1,0 +1,60 @@
+version: "2016"
+section: "5.1"
+rules:
+  - id: UNCERTAIN.QUESTIONABLE_ITEM
+    title: "? before a questionable chromosome or abnormality"
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A question mark marks a questionable identification. When a whole item is uncertain (a
+      gained or lost chromosome, an abnormality, or the rearrangement a derivative came from),
+      the ? is written immediately before that item.
+    cite:
+      - {section: "5.1", page: 47, para: "¶1"}
+    examples:
+      valid:
+        - text: "45,XX,–?21"
+          cite: {section: "5.1", page: 47, example: E1}
+        - text: "47,XX,+?8"
+          cite: {section: "5.1", page: 47, example: E2}
+        - text: "46,XY,?del(1)(q23)"
+          cite: {section: "5.1", page: 47, example: E8}
+        - text: "46,XX,der(1)?t(1;3)(p22;q13)"
+          cite: {section: "5.1", page: 47, example: E9}
+      invalid:
+        - text: "45,XX,–21?"
+          why: The ? follows the uncertain chromosome; it goes before it.
+          corrected: "45,XX,–?21"
+    fix: {level: 1, kind: reorder, hint: Move the ? to directly before the uncertain item.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [UNCERTAIN.QUESTION_MARK_DESIGNATION]
+
+  - id: UNCERTAIN.QUESTION_MARK_DESIGNATION
+    title: "? in place of an unknown chromosome, region or band"
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A question mark may also replace a chromosome, region or band designation that cannot be
+      determined. As the book's examples show, it then sits at the position of the unknown or
+      uncertain digit: q2? (region known, band not), q2?3 (band probably 23), q?2 (region
+      probably 2), q?23 (region uncertain; if 2, then band 23), q? (arm only).
+    cite:
+      - {section: "5.1", page: 47, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,del(1)(q2?)"
+          cite: {section: "5.1", page: 47, example: E3}
+        - text: "46,XY,del(1)(q2?3)"
+          cite: {section: "5.1", page: 47, example: E4}
+        - text: "46,XX,del(1)(q?2)"
+          cite: {section: "5.1", page: 47, example: E5}
+        - text: "46,XY,del(1)(q?23)"
+          cite: {section: "5.1", page: 47, example: E6}
+        - text: "46,XX,del(1)(q?)"
+          cite: {section: "5.1", page: 47, example: E7}
+    fix: {level: 3, hint: "Write ? where the chromosome, region or band cannot be determined."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: Section 9.2.3 has further examples (der(?), T-012).
+    related: [UNCERTAIN.QUESTIONABLE_ITEM, BREAK.REGION_ONLY, KARYO.NO_ARM_LENGTH_SIGN]
