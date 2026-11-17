@@ -1,0 +1,22 @@
+version: "2016"
+section: "4.3"
+quotes:
+  - rule: STRUCT.SHORT_AND_DETAILED_SYSTEMS
+    cite: {section: "4.3", page: 40, para: "¶1"}
+    text: >-
+      Two systems for designating structural abnormalities exist. One is a short system in which
+      the nature of the rearrangement and the breakpoint(s) are identified by the bands or
+      regions in which the breaks occur.
+  - rule: STRUCT.SHORT_AND_DETAILED_SYSTEMS
+    cite: {section: "4.3", page: 40, para: "¶1"}
+    text: >-
+      The other is a detailed system which, besides identifying the type of rearrangement,
+      defines each abnormal chromosome in terms of its band composition. The notation used to
+      identify the rearrangement and the method of specifying the breakpoints are common to both
+      systems
+  - rule: GEN.GENOME_BUILD_REQUIRED
+    cite: {section: "4.3", page: 41, para: "¶2"}
+    text: >-
+      The genome build or assembly must be specified when designating an aberration by
+      nucleotide position defined by microarray, region-specific assay or sequencing (see
+      Sections 14.1, 15.1 and 16.2).

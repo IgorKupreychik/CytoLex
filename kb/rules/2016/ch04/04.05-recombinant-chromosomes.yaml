@@ -1,0 +1,84 @@
+version: "2016"
+section: "4.5"
+rules:
+  - id: REC.DEFINITION
+    title: What a recombinant chromosome is
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      A recombinant chromosome is a rearranged chromosome with a new segment composition,
+      arising de novo during gametogenesis from meiotic crossing-over between a displaced
+      segment and its normally placed counterpart in a structural heterozygote (most often an
+      inversion or insertion carrier). A derivative chromosome, by contrast, is a product of the
+      original rearrangement and passes through meiosis unchanged.
+    cite:
+      - {section: "4.5", page: 46, para: "¶1"}
+      - {section: "4.5", page: 46, para: "¶2"}
+      - {section: "4.5", page: 46, para: "¶4"}
+    examples:
+      valid:
+        - text: "46,XX,inv(2)(p21q31)"
+          cite: {section: "4.5", page: 46, para: "¶4"}
+          note: The maternal pericentric inversion of the book's example; the text layer has a line-wrap space before "(p21q31)" (a line break on printed p.46, checked 2026-11-17).
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        ¶4 refers to Fig. 9 (inversion loop diagram); the duplicated and deleted segments are
+        spelled out in the text, so the rule does not depend on the diagram.
+    related: [REC.FORMAT, DER.DEFINITION]
+
+  - id: REC.FORMAT
+    title: rec(n) followed by its aberrations without commas
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A recombinant chromosome is written rec, followed directly by the chromosome in
+      parentheses; that chromosome is the one supplying the recombinant's centromere. As with
+      der, the aberrations that follow rec are not separated by commas.
+    cite:
+      - {section: "4.5", page: 46, para: "¶3"}
+      - {section: "4.5", page: 46, para: "¶4"}
+    examples:
+      valid:
+        - text: "46,XX,rec(2)dup(2p)inv(2)(p21q31)mat"
+          cite: {section: "4.5", page: 46, para: "¶4"}
+          note: The text layer has a line-wrap space after "rec(2)" (a line break on printed p.46, checked 2026-11-17).
+        - text: "46,XX,rec(2)dup(2q)inv(2)(p21q31)mat"
+          cite: {section: "4.5", page: 46, para: "¶4"}
+        - text: "46,XX,rec(6)(pter→q25.2::p22.2→pter)mat"
+          cite: {section: "9.2.3", page: 61, example: E2}
+      invalid:
+        - text: "46,XX,rec(2),dup(2p),inv(2)(p21q31)mat"
+          why: The aberrations following rec(2) are not separated by commas.
+          corrected: "46,XX,rec(2)dup(2p)inv(2)(p21q31)mat"
+    fix: {level: 1, kind: delete, hint: Remove the commas after rec(n) and between its aberrations.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [DER.ABERRATIONS_NO_COMMA, REC.KNOWN_PARENTAL_REARRANGEMENT]
+
+  - id: REC.KNOWN_PARENTAL_REARRANGEMENT
+    title: rec only with an identified parental inversion or insertion
+    applies_to: [karyotype]
+    severity: warning
+    statement: >-
+      rec is used only when the parental inversion or insertion has been identified. Otherwise
+      an apparent recombinant is written as a derivative chromosome (der); the net imbalance
+      described is the same.
+    cite:
+      - {section: "4.5", page: 46, para: "¶4"}
+    examples:
+      valid:
+        - text: "46,XX,rec(2)dup(2p)inv(2)(p21q31)mat"
+          cite: {section: "4.5", page: 46, para: "¶4"}
+          note: Recombinant from a known maternal inversion (text-layer line-wrap space removed).
+        - text: "46,XX,der(2)(pter→q31::p21→pter)"
+          cite: {section: "4.5", page: 46, para: "¶4"}
+          note: Same imbalance without a known parental inversion (text-layer line-wrap space removed).
+    review:
+      paraphrase_checked: true
+      needs_review: true
+      note: >-
+        Whether the parent's rearrangement is known can't be read from the string; a validator
+        could at most warn when rec carries no mat/pat/inh. Whether that heuristic is wanted is
+        for T-022.
+    related: [REC.FORMAT]

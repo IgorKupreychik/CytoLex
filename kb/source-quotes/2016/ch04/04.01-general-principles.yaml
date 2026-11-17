@@ -1,0 +1,160 @@
+version: "2016"
+section: "4.1"
+quotes:
+  - rule: KARYO.COUNT_SEX_ORDER
+    cite: {section: "4.1", page: 37, para: "¶1"}
+    text: >-
+      In the description of a karyotype the first item to be recorded is the total number of
+      chromosomes, including the sex chromosomes, followed by a comma (,). The sex chromosome
+      constitution is given next. The autosomes are specified only when an abnormality is
+      present.
+  - rule: KARYO.ABNORMALITY_ORDER
+    cite: {section: "4.1", page: 37, para: "¶2"}
+    text: >-
+      In the description of chromosome abnormalities, sex chromosome aberrations are presented
+      first, followed by abnormalities of the autosomes listed in numerical order irrespective of
+      aberration type. Each abnormality is separated by a comma.
+  - rule: KARYO.CHROMOSOME_IN_PARENTHESES
+    cite: {section: "4.1", page: 37, para: "¶3"}
+    text: >-
+      In single chromosome rearrangements, the chromosome involved in the change is specified
+      within parentheses ( ) immediately following the symbol identifying the type of
+      rearrangement, e.g., inv(2), del(4), r(18).
+  - rule: STRUCT.CHROMOSOME_SEPARATOR
+    cite: {section: "4.1", page: 37, para: "¶3"}
+    text: >-
+      If two or more chromosomes have been altered, a semicolon (;) is used to separate their
+      designations.
+  - rule: STRUCT.CHROMOSOME_ORDER
+    cite: {section: "4.1", page: 37, para: "¶3"}
+    text: >-
+      If one of the rearranged chromosomes is a sex chromosome, then it is listed first;
+      otherwise, the chromosome having the lowest number is always specified first, e.g., t(X;3)
+      or t(2;5).
+  - rule: KARYO.GAIN_LOSS_SIGN
+    cite: {section: "4.1", page: 38, para: "¶5"}
+    text: >-
+      A plus (+) or minus (–) sign is placed before a chromosome or an abnormality designation to
+      indicate additional or missing, normal or abnormal chromosomes, e.g., +21, –7, +der(2); for
+      details, see Section 8.1.
+  - rule: KARYO.NO_ARM_LENGTH_SIGN
+    cite: {section: "4.1", page: 38, para: "¶5"}
+    text: >-
+      The + or – sign placed after a chromosome arm symbol (p or q) may be used in text to
+      indicate an increase or decrease in the length of a chromosome arm (e.g., 4p+, 5q–) but
+      should not be used in the description of karyotypes.
+  - rule: KARYO.REPLACED_NORMAL_NOT_MISSING
+    cite: {section: "4.1", page: 38, para: "¶6"}
+    text: >-
+      When normal chromosomes are replaced by structurally altered chromosomes, the normal ones
+      should not be recorded as missing (see Section 9.1). In the description of karyotypes
+      containing dicentric chromosomes or derivative chromosomes resulting from whole-arm
+      translocations, the abnormal chromosomes by convention replace both normal chromosomes
+      involved in the formation of the dicentric chromosome or derivative chromosome.
+  - rule: KARYO.MULTIPLY_SIGN_REARRANGED_ONLY
+    cite: {section: "4.1", page: 38, para: "¶7"}
+    text: >-
+      The multiplication sign (×) can be used to describe multiple copies of a rearranged
+      chromosome but should not be used to denote multiple copies of normal chromosomes (see
+      Section 9.3).
+  - rule: KARYO.CLONE_SEPARATOR
+    cite: {section: "4.1", page: 38, para: "¶9"}
+    text: >-
+      The karyotype designations of different clones are separated by a slant line (/). Square
+      brackets [ ], placed after the karyotype description, are used to designate the absolute
+      number of cells in each clone (see Section 11.1.2).
+  - rule: KARYO.MOSAIC_CHIMERA_PREFIX
+    cite: {section: "4.1", page: 38, para: "¶9"}
+    text: >-
+      In order to distinguish between a mosaic (cell lines originating from the same zygote) and
+      a chimera (cell lines originating from different zygotes) in constitutional cases, the
+      symbol mos or chi, respectively, preceding the karyotype designations, may be used; for
+      example, mos 45,X/46,XX and chi 46,XX/46,XY.
+  - rule: KARYO.MOSAIC_CHIMERA_PREFIX
+    cite: {section: "4.1", page: 38, para: "¶9"}
+    text: >-
+      In most instances the triplets will be needed only for the initial description in any
+      report; subsequently, the simple karyotype designation may be used. A space should follow
+      mos or chi.
+  - rule: KARYO.CLONE_ORDER_CONSTITUTIONAL
+    cite: {section: "4.1", page: 38, para: "¶9"}
+    text: >-
+      A normal diploid clone, when present, is always listed last, e.g., mos 47,XY,+21/46,XY;
+      mos 47,XXY/46,XY. If there are several abnormal clones, they are presented according to
+      their size; the largest first, then the second largest, and so on, e.g., mos
+      45,X[15]/47,XXX[10]/46,XX[23]. Likewise, the largest clone in chimeras is presented first,
+      e.g., chi 46,XX[25]/46,XY[10].
+  - rule: KARYO.CLONE_ORDER_CONSTITUTIONAL
+    cite: {section: "4.1", page: 38, para: "¶9"}
+    text: >-
+      When equivalent numbers of cells are found in two cell lines, one of which has a numerical
+      abnormality and the other of which has a structural abnormality, the numerical is listed
+      first, e.g., 45,X[25]/46,X,i(X)(q10)[25]. When both clones have numerical abnormalities
+      they are listed according to the altered autosome number, e.g., 47,XX,+8[25]/47,XX,+21[25];
+      a clone with a sex chromosome abnormality always comes first, e.g.,
+      47,XXX[25]/47,XX,+21[25].
+  - rule: KARYO.TRANSPLANT_CHIMERA
+    cite: {section: "4.1", page: 38, para: "¶10"}
+    text: >-
+      In chimerism secondary to bone marrow transplant, the recipient cell clones are listed
+      first, followed by the donor cell line(s). The recipient and donor cell line(s) are
+      separated by a double slant line (//) as shown in the following examples.
+  - rule: KARYO.PLOIDY_RELATIVE
+    cite: {section: "4.1", page: 39, para: "¶11"}
+    text: >-
+      A haploid or polyploid karyotype will be evident from the chromosome number and from the
+      further designations, e.g., 69,XXY. All chromosome changes should be expressed in relation
+      to the appropriate ploidy level (see Sections 8.1 and 9.1), e.g., 70,XXY,+21.
+  - rule: KARYO.ENDOREDUPLICATION
+    cite: {section: "4.1", page: 39, para: "¶12"}
+    text: >-
+      An endoreduplicated metaphase cell is indicated by the abbreviation end preceding the
+      karyotype designation, e.g., end 46,XX.
+  - rule: KARYO.PARENTAL_ORIGIN
+    cite: {section: "4.1", page: 39, para: "¶13"}
+    text: >-
+      When it is known that a particular chromosome involved in an aberration has been
+      inherited, the term inh may be used, e.g., 46,XX,t(5;6)(q34;q23)inh. When it is known that
+      the aberration is inherited from the mother or the father, the most complete information is
+      evident by the use of the abbreviation mat or pat, respectively, immediately following the
+      designation of the abnormality
+  - rule: KARYO.PARENTAL_ORIGIN
+    cite: {section: "4.1", page: 39, para: "¶13"}
+    text: >-
+      If it is known that the parents’ chromosomes are normal with respect to the abnormality,
+      the abnormality may be designated de novo (dn)
+  - rule: KARYO.DE_NOVO_SPACE
+    cite: {section: "4.1", page: 39, para: "¶13"}
+    text: >-
+      When dn follows another abbreviation, a space is inserted, e.g., 47,XY,+mar
+      dn[14]/46,XY[16].
+  - rule: KARYO.CONSTITUTIONAL_C
+    cite: {section: "4.1", page: 40, para: "¶14"}
+    text: >-
+      The same rules for designating chromosome aberrations are followed in the description of
+      constitutional and acquired chromosome aberrations.
+  - rule: KARYO.CONSTITUTIONAL_C
+    cite: {section: "4.1", page: 40, para: "¶14"}
+    text: >-
+      When an acquired chromosome abnormality is found in an individual with a constitutional
+      chromosome anomaly, the latter is indicated by the letter c immediately after the
+      constitutional abnormality designation (see Sections 8.3 and 11.3).
+  - rule: KARYO.ABBREVIATED_FORM
+    cite: {section: "4.1", page: 40, para: "¶15"}
+    text: >-
+      In the interest of clarity, complex rearrangements necessitating lengthy descriptions
+      should be written out in full the first time they are used in a report. An abbreviated
+      version may be used subsequently, provided it is clearly defined immediately after the
+      complete notation.
+  - rule: KARYO.ABBREVIATED_FORM
+    cite: {section: "4.4", page: 45, para: "¶3"}
+    text: >-
+      The full karyotype designation needs be written only once in any given publication and
+      then can be abbreviated. A suggested abbreviation for the first designated karyotype in
+      Table 4, for example, would be 46,XX,der(5)mat.
+  - rule: STRUCT.CHROMOSOME_ORDER
+    cite: {section: "4.3.1.1", page: 41, para: "¶3"}
+    text: >-
+      When two chromosomes are involved, the chromosome having the lowest number is always
+      listed first; however, if one of the rearranged chromosomes is a sex chromosome this is
+      listed first.

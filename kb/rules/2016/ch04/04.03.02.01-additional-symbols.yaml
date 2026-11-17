@@ -1,0 +1,29 @@
+version: "2016"
+section: "4.3.2.1"
+rules:
+  - id: STRUCT.DETAILED_SYMBOLS
+    title: Detailed-system symbols - colon, double colon, arrow, pter/qter, cen
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      In band compositions a single colon (:) marks a break and a double colon (::) a break and
+      reunion. An arrow (→, or ->) means "from … to". The end of an arm is written either as its
+      band or as ter preceded by the arm symbol (pter for the short-arm end, qter for the
+      long-arm end). The centromere is written cen.
+    cite:
+      - {section: "4.3.2.1", page: 43, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,del(5)(pter→q13:)"
+          cite: {section: "9.2.2", page: 60, example: E1}
+        - text: "46,XX,del(5)(pter->q13:)"
+          note: Not a book example; -> is the alternative arrow the book gives.
+        - text: "46,XX,der(6)(pter→q25.2::p22.2→pter)"
+          cite: {section: "9.2.3", page: 61, example: E1}
+      invalid:
+        - text: "46,XX,del(5)(ter→q13:)"
+          why: ter must be preceded by the arm symbol (pter or qter).
+          corrected: "46,XX,del(5)(pter→q13:)"
+    fix: {level: 3, hint: "Write the arm end as pter or qter (or as its band)."}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [STRUCT.DETAILED_SYSTEM]

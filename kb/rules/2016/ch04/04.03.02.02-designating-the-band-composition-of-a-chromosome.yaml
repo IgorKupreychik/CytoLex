@@ -1,0 +1,68 @@
+version: "2016"
+section: "4.3.2.2"
+rules:
+  - id: STRUCT.COMPOSITION_ORDER
+    title: Band composition from the short-arm end to the long-arm end
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A band composition starts at the end of the short arm and runs to the end of the long arm,
+      listing the bands in the order they occur in the rearranged chromosome. If neither end is
+      a short-arm segment, it starts at the long-arm end belonging to the lowest-numbered
+      chromosome. But if part of the proximal short arm is present, it starts at the end of that
+      arm, even when the segment attached there comes from a long arm or from a chromosome with
+      a higher or lower number.
+    cite:
+      - {section: "4.3.2.2", page: 43, para: "¶1"}
+      - {section: "4.3.2.2", page: 43, para: "¶2"}
+    examples:
+      valid:
+        - text: "46,XX,der(1)(3qter→3q13.1::1p22→1qter)"
+          cite: {section: "9.2.3", page: 61, example: E10}
+          note: The proximal short arm of chromosome 1 is present, so the description starts at the end attached to it (3qter).
+      invalid:
+        - text: "46,XX,der(1)(1qter→1p22::3q13.1→3qter)"
+          why: The composition is written from the long-arm end of chromosome 1; it must start at the end attached to the proximal short arm.
+          corrected: "46,XX,der(1)(3qter→3q13.1::1p22→1qter)"
+    fix: {level: 1, kind: reorder, hint: "Reverse the composition so that it starts at the short-arm end (each segment's arrow reversed)."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Section listed in docs/extraction-review-2016.md because of Table 4 (signed off
+        2026-11-17) and Fig. 8; the rule's text is complete in the chunk and does not depend on
+        the diagram.
+    related: [STRUCT.DETAILED_SYSTEM, STRUCT.COMPOSITION_CHROMOSOME_NUMBERS]
+
+  - id: STRUCT.COMPOSITION_CHROMOSOME_NUMBERS
+    title: Chromosome numbers in a band composition only when several chromosomes are involved
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      When the rearrangement involves a single chromosome, the chromosome number is not repeated
+      in the band composition. When more than one chromosome is involved, every band and arm end
+      carries its chromosome number.
+    cite:
+      - {section: "4.3.2.2", page: 43, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,der(6)(pter→q25.2::p22.2→pter)"
+          cite: {section: "9.2.3", page: 61, example: E1}
+        - text: "46,XX,der(1)(3qter→3q13.1::1p22→1qter)"
+          cite: {section: "9.2.3", page: 61, example: E10}
+      invalid:
+        - text: "46,XX,der(6)(6pter→6q25.2::6p22.2→6pter)"
+          why: Only chromosome 6 is involved, so the chromosome number is not repeated in the band composition.
+          corrected: "46,XX,der(6)(pter→q25.2::p22.2→pter)"
+        - text: "46,XX,der(1)(3qter→q13.1::1p22→1qter)"
+          why: Several chromosomes are involved, so every band needs its chromosome number (3q13.1).
+          corrected: "46,XX,der(1)(3qter→3q13.1::1p22→1qter)"
+    fix: {level: 1, kind: replace, hint: "Remove the chromosome numbers (single chromosome) or add them to every band (several chromosomes)."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Section listed in docs/extraction-review-2016.md because of Table 4 (signed off
+        2026-11-17) and Fig. 8; the rule's text is complete in the chunk and does not depend on
+        the diagram.
+    related: [STRUCT.COMPOSITION_ORDER]

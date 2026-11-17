@@ -1,0 +1,38 @@
+version: "2016"
+section: "4.3.1"
+rules:
+  - id: STRUCT.BREAKPOINT_GROUPS
+    title: Breakpoints in parentheses, one group per chromosome
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      In the short system the breakpoints, given as band designations, are written in
+      parentheses directly after the rearrangement symbol and its chromosome(s). They are listed
+      in the same order as the chromosomes: one group per chromosome, groups separated by
+      semicolons. A rearrangement within a single chromosome has one group, with no semicolon
+      between its breakpoints.
+    cite:
+      - {section: "4.3.1", page: 41, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,inv(2)(p21q31)"
+          cite: {section: "4.3.1.1", page: 41, example: E1}
+        - text: "46,XY,t(12;16)(q13;p11.1)"
+          cite: {section: "4.3.1.1", page: 41, example: E3}
+        - text: "46,XY,t(5;6)(q13q23;q15q23)"
+          cite: {section: "4.3.1.3", page: 42, example: E2}
+      invalid:
+        - text: "46,XX,inv(2)(p21;q31)"
+          why: No semicolon between the breakpoints of a single-chromosome rearrangement.
+          corrected: "46,XX,inv(2)(p21q31)"
+        - text: "46,XY,t(12;16)(q13)"
+          why: Two chromosomes but only one breakpoint group; each chromosome needs its breakpoint(s).
+        - text: "46,XY,t(5;6)(q13;q23;q15;q23)"
+          why: The two breakpoints of each chromosome form one group without a semicolon; semicolons only separate the chromosomes' groups.
+          corrected: "46,XY,t(5;6)(q13q23;q15q23)"
+        - text: "46,XX,inv(2)p21q31"
+          why: The breakpoints must be in parentheses after the chromosome.
+          corrected: "46,XX,inv(2)(p21q31)"
+    fix: {level: 1, kind: replace, hint: "Put the breakpoints in parentheses, one group per chromosome, with semicolons only between groups."}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [STRUCT.CHROMOSOME_SEPARATOR, KARYO.CHROMOSOME_IN_PARENTHESES]

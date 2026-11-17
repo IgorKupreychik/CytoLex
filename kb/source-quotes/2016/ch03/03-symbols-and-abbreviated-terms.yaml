@@ -22,3 +22,8 @@ quotes:
     text: >-
       There is no space when a symbol or abbreviation immediately precedes or follows a
       parenthesis.
+  - rule: SYM.SPACE_BEFORE_CHROMOSOME_COUNT
+    cite: {section: "4.1", page: 38, para: "¶9"}
+    text: >-
+      A space should follow mos or chi. All abbreviations that precede a number will have a
+      space that follows.

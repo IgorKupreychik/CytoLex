@@ -1,0 +1,18 @@
+version: "2016"
+section: "4.3.1.3"
+rules:
+  - id: DER.UNBALANCED_USE_DER
+    title: Unbalanced complex rearrangements described with der
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      An unbalanced rearrangement produces at least one derivative chromosome, which should be
+      described with der (section 9.2.3). The short system usually cannot describe every complex
+      rearrangement, but the detailed system can describe any abnormality; a diagram or a
+      description in words may still be needed for full clarity.
+    cite:
+      - {section: "4.3.1.3", page: 42, para: "¶2"}
+    examples:
+      valid: []
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [STRUCT.DETAILED_SYSTEM, DER.DEFINITION]

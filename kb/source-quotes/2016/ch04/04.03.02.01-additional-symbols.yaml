@@ -1,0 +1,12 @@
+version: "2016"
+section: "4.3.2.1"
+quotes:
+  - rule: STRUCT.DETAILED_SYMBOLS
+    cite: {section: "4.3.2.1", page: 43, para: "¶1"}
+    text: >-
+      A single colon (:) is used to indicate a chromosome break and a double colon (::) to
+      indicate break and reunion. In order to avoid an unwieldy description, an arrow (→ or ->),
+      meaning from – to, is employed. The end of a chromosome arm may be designated either by
+      its band designation or by the symbol ter (terminal), preceded by the arm designation,
+      i.e., pter indicates the end of the short arm and qter the end of the long arm. When it is
+      necessary to indicate the centromere, the abbreviation cen should be used.

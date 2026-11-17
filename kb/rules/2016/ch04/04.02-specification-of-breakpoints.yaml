@@ -1,0 +1,96 @@
+version: "2016"
+section: "4.2"
+rules:
+  - id: BREAK.INTERFACE_HIGHER_BAND
+    title: Break at a band interface goes to the more distal band
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      A breakpoint is given as the band in which the break lies. A break that seems to lie at
+      the interface of two bands is assigned to the band with the higher number, i.e. the one
+      farther from the centromere.
+    cite:
+      - {section: "4.2", page: 40, para: "¶1"}
+    examples:
+      valid: []
+    review: {paraphrase_checked: true, needs_review: false}
+
+  - id: BREAK.ALTERNATIVE_BANDS
+    title: Two adjacent candidate bands or regions joined by or
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      When a break may lie in either of two consecutive bands (or, if only the region is known,
+      in either of two adjacent regions), both are given, joined by the term or; the second is
+      written without the chromosome number (1q23 or q24; 1q2 or q3). Section 5.3 gives the
+      details.
+    cite:
+      - {section: "4.2", page: 40, para: "¶2"}
+    examples:
+      valid:
+        - text: "1q23 or q24"
+          cite: {section: "4.2", page: 40, para: "¶2"}
+        - text: "1q2 or q3"
+          cite: {section: "4.2", page: 40, para: "¶2"}
+      invalid:
+        - text: "1q21 or q24"
+          why: The two alternatives must be consecutive bands; 1q21 and 1q24 are not adjacent.
+    fix: {level: 3, hint: "Give two adjacent bands (or regions) as the alternatives, or use another uncertainty notation (chapter 5)."}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [BREAK.REGION_ONLY]
+
+  - id: BREAK.REGION_ONLY
+    title: Region-only breakpoints are allowed
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      A break that can be placed in a region but not in a particular band may be given by the
+      region number alone (1p1). A question mark may mark an uncertain localisation (1p1?;
+      section 5.1); for the approximate sign see section 5.2.
+    cite:
+      - {section: "4.2", page: 40, para: "¶2"}
+    examples:
+      valid:
+        - text: "1p1"
+          cite: {section: "4.2", page: 40, para: "¶2"}
+        - text: "1p1?"
+          cite: {section: "4.2", page: 40, para: "¶2"}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [BREAK.ALTERNATIVE_BANDS, BREAK.MIXED_RESOLUTION]
+
+  - id: BREAK.MIXED_RESOLUTION
+    title: Breakpoints may differ in resolution within one string
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      Breakpoints in the same rearrangement or karyotype may be given at different levels of
+      resolution, according to how precise the karyogram is.
+    cite:
+      - {section: "4.2", page: 40, para: "¶2"}
+    examples:
+      valid:
+        - text: "46,XX,inv(2)(q11.2q32)"
+          cite: {section: "4.3.1.1", page: 41, example: E2}
+          note: Sub-band 2q11.2 and band 2q32 in one rearrangement.
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [BREAK.REGION_ONLY]
+
+  - id: BREAK.NOT_REPEATED_FOR_COPIES
+    title: Breakpoints given only at the first appearance
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      When an extra copy of a rearranged chromosome is present, its breakpoints are given only
+      where the rearrangement first appears in the karyotype; later mentions may leave them out.
+    cite:
+      - {section: "4.2", page: 40, para: "¶3"}
+    examples:
+      valid:
+        - text: "48,XX,+1,+der(1)t(1;16)(p13;q13),t(1;16)"
+          cite: {section: "4.2", page: 40, para: "¶3"}
+        - text: "46,XX,der(2)t(2;5)(q21;q31)mat,+der(2)t(2;5),–5"
+          cite: {section: "4.3.2.2", page: 44, float: "Table 4"}
+        - text: "46,XX,–2,der(5)t(2;5)(q21;q31)mat,+der(5)t(2;5)"
+          cite: {section: "4.3.2.2", page: 44, float: "Table 4"}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [KARYO.ABBREVIATED_FORM]

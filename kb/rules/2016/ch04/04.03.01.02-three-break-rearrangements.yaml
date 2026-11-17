@@ -1,0 +1,81 @@
+version: "2016"
+section: "4.3.1.2"
+rules:
+  - id: STRUCT.INSERTION_RECEPTOR_FIRST
+    title: Insertion - receiving chromosome first
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      In an insertion between two chromosomes, the receiving chromosome is listed first and the
+      donor last, even if the donor is a sex chromosome or has a lower number. This is the
+      exception to the sex-chromosome / lowest-number-first rule. Section 9.2.9 gives the
+      details.
+    cite:
+      - {section: "4.1", page: 37, para: "¶3"}
+      - {section: "4.3.1.2", page: 41, para: "¶1"}
+    examples:
+      valid:
+        - text: "ins(5;2)"
+          cite: {section: "4.1", page: 37, para: "¶3"}
+        - text: "46,X,ins(5;X)(p14;q21q25)"
+          cite: {section: "4.3.1.2", page: 41, example: E1}
+        - text: "46,XY,ins(5;2)(p14;q22q32)"
+          cite: {section: "4.3.1.2", page: 41, example: E1}
+      invalid:
+        - text: "46,XY,ins(2;5)(q22q32;p14)"
+          why: In an insertion the receiving chromosome (5) is listed first, even though chromosome 2 has the lower number.
+          corrected: "46,XY,ins(5;2)(p14;q22q32)"
+    fix: {level: 1, kind: reorder, hint: Put the receiving chromosome and its breakpoint first and the donor chromosome and its segment last.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [STRUCT.CHROMOSOME_ORDER, STRUCT.INSERTION_SITE_FIRST]
+
+  - id: STRUCT.INSERTION_SITE_FIRST
+    title: Insertion within one chromosome - insertion site first
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      In an insertion within a single chromosome, the breakpoint where the segment is inserted
+      comes first. The inserted segment's two breakpoints follow, proximal before distal for a
+      direct insertion and distal before proximal for an inverted one.
+    cite:
+      - {section: "4.3.1.2", page: 41, para: "¶2"}
+    examples:
+      valid:
+        - text: "46,XX,ins(2)(q13p13p23)"
+          cite: {section: "4.3.1.2", page: 42, example: E2}
+          note: Direct insertion of 2p13→2p23 into 2q13.
+        - text: "46,XX,ins(2)(q13p23p13)"
+          cite: {section: "4.3.1.2", page: 42, example: E3}
+          note: Inverted insertion of the same segment.
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [STRUCT.INSERTION_RECEPTOR_FIRST]
+
+  - id: STRUCT.MULTI_CHROMOSOME_ORDER
+    title: Three or more chromosomes - first, then receiver, donor last
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      In a balanced translocation of three chromosomes with one break each, the sex chromosome
+      or lowest-numbered autosome is listed first. Next comes the chromosome that receives a
+      segment from the first one, and last the chromosome that donates a segment to the first
+      one. Four-break and more complex balanced translocations follow the same rule (see also
+      section 9.2.17.1). Homologues may be told apart by underlining one numeral (T-042).
+    cite:
+      - {section: "4.1", page: 37, para: "¶4"}
+      - {section: "4.3.1.2", page: 42, para: "¶3"}
+      - {section: "4.3.1.3", page: 42, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,t(9;22;17)(q34;q11.2;q22)"
+          cite: {section: "4.3.1.2", page: 42, example: E4}
+        - text: "46,Y,t(X;15;18)(p11.1;p11.1;q11.1)"
+          cite: {section: "4.3.1.2", page: 42, example: E5}
+        - text: "46,XX,t(3;9;22;21)(p13;q34;q11.2;q21)"
+          cite: {section: "4.3.1.3", page: 42, example: E1}
+      invalid:
+        - text: "46,XX,t(22;17;9)(q11.2;q22;q34)"
+          why: Chromosome 9, the lowest-numbered, must be listed first; the cycle is rotated to start with it, which keeps the meaning.
+          corrected: "46,XX,t(9;22;17)(q34;q11.2;q22)"
+    fix: {level: 1, kind: reorder, hint: Rotate chromosomes and breakpoint groups together so that the sex chromosome or lowest-numbered autosome comes first.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [STRUCT.CHROMOSOME_ORDER]

@@ -1,0 +1,13 @@
+version: "2016"
+section: "4.3.1.1"
+quotes:
+  - rule: STRUCT.SHORT_ARM_BREAKPOINT_FIRST
+    cite: {section: "4.3.1.1", page: 41, para: "¶1"}
+    text: >-
+      When both arms of a single chromosome are involved in a two-break rearrangement, the
+      breakpoint in the short arm is always specified before the breakpoint in the long arm.
+  - rule: STRUCT.PROXIMAL_BREAKPOINT_FIRST
+    cite: {section: "4.3.1.1", page: 41, para: "¶2"}
+    text: >-
+      When two breaks occur within the same arm, the breakpoint more proximal to the centromere
+      is specified first.

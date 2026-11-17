@@ -73,7 +73,7 @@ tables:
 
   - id: Table 4
     kind: float
-    review: {image: ok, human: pending, fallback: none}
+    review: {image: ok, human: ok, fallback: none}
     regions:
       - book_page: 44
         top: 92

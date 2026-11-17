@@ -1,0 +1,11 @@
+version: "2016"
+section: "4.3.1.3"
+quotes:
+  - rule: DER.UNBALANCED_USE_DER
+    cite: {section: "4.3.1.3", page: 42, para: "¶2"}
+    text: >-
+      Unbalanced rearrangements will lead to at least one derivative chromosome and in these
+      situations the use of the symbol der to describe the derivative chromosome(s) is
+      recommended (see Section 9.2.3). It will usually not be possible to adequately describe
+      all complex rearrangements with the short system. The detailed system can always be used
+      to describe any abnormality, however complex.

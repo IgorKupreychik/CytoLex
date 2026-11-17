@@ -1,0 +1,500 @@
+version: "2016"
+section: "4.1"
+rules:
+  - id: KARYO.COUNT_SEX_ORDER
+    title: Chromosome count, comma, then sex chromosomes
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A karyotype begins with the total number of chromosomes (sex chromosomes included),
+      followed by a comma and then the sex chromosome constitution. Autosomes are written only
+      when they are abnormal.
+    cite:
+      - {section: "4.1", page: 37, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX"
+          cite: {section: "4.1", page: 37, example: E1}
+        - text: "46,XY"
+          cite: {section: "4.1", page: 37, example: E1}
+      invalid:
+        - text: "46XX"
+          why: The comma after the chromosome count is missing.
+          corrected: "46,XX"
+        - text: "XX,46"
+          why: The chromosome count must come before the sex chromosomes.
+          corrected: "46,XX"
+    fix: {level: 1, kind: insert, hint: Insert the comma between the chromosome count and the sex chromosomes.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [KARYO.ABNORMALITY_ORDER]
+
+  - id: KARYO.ABNORMALITY_ORDER
+    title: Sex chromosome abnormalities first, then autosomes in numerical order
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      Abnormalities are listed after the sex chromosomes, each separated by a comma: sex
+      chromosome aberrations first, then autosomal ones in order of chromosome number, whatever
+      the type of aberration. Chapter 6 gives the details.
+    cite:
+      - {section: "4.1", page: 37, para: "¶2"}
+    examples:
+      valid:
+        - text: "47,XY,del(5)(q13q33),+21"
+          note: Not a book example in this section.
+      invalid:
+        - text: "47,XY,+21,del(5)(q13q33)"
+          why: The chromosome 21 abnormality is listed before the chromosome 5 abnormality.
+          corrected: "47,XY,del(5)(q13q33),+21"
+        - text: "47,XY,del(5)(q13q33)+21"
+          why: The two abnormalities are not separated by a comma.
+          corrected: "47,XY,del(5)(q13q33),+21"
+    fix: {level: 1, kind: reorder, hint: Reorder the abnormalities by chromosome (sex chromosomes first) and separate them with commas.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [KARYO.COUNT_SEX_ORDER]
+
+  - id: KARYO.CHROMOSOME_IN_PARENTHESES
+    title: Chromosome in parentheses right after the rearrangement symbol
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A rearranged chromosome is identified by the symbol for the type of rearrangement (see
+      chapter 3), immediately followed by the chromosome involved in parentheses, as in inv(2),
+      del(4) or r(18).
+    cite:
+      - {section: "4.1", page: 37, para: "¶3"}
+    examples:
+      valid:
+        - text: "inv(2)"
+          cite: {section: "4.1", page: 37, para: "¶3"}
+        - text: "del(4)"
+          cite: {section: "4.1", page: 37, para: "¶3"}
+        - text: "r(18)"
+          cite: {section: "4.1", page: 37, para: "¶3"}
+      invalid:
+        - text: "46,XX,del4(p14)"
+          why: The chromosome number 4 must be in parentheses after del.
+          corrected: "46,XX,del(4)(p14)"
+    fix: {level: 1, kind: insert, hint: Put the chromosome number in parentheses directly after the rearrangement symbol.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [SYM.NO_SPACE_AT_PARENTHESIS, STRUCT.BREAKPOINT_GROUPS]
+
+  - id: STRUCT.CHROMOSOME_SEPARATOR
+    title: Semicolon between the chromosomes of a rearrangement
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      When a rearrangement involves two or more chromosomes, their designations inside the
+      parentheses are separated by a semicolon, as in t(2;5).
+    cite:
+      - {section: "4.1", page: 37, para: "¶3"}
+    examples:
+      valid:
+        - text: "t(2;5)"
+          cite: {section: "4.1", page: 37, para: "¶3"}
+      invalid:
+        - text: "46,XY,t(2,5)(q21;q31)"
+          why: The chromosomes 2 and 5 are separated by a comma instead of a semicolon.
+          corrected: "46,XY,t(2;5)(q21;q31)"
+    fix: {level: 1, kind: replace, hint: Separate the chromosomes with a semicolon.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS]
+
+  - id: STRUCT.CHROMOSOME_ORDER
+    title: Sex chromosome or lowest-numbered autosome first
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      In a rearrangement involving more than one chromosome, a sex chromosome is listed first;
+      otherwise the chromosome with the lowest number comes first. Insertions are the exception
+      (the receiving chromosome comes first). The breakpoints follow the same order as the
+      chromosomes.
+    cite:
+      - {section: "4.1", page: 37, para: "¶3"}
+      - {section: "4.3.1.1", page: 41, para: "¶3"}
+    examples:
+      valid:
+        - text: "t(X;3)"
+          cite: {section: "4.1", page: 37, para: "¶3"}
+        - text: "t(2;5)"
+          cite: {section: "4.1", page: 37, para: "¶3"}
+        - text: "46,XY,t(12;16)(q13;p11.1)"
+          cite: {section: "4.3.1.1", page: 41, example: E3}
+        - text: "46,X,t(X;18)(p11.1;q11.1)"
+          cite: {section: "4.3.1.1", page: 41, example: E3}
+      invalid:
+        - text: "46,XY,t(16;12)(p11.1;q13)"
+          why: Chromosome 16 is listed before chromosome 12.
+          corrected: "46,XY,t(12;16)(q13;p11.1)"
+        - text: "46,X,t(18;X)(q11.1;p11.1)"
+          why: The X chromosome must be listed first.
+          corrected: "46,X,t(X;18)(p11.1;q11.1)"
+    fix: {level: 1, kind: reorder, hint: Swap the chromosomes and swap their breakpoint groups the same way.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [STRUCT.INSERTION_RECEPTOR_FIRST, STRUCT.MULTI_CHROMOSOME_ORDER]
+
+  - id: KARYO.GAIN_LOSS_SIGN
+    title: Plus or minus sign before a gained or lost chromosome
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      An additional chromosome is shown by a plus sign and a missing one by a minus sign, placed
+      before the chromosome number or the abnormality designation; this applies to normal and
+      abnormal chromosomes alike (+21, –7, +der(2)). Section 8.1 gives the details.
+    cite:
+      - {section: "4.1", page: 38, para: "¶5"}
+    examples:
+      valid:
+        - text: "+21"
+          cite: {section: "4.1", page: 38, para: "¶5"}
+        - text: "–7"
+          cite: {section: "4.1", page: 38, para: "¶5"}
+        - text: "+der(2)"
+          cite: {section: "4.1", page: 38, para: "¶5"}
+        - text: "46,XX,+der(2)t(2;5)(q21;q31)mat,–5"
+          cite: {section: "4.3.2.2", page: 44, float: "Table 4"}
+        - text: "46,XX,–2,+der(5)t(2;5)(q21;q31)mat"
+          cite: {section: "4.3.2.2", page: 44, float: "Table 4"}
+        - text: "46,XX,+2,–5"
+          cite: {section: "4.3.2.2", page: 44, float: "Table 4"}
+        - text: "46,XX,–2,+5"
+          cite: {section: "4.3.2.2", page: 44, float: "Table 4"}
+        - text: "47,XX,+der(5)t(2;5)(q21;q31)mat"
+          cite: {section: "4.3.2.2", page: 44, float: "Table 4"}
+        - text: "47,XX,t(2;5)(q21;q31)mat,+5"
+          cite: {section: "4.3.2.2", page: 44, float: "Table 4"}
+        - text: "45,XX,–5"
+          cite: {section: "4.3.2.2", page: 44, float: "Table 4"}
+        - text: "47,XX,+der(2)t(2;5)(q21;q31)mat"
+          cite: {section: "4.3.2.2", page: 44, float: "Table 4"}
+        - text: "47,XX,+2,t(2;5)(q21;q31)mat"
+          cite: {section: "4.3.2.2", page: 44, float: "Table 4"}
+        - text: "45,XX,–2"
+          cite: {section: "4.3.2.2", page: 44, float: "Table 4"}
+      invalid:
+        - text: "47,XX,21+"
+          why: The plus sign goes before the chromosome number, not after it.
+          corrected: "47,XX,+21"
+    fix: {level: 1, kind: reorder, hint: Move the sign in front of the chromosome or abnormality.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [KARYO.NO_ARM_LENGTH_SIGN]
+
+  - id: KARYO.NO_ARM_LENGTH_SIGN
+    title: No 4p+ / 5q– arm-length notation in karyotypes
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A plus or minus sign after an arm symbol (4p+, 5q–) may describe a longer or shorter arm in
+      running text, but must not be used in a karyotype description. Signs after the symbols of
+      normal variable features (heterochromatin, satellites, stalks) are a separate convention
+      (section 7.1).
+    cite:
+      - {section: "4.1", page: 38, para: "¶5"}
+    examples:
+      valid: []
+      invalid:
+        - text: "46,XX,5q–"
+          why: "'5q–' is text-only shorthand; describe the change with the proper rearrangement (e.g. del)."
+        - text: "46,XY,4p+"
+          why: "'4p+' is text-only shorthand; describe the change with the proper rearrangement (e.g. add, der)."
+    fix: {level: 3, hint: Replace the arm-length shorthand with the designation of the actual rearrangement and its breakpoints.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [KARYO.GAIN_LOSS_SIGN]
+
+  - id: KARYO.REPLACED_NORMAL_NOT_MISSING
+    title: Normal chromosome replaced by a rearranged one is not recorded as missing
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      When a structurally altered chromosome takes the place of a normal one, the normal
+      chromosome is not written as missing. Dicentric chromosomes and derivatives of whole-arm
+      translocations by convention replace both normal chromosomes involved, so neither is
+      written as missing.
+    cite:
+      - {section: "4.1", page: 38, para: "¶6"}
+    examples:
+      valid:
+        - text: "46,XX,del(4)(p14)"
+          note: Not a book example in this section.
+      invalid:
+        - text: "46,XX,–4,del(4)(p14)"
+          why: The del(4) replaces a normal chromosome 4, which must not also be written as missing.
+          corrected: "46,XX,del(4)(p14)"
+    fix: {level: 1, kind: delete, hint: Remove the loss of the normal chromosome that the rearranged one replaces.}
+    review: {paraphrase_checked: true, needs_review: false}
+
+  - id: KARYO.MULTIPLY_SIGN_REARRANGED_ONLY
+    title: Multiplication sign only for copies of rearranged chromosomes
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      The multiplication sign (×) may show several copies of a rearranged chromosome, but not
+      several copies of a normal chromosome. Section 9.3 gives the details.
+    cite:
+      - {section: "4.1", page: 38, para: "¶7"}
+      - {section: "9.3", page: 79, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,del(6)(q13q23)×2"
+          cite: {section: "9.3", page: 80, example: E1}
+      invalid:
+        - text: "48,XX,+21×2"
+          why: Chromosome 21 is a normal chromosome; extra normal copies are each written with a plus sign.
+          corrected: "48,XX,+21,+21"
+    fix: {level: 1, kind: replace, hint: Write each extra copy of the normal chromosome separately with a plus sign.}
+    review: {paraphrase_checked: true, needs_review: false}
+
+  - id: KARYO.CLONE_SEPARATOR
+    title: Slant line between clones, cell counts in square brackets
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      The karyotypes of different clones are separated by a slant line (/). The number of cells
+      in each clone is given in square brackets right after that clone's karyotype (section
+      11.1.2).
+    cite:
+      - {section: "4.1", page: 38, para: "¶9"}
+    examples:
+      valid:
+        - text: "mos 45,X[15]/47,XXX[10]/46,XX[23]"
+          cite: {section: "4.1", page: 38, para: "¶9"}
+      invalid:
+        - text: "mos 45,X[15],47,XXX[10],46,XX[23]"
+          why: Clones are separated by a slant line, not a comma.
+          corrected: "mos 45,X[15]/47,XXX[10]/46,XX[23]"
+        - text: "mos 45,X(15)/47,XXX(10)/46,XX(23)"
+          why: Cell counts are written in square brackets.
+          corrected: "mos 45,X[15]/47,XXX[10]/46,XX[23]"
+    fix: {level: 1, kind: replace, hint: Separate clones with / and put cell counts in square brackets.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [KARYO.CLONE_ORDER_CONSTITUTIONAL]
+
+  - id: KARYO.MOSAIC_CHIMERA_PREFIX
+    title: mos / chi before the clone designations
+    applies_to: [karyotype]
+    context: [constitutional]
+    severity: info
+    statement: >-
+      In constitutional cases, mos (mosaic: cell lines from one zygote) or chi (chimera: cell
+      lines from different zygotes) may precede the karyotype designations, followed by a space.
+      They are needed mainly in the first description in a report; later the plain designation
+      may be used.
+    cite:
+      - {section: "4.1", page: 38, para: "¶9"}
+    examples:
+      valid:
+        - text: "mos 45,X/46,XX"
+          cite: {section: "4.1", page: 38, para: "¶9"}
+        - text: "chi 46,XX/46,XY"
+          cite: {section: "4.1", page: 38, para: "¶9"}
+      invalid:
+        - text: "45,X/46,XX mos"
+          why: mos precedes the karyotype designations.
+          corrected: "mos 45,X/46,XX"
+    fix: {level: 1, kind: reorder, hint: "Move mos or chi to the front, followed by a space."}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [SYM.SPACE_BEFORE_CHROMOSOME_COUNT, KARYO.CLONE_ORDER_CONSTITUTIONAL]
+
+  - id: KARYO.CLONE_ORDER_CONSTITUTIONAL
+    title: Constitutional clone order (normal last, largest first, tie rules)
+    applies_to: [karyotype]
+    context: [constitutional]
+    severity: error
+    statement: >-
+      A normal diploid clone is always listed last. Abnormal clones are listed by size, largest
+      first; in chimeras too the largest clone comes first. When two cell lines have the same
+      number of cells: a numerical abnormality comes before a structural one; two numerical
+      abnormalities are ordered by the number of the altered autosome; a sex chromosome
+      abnormality always comes first. For neoplasia, see sections 11.1.4 and 11.1.6.
+    cite:
+      - {section: "4.1", page: 38, para: "¶9"}
+    examples:
+      valid:
+        - text: "mos 47,XY,+21/46,XY"
+          cite: {section: "4.1", page: 38, para: "¶9"}
+        - text: "mos 47,XXY/46,XY"
+          cite: {section: "4.1", page: 38, para: "¶9"}
+        - text: "mos 45,X[15]/47,XXX[10]/46,XX[23]"
+          cite: {section: "4.1", page: 38, para: "¶9"}
+        - text: "chi 46,XX[25]/46,XY[10]"
+          cite: {section: "4.1", page: 38, para: "¶9"}
+        - text: "45,X[25]/46,X,i(X)(q10)[25]"
+          cite: {section: "4.1", page: 38, para: "¶9"}
+        - text: "47,XX,+8[25]/47,XX,+21[25]"
+          cite: {section: "4.1", page: 38, para: "¶9"}
+        - text: "47,XXX[25]/47,XX,+21[25]"
+          cite: {section: "4.1", page: 38, para: "¶9"}
+      invalid:
+        - text: "mos 46,XY/47,XY,+21"
+          why: The normal diploid clone must be listed last.
+          corrected: "mos 47,XY,+21/46,XY"
+        - text: "mos 47,XXX[10]/45,X[15]/46,XX[23]"
+          why: The larger abnormal clone (15 cells) must come before the smaller one (10 cells).
+          corrected: "mos 45,X[15]/47,XXX[10]/46,XX[23]"
+        - text: "46,X,i(X)(q10)[25]/45,X[25]"
+          why: With equal cell counts, the numerical abnormality is listed before the structural one.
+          corrected: "45,X[25]/46,X,i(X)(q10)[25]"
+    fix: {level: 1, kind: reorder, hint: "Reorder the clones (normal last, then by size and the tie rules)."}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [KARYO.CLONE_SEPARATOR, KARYO.MOSAIC_CHIMERA_PREFIX]
+
+  - id: KARYO.TRANSPLANT_CHIMERA
+    title: Transplant chimerism - recipient first, // before the donor
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      In chimerism after bone marrow transplantation, the recipient cell line(s) are listed
+      first and the donor cell line(s) after them, separated by a double slant line (//). When
+      only donor or only recipient cells are found, the other side of // is left empty.
+    cite:
+      - {section: "4.1", page: 38, para: "¶10"}
+    examples:
+      valid:
+        - text: "46,XY[3]//46,XX[17]"
+          cite: {section: "4.1", page: 38, example: E2}
+        - text: "46,XY,t(9;22)(q34;q11.2)[4]//46,XX[16]"
+          cite: {section: "4.1", page: 39, example: E3}
+        - text: "//46,XX[20]"
+          cite: {section: "4.1", page: 39, example: E4}
+        - text: "46,XY[20]//"
+          cite: {section: "4.1", page: 39, example: E5}
+      invalid:
+        - text: "46,XY[3]/46,XX[17]"
+          why: Recipient and donor cell lines are separated by a double slant line (//) when describing transplant chimerism.
+          corrected: "46,XY[3]//46,XX[17]"
+    fix: {level: 3, hint: Separate recipient (first) and donor (second) cell lines with //.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [KARYO.CLONE_SEPARATOR]
+
+  - id: KARYO.PLOIDY_RELATIVE
+    title: Changes expressed relative to the ploidy level
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      Haploidy or polyploidy shows from the chromosome count and the rest of the designation
+      (69,XXY). Gains and losses are stated relative to the relevant ploidy level (70,XXY,+21).
+      Sections 8.1 and 9.1 give the details.
+    cite:
+      - {section: "4.1", page: 39, para: "¶11"}
+    examples:
+      valid:
+        - text: "69,XXY"
+          cite: {section: "4.1", page: 39, para: "¶11"}
+        - text: "70,XXY,+21"
+          cite: {section: "4.1", page: 39, para: "¶11"}
+    review: {paraphrase_checked: true, needs_review: false}
+
+  - id: KARYO.ENDOREDUPLICATION
+    title: end before an endoreduplicated karyotype
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      An endoreduplicated metaphase (chromosomes replicated without chromatid separation or
+      cytokinesis) is shown by the abbreviation end before the karyotype designation.
+    cite:
+      - {section: "4.1", page: 39, para: "¶12"}
+    examples:
+      valid:
+        - text: "end 46,XX"
+          cite: {section: "4.1", page: 39, para: "¶12"}
+      invalid:
+        - text: "46,XX end"
+          why: end precedes the karyotype designation.
+          corrected: "end 46,XX"
+    fix: {level: 1, kind: reorder, hint: "Move end to the front, followed by a space."}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [SYM.SPACE_BEFORE_CHROMOSOME_COUNT]
+
+  - id: KARYO.PARENTAL_ORIGIN
+    title: inh / mat / pat / dn directly after the abnormality
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      A known inherited abnormality may be marked inh; when the parent is known, mat (mother) or
+      pat (father) is written directly after the abnormality designation. When both parents are
+      known to be normal for the abnormality, it may be marked de novo with dn. These terms are
+      attached to the abnormality, without a comma.
+    cite:
+      - {section: "4.1", page: 39, para: "¶13"}
+    examples:
+      valid:
+        - text: "46,XX,t(5;6)(q34;q23)inh"
+          cite: {section: "4.1", page: 39, para: "¶13"}
+        - text: "46,XX,t(5;6)(q34;q23)mat,inv(14)(q12q31)pat"
+          cite: {section: "4.1", page: 39, para: "¶13"}
+        - text: "46,XY,t(5;6)(q34;q23)mat,inv(14)(q12q31)dn"
+          cite: {section: "4.1", page: 39, para: "¶13"}
+      invalid:
+        - text: "46,XX,t(5;6)(q34;q23),mat"
+          why: mat belongs to the translocation and follows it directly, not as a separate comma-separated item.
+          corrected: "46,XX,t(5;6)(q34;q23)mat"
+    fix: {level: 1, kind: delete, hint: Remove the comma (or space) between the abnormality and inh/mat/pat/dn.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [KARYO.DE_NOVO_SPACE]
+
+  - id: KARYO.DE_NOVO_SPACE
+    title: Space before dn when it follows another abbreviation
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      When dn comes right after another abbreviation (such as mar), a space separates them.
+    cite:
+      - {section: "4.1", page: 39, para: "¶13"}
+    examples:
+      valid:
+        - text: "47,XY,+mar dn[14]/46,XY[16]"
+          cite: {section: "4.1", page: 39, para: "¶13"}
+      invalid:
+        - text: "47,XY,+mardn[14]/46,XY[16]"
+          why: A space is required between mar and dn.
+          corrected: "47,XY,+mar dn[14]/46,XY[16]"
+    fix: {level: 1, kind: insert, hint: Insert a space before dn.}
+    review: {paraphrase_checked: true, needs_review: false}
+    related: [SYM.SPACE_BETWEEN_SYMBOLS, KARYO.PARENTAL_ORIGIN]
+
+  - id: KARYO.CONSTITUTIONAL_C
+    title: c after a constitutional abnormality in an acquired karyotype
+    applies_to: [karyotype]
+    context: [neoplastic]
+    severity: error
+    statement: >-
+      Constitutional and acquired aberrations follow the same nomenclature rules. When an
+      acquired abnormality is found in a person with a constitutional anomaly, the constitutional
+      one is marked with the letter c directly after its designation (sections 8.3 and 11.3).
+    cite:
+      - {section: "4.1", page: 40, para: "¶14"}
+    examples:
+      valid:
+        - text: "47,XXYc,t(9;22)(q34;q11.2)[20]"
+          cite: {section: "11.3", page: 91, example: E3}
+      invalid:
+        - text: "47,XXY c,t(9;22)(q34;q11.2)[20]"
+          why: c follows the constitutional abnormality directly, without a space.
+          corrected: "47,XXYc,t(9;22)(q34;q11.2)[20]"
+    fix: {level: 1, kind: delete, hint: Remove the space before c.}
+    review: {paraphrase_checked: true, needs_review: false}
+
+  - id: KARYO.ABBREVIATED_FORM
+    title: Full designation once, abbreviation afterwards
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      A complex or lengthy designation is written out in full the first time it is used in a
+      report or publication; afterwards an abbreviated form may be used, provided it is defined
+      right after the full notation (e.g. 46,XX,der(5)mat for
+      46,XX,der(5)t(2;5)(q21;q31)mat).
+    cite:
+      - {section: "4.1", page: 40, para: "¶15"}
+      - {section: "4.4", page: 45, para: "¶3"}
+    examples:
+      valid:
+        - text: "46,XX,der(5)mat"
+          cite: {section: "4.4", page: 45, para: "¶3"}
+    review:
+      paraphrase_checked: true
+      needs_review: true
+      note: >-
+        A single string cannot show whether the full form was given earlier in the report, so
+        the validator cannot tell an allowed abbreviation from an incomplete designation. How to
+        treat abbreviated forms (accept, info, warning) is for T-022.
+    related: [BREAK.NOT_REPEATED_FOR_COPIES]

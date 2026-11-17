@@ -1,0 +1,40 @@
+version: "2016"
+section: "4.3.1.2"
+quotes:
+  - rule: STRUCT.INSERTION_RECEPTOR_FIRST
+    cite: {section: "4.1", page: 37, para: "¶3"}
+    text: >-
+      In this event, the receptor chromosome is specified first, regardless of whether it is a
+      sex chromosome or an autosome with a number higher or lower than that of the donor
+      chromosome, e.g., ins(5;2).
+  - rule: STRUCT.INSERTION_RECEPTOR_FIRST
+    cite: {section: "4.3.1.2", page: 41, para: "¶1"}
+    text: >-
+      In that event, the donor chromosome is listed last, even if it is a sex chromosome or an
+      autosome with a lower number than that of the receptor chromosome.
+  - rule: STRUCT.INSERTION_SITE_FIRST
+    cite: {section: "4.3.1.2", page: 41, para: "¶2"}
+    text: >-
+      When an insertion within a single chromosome occurs, the breakpoint at which the
+      chromosome segment is inserted is always specified first. The remaining breakpoints are
+      specified in the same way as in a two-break rearrangement, i.e., the more proximal
+      breakpoint of the inserted segment is specified first and the more distal one last if the
+      insertion is direct and vice versa if it is inverted.
+  - rule: STRUCT.MULTI_CHROMOSOME_ORDER
+    cite: {section: "4.3.1.2", page: 42, para: "¶3"}
+    text: >-
+      For translocations involving three chromosomes, with one breakpoint in each, the rule is
+      still followed that the sex chromosome or autosome with the lowest number is given first.
+      The chromosome listed next is the one that receives a segment from the first chromosome,
+      and the chromosome specified last is the one that donates a segment to the first
+      chromosome listed.
+  - rule: STRUCT.MULTI_CHROMOSOME_ORDER
+    cite: {section: "4.1", page: 37, para: "¶4"}
+    text: >-
+      The same rule is followed in four-break and more complex balanced translocations (see also
+      Section 9.2.17.1). In order to distinguish homologous chromosomes, one of the numerals may
+      be underlined (single underlining).
+  - rule: STRUCT.MULTI_CHROMOSOME_ORDER
+    cite: {section: "4.3.1.3", page: 42, para: "¶1"}
+    text: >-
+      Whenever applicable, the guidelines for three-break rearrangements should be used.

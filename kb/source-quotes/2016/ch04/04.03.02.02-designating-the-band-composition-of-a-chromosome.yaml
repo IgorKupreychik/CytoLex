@@ -1,0 +1,24 @@
+version: "2016"
+section: "4.3.2.2"
+quotes:
+  - rule: STRUCT.COMPOSITION_ORDER
+    cite: {section: "4.3.2.2", page: 43, para: "¶1"}
+    text: >-
+      The description starts at the end of the short arm and proceeds to the end of the long
+      arm, with the bands being identified in the order in which they occur in the rearranged
+      chromosome.
+  - rule: STRUCT.COMPOSITION_ORDER
+    cite: {section: "4.3.2.2", page: 43, para: "¶2"}
+    text: >-
+      If, owing to a rearrangement, no short-arm segment is present at the end of either arm,
+      the description of the structurally rearranged chromosome starts at the end of the
+      long-arm segment with the lowest chromosome number. However, if a portion of the proximal
+      short arm is present, the description begins with the material on the end of that
+      chromosome arm even if the recipient segment is from a long arm or from a chromosome with
+      a higher or lower chromosome number.
+  - rule: STRUCT.COMPOSITION_CHROMOSOME_NUMBERS
+    cite: {section: "4.3.2.2", page: 43, para: "¶1"}
+    text: >-
+      If the rearrangement is confined to a single chromosome, the chromosome number is not
+      repeated in the band description. If more than one chromosome is involved, however, the
+      bands and chromatid ends are identified with the appropriate chromosome numbers.

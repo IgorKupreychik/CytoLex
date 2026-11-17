@@ -1,0 +1,10 @@
+version: "2016"
+section: "4.3.1"
+quotes:
+  - rule: STRUCT.BREAKPOINT_GROUPS
+    cite: {section: "4.3.1", page: 41, para: "¶1"}
+    text: >-
+      The breakpoints are specified within parentheses immediately following the designation of
+      the type of rearrangement and the chromosome(s) involved. The breakpoints are identified by
+      band designations and are listed in the same order as the chromosomes involved. No
+      semicolon is used between breakpoints in single chromosome rearrangements.

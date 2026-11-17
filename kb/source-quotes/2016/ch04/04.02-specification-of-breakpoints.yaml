@@ -1,0 +1,39 @@
+version: "2016"
+section: "4.2"
+quotes:
+  - rule: BREAK.INTERFACE_HIGHER_BAND
+    cite: {section: "4.2", page: 40, para: "¶1"}
+    text: >-
+      The location of any given breakpoint is specified by the band in which that break has
+      occurred. Since it is not possible at present to define band interfaces accurately, a
+      break suspected to be at an interface between two bands is assigned arbitrarily to the
+      higher of the two band numbers, i.e., the number of the band more distal to the
+      centromere.
+  - rule: BREAK.ALTERNATIVE_BANDS
+    cite: {section: "4.2", page: 40, para: "¶2"}
+    text: >-
+      In this event, the break can be specified by both band numbers separated by the term or,
+      e.g., 1q23 or q24, indicating a break in either band 1q23 or band 1q24 (see also Section
+      5.3).
+  - rule: BREAK.ALTERNATIVE_BANDS
+    cite: {section: "4.2", page: 40, para: "¶2"}
+    text: >-
+      If the breakpoint can be assigned only to two adjacent regions, both suspected regions
+      should be indicated, e.g., 1q2 or q3.
+  - rule: BREAK.REGION_ONLY
+    cite: {section: "4.2", page: 40, para: "¶2"}
+    text: >-
+      If a break can be localized to a region but not to a particular band, only the region
+      number may be specified, e.g., 1p1. Uncertainty about breakpoint localization may also be
+      indicated by a question mark, e.g., 1p1? (see Section 5.1).
+  - rule: BREAK.MIXED_RESOLUTION
+    cite: {section: "4.2", page: 40, para: "¶2"}
+    text: >-
+      Breakpoints within the same rearrangement or karyotype string can be at different levels
+      of resolution reflecting the precision of the karyogram.
+  - rule: BREAK.NOT_REPEATED_FOR_COPIES
+    cite: {section: "4.2", page: 40, para: "¶3"}
+    text: >-
+      When an extra copy of a rearranged chromosome is present, the breakpoints do not need to
+      be repeated; the breakpoints are specified only at the first time they appear in the
+      karyotype

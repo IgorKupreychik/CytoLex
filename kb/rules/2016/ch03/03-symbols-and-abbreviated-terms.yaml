@@ -27,6 +27,7 @@ rules:
       note: >-
         Reading the list as closed is an inference from "All symbols … are listed below". Later
         chapters may use terms that are not in the list; check this while writing T-009 to T-019.
+        Checked so far: ch. 4 (T-009), where every symbol used is listed.
 
   - id: SYM.SPACE_BETWEEN_SYMBOLS
     title: Space between combined symbols
@@ -58,10 +59,13 @@ rules:
       parenthesis between them, a space separates the two (mos 47,XXX[25]/46,XX[5]).
     cite:
       - {section: "3", page: 34, para: "¶1"}
+      - {section: "4.1", page: 38, para: "¶9"}
     examples:
       valid:
         - text: "mos 47,XXX[25]/46,XX[5]"
           cite: {section: "3", page: 34, para: "¶1"}
+        - text: "mos 45,X/46,XX"
+          cite: {section: "4.1", page: 38, para: "¶9"}
       invalid:
         - text: "mos47,XXX[25]/46,XX[5]"
           why: A space is required between mos and the chromosome number 47.

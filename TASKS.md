@@ -18,7 +18,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-006 | done | 1 | T-001 | Band data generator from UCSC cytoBand (all resolutions, versioned) |
 | T-007 | done | 1 | T-006, T-003 | Spot-check bands vs. ISCN 2016 ideograms; exceptions YAML |
 | T-008 | done | 1 | T-003, T-005 | KB: ch. 2–3 (band nomenclature, symbols & abbreviated terms) |
-| T-009 | todo | 1 | T-008 | KB: ch. 4 (karyotype designation, short/detailed systems, derivatives) |
+| T-009 | done | 1 | T-008 | KB: ch. 4 (karyotype designation, short/detailed systems, derivatives) |
 | T-010 | todo | 1 | T-008 | KB: ch. 5–7 (uncertainty, order of abnormalities, variable features) |
 | T-011 | todo | 1 | T-008 | KB: ch. 8 (numerical abnormalities) |
 | T-012 | todo | 1 | T-008 | KB: ch. 9.1–9.2.10 (structural, part 1) |
@@ -168,10 +168,11 @@ All KB tasks share these steps and criteria:
 **Outcome (2026-11-17):** Table 2 and the ch. 3 symbol list signed off (131 rows, not 134: header lines were counted). New vocabulary format: `kb/schema/vocab.schema.json`, `kb/vocab/2016/ch03/03-symbols.yaml` (131 entries) and `ch02/02.04-banding-codes.yaml` (22); `kb build` checks tokens and coverage of the printed tables, writes SQLite `vocab`/`vocab_tokens` and `vocab` in `kb.json` (format_version 2). 19 rules (CHROM/BAND/SYM) + quotes in `kb/rules/2016/ch02–ch03/`, all paraphrases reviewed; `SYM.LISTED_ONLY` stays `needs_review` (check in T-009–T-019); `BAND.MUST_EXIST` accepted. Deviations: sign-off moved before planning (skill updated); vocab files instead of one rule per symbol; book's hypothetical `1p31.11`/`1p31.12` kept as format-only examples. Follow-up: T-055 (CRLF test failure).
 
 ### T-009 — KB: ch. 4 (karyotype designation)
-**Status:** todo
+**Status:** done
 **Description:** General principles, breakpoint specification, short and detailed systems, derivative and recombinant chromosomes (§4.1–4.5).
 **Acceptance:** Shared KB criteria.
 **Notes:** Before starting, person sign-off of **Table 4** (p.44): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`. §4.3.2–4.4 also depend on the Fig. 8/9 diagrams (images): check the printed page, `needs_review` (`docs/extraction-review-2016.md`).
+**Outcome (2026-11-17):** Table 4 (p.44, 16 rows) signed off before planning. 44 rules + quotes in `kb/rules/2016/ch04/` and `kb/source-quotes/2016/ch04/` (12 section files, §4.1–4.5), prefixes `KARYO`, `STRUCT`, `BREAK`, `DER`, `REC`, plus `GEN.GENOME_BUILD_REQUIRED`; all paraphrases approved by the user. All 35 printed example strings (19 example-block lines + 16 Table 4 rows) and the inline e.g. strings are valid examples; `kb build` passes with chunk checks (63 rules, 89 quotes). Fig. 8/9 and the p.46 line-wrap spaces were checked on the printed pages: no rule depends on the diagrams (`docs/extraction-review-2016.md` updated). Also: §4.1 ¶9 cite added to `SYM.SPACE_BEFORE_CHROMOSOME_COUNT`; `SYM.LISTED_ONLY` notes ch. 4 checked (all symbols listed). Decision entry in `docs/decisions.md`. Deviation: `REC.KNOWN_PARENTAL_REARRANGEMENT` is `needs_review` too (with `KARYO.ABBREVIATED_FORM`), both handed to T-022 (note added there). Severities are provisional until T-022.
 
 ### T-010 — KB: ch. 5–7
 **Status:** todo
@@ -256,7 +257,7 @@ All KB tasks share these steps and criteria:
 - How book-ambiguous rules are reported.
 - What "valid" means when there are only warnings.
 **Acceptance:** Policy in `docs/decisions.md`.
-**Notes:** From T-007: include the severity for band names that exist in the genome assemblies but not in the book's idiograms (`book: false` in band data, e.g. 9q34.12 in a karyotype string).
+**Notes:** From T-007: include the severity for band names that exist in the genome assemblies but not in the book's idiograms (`book: false` in band data, e.g. 9q34.12 in a karyotype string). From T-009: severities in the ch. 4 rules are provisional ("always/is/must/should not" → error, descriptive → info); decide `KARYO.ABBREVIATED_FORM` (abbreviations such as `46,XX,der(5)mat` and copies without breakpoints are only valid after an earlier full form, which a single string can't show) and `REC.KNOWN_PARENTAL_REARRANGEMENT` (warn on `rec` without mat/pat/inh?), both `needs_review`.
 
 ### T-053 — Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`?
 **Status:** discussion
