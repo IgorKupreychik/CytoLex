@@ -34,7 +34,7 @@ EditionResult (validity, counts, diagnostics, fixes, [translation])      §9
 ValidationReport (one or all editions)
 ```
 
-The parser emits syntax diagnostics; the binder emits diagnostics it finds while interpreting (e.g. an unknown band); the rule engine runs the rule implementations. All three use the same `Diagnostic` type and the same KB-driven severity resolution (§8.2).
+The parser emits syntax diagnostics; the binder interprets without reporting (T-065: an unknown band or a group without a chromosome is a fact in the model, reported by a rule); the rule engine runs the rule implementations. All three use the same `Diagnostic` type and the same KB-driven severity resolution (§8.2).
 
 ## 3. Segments, type detection, context inference (T-026)
 
@@ -110,6 +110,12 @@ sealed record DerivativeStructure(ImmutableArray<SegmentPiece> Pieces); // order
   Every meaning node carries the refs that define it (the abnormality's format rule, the symbol's vocab item, each band).
 - **Partial nodes:** a node built from input with recovered or skipped parts has `IsPartial = true` and the IDs of the diagnostics concerned; rules that need complete data skip it (and say so only if that hides a check), and the renderer prints "not translated, see diagnostic …".
 - **Normalisation for rules:** the binder resolves short vs detailed system into the same `Breakpoint`/`DerivativeStructure` shape, so rules don't care which system was written (system-specific rules use the syntax layer).
+- **As built (T-065, decided with the user):** `CytoLex.Core.Semantics` — `Binder(IEditionKb)`, `Bind(SyntaxTree)` → `KaryotypeModel`; `KbRef` (`rule:`/`vocab:`/`band:`, `Parse`/`ToString`); meaning nodes in `MeaningNodes.cs`. The validator binds every karyotype segment and checks read `RuleContext.Model`.
+  - **No binder diagnostics.** The binder records facts (band found in the band set or not → `Breakpoint.KbBand`; group without a chromosome → `BreakpointGroup.Chromosome = null`); the rules (T-029+) report them.
+  - **Breakpoints, both systems:** short system = each band/`?` of a group, group *i* → chromosome *i* of the part's list (the only chromosome when there is one); detailed system = the points at the joins `::`/`:`, minus arm ends (`pter`/`qter`/`ter`) and inserted `hsr`/`neo`, distinct in written order. The breakpoint *sets* of the book's short/detailed pairs are equal (tested). **`DerivativeStructure` is kept as written only** (detailed system, band-composition fragments); computing it from the short system is T-066.
+  - **Deviations from the sketch:** `Abnormality` is a list of `AbnormalityPart`s (a `der`/`rec`/`ider` part, then one part per rearrangement); `Kind` = the head (last) symbol of the first part, `Symbols` keep combinations (`psu dic`, `trc r`, `upd der`); breakpoints live in `BreakpointGroup`s (one per `;`), each with an optional `Structure`; uncertainty is on the nodes (`IsQuestioned`, `Breakpoint.RangeEnd` for `~`, `Breakpoint.Alternatives` and `AlternativeItem` for `or`, `NumberRange.IsRange`); further item kinds `WholeChromosomeChange`, `ChromosomeRegion` (variants, bands), `OmittedItems` (`…`), `BandComposition`, `UnboundItem` (skipped/misplaced text); `CellLine.SeparatorBefore` and `KaryotypeModel.Relation` (`//` → transplant, else `mos`/`chi`) instead of one relation field; `BasedOn`/`CloneRef` wait for T-032.
+  - **Partial:** `MeaningNode.Issues` holds the `SyntaxDiagnostic`s themselves (no diagnostic IDs exist): those whose missing token lies in the node, or whose span overlaps it; ancestors inherit them, the root has all, a recovered separator marks the following cell line.
+  - **KbRefs:** each symbol's vocab item plus its format rule(s) from `Binder.SymbolRules` (each rule's section is one of the symbol's vocab sections — tested); resolved bands; construct rules (`KARYO.MOSAIC_CHIMERA_PREFIX`, `KARYO.TRANSPLANT_CHIMERA`, `STRUCT.DETAILED_SYSTEM`, `STRUCT.BREAKPOINT_GROUPS`, `UNCERTAIN.*`, `KARYO.CONSTITUTIONAL_C`, `KARYO.PARENTAL_ORIGIN`, `VAR.*`, …), attached only when the edition's KB has them.
 
 ## 6. KB at runtime
 
@@ -161,7 +167,7 @@ sealed class ChromosomeOrderCheck : IRuleCheck {
 - **As built (T-028):**
   - Edition IDs are strings (`"2016"`), as in `Parser.ForEdition` and `[KbRule(Editions = …)]`. KB: `CytoLex.Core.Kb.KnowledgeBase` (`LoadEmbedded`, `Load(Stream)`) → `IKnowledgeBase.ForEdition` (renamed from `Get`, analyzer CA1716) → `IEditionKb` (`Rules`, `Rule(id)` → `KbRule` with rendered `Citation`s, `Vocab`, `BandSet? Bands`).
   - Engine: `CytoLex.Core.Rules` — `IRuleCheck.Check(RuleContext)` (the context exposes input, segment, syntax tree, `ContextInfo`, `KbRule`, edition KB; `Report(span, detail, secondarySpans, certainty, contexts, cannotVerify)`), `RuleCatalog` (scan, startup check incl. `Parser.RuleIds`, most specific variant: exact edition > range > any; equally specific → exception), `EditionProfile` / `EditionProfiles` (pilot: 2016 → karyotype), `EditionCoverage` (checked rule IDs + parser-reported rule IDs, `Validator.Coverage(edition)`).
-  - Parse sharing is not implemented (optimisation only). The semantic model is added to `RuleContext` by T-065.
+  - Parse sharing is not implemented (optimisation only). The semantic model is on `RuleContext.Model` (T-065).
 
 ## 8. Diagnostics
 
@@ -291,4 +297,4 @@ The core model guarantees what the renderer needs; the renderer itself is T-058.
 - **`CORE.UNPARSED`** (§8.4): kept only as a safety net; every occurrence on a KB example is a KB/parser gap.
 - **Default edition** for `EditionSelection` when none is given: the newest implemented edition (2016 in the pilot).
 - **T-028** (done 2026-11-18): engine, KB loader and result API as built (§7.2, §8.5, §9); clone structure dropped as a context marker (§3.3).
-- **T-065** (from T-027): the binder (syntax tree → semantic model, §5) is its own task; T-027 delivers the syntax layer only.
+- **T-065** (done 2026-11-18): the binder (syntax tree → semantic model) as built in §5; no binder diagnostics; short-system band compositions are T-066.

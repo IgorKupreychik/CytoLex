@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Collections.Immutable;
 using CytoLex.Core.Kb;
 using CytoLex.Core.Segmentation;
+using CytoLex.Core.Semantics;
 using CytoLex.Core.Syntax;
 
 namespace CytoLex.Core.Rules;
@@ -15,12 +16,14 @@ namespace CytoLex.Core.Rules;
 /// <param name="Parser">The karyotype parser configured with the edition's vocabulary.</param>
 /// <param name="ImplementedTypes">Notation types validated in this edition; other segments are <c>NotImplemented</c>.</param>
 /// <param name="Checks">The rule checks that run, one per KB rule ID.</param>
+/// <param name="Binder">The binder that turns the edition's syntax trees into the semantic model (T-065).</param>
 internal sealed record EditionProfile(
     string Edition,
     IEditionKb Kb,
     Parser Parser,
     ImmutableHashSet<NotationType> ImplementedTypes,
-    ImmutableArray<(KbRule Rule, IRuleCheck Check)> Checks);
+    ImmutableArray<(KbRule Rule, IRuleCheck Check)> Checks,
+    Binder Binder);
 
 /// <summary>The editions the core has a profile for, and what each implements (pilot: ISCN 2016 karyotypes, T-021).</summary>
 internal static class EditionProfiles

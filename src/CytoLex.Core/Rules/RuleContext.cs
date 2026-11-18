@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using CytoLex.Core.Context;
 using CytoLex.Core.Kb;
 using CytoLex.Core.Segmentation;
+using CytoLex.Core.Semantics;
 using CytoLex.Core.Syntax;
 using CytoLex.Core.Text;
 using CytoLex.Core.Validation;
@@ -40,11 +41,12 @@ public sealed class RuleContext
 {
     private readonly List<RuleFinding> _findings = [];
 
-    internal RuleContext(string input, Segment segment, SyntaxTree syntax, ContextInfo context, KbRule rule, IEditionKb kb)
+    internal RuleContext(string input, Segment segment, SyntaxTree syntax, KaryotypeModel model, ContextInfo context, KbRule rule, IEditionKb kb)
     {
         Input = input;
         Segment = segment;
         Syntax = syntax;
+        Model = model;
         Context = context;
         Rule = rule;
         Kb = kb;
@@ -56,8 +58,11 @@ public sealed class RuleContext
     /// <summary>The segment being checked.</summary>
     public Segment Segment { get; }
 
-    /// <summary>The segment's lossless syntax tree (the semantic model follows with T-065).</summary>
+    /// <summary>The segment's lossless syntax tree (for spans, spacing and system-specific rules).</summary>
     public SyntaxTree Syntax { get; }
+
+    /// <summary>The segment's semantic model (T-065). Partial nodes (<see cref="MeaningNode.IsPartial"/>) come from recovered input.</summary>
+    public KaryotypeModel Model { get; }
 
     /// <summary>The sample context of the whole string (hint, inferred, effective).</summary>
     public ContextInfo Context { get; }

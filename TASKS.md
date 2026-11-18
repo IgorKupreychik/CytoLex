@@ -74,7 +74,8 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-062 | todo | 2 | T-026 | Test corpus of ISCN strings per notation type (review-flagged) + mutation generator |
 | T-063 | done | 1 | T-053 | KB: typed symbol forms (`-`/`x`/`->`) in the ch. 3 vocab + rule `SYM.TYPED_SYMBOL_FORMS` |
 | T-064 | todo | 3 | – | Line endings: generated committed files vs `core.autocrlf` (ideograms test fails on Windows) |
-| T-065 | todo | 1 | T-027 | Binder: syntax tree → semantic model (meaning nodes, KbRefs, IsPartial) |
+| T-065 | done | 1 | T-027 | Binder: syntax tree → semantic model (meaning nodes, KbRefs, IsPartial) |
+| T-066 | todo | 2 | T-065 | Band composition from the short system (derivative structure for short-form abnormalities) |
 
 ---
 
@@ -547,7 +548,7 @@ Outcome (2026-11-18):
 **Status:** todo
 **Description:** Compute Loss–Gain–Fusion per band from a parsed karyotype, in a form comparable with CytoGPS output.
 **Acceptance:** Matches hand-checked LGF for a sample set of karyotypes.
-**Notes:**
+**Notes:** From T-065: the semantic model gives breakpoints for both systems but band compositions only for the detailed system; T-066 computes them for the short system (proposed as a dependency).
 
 ### T-051 — Comparison engine + CLI report
 **Status:** todo
@@ -611,7 +612,14 @@ Outcome (2026-11-18):
 **Notes:** Raised 2026-11-18 by the user, at the end of T-023.
 
 ### T-065 — Binder: syntax tree → semantic model
-**Status:** todo
+**Status:** done
 **Description:** Walk the T-027 syntax tree and build the meaning nodes of `docs/design/core.md` §5 (`KaryotypeSegment`, `CellLine`, `Abnormality`, `Breakpoint`, `DerivativeStructure`, …) with spans, `KbRef`s (`rule:`, `vocab:`, `band:`) and `IsPartial` for recovered input. Normalise the short and detailed systems into the same breakpoint/derivative shape.
 **Acceptance:** Every valid karyotype KB example binds to a complete (not partial) model; spot checks of the model for representative examples (del, t, der with several parts, detailed system, rec, mos/chi, `//`, variants, ×n, uncertainty `?`/`~`/`or`); recovered input gives partial nodes that name the parser diagnostics.
 **Notes:** Created 2026-11-18 from T-027 (decided with the user: binder split from the parser). Input: `CytoLex.Core.Syntax.SyntaxTree` (node kinds in `SyntaxKind`; `Parser` is permissive, so the binder sees e.g. arms inside chromosome lists `del(5q)`/`dup(2p)`, symbol sequences `psu dic`/`der dic`, leading counts `3mar`/`12~20dmin`). Bands need the band set from the bundle (`KbRef` `band:`). T-065 added to the Depends of T-029, T-030 and T-031 (user, 2026-11-18), which check the semantic model.
+**Outcome (2026-11-18):** Binder in `src/CytoLex.Core/Semantics/` (`Binder.cs`, `MeaningNodes.cs`, `KbRef.cs`); the validator binds every karyotype segment and checks read `RuleContext.Model` (`EditionProfile.Binder`). Decided with the user: breakpoints normalised for both systems (detailed = points at the `::`/`:` joins, minus arm ends and hsr/neo), `DerivativeStructure` only as written (short-system compositions → new task T-066); the binder reports no diagnostics (facts in the model, rules report). KbRefs: symbol vocab items + format rules (`Binder.SymbolRules`, section-checked against the vocab), resolved bands, construct rules. Partial nodes carry the `SyntaxDiagnostic`s themselves. Tests in `tests/CytoLex.Core.Tests/Semantics/` (KB examples valid/corrected complete, invalid → diagnostics named by partial nodes, 32 spot checks incl. 11 short/detailed pairs, KB-trace tests). Docs: `docs/design/core.md` §5 "As built (T-065)" lists the deviations from the sketch (parts, groups, item kinds, `Issues` instead of diagnostic IDs); CLAUDE.md/README status; note on T-050.
+
+### T-066 — Band composition from the short system
+**Status:** todo
+**Description:** The binder (T-065) keeps `DerivativeStructure` only as written (detailed system); short-form abnormalities have none. Compute the band composition (ordered pieces with orientation, joins) from the short system for every pilot rearrangement type (del, dup, inv, ins, i, idic, r, t, der with several parts, rec, dic, trc, tas, trp, qdp, add, hsr, fis …), so rules can compare both systems and LGF (T-050) and the translation (T-058) can use one shape. Each type's composition must trace to its KB rule (§4.3, §9); missing semantics go into the KB first.
+**Acceptance:** For every KB example pair printed in both systems, the computed composition of the short form equals the bound detailed form; per-type unit tests; types without a defined composition are listed and left `null`.
+**Notes:** Created 2026-11-18 from T-065 (decided with the user: T-065 normalises breakpoints only). Useful for T-031 (short-vs-detailed rules such as `DER.COMPLEX_USE_DETAILED`), T-050 (LGF) and T-058 (translation).

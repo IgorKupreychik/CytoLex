@@ -6,6 +6,7 @@ using CytoLex.Core.Context;
 using CytoLex.Core.Kb;
 using CytoLex.Core.Rules;
 using CytoLex.Core.Segmentation;
+using CytoLex.Core.Semantics;
 using CytoLex.Core.Syntax;
 
 namespace CytoLex.Core.Validation;
@@ -43,7 +44,7 @@ public sealed class Validator
         {
             if (kb.ForEdition(edition) is { } ekb && EditionProfiles.ImplementedTypes.TryGetValue(edition, out var types))
             {
-                profiles[edition] = new EditionProfile(edition, ekb, new Parser(ekb.Vocab), types, catalog.ChecksFor(ekb));
+                profiles[edition] = new EditionProfile(edition, ekb, new Parser(ekb.Vocab), types, catalog.ChecksFor(ekb), new Binder(ekb));
             }
         }
 
@@ -108,11 +109,12 @@ public sealed class Validator
             }
 
             var tree = profile.Parser.Parse(input, segment, isFragment);
+            var model = profile.Binder.Bind(tree);
             diagnostics.AddRange(tree.Diagnostics.Select(d => DiagnosticFactory.FromSyntax(profile.Kb, d, context.Effective)).OfType<Diagnostic>());
 
             foreach (var (rule, check) in profile.Checks.Where(c => c.Rule.AppliesToType(segment.Type)))
             {
-                var ctx = new RuleContext(input, segment, tree, context, rule, profile.Kb);
+                var ctx = new RuleContext(input, segment, tree, model, context, rule, profile.Kb);
                 check.Check(ctx);
                 diagnostics.AddRange(ctx.Findings.Select(f => DiagnosticFactory.FromFinding(rule, f, DiagnosticOrigin.Rule, context.Effective)).OfType<Diagnostic>());
             }
