@@ -7,10 +7,10 @@ CytoLex validates ISCN cytogenomic nomenclature strings (karyotype, FISH, microa
 - Results are given per ISCN edition (2016 now; 2020/2024 later — editions are not backward compatible).
 - Every diagnostic cites the book (`ISCN 2016 §9.2.17.1, p.75, ¶1`).
 
-Planned architecture: a UI-free core library, a desktop app (pilot UI), and later a web service reusing the library. App stack (T-020): **C# / .NET 10 LTS**. The core library uses a hand-written recursive-descent parser; the desktop app uses **Avalonia + AvaloniaEdit** with CommunityToolkit.Mvvm; tests use **xUnit v3**; the web service will use ASP.NET Core. The projects aren't scaffolded yet (T-024). Core design (data model, version profiles, result/diagnostic API, fix model; KB read at runtime from a lean bundle embedded in the core): `docs/design/core.md` — follow it when writing core code. Full decision record: `docs/decisions.md`.
+Planned architecture: a UI-free core library, a desktop app (pilot UI), and later a web service reusing the library. App stack (T-020): **C# / .NET 10 LTS**. The core library uses a hand-written recursive-descent parser; the desktop app uses **Avalonia + AvaloniaEdit** with CommunityToolkit.Mvvm; tests use **xUnit v3**; the web service will use ASP.NET Core. The projects are scaffolded (T-024): `CytoLex.slnx`, `src/CytoLex.Core/` (UI-free library; embeds the KB bundle), `src/CytoLex.Desktop/` (Avalonia app), `tests/CytoLex.Core.Tests/` (xUnit v3 on Microsoft.Testing.Platform); shared settings in `Directory.Build.props` (net10.0, nullable, warnings as errors, analyzers), package versions pinned centrally in `Directory.Packages.props`, SDK pinned in `global.json`, code style in `.editorconfig`. Core design (data model, version profiles, result/diagnostic API, fix model; KB read at runtime from a lean bundle embedded in the core): `docs/design/core.md` — follow it when writing core code. Full decision record: `docs/decisions.md`.
 
 ## Status & workflow
-- The project is in its planning/foundation phase. Repo tooling exists in `tools/` (`kb extract`, `kb tables`, `kb check`, `kb build`, `kb bands` and `kb ideograms` are implemented); no application code exists yet.
+- The project is in its planning/foundation phase. Repo tooling exists in `tools/` (`kb extract`, `kb tables`, `kb check`, `kb build`, `kb bands` and `kb ideograms` are implemented). The .NET projects are scaffolded (T-024) but hold no validator code yet.
 - **`README.md` is the human-facing overview** (purpose, status, layout, setup, commands). Whenever you change `CLAUDE.md`'s Commands, layout or status, or add a new top-level folder, update `README.md` in the same change.
 - All work is tracked in `TASKS.md`: a summary table plus a section per task.
   - Statuses: `todo`, `in_progress`, `blocked`, `done`, `discussion`.
@@ -19,7 +19,7 @@ Planned architecture: a UI-free core library, a desktop app (pilot UI), and late
 - New open questions become `discussion` tasks; decisions are logged in `docs/decisions.md`.
 
 ## Commands
-Repo tooling is a **self-contained Python 3.14 project in `tools/`**, managed by **uv** (decision T-001). It's kept apart from the app code; app build/test commands come in T-024, so add them here then.
+Repo tooling is a **self-contained Python 3.14 project in `tools/`**, managed by **uv** (decision T-001). It's kept apart from the app code (see **App (.NET)** below).
 - Layout: `tools/pyproject.toml`, `tools/uv.lock`, sources in `tools/src/cytolex_tools/`, tests in `tools/tests/`.
 - Run every command from the repo root with `--directory tools` (or `cd tools` and drop the flag). If `uv` isn't on PATH, use `py -m uv …`.
   - Setup: `uv sync --directory tools`.
@@ -31,12 +31,21 @@ Repo tooling is a **self-contained Python 3.14 project in `tools/`**, managed by
   - `kb tables` renders the configured table regions to PNG in `build/review/tables/<version>/` for the person sign-off of tables.
   - Tests: `uv run --directory tools pytest`; single test: `uv run --directory tools pytest tests/test_cli.py::test_help_lists_subcommands`.
   - Lint/format: `uv run --directory tools ruff check .` and `uv run --directory tools ruff format .`.
+
+**App (.NET)** — requires the .NET 10 SDK; run from the repo root (the solution `CytoLex.slnx` is found automatically).
+- **Prerequisite:** `build/kb.json` must exist (`uv run --directory tools kb build`). `CytoLex.Core` embeds it as resource `CytoLex.Kb.bundle.json` (MSBuild property `CytoLexKbBundle`; T-060 will switch the default to the lean runtime bundle). Without it `dotnet build` fails with "KB bundle not found … Run 'uv run --directory tools kb build'". Rebuild after every `kb build` so the app and tests embed the current KB.
+- Build: `dotnet build`.
+- Tests: `dotnet test` (Microsoft.Testing.Platform, opted in via `global.json`; VSTest-style `--filter` is not used).
+  - Single test: `dotnet test --filter-method "CytoLex.Core.Tests.EmbeddedBundleTests.EmbeddedBundle_IsPresentAndParses"` (wildcards allowed at either end, e.g. `"*IsPresentAndParses"`); one class: `--filter-class "CytoLex.Core.Tests.EmbeddedBundleTests"`.
+- Run the desktop app: `dotnet run --project src/CytoLex.Desktop`.
+- Lint: `dotnet format --verify-no-changes` (exit ≠ 0 on style issues); format: `dotnet format`. Analyzer warnings are build errors (`TreatWarningsAsErrors`).
+- Add NuGet packages with a `PackageVersion` in `Directory.Packages.props` and a version-less `PackageReference` in the project.
 - When to run each command: see `README.md` → "When to run what".
 - **Remind the user to run commands.** Whenever a change makes a command necessary, tell them explicitly which command to run and why, in the step where it becomes necessary and again in the task's final report. Examples:
   - `uv sync --directory tools` after dependency changes;
   - `kb extract` after a fresh clone, a new edition, or an extraction-script or table-layout (`extract/tables/<version>.yaml`) change;
   - `kb ideograms` then `kb bands` after a decoder or `ideograms` config change; `kb bands` after an `exceptions.yaml` or band source change;
-  - `kb build` after any KB edit, or before running the app.
+  - `kb build` after any KB edit, or before running the app — then `dotnet build` so `CytoLex.Core` embeds the new bundle.
 - The tools resolve repo paths (`config/`, `kb/`, `build/`) from the repo root, not the working directory.
 - ISCN PDF path: `config/local.yaml` (`iscn_pdf.<version>`), or env var `CYTOLEX_ISCN_PDF_2016` to override.
 

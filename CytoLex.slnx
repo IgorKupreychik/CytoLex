@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CytoLex.Core/CytoLex.Core.csproj" />
+    <Project Path="src/CytoLex.Desktop/CytoLex.Desktop.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CytoLex.Core.Tests/CytoLex.Core.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -18,3 +18,10 @@ build/
 __pycache__/
 .pytest_cache/
 .ruff_cache/
+
+# .NET app (T-024)
+bin/
+obj/
+.vs/
+*.user
+TestResults/

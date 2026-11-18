@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- UI-free core library: parsing, validation, fixes (docs/design/core.md). -->
+  <PropertyGroup>
+    <RootNamespace>CytoLex.Core</RootNamespace>
+    <!-- KB bundle embedded at build time (docs/design/core.md §6). build/kb.json stands in until
+         T-060 adds the lean runtime bundle; then only this default changes.
+         Override with -p:CytoLexKbBundle=<path>. -->
+    <CytoLexKbBundle Condition="'$(CytoLexKbBundle)' == ''">$(RepoRoot)build/kb.json</CytoLexKbBundle>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="$(CytoLexKbBundle)" LogicalName="CytoLex.Kb.bundle.json" Visible="false" />
+    <InternalsVisibleTo Include="CytoLex.Core.Tests" />
+  </ItemGroup>
+
+  <Target Name="CheckKbBundle" BeforeTargets="BeforeBuild;PrepareResources">
+    <Error Condition="!Exists('$(CytoLexKbBundle)')"
+           Text="KB bundle not found: $(CytoLexKbBundle). Run 'uv run --directory tools kb build' from the repo root first." />
+  </Target>
+</Project>

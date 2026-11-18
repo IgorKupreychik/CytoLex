@@ -6,18 +6,23 @@ CytoLex validates **ISCN cytogenomic nomenclature** strings: karyotypes, FISH (`
 - **Cited.** Every diagnostic points to the book, e.g. `ISCN 2016 §9.2.17.1, p.75, ¶1`.
 - **Helpful.** It suggests deterministic fixes where one exists, or explains the problem otherwise.
 
-> **Status:** planning/foundation phase. The repo tooling (`tools/`) is set up, `kb extract` works and its output has been reviewed against the book ([`docs/extraction-review-2016.md`](docs/extraction-review-2016.md)), the KB file format is fixed by JSON Schemas ([`kb/README.md`](kb/README.md)), `kb build` checks the KB and compiles it to SQLite + JSON, and `kb bands` generates the band data, checked against the book's idiograms (`kb ideograms`); the validator itself does not exist yet. Progress is tracked in [`TASKS.md`](TASKS.md).
+> **Status:** planning/foundation phase. The repo tooling (`tools/`) is set up, `kb extract` works and its output has been reviewed against the book ([`docs/extraction-review-2016.md`](docs/extraction-review-2016.md)), the KB file format is fixed by JSON Schemas ([`kb/README.md`](kb/README.md)), `kb build` checks the KB and compiles it to SQLite + JSON, and `kb bands` generates the band data, checked against the book's idiograms (`kb ideograms`). The .NET solution (core library, desktop app, tests) is scaffolded and builds; the validator itself does not exist yet. Progress is tracked in [`TASKS.md`](TASKS.md).
 
 ## Architecture (planned)
 - **Core library:** UI-free ISCN parsing and validation, driven by a knowledge base (KB) of cited rules.
 - **Desktop app:** the pilot UI. Single-string check, batch validation, rule browser, fix view.
 - **Web service:** later, reusing the core library.
 
-The app stack is C# on .NET 10 LTS: a core library with a hand-written parser, an Avalonia + AvaloniaEdit desktop app, xUnit v3 tests, and ASP.NET Core for the web service later (decision T-020). The projects aren't scaffolded yet (T-024). The pilot validator covers karyotypes from ISCN ch. 2–9 (constitutional and acquired, numerical and structural, mos/chi), using only the string as input. Neoplastic clones, microarray and FISH come later, in that order (decision T-021). A string is valid when it has no errors; warnings and info notes are listed but don't affect validity (decision T-022). The core library's design (data model, version profiles, result/diagnostic API, fix model) is in [`docs/design/core.md`](docs/design/core.md) (T-023). All decisions and their rationale are in [`docs/decisions.md`](docs/decisions.md).
+The app stack is C# on .NET 10 LTS: a core library with a hand-written parser, an Avalonia + AvaloniaEdit desktop app, xUnit v3 tests, and ASP.NET Core for the web service later (decision T-020). The projects are scaffolded (T-024); see [Getting started (app)](#getting-started-app). The pilot validator covers karyotypes from ISCN ch. 2–9 (constitutional and acquired, numerical and structural, mos/chi), using only the string as input. Neoplastic clones, microarray and FISH come later, in that order (decision T-021). A string is valid when it has no errors; warnings and info notes are listed but don't affect validity (decision T-022). The core library's design (data model, version profiles, result/diagnostic API, fix model) is in [`docs/design/core.md`](docs/design/core.md) (T-023). All decisions and their rationale are in [`docs/decisions.md`](docs/decisions.md).
 
 ## Repository layout
 | Path | Content |
 |---|---|
+| `CytoLex.slnx` | .NET solution: the projects below |
+| `src/CytoLex.Core/` | UI-free core library (parser, validator, fixes); embeds the KB bundle from `build/` |
+| `src/CytoLex.Desktop/` | Desktop app (Avalonia + AvaloniaEdit, CommunityToolkit.Mvvm) |
+| `tests/CytoLex.Core.Tests/` | xUnit v3 tests for the core library |
+| `global.json`, `Directory.Build.props`, `Directory.Packages.props`, `.editorconfig` | .NET SDK pin (+ test runner), shared build settings, central NuGet versions, code style |
 | `tools/` | Self-contained Python project for repo tooling: PDF extraction, KB build, band data |
 | `kb/schema/` | JSON Schemas for rule and quote files; format and conventions in [`kb/README.md`](kb/README.md) |
 | `kb/rules/<version>/` | KB rules (YAML): paraphrase, citation, valid/invalid examples |
@@ -53,6 +58,24 @@ Requirements: Windows, macOS or Linux with **Python 3.14** and **[uv](https://do
    uv run --directory tools kb bands                    # NCBI GDP + UCSC cytoBand + book → kb/bands/2016/bands.yaml
    ```
 
+## Getting started (app)
+Requirements: the **.NET 10 SDK** (any 10.0.x; `global.json` pins the major version and opts `dotnet test` into Microsoft.Testing.Platform). Run everything from the repo root.
+
+1. Build the KB bundle first. `CytoLex.Core` embeds `build/kb.json`, and `dotnet build` stops with "KB bundle not found … Run 'uv run --directory tools kb build'" if it is missing:
+   ```sh
+   uv run --directory tools kb build
+   ```
+2. Build, test and run:
+   ```sh
+   dotnet build                                   # whole solution (CytoLex.slnx); warnings are errors
+   dotnet test                                    # all tests
+   dotnet test --filter-method "CytoLex.Core.Tests.EmbeddedBundleTests.EmbeddedBundle_IsPresentAndParses"   # single test
+   dotnet run --project src/CytoLex.Desktop       # desktop app
+   dotnet format --verify-no-changes              # lint (code style); `dotnet format` fixes
+   ```
+   `--filter-method` accepts `*` at either end (`"*IsPresentAndParses"`); `--filter-class` selects a whole test class.
+3. NuGet versions live in `Directory.Packages.props` (Central Package Management); projects reference packages without a version.
+
 ## When to run what
 | Command | Built in | What it does | When to run it |
 |---|---|---|---|
@@ -62,12 +85,13 @@ Requirements: Windows, macOS or Linux with **Python 3.14** and **[uv](https://do
 | `kb ideograms [--version 2016]` | T-007 | Decodes the band labels of the book's idiograms (Fig. 5, pp.16–29; 24 chromosomes × 300/400/550/700/850) from the PDF text layer into `kb/bands/2016/ideograms.yaml` (committed; byte-identical re-runs) and writes a crop + decoded-label list per chromosome to `build/review/bands/2016/` for visual checks. Glyph map, pages and spot-check sign-off: `tools/src/cytolex_tools/bands/sources/<version>.yaml` → `ideograms` | **Rarely:** only after a decoder or `ideograms` config change. Needs the PDF; not needed after a clone. |
 | `kb bands [--version 2016]` | T-006 / T-007 | Downloads the sha256-pinned NCBI GDP ideograms (400/550/850, GRCh37/38) and UCSC cytoBand into `build/cache/bands/`, cross-checks names and coordinates, compares the result with the book's idiograms and applies `kb/bands/2016/exceptions.yaml`, then writes `kb/bands/2016/bands.yaml` (committed; byte-identical re-runs). Any book-vs-NCBI difference without an exception (or a stale exception) → exit 1, plus a draft of all differences in `build/review/bands/2016/exceptions-draft.yaml`. `--cache-only` = offline; `--update-pins` accepts changed upstream files | **Rarely:** after a change to the sources, the generator, `ideograms.yaml` or `exceptions.yaml`. The committed file is already current after a clone. |
 | `kb build [--version 2016]` | T-005 | Checks `kb/` (schemas, `version`/section vs path, unique IDs, `related` IDs, rule ↔ quote links, vocab tokens; with chunks present also cite labels/pages, verbatim quote text and vocab coverage of the printed lists) → `build/kb.sqlite` (FTS5) + `build/kb.json`; lists rules with `needs_review: true` / `paraphrase_checked: false` (also in `build/review/kb-review.md`). Default: every edition; exit 1 and nothing written on any error | **Often:** after every KB edit, and before running or testing the app (it loads the bundle). |
+| `dotnet build`, `dotnet test`, `dotnet format` | T-024 | Build the solution (embedding `build/kb.json` into `CytoLex.Core`), run the xUnit tests, check/fix code style | After any change in `src/` or `tests/`, and after every `kb build` (rebuild so the app and tests embed the new KB). |
 | `pytest`, `ruff check`, `ruff format` | — | Test, lint and format the tooling code in `tools/` (not the validator) | After any change in `tools/`. |
 
 Typical flow:
 1. **One-time setup:** `uv sync --directory tools`, fill in `config/local.yaml`, run `kb extract`. (`kb/bands/` is committed, so `kb bands` isn't needed after a clone.)
 2. **KB work (T-008 onwards):** if the task's tables still need a person sign-off, do that first and run `kb extract`; then write or edit rules and vocab files (format: [`kb/README.md`](kb/README.md)), run `kb check` while editing, then `kb build` until it passes.
-3. **App work (T-024 onwards):** run `kb build` first, so the app and its tests use the current KB.
+3. **App work (T-024 onwards):** run `kb build` first, then `dotnet build`/`dotnet test`, so the app and its tests use the current KB.
 
 ## Source-text chunks (`kb extract`)
 `kb extract` turns the ISCN PDF into one Markdown file per numbered section, plus `manifest.yaml`. It is deterministic and uses no AI: re-running gives byte-identical output.
@@ -84,6 +108,9 @@ Typical flow:
 - **Known limits:** what the text layer can't carry (drawn diagrams, shading, bold/italic, the ploidy table's indentation) is listed per section in [`docs/extraction-review-2016.md`](docs/extraction-review-2016.md); rules citing those sections get `needs_review`.
 
 ## Development
+App (.NET), from the repo root: `dotnet build`, `dotnet test` (single test: `dotnet test --filter-method "<Namespace.Class.Method>"`), `dotnet format --verify-no-changes`; see [Getting started (app)](#getting-started-app).
+
+Tooling (Python):
 ```sh
 uv run --directory tools pytest                                                   # all tests
 uv run --directory tools pytest tests/test_cli.py::test_help_lists_subcommands   # single test
