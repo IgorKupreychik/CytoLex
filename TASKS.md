@@ -62,7 +62,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-050 | todo | 2 | T-031 | LGF computation in the core library |
 | T-051 | todo | 2 | T-049, T-050 | Comparison engine + CLI report |
 | T-052 | todo | 3 | T-051, T-038 | Desktop: comparison view |
-| T-053 | discussion | 1 | T-003 | Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`? |
+| T-053 | in_progress | 1 | T-003 | Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`? |
 | T-054 | done | 2 | T-021 | Literal translation of ISCN strings into plain language: scope, style, architecture |
 | T-055 | todo | 2 | T-007 | Tooling: LF line endings for committed generated files (CRLF checkout breaks the ideograms test) |
 | T-056 | todo | 1 | T-022 | KB: apply the strictness & severity policy to the 2016 rules |
@@ -72,6 +72,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-060 | todo | 1 | T-023 | `kb build`: lean runtime bundle (rules metadata, vocab, bands) for the core |
 | T-061 | discussion | 3 | – | Presentation & documentation material for the pilot: define what to prepare |
 | T-062 | todo | 2 | T-026 | Test corpus of ISCN strings per notation type (review-flagged) + mutation generator |
+| T-063 | todo | 1 | T-053 | KB: typed symbol forms (`-`/`x`/`->`) in the ch. 3 vocab + rule `SYM.TYPED_SYMBOL_FORMS` |
 
 ---
 
@@ -282,7 +283,7 @@ All KB tasks share these steps and criteria:
 **Outcome (2026-11-18):** Decided: valid = no errors (warnings/info listed with counts); severity from the book's wording (mandatory → error, preference → warning, explanation → info); spaces/case → error + level-1 fix; `needs_review` rules capped at warning ("book ambiguous"); uncertain checks → warning (`NUM.COUNT_MATCHES_CHANGES`: error when certain); conditional diagnostics carry per-context severity, valid if one context has no errors; rules a string can't verify → info only when the notation is present; `book: false` bands → info in karyotype/ish, silent in arr/seq. Recorded in `docs/decisions.md` (new section, result-format bullet, log entry with per-rule dispositions); README sentence; new task T-056 (apply the policy to the KB); notes added to T-023, T-025, T-029, T-053. No deviations from the plan; T-056 not yet added to T-029's Depends (proposed).
 
 ### T-053 — Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`?
-**Status:** discussion
+**Status:** in_progress
 **Description:** The book prints the minus sign as an en dash (`–5`, `arr(1–22)`), copy numbers with `×` (`×2`) and the arrow as `→`; users usually type `-`, `x` and `->`. The ch. 3 symbol list itself gives "arrow (→ or ->)" (p.34). Decide whether the validator treats the ASCII forms as equivalent, as a warning with a level-1 fix, or as an error, per edition. Found in T-003 (`docs/extraction-review-2016.md`, "Glyphs and characters"). Related: T-022 (strictness policy).
 **Acceptance:** Decision in `docs/decisions.md`; the KB rule(s) to write are named.
 **Notes:** From T-022: non-canonical but unambiguous input is an `error` with a level-1 fix; apply that here unless the book allows the ASCII form (the ch. 3 list gives "→ or ->", p.34).
@@ -445,6 +446,23 @@ Expected results start as `unreviewed`. Until a person checks an entry, or every
 - Files for the other types aim at "every construct at least once" rather than a fixed count. For `ish`, `nuc_ish` and `arr`, expected results are labelled only once their KB tasks (T-015/T-016, T-017) are done; before that they are parse-only.
 - A schema for the corpus files, the mutation generator with tests, and the harness running the corpus in `dotnet test` (parse-only entries skip until the parser exists).
 **Notes:** Raised 2026-11-18 by the user, after T-025. Labels must trace to KB rules, never to ISCN from memory (CLAUDE.md). Anonymised real strings from the user's lab would be the most valuable source; check the data policy first (no patient identifiers in the repo). Builds on the T-025 harness (`tests/CytoLex.Core.Tests/KbExamples/`).
+
+### T-063 — KB: typed symbol forms in the ch. 3 vocab + `SYM.TYPED_SYMBOL_FORMS`
+**Status:** todo
+**Description:** Apply the T-053 decision (`docs/decisions.md`, Strictness & severity and the T-053 log entry) to the 2016 KB:
+- `kb/vocab/2016/ch03/03-symbols.yaml`:
+  - minus sign tokens `["–", "-", "−"]`;
+  - multiplication sign tokens `["×", "x"]`;
+  - replace the "is T-053" notes with the decision.
+  The arrow already lists `→`/`->`.
+- New rule `SYM.TYPED_SYMBOL_FORMS` (`kb/rules/2016/ch03/`):
+  - cites §3 pp.34–35 and §4.3.2.1 ¶1 p.43, with quotes in `kb/source-quotes/`;
+  - valid examples use typed forms, e.g. `45,X,-X`, `del(6)(q13q23)x2` and a detailed-system string with `->`;
+  - invalid example: uppercase `X2` used as a multiplier, with a level-1 fix to `×2`;
+  - `review.note`: the minus/x equivalences are a project decision (T-053), not book text.
+- Check whether `kb build`'s lookup of valid examples in their `En` block tolerates the typed forms (`docs/decisions.md`, T-025: a miss is a warning).
+**Acceptance:** `kb check` and `kb build` pass; the rule and its examples are in `build/kb.json`; the lexer task (T-028) can read the equivalent tokens from the vocab.
+**Notes:** From T-053 (2026-11-18). Proposed: add T-063 to T-028's Depends.
 
 ## Desktop app (pilot)
 

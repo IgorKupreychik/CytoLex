@@ -34,7 +34,13 @@ Decisions made during planning (2026-11-16) and later `discussion` tasks. Each n
   | Preference: "recommended", "preferred", "discouraged", "may be simplified" | `warning` |
   | Explanation or convention | `info` |
 
-- **Non-canonical but unambiguous input** (stray or missing spaces, wrong letter case) → `error` with a level-1 fix, as the book prescribes the form. The parser recovers, reads the intended meaning and keeps running every other rule. (ASCII `-`/`x`/`->`: T-053.)
+- **Non-canonical but unambiguous input** (stray or missing spaces, wrong letter case) → `error` with a level-1 fix, as the book prescribes the form. The parser recovers, reads the intended meaning and keeps running every other rule.
+- **Typed symbol forms (T-053, ISCN 2016)** are the same symbol, not non-canonical input, and get **no diagnostic**:
+  - arrow: `->` = `→`, as the book gives both;
+  - minus sign: `-` (U+002D) = `–` (U+2013, as printed) = `−` (U+2212);
+  - multiplication sign: lowercase `x` = `×` in multiplier position (after `)`, a band or `]`, followed by a number). Uppercase `X` there is a letter-case error with a level-1 fix.
+  - Fixes keep the user's forms (no normalisation to the typeset glyphs).
+  - KB: vocab tokens plus rule `SYM.TYPED_SYMBOL_FORMS` (T-063). Later editions re-check their own symbol list.
 - **Book-ambiguous rules** (`review.needs_review: true`): a violation is reported **at most as a `warning`**, marked "book ambiguous" with the review note, so it never invalidates a string. Once the rule is reviewed and resolved, its own severity applies.
 - **Uncertain checks:** when the engine can't decide a violation with certainty (e.g. the chromosome count with dic/psu dic, ploidy ranges, `?`/`~`, uncertain mar counts), it reports a `warning` instead of an `error`. Example: `NUM.COUNT_MATCHES_CHANGES` is an error when the arithmetic is certain, else a warning.
 - **Conditional diagnostics** (context unknown, see Pilot scope) carry a **severity per context** ("error if acquired"). The string is **valid if at least one context has no errors**. The result says in which context(s) it is valid ("valid as constitutional only"). A context hint makes the result firm.
@@ -318,3 +324,16 @@ _(entries added by `discussion` tasks: date — task — decision — rationale)
   - **Rule binding:** C# checks carry `[KbRule("ID")]` and report only facts (span, arguments, edits, certainty); an edition runs a check only if its KB has the ID; startup check + coverage list for T-025. Parser/binder errors also name a KB rule; `CORE.UNPARSED` is a flagged safety net only.
   - **References:** `KbRef` forms `rule:<ID>`, `vocab:<key>/<label>` (vocab entries have no IDs; key + label is unique), `band:<name>`.
   - **Follow-up:** T-060 (`kb build` runtime bundle; proposed as a dependency of T-028); notes added to T-024, T-026, T-027, T-028, T-035.
+
+- **2026-11-18 — T-053 — Typed symbol forms: `->`, `-` and lowercase `x` are equivalent to the printed `→`, `–` and `×` (ISCN 2016), with no diagnostic.**
+  - **Arrow:** the book itself allows both forms: "arrow (→ or ->)", §3 p.34 and §4.3.2.1 ¶1 p.43.
+  - **Minus sign:** hyphen-minus, en dash and U+2212 are one token. Rationale: the ch. 3 list names a *minus sign* ("minus sign (–)", p.35). The en dash is how the book typeset it, and `-` is the plain-text minus. Almost all real input uses `-`. Rejected:
+    - error + level-1 fix (T-022's default for non-canonical input; it would make nearly every real string invalid over typography);
+    - warning + fix (noise on correct input).
+  - **Multiplication sign:** lowercase `x` = `×` in multiplier position (after `)`, a band or `]`, followed by a number). Rationale: lowercase x has no other meaning in ISCN, so it is unambiguous there, and lab and array reports write `x1`/`x3`. Uppercase `X` there stays a letter-case error with a level-1 fix (T-022), since `X` is the sex chromosome. Rejected: error + fix and warning + fix (same reasons as for the minus sign).
+  - **Relation to T-022:** this is not an exception to T-022. Typed forms of one symbol are equivalent, while spacing and letter case remain errors. Fixes rewrite only their own span and keep the user's symbol forms.
+  - **Scope:** ISCN 2016. Later editions (T-045/T-046) re-check their own symbol list.
+  - **KB:**
+    - In `kb/vocab/2016/ch03/03-symbols.yaml`: minus tokens `["–", "-", "−"]`; multiplication tokens `["×", "x"]` (the arrow already lists `→`/`->`).
+    - New rule `SYM.TYPED_SYMBOL_FORMS`, citing §3 pp.34–35 and §4.3.2.1 ¶1. Its valid examples use the typed forms; its invalid example is uppercase `X2` as a multiplier. Its review note says the minus/x equivalences are a project decision, not book text.
+    - Done in T-063.
