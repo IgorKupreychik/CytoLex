@@ -10,9 +10,11 @@ Checks (errors fail the build; nothing is written then):
   6. (chunks present) every cite's section, label and page match the chunk front matter
   7. (chunks present) quote text occurs verbatim (whitespace-normalised) in a cited block
   8. vocab files (T-008): unique vocabulary names, labels and tokens (except `shared_tokens`),
-     `pair` tokens listed in `tokens`; (chunks present) the labels equal the first-column
+     `pair` tokens listed in `tokens`, `equivalent_forms` only on non-pair entries with 2+
+     tokens; (chunks present) the labels equal the first-column
      cells of the `source` tables, and each entry's label is in its own cited block
-Warnings: chunks missing (6-7 skipped); a valid example's text not found in its cited E block.
+Warnings: chunks missing (6-7 skipped); a valid example's text not found in its cited E block
+(whitespace ignored; typed forms of `equivalent_forms` vocab entries count as printed, T-053).
 """
 
 import json
@@ -228,6 +230,14 @@ def _check_vocab_tokens(f: KbFile, errors: list[Problem]) -> dict[str, int]:
         for k, tok in (e.get("pair") or {}).items():
             if tok not in e["tokens"]:
                 errors.append(Problem(f.path, f"entries[{i}].pair.{k}", f"{tok!r} not in tokens"))
+        if e.get("equivalent_forms") and ("pair" in e or len(e["tokens"]) < 2):
+            errors.append(
+                Problem(
+                    f.path,
+                    f"entries[{i}].equivalent_forms",
+                    "needs 2+ tokens and no pair (forms of one symbol)",
+                )
+            )
     shared = set(f.data.get("shared_tokens") or [])
     for tok, idx in owners.items():
         if len(idx) > 1 and tok not in shared:
@@ -287,6 +297,23 @@ def _check_vocab_files(ed: Edition, sections: dict[str, Section], errors: list[P
         labels = _check_vocab_tokens(f, errors)
         if sections:
             _check_vocab_coverage(f, labels, sections, errors)
+
+
+def typed_form_fold(ed: Edition):
+    """Map typed forms of `equivalent_forms` vocab entries to the printed (first) token."""
+    pairs = [
+        (tok, e["tokens"][0])
+        for f in ed.vocab_files
+        for e in f.data["entries"]
+        if e.get("equivalent_forms")
+        for tok in e["tokens"][1:]
+    ]
+    pairs.sort(key=lambda p: -len(p[0]))  # `->` before `-`
+    if not pairs:
+        return lambda s: s
+    pattern = re.compile("|".join(re.escape(tok) for tok, _ in pairs))
+    table = dict(pairs)
+    return lambda s: pattern.sub(lambda m: table[m.group(0)], s)
 
 
 def _check_edition(ed: Edition, source_dir: Path, report: BuildReport) -> None:
@@ -377,6 +404,7 @@ def _check_edition(ed: Edition, source_dir: Path, report: BuildReport) -> None:
                         f"text not found verbatim in §{sec.section} {'/'.join(labels)}",
                     )
                 )
+    fold = typed_form_fold(ed)
     for f in ed.rule_files:
         for i, rule in enumerate(f.data["rules"]):
             for j, ex in enumerate(rule["examples"].get("valid") or []):
@@ -385,7 +413,7 @@ def _check_edition(ed: Edition, source_dir: Path, report: BuildReport) -> None:
                 label = c.get("example")
                 if sec is None or label not in sec.blocks:
                     continue
-                if squash(ex["text"]) not in squash(sec.blocks[label]):
+                if fold(squash(ex["text"])) not in fold(squash(sec.blocks[label])):
                     report.warnings.append(
                         f"{f.path}:rules[{i}].examples.valid[{j}]: {ex['text']!r} "
                         f"not found in §{sec.section} {label}"
@@ -416,7 +444,8 @@ CREATE TABLE quotes (
   para TEXT, example TEXT, float TEXT, rendered TEXT, text TEXT);
 CREATE TABLE vocab (
   version TEXT, vocabulary TEXT, file TEXT, ord INTEGER, label TEXT, kind TEXT,
-  tokens TEXT, pair_open TEXT, pair_close TEXT, meanings TEXT, note TEXT, cite_rendered TEXT,
+  tokens TEXT, pair_open TEXT, pair_close TEXT, equivalent_forms INTEGER, meanings TEXT,
+  note TEXT, cite_rendered TEXT,
   PRIMARY KEY (version, vocabulary, label));
 CREATE TABLE vocab_tokens (version TEXT, vocabulary TEXT, token TEXT, label TEXT);
 CREATE INDEX vocab_tokens_token ON vocab_tokens (version, token);
@@ -513,7 +542,7 @@ def write_sqlite(report: BuildReport, path: Path) -> None:
             for i, e in enumerate(f.data["entries"]):
                 pair = e.get("pair") or {}
                 con.execute(
-                    "INSERT INTO vocab VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+                    "INSERT INTO vocab VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
                     (
                         v,
                         name,
@@ -524,6 +553,7 @@ def write_sqlite(report: BuildReport, path: Path) -> None:
                         json.dumps(e["tokens"], ensure_ascii=False),
                         pair.get("open"),
                         pair.get("close"),
+                        int(bool(e.get("equivalent_forms"))),
                         json.dumps(e["meanings"], ensure_ascii=False),
                         e.get("note"),
                         render_cite(v, e["cite"]),

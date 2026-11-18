@@ -27,3 +27,17 @@ quotes:
     text: >-
       A space should follow mos or chi. All abbreviations that precede a number will have a
       space that follows.
+  - rule: SYM.TYPED_SYMBOL_FORMS
+    cite: {section: "3", page: 34, para: "¶2"}
+    text: "arrow (→ or ->)"
+  - rule: SYM.TYPED_SYMBOL_FORMS
+    cite: {section: "3", page: 35, para: "¶3"}
+    text: "minus sign (–)"
+  - rule: SYM.TYPED_SYMBOL_FORMS
+    cite: {section: "3", page: 35, para: "¶3"}
+    text: "multiplication sign (×)"
+  - rule: SYM.TYPED_SYMBOL_FORMS
+    cite: {section: "4.3.2.1", page: 43, para: "¶1"}
+    text: >-
+      In order to avoid an unwieldy description, an arrow (→ or ->), meaning from – to, is
+      employed.

@@ -16,8 +16,9 @@ uv run --directory tools kb check kb/rules/2016/ch09/09.02.17.01-reciprocal-tran
 | Every quote file has a rule file at the same relative path with the same `section`; every quote's `rule` is in that rule file | error |
 | *With chunks:* every `cite` (rules, examples, quotes): the section exists, its `para`/`example`/`float` label is in the chunk front matter, and `page` is that label's page | error |
 | *With chunks:* quote `text` occurs verbatim in a cited label's block (whitespace, line breaks, `>` and code fences ignored) | error |
-| *With chunks:* a valid example with an `En` cite occurs in that example block (all whitespace ignored) | warning |
+| *With chunks:* a valid example with an `En` cite occurs in that example block (all whitespace ignored; typed forms of `equivalent_forms` vocab entries count as the printed token, so `->`/`-`/`x` match `→`/`–`/`×`) | warning |
 | Vocab: names unique per edition; labels unique; a token in one entry only, unless listed in `shared_tokens` (a listed token must be shared); `pair` tokens are in `tokens` | error |
+| Vocab `equivalent_forms` only on an entry with 2+ tokens and no `pair` | error |
 | *With chunks:* vocab coverage: the entry labels equal the first-column cells of the `source` tables, and each entry cites the block its row is printed in | error |
 | No chunks for the edition (`kb extract` not run): the chunk checks above are skipped | warning |
 
@@ -158,7 +159,8 @@ entries:
     ...
 ```
 - `label` is only for the coverage check: `kb build` fails if a book row has no entry or an entry has no book row. It never appears in a string.
-- `tokens`: as printed (`→`, `–`, `×`), plus alternatives only when the book itself gives them (`->`). Typed ASCII forms are T-053. Several tokens for one row are fine (`I`, `II`, `III`, `IV`). Empty only for `kind: typographic` (underlining, T-042).
+- `tokens`: as printed (`→`, `–`, `×`) first, then the typed forms of the same symbol: those the book gives itself (`->`) and those decided in T-053 (`-`/`−` for the minus sign, lowercase `x` for the multiplication sign; rule `SYM.TYPED_SYMBOL_FORMS`). Several tokens for one row are fine (`I`, `II`, `III`, `IV`). Empty only for `kind: typographic` (underlining, T-042).
+- `equivalent_forms: true`: every token is a form of the same symbol (the lexer treats them as one; arrow, minus, multiplication sign). Not for bracket pairs or lists of different symbols (`I`…`IV`). Where a form is only valid in some positions (lowercase `x`), the entry's `note` says so.
 - `meanings[].text` is a paraphrase; single-term names (`Deletion`) may equal the book. `sections` are the book's cross-references.
 - Which meaning applies at a position (`.` = sub-band or technique separator; `p` = arm or nothing else) is the parser's job; the vocab lists all meanings.
 - `note`: hints for parser authors (e.g. the en dash vs hyphen question).

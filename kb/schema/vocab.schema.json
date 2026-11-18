@@ -68,6 +68,10 @@
               "close": { "type": "string", "minLength": 1 }
             }
           },
+          "equivalent_forms": {
+            "description": "Every token is a form of the same symbol, printed form first (e.g. ['–', '-', '−']; T-053). Not for bracket pairs or lists of different symbols (I, II, III, IV).",
+            "type": "boolean"
+          },
           "kind": {
             "description": "abbreviation (letters: del, GRCh), punctuation (signs: +, ::, ( )), typographic (formatting with no typed token: underlining), code (banding technique codes).",
             "enum": ["abbreviation", "punctuation", "typographic", "code"]

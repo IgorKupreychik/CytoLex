@@ -100,7 +100,7 @@ def test_build_ok(kb):
     review = (out / "review" / "kb-review.md").read_text(encoding="utf-8")
     assert "### `needs_review: true` (1)" in review
     assert "### `paraphrase_checked: false` (2)" in review
-    assert "`symbols` (ch03/03-symbols-and-abbreviated-terms.yaml, 5 entries)" in review
+    assert "`symbols` (ch03/03-symbols-and-abbreviated-terms.yaml, 6 entries)" in review
     assert [r["id"] for _, _, r in report.needs_review] == ["TRANSLOC.CHROMOSOME_ORDER"]
     assert len(report.unchecked) == 2
 
@@ -151,6 +151,28 @@ def test_example_text_mismatch_is_warning(kb):
     report = build(kb)
     assert report.errors == []
     assert any("examples.valid[1]" in w and "E3" in w for w in report.warnings)
+
+
+def _typed_example(kb) -> None:
+    """E1 gets a printed minus; its valid example uses the typed hyphen-minus (T-063)."""
+    chunk = kb[1] / "2016" / "ch09" / "09.02.17.01-reciprocal-translocations.md"
+    edit(chunk, "46,XY,t(2;5)(q21;q31)\n", "46,XY,t(2;5)(q21;q31),–7\n")
+    edit(rules_file(kb), '- text: "46,XY,t(2;5)(q21;q31)"', '- text: "46,XY,t(2;5)(q21;q31),-7"')
+
+
+def test_typed_form_of_equivalent_entry_is_not_a_mismatch(kb):
+    _typed_example(kb)
+    report = build(kb)
+    assert report.errors == []
+    assert not any("examples.valid[0]" in w for w in report.warnings), report.warnings
+
+
+def test_typed_form_without_equivalent_forms_is_a_mismatch(kb):
+    _typed_example(kb)
+    edit(vocab_file(kb), "    equivalent_forms: true\n", "")
+    report = build(kb)
+    assert report.errors == []
+    assert any("examples.valid[0]" in w and "E1" in w for w in report.warnings)
 
 
 # --- errors ------------------------------------------------------------------------------
@@ -285,7 +307,7 @@ def test_cli_build(kb, monkeypatch, capsys):
     monkeypatch.setattr(cli, "REPO_ROOT", root)
     assert cli.main(["build"]) == 0
     out = capsys.readouterr().out
-    assert "ISCN 2016: 2 rules, 1 quotes, 1 vocabularies (5 entries) (chunk checks: on)" in out
+    assert "ISCN 2016: 2 rules, 1 quotes, 1 vocabularies (6 entries) (chunk checks: on)" in out
     assert "2016 symbols (ch03/03-symbols-and-abbreviated-terms.yaml)" in out
     assert "TRANSLOC.CHROMOSOME_ORDER (ch09/09.02.17.01-reciprocal-translocations.yaml)" in out
     assert "wrote build/kb.sqlite, build/kb.json, build/review/kb-review.md" in out
@@ -303,7 +325,7 @@ def test_cli_build(kb, monkeypatch, capsys):
 def test_vocab_sqlite(kb):
     assert build(kb).errors == []
     con = sqlite3.connect(kb[2] / "kb.sqlite")
-    assert con.execute("SELECT count(*) FROM vocab").fetchone() == (5,)
+    assert con.execute("SELECT count(*) FROM vocab").fetchone() == (6,)
     assert con.execute(
         "SELECT label FROM vocab_tokens WHERE token = '.' ORDER BY label"
     ).fetchall() == [("decimal point (.)",), ("period (.)",)]
@@ -313,6 +335,9 @@ def test_vocab_sqlite(kb):
     assert con.execute(
         "SELECT tokens, note IS NOT NULL FROM vocab WHERE kind = 'typographic'"
     ).fetchone() == ("[]", 1)
+    assert con.execute("SELECT label FROM vocab WHERE equivalent_forms = 1").fetchall() == [
+        ("minus sign (–)",)
+    ]
     con.close()
 
 
@@ -326,7 +351,7 @@ def test_vocab_missing_book_row(kb):
 def test_vocab_source_block_missing(kb):
     edit(vocab_file(kb), '  - {section: "3", page: 35, para: "¶3"}\n', "")
     report = build(kb)
-    assert_fails(report, kb, "entries[3].label", "'period (.)' is not a row of the source table")
+    assert_fails(report, kb, "entries[4].label", "'period (.)' is not a row of the source table")
 
 
 def test_vocab_entry_cites_wrong_block(kb):
@@ -338,7 +363,16 @@ def test_vocab_entry_cites_wrong_block(kb):
 
 def test_vocab_duplicate_token_needs_shared_tokens(kb):
     edit(vocab_file(kb), 'shared_tokens: ["."]\n', "")
-    assert_fails(build(kb), kb, "entries[3].tokens", "token '.' also in entries[1]")
+    assert_fails(build(kb), kb, "entries[4].tokens", "token '.' also in entries[1]")
+
+
+def test_vocab_equivalent_forms_needs_two_tokens_and_no_pair(kb):
+    pair = '    pair: {open: "[", close: "]"}\n'
+    edit(vocab_file(kb), '    tokens: ["–", "-"]', '    tokens: ["–"]')
+    edit(vocab_file(kb), pair, pair + "    equivalent_forms: true\n")
+    report = build(kb)
+    assert_fails(report, kb, "entries[0].equivalent_forms", "no pair")
+    assert_fails(report, kb, "entries[3].equivalent_forms", "2+ tokens")
 
 
 def test_vocab_stale_shared_token(kb):

@@ -22,5 +22,6 @@ floats: {}
 [¶3 p.35]
 |  |  |
 |---|---|
+| minus sign (–) | Loss (4.1, 8.1) |
 | period (.) | Separates various techniques (13.2, 14.2, 16.2, 16.3) |
 | underlining (single) | Used to distinguish homologous chromosomes (4.1, 9.2.3, 9.2.17.1) |

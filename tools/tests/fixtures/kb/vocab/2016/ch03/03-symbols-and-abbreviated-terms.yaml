@@ -26,6 +26,13 @@ entries:
     meanings:
       - {text: Deletion, sections: ["9.2.2", "16.3.1"]}
     cite: {section: "3", page: 34, para: "¶2"}
+  - label: "minus sign (–)"
+    tokens: ["–", "-"]
+    equivalent_forms: true
+    kind: punctuation
+    meanings:
+      - {text: Loss., sections: ["4.1", "8.1"]}
+    cite: {section: "3", page: 35, para: "¶3"}
   - label: "period (.)"
     tokens: ["."]
     kind: punctuation

@@ -64,12 +64,13 @@ entries:
     cite: {section: "3", page: 34, para: "¶2"}
   - label: "arrow (→ or ->)"
     tokens: ["→", "->"]
+    equivalent_forms: true
     kind: punctuation
     meanings:
       - text: "'From … to' in the detailed system."
         sections: ["4.3.2.1"]
     cite: {section: "3", page: 34, para: "¶2"}
-    note: "The book itself gives both forms."
+    note: "The book itself gives both forms; the same symbol, no diagnostic (SYM.TYPED_SYMBOL_FORMS)."
   - label: "b"
     tokens: ["b"]
     kind: abbreviation
@@ -497,7 +498,8 @@ entries:
         sections: ["10.2.1"]
     cite: {section: "3", page: 35, para: "¶3"}
   - label: "minus sign (–)"
-    tokens: ["–"]
+    tokens: ["–", "-", "−"]
+    equivalent_forms: true
     kind: punctuation
     meanings:
       - text: "Loss."
@@ -507,7 +509,9 @@ entries:
       - text: "A locus absent from a particular chromosome."
         sections: ["13.2"]
     cite: {section: "3", page: 35, para: "¶3"}
-    note: "Printed as an en dash; whether a typed hyphen-minus is accepted is T-053."
+    note: >-
+      Printed as an en dash (U+2013). Hyphen-minus (U+002D) and the minus sign U+2212 are typed
+      forms of the same symbol, with no diagnostic (project decision T-053, SYM.TYPED_SYMBOL_FORMS).
   - label: "mos"
     tokens: ["mos"]
     kind: abbreviation
@@ -516,7 +520,8 @@ entries:
         sections: ["4.1"]
     cite: {section: "3", page: 35, para: "¶3"}
   - label: "multiplication sign (×)"
-    tokens: ["×"]
+    tokens: ["×", "x"]
+    equivalent_forms: true
     kind: punctuation
     meanings:
       - text: "Multiple copies of a rearranged chromosome."
@@ -528,7 +533,11 @@ entries:
       - text: "Multiple copies of a chromosome or chromosomal region."
         sections: ["14.2"]
     cite: {section: "3", page: 35, para: "¶3"}
-    note: "Printed as ×; whether a typed letter x is accepted is T-053."
+    note: >-
+      Printed as × (U+00D7). Lowercase x is a typed form of it in multiplier position only (after
+      ')', a band or ']', followed by a number), with no diagnostic (project decision T-053).
+      Uppercase X there is the sex chromosome: a letter-case error with a level-1 fix
+      (SYM.TYPED_SYMBOL_FORMS). The position check is the parser's job.
   - label: "neg"
     tokens: ["neg"]
     kind: abbreviation

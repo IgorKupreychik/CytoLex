@@ -37,7 +37,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-025 | done | 1 | T-024 | KB-example test harness + rule coverage report |
 | T-026 | todo | 1 | T-024 | String type detection & segment splitting |
 | T-027 | todo | 1 | T-026 | Karyotype tokenizer/parser with spans and error recovery |
-| T-028 | todo | 1 | T-027 | Version-profile rule engine; multi-version results |
+| T-028 | todo | 1 | T-027, T-063 | Version-profile rule engine; multi-version results |
 | T-029 | todo | 1 | T-028, T-007 | Rules: general + band validation |
 | T-030 | todo | 1 | T-029 | Rules: numerical + sex chromosomes + ordering |
 | T-031 | todo | 1 | T-029 | Rules: structural rearrangements |
@@ -72,7 +72,8 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-060 | todo | 1 | T-023 | `kb build`: lean runtime bundle (rules metadata, vocab, bands) for the core |
 | T-061 | discussion | 3 | – | Presentation & documentation material for the pilot: define what to prepare |
 | T-062 | todo | 2 | T-026 | Test corpus of ISCN strings per notation type (review-flagged) + mutation generator |
-| T-063 | todo | 1 | T-053 | KB: typed symbol forms (`-`/`x`/`->`) in the ch. 3 vocab + rule `SYM.TYPED_SYMBOL_FORMS` |
+| T-063 | done | 1 | T-053 | KB: typed symbol forms (`-`/`x`/`->`) in the ch. 3 vocab + rule `SYM.TYPED_SYMBOL_FORMS` |
+| T-064 | todo | 3 | – | Line endings: generated committed files vs `core.autocrlf` (ideograms test fails on Windows) |
 
 ---
 
@@ -448,7 +449,7 @@ Expected results start as `unreviewed`. Until a person checks an entry, or every
 **Notes:** Raised 2026-11-18 by the user, after T-025. Labels must trace to KB rules, never to ISCN from memory (CLAUDE.md). Anonymised real strings from the user's lab would be the most valuable source; check the data policy first (no patient identifiers in the repo). Builds on the T-025 harness (`tests/CytoLex.Core.Tests/KbExamples/`).
 
 ### T-063 — KB: typed symbol forms in the ch. 3 vocab + `SYM.TYPED_SYMBOL_FORMS`
-**Status:** todo
+**Status:** done
 **Description:** Apply the T-053 decision (`docs/decisions.md`, Strictness & severity and the T-053 log entry) to the 2016 KB:
 - `kb/vocab/2016/ch03/03-symbols.yaml`:
   - minus sign tokens `["–", "-", "−"]`;
@@ -462,7 +463,19 @@ Expected results start as `unreviewed`. Until a person checks an entry, or every
   - `review.note`: the minus/x equivalences are a project decision (T-053), not book text.
 - Check whether `kb build`'s lookup of valid examples in their `En` block tolerates the typed forms (`docs/decisions.md`, T-025: a miss is a warning).
 **Acceptance:** `kb check` and `kb build` pass; the rule and its examples are in `build/kb.json`; the lexer task (T-028) can read the equivalent tokens from the vocab.
-**Notes:** From T-053 (2026-11-18). Proposed: add T-063 to T-028's Depends.
+**Notes:** From T-053 (2026-11-18). T-063 was added to T-028's Depends (user, 2026-11-18).
+Outcome (2026-11-18):
+- Vocab `kb/vocab/2016/ch03/03-symbols.yaml`: minus `["–", "-", "−"]`, multiplication `["×", "x"]`, arrow `["→", "->"]`, each with the new optional flag `equivalent_forms: true` (deviation: needed because brackets and Roman numerals also list several tokens that are *not* interchangeable).
+- `kb/schema/vocab.schema.json`: the flag. `kb build`: the flag is an error with `pair` or fewer than 2 tokens; new SQLite column `vocab.equivalent_forms`; the valid-example lookup counts typed forms as printed, so typed examples cite their `En` block without a warning.
+- Rule `SYM.TYPED_SYMBOL_FORMS` (`kb/rules/2016/ch03/…`, paraphrase approved) with 4 quotes; valid examples are typed forms of §8.2 E10, §9.3 E1 and §9.2.2 E2; invalid `…X2` with a level-1 fix to `×2`.
+- Docs `kb/README.md`; tests `tools/tests/test_kb_build.py` + fixtures.
+- Follow-up: T-064 (an ideograms test fails on CRLF checkouts, unrelated).
+
+### T-064 — Line endings of generated committed files
+**Status:** todo
+**Description:** With `core.autocrlf=true` (Windows), git checks out `kb/bands/2016/ideograms.yaml` with CRLF, but `kb ideograms` writes LF bytes. So `tools/tests/test_ideograms.py::test_pdf_decodes_every_chromosome_and_matches_committed` fails on a byte compare, even on a clean tree. The same risk applies to `bands.yaml` and any other generated file that is committed. Fix with a `.gitattributes` (`eol=lf` for `kb/**` generated YAML, or `* text=auto eol=lf`) plus a renormalise, or compare normalised text in the test.
+**Acceptance:** `uv run --directory tools pytest` passes on Windows with `core.autocrlf=true`; the generators and the checkout agree on line endings.
+**Notes:** Found during T-063 (2026-11-18); the failure is unrelated to T-063.
 
 ## Desktop app (pilot)
 
