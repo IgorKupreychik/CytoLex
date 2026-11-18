@@ -10,6 +10,7 @@ Decisions made during planning (2026-11-16) and later `discussion` tasks. Each n
 - ISCN 2016 in the pilot; 2020/2024 later (T-045/T-046). Editions are not backward compatible.
 - The user selects a single version (one result) or all versions (an array with one result per version; unimplemented versions return `not-implemented`).
 - Each diagnostic has: severity (error/warning/info), character span, rule ID, citation — format `ISCN 2016 §9.2.17.1, p.75, ¶1` (book page numbers).
+- Each per-version result has a validity (valid = no errors; per context when the context is unknown) and counts per severity (T-022).
 - Input type detection (`ish`, `nuc ish`, `arr[...]`, …). Combined strings are split on `.` and each segment is typed.
 - The parser must recover from errors and report all problems, not stop at the first.
 
@@ -23,11 +24,40 @@ Decisions made during planning (2026-11-16) and later `discussion` tasks. Each n
   - An optional context hint makes the result firm.
 - **After the pilot:** clones, then arr, then FISH.
 
+## Strictness & severity (T-022)
+- **Valid = no errors** in that edition. Warnings and info never affect validity. Each edition is judged on its own. The result carries counts per severity ("valid, 2 warnings").
+- **Severity from the book's wording:**
+
+  | Book wording | Severity |
+  |---|---|
+  | Mandatory: "is", "must", "always", a forbidding "should not", the printed format | `error` |
+  | Preference: "recommended", "preferred", "discouraged", "may be simplified" | `warning` |
+  | Explanation or convention | `info` |
+
+- **Non-canonical but unambiguous input** (stray or missing spaces, wrong letter case) → `error` with a level-1 fix, as the book prescribes the form. The parser recovers, reads the intended meaning and keeps running every other rule. (ASCII `-`/`x`/`->`: T-053.)
+- **Book-ambiguous rules** (`review.needs_review: true`): a violation is reported **at most as a `warning`**, marked "book ambiguous" with the review note, so it never invalidates a string. Once the rule is reviewed and resolved, its own severity applies.
+- **Uncertain checks:** when the engine can't decide a violation with certainty (e.g. the chromosome count with dic/psu dic, ploidy ranges, `?`/`~`, uncertain mar counts), it reports a `warning` instead of an `error`. Example: `NUM.COUNT_MATCHES_CHANGES` is an error when the arithmetic is certain, else a warning.
+- **Conditional diagnostics** (context unknown, see Pilot scope) carry a **severity per context** ("error if acquired"). The string is **valid if at least one context has no errors**. The result says in which context(s) it is valid ("valid as constitutional only"). A context hint makes the result firm.
+- **Rules a single string can't verify** (they need the report or the family, e.g. `KARYO.ABBREVIATED_FORM`, `REC.KNOWN_PARENTAL_REARRANGEMENT`) → an `info` note **only when the string uses the notation concerned**: "can't be verified from the string: <what to check>", with a citation. Otherwise silent.
+- **Band names in the genome assemblies but not in the book's idiograms** (`book: false`, e.g. `9q34.12`) → `info` in karyotype and ish strings: accepted, with a note naming the source. No note in arr/seq, where genome bands are expected. Names that exist nowhere stay errors (`BAND.MUST_EXIST`).
+- Applied to the KB rules in T-056.
+
 ## Fix suggestions
 - **Pilot:** level 1 (deterministic fix, shown as a before/after diff with an "Apply" button) and level 3 (plain-language explanation with citation when no single fix exists).
 - **Later:** level 2, "did you mean" (typos, nearest band) — T-041.
 - **Highlighting:** wrong range underlined; missing text shown as an insertion marker with grey expected text; extra text struck through.
 - Fixes are per version.
+
+## Literal translation (T-054)
+- **What:** a plain-language rendering of what a string literally says (`46,XY,del(5)(q13q33)` → "46 chromosomes; sex chromosomes XY; … interstitial deletion of the long arm of chromosome 5 between bands 5q13 and 5q33"). No clinical interpretation.
+- **When:** designed now (the T-023 model keeps the meaning), built after the pilot rules (T-057–T-059, Pri 2). Covers karyotype ch. 2–9 first; other types arrive with their parsers.
+- **Strings with errors:** every part the parser understood is translated; parts with errors are marked "not translated, see diagnostic …", under a "not valid ISCN <edition>; partial translation" banner. Per edition.
+- **Shape:** a summary line (count, sex chromosomes, number of abnormalities) plus one sentence per item, each tied to its character span.
+- **References:** the translation links to **KB entries** (a rule ID or a vocab item such as a symbol or band), shown by title with the ID on hover. The link opens the version-specific entry in the rule browser, where the book citation is shown. The translation itself shows **no book citations**; diagnostics keep their inline citation. Exports carry the KB IDs.
+- **Context:** neutral literal wording by default (never a syndrome name). Where the context changes the meaning, both readings are given ("if constitutional / if acquired"). A hint or a clear marker gives one reading.
+- **Genomic detail:** optional, off by default: approximate GRCh37/38 coordinates and sizes from `kb/bands`, labelled as approximate; book-only bands show "no coordinates". LGF (T-050) linked later.
+- **Language:** English in the pilot, from template data files per edition keyed by KB entry (proposed `kb/translation/<version>/`, schema-checked, in the bundle), so other languages are a new template set.
+- **Tests:** a per-edition golden file (string → summary, items, spans, KB IDs), seeded from book examples (compared with the printed explanation, cited not quoted) plus non-book strings; entries count only after a person's review.
 
 ## Knowledge base (KB)
 The KB is the single source for all validation decisions.
@@ -241,3 +271,33 @@ _(entries added by `discussion` tasks: date — task — decision — rationale)
     - Rejected: a required context input (contradicts the string-only goal); inference without a hint (lab systems that know the sample type couldn't use that knowledge).
   - **Order after the pilot: clones → arr → FISH.** Clones extend the karyotype model directly (the mos/chi groundwork). Microarray is very common in labs and has a compact grammar. FISH is the largest grammar. T-014/T-032 and T-017/T-034 stay Pri 2; T-015, T-016 and T-033 move to Pri 3.
   - Requirements were handed on as notes to T-022 (severity of conditional diagnostics), T-023 (model), T-025 (harness expectations), T-026 (context inference), T-035 (per-context fixes) and T-054 (wording, scope).
+
+- **2026-11-18 — T-022 — Strictness & severity: valid = no errors; severity from the book's wording; ambiguous rules capped at warning; conditional validity per context.**
+  - **Validity:** valid = no errors in that edition; warnings and info are listed with counts. Rejected: "no errors and no warnings" (preferences in the book would make correct strings invalid) and a three-state result (batch exports and the CytoGPS 2×2 comparison need yes/no; the counts carry the same information).
+  - **Non-canonical input** (spaces, letter case) → `error` + level-1 fix. Rationale: the book prescribes the form (`SYM.SPACE_BETWEEN_SYMBOLS`, `SYM.SPACE_BEFORE_CHROMOSOME_COUNT`, `SYM.NO_SPACE_AT_PARENTHESIS` stay `error`); with error recovery and a one-click fix this costs the user little. Rejected: warnings (a validator that calls `46, xx` valid isn't checking ISCN) and a split by kind (one rule is simpler). ASCII forms are left to T-053, which should follow this principle unless the book allows the ASCII form (e.g. "→ or ->", p.34).
+  - **Wording map:** mandatory wording → error, preference wording → warning, explanations → info. It replaces the provisional ch. 4 mapping from T-009; T-056 re-checks every rule against it. Rejected: preferences as info (users wouldn't see them) and per-rule decisions without a map (inconsistent).
+  - **Book-ambiguous rules** (`needs_review: true`) are capped at warning and marked "book ambiguous" until reviewed. Rationale: an unresolved reading of the book must not make a string invalid. Rejected: the rule's own severity (false errors) and info only (the issue is hidden).
+  - **Uncertain checks** are warnings, not errors (decided on `NUM.COUNT_MATCHES_CHANGES`; a general principle). Rationale: no false errors while the counting logic can't fully interpret dic/rob/mar, ploidy ranges or `?`/`~`.
+  - **Conditional diagnostics** (T-021) carry a severity per context; the string is valid if one context has no errors, and the result names that context. Rejected: plain warnings while the context is unknown (the context-specific outcome is lost) and invalid unless valid in all contexts (most correct constitutional strings would fail without a hint).
+  - **Rules a string can't verify** give an info note only when the notation concerned is present. Rejected: warnings (noise on correct strings) and not reporting them (the user isn't told what to check).
+  - **`book: false` bands** give info in karyotype/ish (accepted, source named) and are silent in arr/seq. Rejected: warning (they are real bands of the assemblies) and error (strict book-only names would reject current lab practice).
+  - **Follow-up:** T-056 applies the policy to the KB. The dispositions from the T-022 notes:
+    - Info when triggered: `KARYO.ABBREVIATED_FORM`, `REC.KNOWN_PARENTAL_REARRANGEMENT`, `ADD.INSERTED_UNKNOWN_USE_INS`, `DER.INSERTION_POINT_CONVENTION`, `DIC.PSEUDODICENTRIC_ORDER`.
+    - Conditional: `SEX.ACQUIRED_GAIN_LOSS`, `SEX.CONSTITUTIONAL_COMPLEMENT`, `REC.NOT_ACQUIRED`, `ROB.NOT_ACQUIRED`, `TRANSLOC.JUMPING`, `KARYO.CONSTITUTIONAL_C`.
+    - Warning (preference wording): `ORDER.SHORTEST_STRING_PREFERRED`, `ADD.FORMAT`, `MAR.NO_SIZE_MORPHOLOGY`.
+    - Capped at warning while `needs_review`: `UPD.FORMAT` (no mat/pat), `TRP.FORMAT`.
+    - Info: `NEO.FORMAT`.
+    - Error when certain, else warning: `NUM.COUNT_MATCHES_CHANGES`.
+    - To re-check against the map: `INS.ORIENTATION`, `ACE.NOT_IN_KARYOTYPE`.
+  - Requirements were handed on as notes to T-023 (result API), T-025 (harness expectations), T-029 (band notes) and T-053 (ASCII forms).
+
+- **2026-11-18 — T-054 — Literal translation: KB-linked, partial for invalid strings, per-context readings; built after the pilot rules.**
+  - **Timing:** decided before T-023 so the model keeps the meaning (event type, chromosomes, arms, bands, derivative structure, sex field, count/ploidy, cell lines/clones, uncertainty, inheritance; spans and KB entry IDs per node; partial ASTs marked). Implementation after T-030/T-031. Rejected: building it in the pilot (delays the validator) and leaving it until after the desktop pilot (the model requirements would be forgotten).
+  - **Invalid strings:** partial translation with the bad parts marked. Rejected: only valid strings (no help exactly where users need it) and translating the auto-fixed form (hides what the user actually wrote).
+  - **Shape:** summary + per-item sentences with spans. Rejected: breakdown only (no overview) and one paragraph (can't link phrases to spans).
+  - **References:** KB entries, not book citations. Rationale: the translation stays readable; traceability is one click away through the rule browser; the book is cited in one place (the KB), which also helps the copyright cleanup (T-043); citations never get copied into templates. Diagnostics keep their book citation because they assert an error that users check against the book. Vocab items count as KB entries, because many phrases come from symbols and bands rather than rules.
+  - **Context:** neutral wording, both readings where the meaning changes, firm with a hint (follows T-021). Rejected: neutral only (loses meaning, e.g. `–X`) and requiring a hint (contradicts the string-only goal).
+  - **Coordinates:** optional, off by default. Rejected: always shown (clutter, and approximate band boundaries could be mistaken for measured breakpoints) and never (useful, and the data already exists).
+  - **Language:** English templates in data files per edition. Rejected: strings in C# (refactor for any other language; templates can't be reviewed like KB files) and localising now (no need yet).
+  - **Tests:** a person-reviewed golden file. Rejected: an `explanation` field on KB examples (re-touches six finished KB tasks and mixes test expectations into rules) and snapshot-only tests (no independent expectation).
+  - **Follow-up:** T-057 (templates, schema, golden file), T-058 (renderer), T-059 (desktop view); requirements noted on T-023 and T-038.

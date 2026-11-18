@@ -13,7 +13,7 @@ CytoLex validates **ISCN cytogenomic nomenclature** strings: karyotypes, FISH (`
 - **Desktop app:** the pilot UI. Single-string check, batch validation, rule browser, fix view.
 - **Web service:** later, reusing the core library.
 
-The app stack is C# on .NET 10 LTS: a core library with a hand-written parser, an Avalonia + AvaloniaEdit desktop app, xUnit v3 tests, and ASP.NET Core for the web service later (decision T-020). The projects aren't scaffolded yet (T-024). The pilot validator covers karyotypes from ISCN ch. 2–9 (constitutional and acquired, numerical and structural, mos/chi), using only the string as input. Neoplastic clones, microarray and FISH come later, in that order (decision T-021). All decisions and their rationale are in [`docs/decisions.md`](docs/decisions.md).
+The app stack is C# on .NET 10 LTS: a core library with a hand-written parser, an Avalonia + AvaloniaEdit desktop app, xUnit v3 tests, and ASP.NET Core for the web service later (decision T-020). The projects aren't scaffolded yet (T-024). The pilot validator covers karyotypes from ISCN ch. 2–9 (constitutional and acquired, numerical and structural, mos/chi), using only the string as input. Neoplastic clones, microarray and FISH come later, in that order (decision T-021). A string is valid when it has no errors; warnings and info notes are listed but don't affect validity (decision T-022). All decisions and their rationale are in [`docs/decisions.md`](docs/decisions.md).
 
 ## Repository layout
 | Path | Content |

@@ -31,7 +31,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-019 | todo | 3 | T-017 | KB: ch. 15 & 16 (RSA, sequence-based) |
 | T-020 | done | 1 | T-013 | Tech stack for core library + desktop app |
 | T-021 | done | 1 | T-013 | Pilot validator scope (notation types implemented in the pilot) |
-| T-022 | discussion | 1 | T-013 | Strictness & severity policy |
+| T-022 | done | 1 | T-013 | Strictness & severity policy |
 | T-023 | todo | 1 | T-020, T-021, T-022 | Core design: data model, version profiles, result/diagnostic API, fix model |
 | T-024 | todo | 1 | T-023 | Project scaffolding; update CLAUDE.md with commands |
 | T-025 | todo | 1 | T-024 | KB-example test harness + rule coverage report |
@@ -63,8 +63,12 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-051 | todo | 2 | T-049, T-050 | Comparison engine + CLI report |
 | T-052 | todo | 3 | T-051, T-038 | Desktop: comparison view |
 | T-053 | discussion | 1 | T-003 | Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`? |
-| T-054 | discussion | 2 | T-021 | Literal translation of ISCN strings into plain language: scope, style, architecture |
+| T-054 | done | 2 | T-021 | Literal translation of ISCN strings into plain language: scope, style, architecture |
 | T-055 | todo | 2 | T-007 | Tooling: LF line endings for committed generated files (CRLF checkout breaks the ideograms test) |
+| T-056 | todo | 1 | T-022 | KB: apply the strictness & severity policy to the 2016 rules |
+| T-057 | todo | 2 | T-023 | Translation templates + schema; reviewed golden file (ISCN 2016) |
+| T-058 | todo | 2 | T-030, T-031, T-057 | Literal translation renderer in the core library |
+| T-059 | todo | 2 | T-058, T-036, T-039 | Desktop: translation view |
 
 ---
 
@@ -238,6 +242,16 @@ All KB tasks share these steps and criteria:
 **Acceptance:** Shared KB criteria.
 **Notes:** Before starting, person sign-off of the **Alignment figure** (§16.2, p.126): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`. Its shading/bold/italic carry meaning and are lost: `needs_review`.
 
+### T-056 — KB: apply the strictness & severity policy
+**Status:** todo
+**Description:** Apply the T-022 policy (`docs/decisions.md` → "Strictness & severity") to the ISCN 2016 rules:
+- Re-check every rule's `severity` against the wording map (mandatory → error, preference → warning, explanation → info).
+- Apply the dispositions listed in the T-022 decision log entry (info when triggered, conditional, warning, capped while `needs_review`, `NUM.COUNT_MATCHES_CHANGES` error-when-certain).
+- Document in `kb/README.md`: the `needs_review` cap at warning, the "info only when the notation is present" convention for rules a string can't verify, and how a rule states "error when certain, else warning" (add a schema field only if needed).
+- Run `kb build`.
+**Acceptance:** Every severity matches the wording map or has a recorded reason; `kb build` passes; the changed severities are listed in the task's Notes.
+**Notes:** Should be done before T-029 (rule implementation); proposed to add it to T-029's Depends.
+
 ## Decisions before code
 
 ### T-020 — Tech stack for core library + desktop app
@@ -255,22 +269,23 @@ All KB tasks share these steps and criteria:
 **Notes:** Decided: pilot = karyotype ch. 2–9 (constitutional + single-line acquired, numerical + structural, mos/chi), other types `not-implemented` per segment; model designed for all types (T-023). Context never required: inferred from clear markers, else conditional diagnostics with per-context fixes, optional context hint. Order after the pilot: clones → arr → FISH (T-015, T-016, T-033 moved to Pri 3). Recorded in `docs/decisions.md` (Pilot scope section + log entry); README status updated; notes added to T-022, T-023, T-025, T-026, T-035, T-054. No deviations from the plan.
 
 ### T-022 — Strictness & severity policy
-**Status:** discussion
+**Status:** done
 **Description:**
 - When input that is non-canonical but unambiguous (stray spaces, letter case) is an error vs. a warning.
 - How book-ambiguous rules are reported.
 - What "valid" means when there are only warnings.
 **Acceptance:** Policy in `docs/decisions.md`.
 **Notes:** From T-007: include the severity for band names that exist in the genome assemblies but not in the book's idiograms (`book: false` in band data, e.g. 9q34.12 in a karyotype string). From T-009: severities in the ch. 4 rules are provisional ("always/is/must/should not" → error, descriptive → info); decide `KARYO.ABBREVIATED_FORM` (abbreviations such as `46,XX,der(5)mat` and copies without breakpoints are only valid after an earlier full form, which a single string can't show) and `REC.KNOWN_PARENTAL_REARRANGEMENT` (warn on `rec` without mat/pat/inh?), both `needs_review`. From T-010: `ORDER.SHORTEST_STRING_PREFERRED` (§6 E6 note: `+inv(3)(…)` preferred over `+3,inv(3)(…)`; info hint or nothing?), `needs_review`. From T-011: `UPD.FORMAT` (is `upd(n)` without `mat`/`pat` valid? every book example has one), `SEX.ACQUIRED_GAIN_LOSS` / `SEX.CONSTITUTIONAL_COMPLEMENT` (the same string, e.g. `47,XXX` or `45,X,–X`, is valid in one context and not the other: how to report when the context is unknown), severity of `NUM.COUNT_MATCHES_CHANGES` (provisional warning), all `needs_review` where noted. From T-012: `ADD.FORMAT` (add recommended over `t(n;?)`) is a `warning`; `REC.NOT_ACQUIRED` and `REC.KNOWN_PARENTAL_REARRANGEMENT` need the clinical context (constitutional vs neoplastic) or parental information that a string may not carry; several §9 conventions are `info` explanations that cannot be checked from the string (`ADD.INSERTED_UNKNOWN_USE_INS`, `DER.INSERTION_POINT_CONVENTION`, `DIC.PSEUDODICENTRIC_ORDER`, `INS.ORIENTATION` long form recommended). From T-013: decide `MAR.NO_SIZE_MORPHOLOGY` (warning, "discouraged"), `ACE.NOT_IN_KARYOTYPE`, `NEO.FORMAT` (info), the context-only `ROB.NOT_ACQUIRED` and `TRANSLOC.JUMPING`, and whether short-form trp band order carries orientation (`TRP.FORMAT`, `needs_review`: §9.2.19 ¶1 vs E2). From T-021: the context question is settled: when context is unknown, context-dependent rules give **conditional** diagnostics ("valid if constitutional; if acquired …"), never a firm error. Decide their severity/display and how they count towards "valid".
+**Outcome (2026-11-18):** Decided: valid = no errors (warnings/info listed with counts); severity from the book's wording (mandatory → error, preference → warning, explanation → info); spaces/case → error + level-1 fix; `needs_review` rules capped at warning ("book ambiguous"); uncertain checks → warning (`NUM.COUNT_MATCHES_CHANGES`: error when certain); conditional diagnostics carry per-context severity, valid if one context has no errors; rules a string can't verify → info only when the notation is present; `book: false` bands → info in karyotype/ish, silent in arr/seq. Recorded in `docs/decisions.md` (new section, result-format bullet, log entry with per-rule dispositions); README sentence; new task T-056 (apply the policy to the KB); notes added to T-023, T-025, T-029, T-053. No deviations from the plan; T-056 not yet added to T-029's Depends (proposed).
 
 ### T-053 — Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`?
 **Status:** discussion
 **Description:** The book prints the minus sign as an en dash (`–5`, `arr(1–22)`), copy numbers with `×` (`×2`) and the arrow as `→`; users usually type `-`, `x` and `->`. The ch. 3 symbol list itself gives "arrow (→ or ->)" (p.34). Decide whether the validator treats the ASCII forms as equivalent, as a warning with a level-1 fix, or as an error, per edition. Found in T-003 (`docs/extraction-review-2016.md`, "Glyphs and characters"). Related: T-022 (strictness policy).
 **Acceptance:** Decision in `docs/decisions.md`; the KB rule(s) to write are named.
-**Notes:**
+**Notes:** From T-022: non-canonical but unambiguous input is an `error` with a level-1 fix; apply that here unless the book allows the ASCII form (the ch. 3 list gives "→ or ->", p.34).
 
 ### T-054 — Literal translation of ISCN strings into plain language
-**Status:** discussion
+**Status:** done
 **Description:** Render a valid ISCN string as plain-language text describing what it literally says, e.g. `46,XY,del(5)(q13q33)` → "46 chromosomes, XY sex chromosomes. Interstitial deletion of the long arm of chromosome 5 between bands 5q13 and 5q33." **Literal translation only:** no clinical interpretation or disease association (out of scope; a separate decision if ever wanted). Must work for any string the parser accepts, not only the book's examples. Questions to decide:
 - Scope: which notation types are translated in the pilot (follows T-021) and how partially valid strings are handled (translate the valid parts + list errors, or refuse).
 - Output style: a short summary and/or a per-abnormality breakdown; wording per context (constitutional vs. neoplastic: "46,XY" in a tumour sample is not "a male person"); clones, `idem`/`sl`/`sdl`, uncertainty (`?`, `~`, `or`).
@@ -281,6 +296,28 @@ All KB tasks share these steps and criteria:
 - Tests: book examples with their printed explanations as expected outputs (KB tasks T-008+ should capture those explanations), plus a reviewed set of non-book strings.
 **Acceptance:** Decision in `docs/decisions.md`; follow-up `todo` task(s) for the implementation added with Pri and Depends; T-023 requirements noted.
 **Notes:** Raised 2026-11-17 (user). Should be decided before T-023 (core design), so the data model supports it. From T-021: the pilot translation scope is karyotype (ch. 2–9). Use neutral wording when the context is unknown ("three X chromosomes", not a syndrome), or give both readings where context changes the meaning.
+**Outcome (2026-11-18):** Decided: designed now, built after the pilot rules (karyotype ch. 2–9 first); strings with errors get a partial translation with the bad parts marked; summary line + one sentence per item with spans; the translation links to KB entries (rule or vocab item, version-specific, via the rule browser) instead of book citations, while diagnostics keep theirs; neutral wording with both readings where context changes the meaning; optional GRCh37/38 coordinates (off by default); English templates in data files per edition; a person-reviewed golden file for tests. Recorded in `docs/decisions.md` (new "Literal translation (T-054)" section + log entry); T-023 requirements added to its Notes; note on T-038; new tasks T-057 (templates, schema, golden file), T-058 (renderer), T-059 (desktop view). Deviation: the interview added the KB-link-instead-of-citation rule (user's proposal).
+
+### T-057 — Translation templates + schema; reviewed golden file
+**Status:** todo
+**Description:** Data side of the literal translation (T-054, `docs/decisions.md` → "Literal translation"):
+- Phrase templates per ISCN edition, keyed by KB entry (rule ID or vocab item), English for the pilot; proposed location `kb/translation/<version>/`.
+- A JSON Schema for them in `kb/schema/`; `kb check` validates them, `kb build` checks that every key is an existing KB entry and puts them into the bundle.
+- A golden file for ISCN 2016: string → expected summary, items (with spans) and KB IDs. Seeded from book examples by comparing with the printed explanation (cited, not quoted) plus non-book strings; each entry carries a person-review flag and counts only once reviewed.
+**Acceptance:** Templates cover every karyotype ch. 2–9 construct of the T-023 model; `kb build` passes with them; golden file has reviewed entries for the book examples of ch. 4, 8 and 9 plus at least 20 non-book strings; `CLAUDE.md`/`README.md` updated for the new folder.
+**Notes:** Created 2026-11-18 from T-054.
+
+### T-058 — Literal translation renderer
+**Status:** todo
+**Description:** Renderer in the core library working on the T-023 model: summary line + one sentence per item, each with its span and KB entry links (title shown, ID on hover; no book citation); partial translation of strings with errors (bad parts marked "not translated, see diagnostic"); neutral wording when the context is unknown, both readings where context changes the meaning, a single reading with a hint; optional approximate GRCh37/38 coordinates and sizes from `kb/bands` ("no coordinates" for book-only bands). Per edition.
+**Acceptance:** All reviewed golden-file entries (T-057) pass in the normal test command; strings with errors give a partial translation.
+**Notes:** Created 2026-11-18 from T-054. LGF link (T-050) is a later addition.
+
+### T-059 — Desktop: translation view
+**Status:** todo
+**Description:** Show the translation next to the diagnostics: hovering an item highlights its span (and vice versa), KB links open the version-specific entry in the rule browser, a coordinates toggle (off by default) with a GRCh37/38 choice, and the partial-translation banner.
+**Acceptance:** Book examples show their translation; hover ↔ span highlighting and KB links work.
+**Notes:** Created 2026-11-18 from T-054.
 
 ## Core library
 
@@ -300,7 +337,7 @@ All KB tasks share these steps and criteria:
 - Fix model (replace/insert/delete/reorder; per version).
 - Type detection and segment splitting.
 **Acceptance:** `docs/design/core.md` approved by the user.
-**Notes:** From T-021: design the model for **all** notation types and implement the pilot subset (karyotype, ch. 2–9). A string is a list of typed segments; types outside the pilot return `not-implemented` per segment. A karyotype is one or more cell lines (optional `[n]`, `/`, `mos`/`chi`), with room for references to earlier clones (`idem`/`sl`/`sdl`, T-032). Diagnostics carry an optional **condition** (context `constitutional`/`acquired`) for context-dependent rules, and fixes may be per context. The API takes an optional context hint (default auto/inferred).
+**Notes:** From T-021: design the model for **all** notation types and implement the pilot subset (karyotype, ch. 2–9). A string is a list of typed segments; types outside the pilot return `not-implemented` per segment. A karyotype is one or more cell lines (optional `[n]`, `/`, `mos`/`chi`), with room for references to earlier clones (`idem`/`sl`/`sdl`, T-032). Diagnostics carry an optional **condition** (context `constitutional`/`acquired`) for context-dependent rules, and fixes may be per context. The API takes an optional context hint (default auto/inferred). From T-022: per-version result = validity (valid = no errors; per context when unknown, naming the context(s) it is valid in) + counts per severity; diagnostics carry a "book ambiguous" flag (rules with `needs_review` are capped at warning) and a per-context severity for conditional rules; checks the engine can't decide with certainty report a warning, not an error. From T-054 (literal translation, `docs/decisions.md` → "Literal translation"): AST nodes keep their meaning (event type, chromosome(s), arm(s), breakpoints/bands, derivative structure with segment order/orientation, sex-chromosome field, count/ploidy, cell-line and clone membership incl. `[n]`, `/`, mos/chi and room for idem/sl/sdl, uncertainty `?`/`~`/`or`, inheritance mat/pat/inh/dn); each node carries its span and the KB entry IDs (rule or vocab item) that define it; partial ASTs from error recovery are marked so the renderer can skip bad parts; the result API offers a translation per edition next to the diagnostics, with per-context readings where needed.
 
 ### T-024 — Project scaffolding
 **Status:** todo
@@ -312,7 +349,7 @@ All KB tasks share these steps and criteria:
 **Status:** todo
 **Description:** Generate tests from all KB examples (valid → no errors; invalid → expected rule fires; corrected form → fixer output). Produce a coverage report: rules with no implementation or no examples.
 **Acceptance:** Harness runs in the normal test command; coverage report generated.
-**Notes:** From T-021: KB examples from the other context (e.g. a constitutional-only example run without a hint) must produce the conditional diagnostic, not silence; with a matching context hint, the firm result.
+**Notes:** From T-021: KB examples from the other context (e.g. a constitutional-only example run without a hint) must produce the conditional diagnostic, not silence; with a matching context hint, the firm result. From T-022: valid = no errors; expected severities follow the KB after T-056; `needs_review` rules are expected at most as warnings.
 
 ### T-026 — String type detection & segment splitting
 **Status:** todo
@@ -336,7 +373,7 @@ All KB tasks share these steps and criteria:
 **Status:** todo
 **Description:** Symbols, separators, chromosome identifiers, band existence and resolution (using band data from T-006/T-007).
 **Acceptance:** Related KB examples pass.
-**Notes:** From T-007: `kb/bands/2016/bands.yaml` entries carry `levels` (300–850, book-corrected) and `book`. `book: false` marks 6 NCBI-only names (6p24.1–3, 9q34.11–13) that are valid for genome-band contexts (arr/seq, e.g. §15.3 `9q34.11q34.3`) but absent from the book's idiograms. Decide with T-022 whether karyotype/ISH strings using them get a warning. 15 book-only 850 sub-bands (e.g. 1q32.11) have `grch37/grch38: null`.
+**Notes:** From T-007: `kb/bands/2016/bands.yaml` entries carry `levels` (300–850, book-corrected) and `book`. `book: false` marks 6 NCBI-only names (6p24.1–3, 9q34.11–13) that are valid for genome-band contexts (arr/seq, e.g. §15.3 `9q34.11q34.3`) but absent from the book's idiograms. Decide with T-022 whether karyotype/ISH strings using them get a warning. 15 book-only 850 sub-bands (e.g. 1q32.11) have `grch37/grch38: null`. From T-022: `book: false` bands give an `info` note (source named) in karyotype/ish strings and nothing in arr/seq; unknown bands stay errors. Rule severities come from the KB after T-056 (do T-056 first).
 
 ### T-030 — Rules: numerical + sex chromosomes + ordering
 **Status:** todo
@@ -395,7 +432,7 @@ All KB tasks share these steps and criteria:
 **Status:** todo
 **Description:** Load a text/CSV file, validate all strings, show a summary table, export to CSV/JSON.
 **Acceptance:** A batch of 1,000+ strings completes; exports round-trip.
-**Notes:**
+**Notes:** From T-054: exports may optionally include the literal translation with its KB entry IDs (once T-058 exists).
 
 ### T-039 — Rule browser
 **Status:** todo
