@@ -21,8 +21,20 @@ uv run --directory tools kb check kb/rules/2016/ch09/09.02.17.01-reciprocal-tran
 | Vocab `equivalent_forms` only on an entry with 2+ tokens and no `pair` | error |
 | *With chunks:* vocab coverage: the entry labels equal the first-column cells of the `source` tables, and each entry cites the block its row is printed in | error |
 | No chunks for the edition (`kb extract` not run): the chunk checks above are skipped | warning |
+| Bands (`kb/bands/<version>/bands.yaml`, T-060): `version` = edition, every band has `name`, `chrom`, `arm`, `parent`, `levels`, `derived`, `book`, `grch37`, `grch38`, names unique | error |
+| No `bands.yaml` for the edition (`kb bands` not run): the runtime bundle has `bands: null` | warning |
 
-Any error → exit 1 and nothing written. Otherwise it writes `build/kb.sqlite` (tables `rules`, `citations`, `examples`, `quotes`, `rule_applies_to`, `rule_context`, `rule_related`, `vocab`, `vocab_tokens`, `meta`; FTS5 `rules_fts`, `quotes_fts`), `build/kb.json` (`{format_version: 2, editions: {"2016": {chunks_checked, rules, quotes, vocab}}}`, each cite with a `rendered` string) and `build/review/kb-review.md`.
+Any error → exit 1 and nothing written. Otherwise it writes `build/kb.sqlite` (tables `rules`, `citations`, `examples`, `quotes`, `rule_applies_to`, `rule_context`, `rule_related`, `vocab`, `vocab_tokens`, `meta`; FTS5 `rules_fts`, `quotes_fts`), `build/kb.json` (`{format_version: 2, editions: {"2016": {chunks_checked, rules, quotes, vocab}}}`, each cite with a `rendered` string; the full KB, also read by the KB-example tests), `build/kb-runtime.json` and `build/review/kb-review.md`.
+
+`build/kb-runtime.json` is the **lean runtime bundle** that `CytoLex.Core` embeds (T-060, `docs/design/core.md` §6). It is compact JSON with its own `format_version` (1, independent of `kb.json`'s) and is byte-identical across runs:
+```
+{format_version: 1, editions: {"2016": {
+  rules: [{id, section, title, severity, statement, applies_to, context?, related?, fix?,
+           review: {needs_review, note?}, cite: [{section, page, para?|example?|float?, rendered}]}],
+  vocab: {<vocabulary>: {shared_tokens?, entries: [{label, kind, tokens, pair?, equivalent_forms?, meanings, cite: "<rendered>"}]}},
+  bands: {levels_available, bands: [{name, chrom, arm, parent, levels, derived, book, grch37, grch38}]} | null}}}
+```
+Left out: quotes, examples, `paraphrase_checked`, file paths, vocab `source`/`review`/`note`, band `stain`/sources/counts. Bump `RUNTIME_FORMAT_VERSION` in `tools/src/cytolex_tools/kb/build.py` on any incompatible change; the core checks it at load (T-028).
 
 ## Layout
 | Path | Content |

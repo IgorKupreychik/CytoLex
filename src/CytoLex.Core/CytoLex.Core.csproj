@@ -2,10 +2,9 @@
   <!-- UI-free core library: parsing, validation, fixes (docs/design/core.md). -->
   <PropertyGroup>
     <RootNamespace>CytoLex.Core</RootNamespace>
-    <!-- KB bundle embedded at build time (docs/design/core.md §6). build/kb.json stands in until
-         T-060 adds the lean runtime bundle; then only this default changes.
-         Override with -p:CytoLexKbBundle=<path>. -->
-    <CytoLexKbBundle Condition="'$(CytoLexKbBundle)' == ''">$(RepoRoot)build/kb.json</CytoLexKbBundle>
+    <!-- Lean runtime KB bundle embedded at build time (docs/design/core.md §6; written by
+         `kb build`, T-060). Override with -p:CytoLexKbBundle=<path>. -->
+    <CytoLexKbBundle Condition="'$(CytoLexKbBundle)' == ''">$(RepoRoot)build/kb-runtime.json</CytoLexKbBundle>
   </PropertyGroup>
 
   <ItemGroup>

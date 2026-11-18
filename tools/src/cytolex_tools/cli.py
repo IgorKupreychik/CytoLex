@@ -151,9 +151,11 @@ def cmd_build(args: argparse.Namespace) -> int:
         n_quotes = sum(len(f.data["quotes"]) for f in ed.quote_files)
         n_vocab = sum(len(f.data["entries"]) for f in ed.vocab_files)
         checks = "on" if ed.chunks_checked else "skipped"
+        bands = f"{len(ed.bands['bands'])} bands" if ed.bands else "no bands"
         print(
             f"kb build: ISCN {ed.version}: {n_rules} rules, {n_quotes} quotes, "
-            f"{len(ed.vocab_files)} vocabularies ({n_vocab} entries) (chunk checks: {checks})"
+            f"{len(ed.vocab_files)} vocabularies ({n_vocab} entries), {bands} "
+            f"(chunk checks: {checks})"
         )
     for w in report.warnings:
         print(f"  warning: {w}")

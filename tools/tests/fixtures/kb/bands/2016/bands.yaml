@@ -1,0 +1,12 @@
+# Test fixture: an excerpt of kb/bands/2016/bands.yaml (format of `kb bands`, T-006/T-007).
+version: '2016'
+generator_version: 2
+levels_available: [300, 400, 550, 700, 850]
+levels_unavailable: []
+sources: []
+counts: {bands: 4}
+bands:
+  - {name: '1p36', chrom: '1', arm: p, parent: null, levels: [], derived: true, stain: null, grch37: [1, 28000000], grch38: [1, 27600000], book: true}
+  - {name: '1p36.3', chrom: '1', arm: p, parent: '1p36', levels: [300, 400, 550, 700], derived: false, stain: gneg, grch37: [1, 7200000], grch38: [1, 7100000], book: true}
+  - {name: '1q32.11', chrom: '1', arm: q, parent: '1q32.1', levels: [850], derived: false, stain: null, grch37: null, grch38: null, book: true}
+  - {name: '6p24.1', chrom: '6', arm: p, parent: '6p24', levels: [850], derived: false, stain: gpos25, grch37: [11600001, 13400000], grch38: [11600001, 13400000], book: false}

@@ -25,7 +25,7 @@ Repo tooling is a **self-contained Python 3.14 project in `tools/`**, managed by
   - Setup: `uv sync --directory tools`.
   - KB CLI: `uv run --directory tools kb <extract|tables|build|bands|ideograms> [--version 2016]`, `kb check [PATH …]`, and `… kb <subcommand> --help`.
   - `kb check` validates rule/quote/vocab YAML against `kb/schema/` (default: all of `kb/rules/`, `kb/source-quotes/` and `kb/vocab/`); run it while writing KB files.
-  - `kb build [--version 2016]` (default: every edition) runs `kb check` plus the cross-file and chunk checks (see `kb/README.md`), then writes `build/kb.sqlite`, `build/kb.json` and `build/review/kb-review.md` (rules still needing review). Any error → exit 1, nothing written.
+  - `kb build [--version 2016]` (default: every edition) runs `kb check` plus the cross-file and chunk checks (see `kb/README.md`), then writes `build/kb.sqlite`, `build/kb.json` (full KB), `build/kb-runtime.json` (lean runtime bundle for the core: rule metadata, vocab, bands from `kb/bands/<version>/bands.yaml`; format in `kb/README.md`) and `build/review/kb-review.md` (rules still needing review). Any error → exit 1, nothing written.
   - `kb bands [--version 2016] [--cache-only] [--update-pins]` downloads the pinned NCBI GDP ideograms (400/550/850) + UCSC cytoBand into `build/cache/bands/`, cross-checks them, compares them with the book's idiograms (`kb/bands/<version>/ideograms.yaml`), applies the cited `exceptions.yaml` and writes `kb/bands/<version>/bands.yaml` (committed; levels 300/700 come from the book). A sha256 mismatch (upstream change) → exit 1; re-pin deliberately with `--update-pins` and review the band diff. A book-vs-NCBI difference without an exception, or a stale exception → exit 1 and a draft of all differences in `build/review/bands/<version>/exceptions-draft.yaml`. Sources: `tools/src/cytolex_tools/bands/sources/<version>.yaml`.
   - `kb ideograms [--version 2016]` decodes the band labels of the book's idiograms (ISCN 2016 Fig. 5, pp.16–29) from the PDF text layer → `kb/bands/<version>/ideograms.yaml` (committed) + review crops in `build/review/bands/<version>/`. Config (pages, glyph map, spot-check sign-off): the `ideograms` section of the band sources file.
   - `kb tables` renders the configured table regions to PNG in `build/review/tables/<version>/` for the person sign-off of tables.
@@ -33,7 +33,7 @@ Repo tooling is a **self-contained Python 3.14 project in `tools/`**, managed by
   - Lint/format: `uv run --directory tools ruff check .` and `uv run --directory tools ruff format .`.
 
 **App (.NET)** — requires the .NET 10 SDK; run from the repo root (the solution `CytoLex.slnx` is found automatically).
-- **Prerequisite:** `build/kb.json` must exist (`uv run --directory tools kb build`). `CytoLex.Core` embeds it as resource `CytoLex.Kb.bundle.json` (MSBuild property `CytoLexKbBundle`; T-060 will switch the default to the lean runtime bundle). Without it `dotnet build` fails with "KB bundle not found … Run 'uv run --directory tools kb build'". Rebuild after every `kb build` so the app and tests embed the current KB.
+- **Prerequisite:** `build/kb-runtime.json` and `build/kb.json` must exist (`uv run --directory tools kb build`). `CytoLex.Core` embeds the lean runtime bundle `build/kb-runtime.json` as resource `CytoLex.Kb.bundle.json` (MSBuild property `CytoLexKbBundle`); the test project embeds the full `build/kb.json` for the KB-example harness. Without it `dotnet build` fails with "KB bundle not found … Run 'uv run --directory tools kb build'". Rebuild after every `kb build` so the app and tests embed the current KB.
 - Build: `dotnet build`.
 - Tests: `dotnet test` (Microsoft.Testing.Platform, opted in via `global.json`; VSTest-style `--filter` is not used).
   - It includes the **KB-example harness** (T-025, `tests/CytoLex.Core.Tests/KbExamples/`): one case per KB example (valid, invalid, `corrected`), read from `build/kb.json`, which the test project embeds. Cases skip with a reason until the validator (T-028 plugs it into `ValidatorAdapter`), the rule (`[KbRule]` in `CytoLex.Core`) or the fixer (T-035) exists. Book fragments (`inv(2)`, `…` strings) are checked only for their own rule. Each run also writes `build/review/rule-coverage.md` (rules without implementation or examples). One class: `--filter-class "CytoLex.Core.Tests.KbExamples.KbExampleTests"`.
@@ -46,7 +46,7 @@ Repo tooling is a **self-contained Python 3.14 project in `tools/`**, managed by
   - `uv sync --directory tools` after dependency changes;
   - `kb extract` after a fresh clone, a new edition, or an extraction-script or table-layout (`extract/tables/<version>.yaml`) change;
   - `kb ideograms` then `kb bands` after a decoder or `ideograms` config change; `kb bands` after an `exceptions.yaml` or band source change;
-  - `kb build` after any KB edit, or before running the app — then `dotnet build` so `CytoLex.Core` embeds the new bundle.
+  - `kb build` after any KB edit (including a new `bands.yaml` from `kb bands`: bands go into the runtime bundle), or before running the app — then `dotnet build` so `CytoLex.Core` embeds the new bundle.
 - The tools resolve repo paths (`config/`, `kb/`, `build/`) from the repo root, not the working directory.
 - ISCN PDF path: `config/local.yaml` (`iscn_pdf.<version>`), or env var `CYTOLEX_ISCN_PDF_2016` to override.
 
@@ -59,7 +59,7 @@ Repo tooling is a **self-contained Python 3.14 project in `tools/`**, managed by
 | `kb/source-quotes/<version>/` | Verbatim quotes linked by rule ID (for auditing; removable before public release) | Yes |
 | `kb/vocab/<version>/` | Printed lists as parser vocabularies: ch. 3 symbols (`ch03/03-symbols.yaml`), Table 2 banding codes; `kb build` checks they cover every book row | Yes |
 | `kb/bands/<version>/` | `bands.yaml`: band names (300/400/550/700/850 + nesting ancestors) with GRCh37/38 coordinates, generated by `kb bands`; `ideograms.yaml`: the book's idiogram labels (`kb ideograms`); `exceptions.yaml`: cited book-vs-NCBI decisions | Yes |
-| `build/` | Generated SQLite (FTS5) + JSON bundle; download cache | No |
+| `build/` | Generated SQLite (FTS5), full JSON KB (`kb.json`), runtime bundle (`kb-runtime.json`); download cache | No |
 
 - **Citation anchors come from the chunks:** `[¶n p.N]` (prose paragraph) and `[En p.N]` (example block), numbered per numbered section; figures/tables carry their own label (`[Fig. 7 p.39]`, `[Table 1 p.12]`, `[Ploidy table p.90]`) and are cited by it. Cite as `ISCN 2016 §9.2.17.1, p.75, ¶1` or `… ¶2, ex. E3`; quote chunk text verbatim. See `manifest.yaml` for glyph mappings and conventions.
 - **Before writing rules for a section, check `docs/extraction-review-2016.md`**: it lists what the text layer lost (drawn diagrams, shading, bold/italic) and which sections need `needs_review`. Chunk front matter flags `underlined` labels (U+0332 after an underlined character = homologue distinction) and `changed` labels (margin bar = changed since the previous edition).

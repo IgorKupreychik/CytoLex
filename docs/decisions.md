@@ -69,7 +69,7 @@ Decisions made during planning (2026-11-16) and later `discussion` tasks. Each n
 Full design: [`docs/design/core.md`](design/core.md).
 - **Pipeline:** segmenter/type detector → per-segment parser (lossless syntax tree) → binder (semantic model) → rule engine per edition → result.
 - **Two layers:** a lossless syntax tree (every character, trivia, missing/skipped tokens, spans) for spacing rules and exact fixes; a semantic model (cell lines, abnormalities, breakpoints, derivative structure…) with spans and KB refs for rules and the translation.
-- **KB at runtime:** a lean bundle (rule metadata, vocab, bands; no quotes/examples) embedded in `CytoLex.Core`, read into memory behind `IKnowledgeBase`; `build/kb.sqlite` serves the rule browser. Bundle output: T-060.
+- **KB at runtime:** a lean bundle (rule metadata, vocab, bands; no quotes/examples) embedded in `CytoLex.Core`, read into memory behind `IKnowledgeBase`; `build/kb.sqlite` serves the rule browser. Bundle output: `build/kb-runtime.json` (T-060, done 2026-11-18).
 - **Rules in code are bound to KB IDs** (`[KbRule("…")]`); severity, citation, review state and context always come from the KB.
 - **API context:** `Constitutional | Acquired` (KB `neoplastic` = acquired); fixes are text edits on the original input; applying a fix re-validates.
 

@@ -20,7 +20,7 @@ VOCAB_REL = Path("2016") / "ch03" / "03-symbols-and-abbreviated-terms.yaml"
 def kb(tmp_path):
     """A copy of the sample KB + chunk excerpt; returns (kb_dir, source_text_root, out_dir)."""
     kb_dir = tmp_path / "kb"
-    for sub in ("rules", "source-quotes", "source-text", "vocab"):
+    for sub in ("bands", "rules", "source-quotes", "source-text", "vocab"):
         shutil.copytree(FIXTURES / sub, kb_dir / sub)
     return kb_dir, kb_dir / "source-text", tmp_path / "build"
 
@@ -259,10 +259,11 @@ def test_quote_text_not_verbatim(kb):
 
 def test_failed_build_keeps_previous_outputs(kb):
     assert build(kb).errors == []
-    before = (kb[2] / "kb.json").read_text(encoding="utf-8")
+    names = ("kb.json", "kb-runtime.json")
+    before = [(kb[2] / n).read_bytes() for n in names]
     edit(quotes_file(kb), "- rule: TRANSLOC.CHROMOSOME_ORDER", "- rule: TRANSLOC.NOPE")
     assert build(kb).errors
-    assert (kb[2] / "kb.json").read_text(encoding="utf-8") == before
+    assert [(kb[2] / n).read_bytes() for n in names] == before
 
 
 # --- helpers -----------------------------------------------------------------------------
@@ -307,10 +308,13 @@ def test_cli_build(kb, monkeypatch, capsys):
     monkeypatch.setattr(cli, "REPO_ROOT", root)
     assert cli.main(["build"]) == 0
     out = capsys.readouterr().out
-    assert "ISCN 2016: 2 rules, 1 quotes, 1 vocabularies (6 entries) (chunk checks: on)" in out
+    assert (
+        "ISCN 2016: 2 rules, 1 quotes, 1 vocabularies (6 entries), 4 bands (chunk checks: on)"
+    ) in out
     assert "2016 symbols (ch03/03-symbols-and-abbreviated-terms.yaml)" in out
     assert "TRANSLOC.CHROMOSOME_ORDER (ch09/09.02.17.01-reciprocal-translocations.yaml)" in out
-    assert "wrote build/kb.sqlite, build/kb.json, build/review/kb-review.md" in out
+    wrote = "build/kb.sqlite, build/kb.json, build/kb-runtime.json, build/review/kb-review.md"
+    assert f"wrote {wrote}" in out
 
     edit(quotes_file(kb), "- rule: TRANSLOC.CHROMOSOME_ORDER", "- rule: TRANSLOC.NOPE")
     assert cli.main(["build"]) == 1
@@ -403,3 +407,103 @@ def test_first_column():
     block = "\n|  |  |\n|---|---|\n| a (\\|) | x |\n| b | y \\| z |\n\n> note\n"
     assert first_column(block) == ["a (|)", "b"]
     assert first_column("| H | I |\n|---|---|\n| r | s |") == ["r"]
+
+
+# --- runtime bundle (T-060) --------------------------------------------------------------
+
+
+def bands_file(kb) -> Path:
+    return kb[0] / "bands" / "2016" / "bands.yaml"
+
+
+def runtime(kb) -> dict:
+    return json.loads((kb[2] / "kb-runtime.json").read_text(encoding="utf-8"))
+
+
+def test_runtime_bundle_content(kb):
+    report = build(kb)
+    assert report.errors == [] and report.warnings == []
+    data = runtime(kb)
+    assert data["format_version"] == 1
+    ed = data["editions"]["2016"]
+    assert set(ed) == {"rules", "vocab", "bands"}  # no quotes
+    rule = ed["rules"][0]
+    assert rule["id"] == "TRANSLOC.CHROMOSOME_ORDER"
+    assert set(rule) <= {
+        "id",
+        "section",
+        "title",
+        "severity",
+        "statement",
+        "applies_to",
+        "context",
+        "related",
+        "fix",
+        "review",
+        "cite",
+    }
+    assert {"id", "section", "title", "severity", "statement", "applies_to"} <= set(rule)
+    assert rule["section"] == "9.2.17.1"
+    assert rule["review"]["needs_review"] is True and rule["review"]["note"]
+    assert set(rule["review"]) == {"needs_review", "note"}
+    assert rule["cite"][0]["rendered"] == "ISCN 2016 §9.2.17.1, p.75, ¶1"
+    assert rule["cite"][0]["page"] == 75
+    entries = ed["vocab"]["symbols"]["entries"]
+    labels = [e["label"] for e in entries]
+    assert labels[:3] == ["brackets, square ([ ])", "decimal point (.)", "del"]
+    assert entries[2]["cite"] == "ISCN 2016 §3, p.34, ¶2"
+    assert all({"label", "kind", "tokens", "meanings", "cite"} <= set(e) for e in entries)
+    assert not any("note" in e for e in entries)
+    assert set(ed["vocab"]["symbols"]) <= {"entries", "shared_tokens"}
+    bands = ed["bands"]
+    assert bands["levels_available"] == [300, 400, 550, 700, 850]
+    by_name = {b["name"]: b for b in bands["bands"]}
+    assert list(by_name) == ["1p36", "1p36.3", "1q32.11", "6p24.1"]
+    assert by_name["1p36.3"] == {
+        "name": "1p36.3",
+        "chrom": "1",
+        "arm": "p",
+        "parent": "1p36",
+        "levels": [300, 400, 550, 700],
+        "derived": False,
+        "book": True,
+        "grch37": [1, 7200000],
+        "grch38": [1, 7100000],
+    }
+    assert by_name["6p24.1"]["book"] is False
+    assert by_name["1q32.11"]["grch37"] is None and by_name["1q32.11"]["grch38"] is None
+    full = json.loads((kb[2] / "kb.json").read_text(encoding="utf-8"))
+    assert full["format_version"] == 2  # the full KB keeps its own format
+
+
+def test_runtime_bundle_byte_identical(kb):
+    assert build(kb).errors == []
+    first = [(kb[2] / n).read_bytes() for n in ("kb.json", "kb-runtime.json")]
+    assert build(kb).errors == []
+    assert [(kb[2] / n).read_bytes() for n in ("kb.json", "kb-runtime.json")] == first
+    assert first[1].endswith(b"\n") and b"\n" not in first[1][:-1]  # compact, one line
+
+
+def test_missing_bands_warns(kb):
+    shutil.rmtree(kb[0] / "bands")
+    report = build(kb)
+    assert report.errors == []
+    assert any("no " in w and "bands.yaml" in w for w in report.warnings)
+    assert runtime(kb)["editions"]["2016"]["bands"] is None
+
+
+def test_bands_version_mismatch(kb):
+    edit(bands_file(kb), "version: '2016'", "version: '2020'")
+    report = build(kb)
+    assert any(e.where == "version" and "edition '2016'" in e.message for e in report.errors)
+    assert not kb[2].exists()
+
+
+def test_bands_duplicate_name(kb):
+    edit(bands_file(kb), "name: '1q32.11'", "name: '1p36.3'")
+    assert_fails(build(kb), kb, "bands[2].name", "duplicate band '1p36.3' (first at bands[1])")
+
+
+def test_bands_missing_key(kb):
+    edit(bands_file(kb), ", book: false}", "}")
+    assert_fails(build(kb), kb, "bands[3]", "missing key(s) book")

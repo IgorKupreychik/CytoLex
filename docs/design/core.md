@@ -119,8 +119,8 @@ interface IEditionKb {
 static class KnowledgeBase { IKnowledgeBase LoadEmbedded(); IKnowledgeBase Load(Stream bundle); }
 ```
 
-- **Bundle content:** per edition, the rules' metadata (no quotes, no example lists), vocabularies, band names with levels/`book` flag/coordinates; later translation templates (T-057). Produced by `kb build` as a new output (follow-up T-060); `format_version` checked at load (mismatch → clear exception).
-- **Embedding:** `CytoLex.Core.csproj` embeds the bundle from `build/` as a resource. If it is missing, `dotnet build` fails with "run `uv run --directory tools kb build`". As built in T-024: MSBuild property `CytoLexKbBundle` (default `build/kb.json` until T-060), resource name `CytoLex.Kb.bundle.json`, read via `CytoLex.Core.Kb.EmbeddedBundle.Open()`. Desktop, tests and web service therefore always carry the KB the code was built with.
+- **Bundle content:** per edition, the rules' metadata (no quotes, no example lists), vocabularies, band names with levels/`book` flag/coordinates; later translation templates (T-057). Produced by `kb build` as `build/kb-runtime.json` (T-060; format in `kb/README.md`, its own `format_version` = 1); `format_version` checked at load (mismatch → clear exception).
+- **Embedding:** `CytoLex.Core.csproj` embeds the bundle from `build/` as a resource. If it is missing, `dotnet build` fails with "run `uv run --directory tools kb build`". As built in T-024/T-060: MSBuild property `CytoLexKbBundle` (default `build/kb-runtime.json`), resource name `CytoLex.Kb.bundle.json`, read via `CytoLex.Core.Kb.EmbeddedBundle.Open()`. Desktop, tests and web service therefore always carry the KB the code was built with.
 - **Override:** `Load(Stream)` lets tests and developers use another bundle (e.g. a fixture KB).
 - **Why not a database for the validator:** the engine runs every rule of an edition on every string, so it needs the whole edition in memory anyway; dictionary lookups beat queries, and a few MB of JSON load in tens of ms. Size growth goes mainly into quotes and examples, which stay out of the bundle. Because the core only sees `IKnowledgeBase`, the format can change later (SQLite, binary) in one loader class.
 - **SQLite (`build/kb.sqlite`, FTS5)** stays the store for the rule browser (T-039): search, quotes, examples. The desktop app reads it via `Microsoft.Data.Sqlite`; the core does not depend on it.
@@ -266,7 +266,7 @@ The core model guarantees what the renderer needs; the renderer itself is T-058.
 **`46,XX.ish 5p15.2(D5S23×2)`** — two segments: `karyotype` (validated) and `ish` (`NotImplemented`, "ish: not implemented in the pilot"). Result for 2016: valid, `IsComplete = false`. All-editions call: 2016 as above, 2020/2024 `Status = NotImplemented`.
 
 ## 14. Open points and follow-ups
-- **T-060** (new): `kb build` writes the lean runtime bundle (rules metadata, vocab, bands) for the core; T-024 embeds it. Proposed as a dependency of T-028.
+- **T-060** (done 2026-11-18): `kb build` writes the lean runtime bundle `build/kb-runtime.json` (rules metadata, vocab, bands); `CytoLex.Core` embeds it. Proposed as a dependency of T-028.
 - **T-053:** whether ASCII `-`/`x`/`->` are equivalent or errors with a fix; the lexer keeps them as distinct token kinds so either decision fits.
 - **T-056:** severities in the KB are applied to the policy; until then results use the current KB severities.
 - **`CORE.UNPARSED`** (§8.4): kept only as a safety net; every occurrence on a KB example is a KB/parser gap.
