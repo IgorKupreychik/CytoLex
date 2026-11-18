@@ -41,10 +41,11 @@ The parser emits syntax diagnostics; the binder emits diagnostics it finds while
 ### 3.1 Splitting
 - A string is a list of **segments** separated by `.` at the **top level** only. `.` inside brackets (`(q21.1)`), inside a band (`9q34.11`), or as a decimal point is not a separator; the lexer knows these positions (`.` is a `shared_token` in the ch. 3 vocabulary: decimal point vs period).
 - Splitting is purely lexical and edition-independent; it never fails. Each segment keeps its span and the separator token.
+- **Exact rule (T-026):** a `.` separates segments when it is outside every `( )`, `[ ]`, `{ }` (stray closers clamp the depth at 0) **and** the next non-whitespace character is a letter. This splits `46,XX.ish …`, `…×1.rsa …`, `…[10/30].arr …` and keeps `9q34.11`, `1p36.3.3`, `[0.6]`, `NC_000008.10` and seq's HGVS `g.1287…`/`g.[…]` inside their segment. Segments + separators rebuild the input exactly; an empty input is one empty karyotype segment. Code: `CytoLex.Core.Segmentation.Segmenter`.
 
 ### 3.2 Type detection
 - Each segment gets a `NotationType` (the KB `applies_to` vocabulary: `karyotype`, `breakage`, `meiotic`, `ish`, `nuc_ish`, `fib_ish`, `rev_ish`, `cgh`, `arr`, `rsa`, `seq`).
-- Detection is by the segment's leading keyword (`ish`, `nuc ish`, `fib ish`, `rev ish`, `cgh`, `arr`, `rsa`, `seq`, …, from the vocab) — otherwise `karyotype`. Breakage and meiotic notation are recognised by their markers inside a karyotype-shaped segment (T-018 adds the markers).
+- Detection is by the segment's leading keyword (`ish`, `nuc ish`, `fib ish`, `rev ish`, `cgh`, `arr`, `rsa`, `seq`, …, from the vocab) — otherwise `karyotype`. As built (T-026): after leading whitespace, longest keyword first, case-sensitive, not followed by a letter; two-word keywords accept any spacing (`nucish` is still `nuc_ish`, spacing is a parser rule). Each keyword word is a ch. 3 symbol; the segment carries their refs (`vocab:symbols/nuc`, `vocab:symbols/ish`) and a test checks them against the embedded vocab. Whether a type is `NotImplemented` is decided by the edition profile (T-028); construct-level detection inside a karyotype segment needs tokens (T-027). Breakage and meiotic notation are recognised by their markers inside a karyotype-shaped segment (T-018 adds the markers).
 - A segment whose type (or construct) has no implementation in the chosen edition becomes a `NotImplemented` segment result with the reason (`"ish: not implemented in the pilot"`). The rest of the string is still validated.
 - Pilot constructs detected but `NotImplemented` inside a karyotype segment: neoplastic clone syntax (`idem`, `sl`, `sdl`, `//`, `cp`), ch. 10/12 markers, underlined homologues (U+0332, T-042). The segment result says which construct and where (span).
 
@@ -53,6 +54,7 @@ The parser emits syntax diagnostics; the binder emits diagnostics it finds while
 - Inferred **only from clear markers** (T-021): `idem`/`sl`/`sdl`, a clone structure, `c`, or a ploidy `<Nn>` → `Acquired`; `rec` → `Constitutional`. Anything else → `Unknown`. Contradicting markers → `Unknown` plus an info diagnostic naming both markers.
 - An explicit `ContextHint` overrides inference. The effective context per string is `Constitutional`, `Acquired` or `Unknown`; it drives conditional diagnostics (§8.3).
 - The result reports the inferred context and the marker span(s) that decided it.
+- **As built (T-026, lexical scan, decided with the user):** words are maximal ASCII letter runs matched exactly (`cen`, `cp`, `idic` never count as `c`). Acquired: `idem`/`sl`/`sdl`, `c`, `<…n…>`, and a **clone structure** = a top-level `/` or `//` in a karyotype segment with a `[n]` cell count and no `mos`/`chi` word (constitutional mosaics and chimeras are not clone markers). Constitutional: `rec`. Only karyotype, ish-family and cgh segments are scanned (arr/rsa/seq skipped: HGVS `c.`, probe and gene names). Contradiction → `ContextInfo.IsContradictory` with all markers; the info diagnostic is emitted by the engine (T-028). Code: `CytoLex.Core.Context.ContextInference`; the parser (T-027) may back the same API with tokens.
 
 ## 4. Syntax layer (lossless)
 
@@ -267,7 +269,7 @@ The core model guarantees what the renderer needs; the renderer itself is T-058.
 
 ## 14. Open points and follow-ups
 - **T-060** (done 2026-11-18): `kb build` writes the lean runtime bundle `build/kb-runtime.json` (rules metadata, vocab, bands); `CytoLex.Core` embeds it. Proposed as a dependency of T-028.
-- **T-053:** whether ASCII `-`/`x`/`->` are equivalent or errors with a fix; the lexer keeps them as distinct token kinds so either decision fits.
+- **T-053** (decided 2026-11-18): typed `-`/`x`/`->` are equivalent to `–`/`×`/`→` in ISCN 2016, with no diagnostic (vocab `equivalent_forms`, rule `SYM.TYPED_SYMBOL_FORMS`, T-063). The lexer may still keep the typed form on the token so fixes preserve the user's symbol forms.
 - **T-056:** severities in the KB are applied to the policy; until then results use the current KB severities.
 - **`CORE.UNPARSED`** (§8.4): kept only as a safety net; every occurrence on a KB example is a KB/parser gap.
 - **Default edition** for `EditionSelection` when none is given: the newest implemented edition (2016 in the pilot).

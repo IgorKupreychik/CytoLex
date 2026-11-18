@@ -337,3 +337,9 @@ _(entries added by `discussion` tasks: date — task — decision — rationale)
     - In `kb/vocab/2016/ch03/03-symbols.yaml`: minus tokens `["–", "-", "−"]`; multiplication tokens `["×", "x"]` (the arrow already lists `→`/`->`).
     - New rule `SYM.TYPED_SYMBOL_FORMS`, citing §3 pp.34–35 and §4.3.2.1 ¶1. Its valid examples use the typed forms; its invalid example is uppercase `X2` as a multiplier. Its review note says the minus/x equivalences are a project decision, not book text.
     - Done in T-063.
+
+- **2026-11-18 — T-026 — Segment splitting, type detection and context inference as built.**
+  - **Split:** a `.` separates segments when it is outside all brackets and followed (after whitespace) by a letter. Rationale: in the book every technique segment after a `.` starts with a keyword, while every non-separator `.` (sub-bands, decimals, accession versions, HGVS `g.`) is followed by a digit or `[`. Rejected: splitting on any top-level `.` (breaks seq's `chr8:g.…`) and on keyword lookahead only (a mistyped keyword would merge two segments).
+  - **Type detection:** leading keyword, longest first, case-sensitive, any spacing inside `nuc ish`/`fib ish`/`rev ish`; keywords traced to ch. 3 vocab items.
+  - **Context inference (decided with the user):** a lexical scan now, behind `ContextInference.Infer`, rather than waiting for the parser. Clone structure = top-level `/` or `//` with `[n]` and no `mos`/`chi` in a karyotype segment; arr/rsa/seq segments are not scanned. Rejected: deferring to the parser (T-021 asked for inference in T-026); scanning without a clone marker.
+  - **Follow-up:** the contradiction info diagnostic needs a KB rule ID or a core code (T-028); construct-level NotImplemented detection (idem/sl/sdl/`cp`, ch. 10/12 markers, U+0332) moves to T-027.

@@ -35,7 +35,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-023 | done | 1 | T-020, T-021, T-022 | Core design: data model, version profiles, result/diagnostic API, fix model |
 | T-024 | done | 1 | T-023 | Project scaffolding; update CLAUDE.md with commands |
 | T-025 | done | 1 | T-024 | KB-example test harness + rule coverage report |
-| T-026 | todo | 1 | T-024 | String type detection & segment splitting |
+| T-026 | in_progress | 1 | T-024 | String type detection & segment splitting |
 | T-027 | todo | 1 | T-026 | Karyotype tokenizer/parser with spans and error recovery |
 | T-028 | todo | 1 | T-027, T-063 | Version-profile rule engine; multi-version results |
 | T-029 | todo | 1 | T-028, T-007 | Rules: general + band validation |
@@ -62,7 +62,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-050 | todo | 2 | T-031 | LGF computation in the core library |
 | T-051 | todo | 2 | T-049, T-050 | Comparison engine + CLI report |
 | T-052 | todo | 3 | T-051, T-038 | Desktop: comparison view |
-| T-053 | in_progress | 1 | T-003 | Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`? |
+| T-053 | done | 1 | T-003 | Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`? |
 | T-054 | done | 2 | T-021 | Literal translation of ISCN strings into plain language: scope, style, architecture |
 | T-055 | todo | 2 | T-007 | Tooling: LF line endings for committed generated files (CRLF checkout breaks the ideograms test) |
 | T-056 | todo | 1 | T-022 | KB: apply the strictness & severity policy to the 2016 rules |
@@ -284,10 +284,11 @@ All KB tasks share these steps and criteria:
 **Outcome (2026-11-18):** Decided: valid = no errors (warnings/info listed with counts); severity from the book's wording (mandatory → error, preference → warning, explanation → info); spaces/case → error + level-1 fix; `needs_review` rules capped at warning ("book ambiguous"); uncertain checks → warning (`NUM.COUNT_MATCHES_CHANGES`: error when certain); conditional diagnostics carry per-context severity, valid if one context has no errors; rules a string can't verify → info only when the notation is present; `book: false` bands → info in karyotype/ish, silent in arr/seq. Recorded in `docs/decisions.md` (new section, result-format bullet, log entry with per-rule dispositions); README sentence; new task T-056 (apply the policy to the KB); notes added to T-023, T-025, T-029, T-053. No deviations from the plan; T-056 not yet added to T-029's Depends (proposed).
 
 ### T-053 — Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`?
-**Status:** in_progress
+**Status:** done
 **Description:** The book prints the minus sign as an en dash (`–5`, `arr(1–22)`), copy numbers with `×` (`×2`) and the arrow as `→`; users usually type `-`, `x` and `->`. The ch. 3 symbol list itself gives "arrow (→ or ->)" (p.34). Decide whether the validator treats the ASCII forms as equivalent, as a warning with a level-1 fix, or as an error, per edition. Found in T-003 (`docs/extraction-review-2016.md`, "Glyphs and characters"). Related: T-022 (strictness policy).
 **Acceptance:** Decision in `docs/decisions.md`; the KB rule(s) to write are named.
 **Notes:** From T-022: non-canonical but unambiguous input is an `error` with a level-1 fix; apply that here unless the book allows the ASCII form (the ch. 3 list gives "→ or ->", p.34).
+Outcome (2026-11-18): Decided that `->`, `-` (and U+2212) and lowercase `x` in multiplier position are equivalent to the printed `→`, `–`, `×` in ISCN 2016, with no diagnostic; uppercase `X` as a multiplier stays a letter-case error with a level-1 fix. Recorded in `docs/decisions.md` (T-053 log entry). KB work named and done in T-063 (vocab tokens + `equivalent_forms`, rule `SYM.TYPED_SYMBOL_FORMS`). No deviations.
 
 ### T-054 — Literal translation of ISCN strings into plain language
 **Status:** done
@@ -366,7 +367,7 @@ All KB tasks share these steps and criteria:
 **Outcome (2026-11-18):** Decided with the user: build the full harness now and skip per case until the code exists. `tests/CytoLex.Core.Tests/KbExamples/`: `KbCatalog` (reads `build/kb.json`, embedded in the test project as `CytoLex.Tests.kb.json`), `KbExampleTests` (one theory row per valid/invalid/corrected example, 813 for 2016, display name `[2016] RULE.ID kind#n: text`), `ExampleExpectations` (valid = valid without a hint and in the rule's contexts, no errors with a matching hint, own rule never fires; invalid = rule fires without a hint (firm or conditional) and firmly with a matching hint, severity = KB severity capped at warning for `needs_review`/uncertain; corrected = valid + exact `Fix.Preview`; `CORE.UNPARSED` always fails), `ValidatorAdapter` (`null` → skip "no validator yet (T-028)"), `RuleImplementationScan` (`[KbRule]` over Core), `RuleCoverageReport` → `build/review/rule-coverage.md` on every `dotnet test` (140 rules, 0 implemented, 12 without examples), and 47 self-tests with a fake validator. New in Core: `CytoLex.Core.Rules.KbRuleAttribute` (core.md §7.2). CLAUDE.md/README.md updated; notes added to T-028 and T-035. Deviations: book fragments (`inv(2)`, `+21`, `GTG`, `…` strings; `KbCatalog.IsFragment`) are checked only for their own rule (valid) or that it fires (invalid), and the adapter gets an `isFragment` flag; skipped cases print 3 lines each in `dotnet test` (MTP 2.5.2 ignores `--show-test-results failed` for skips), which ends once T-028 plugs in the validator. Follow-up: T-062 (test corpus).
 
 ### T-026 — String type detection & segment splitting
-**Status:** todo
+**Status:** in_progress
 **Description:** Split combined strings on `.` (respecting context) and detect each segment's type (`karyotype`, `ish`, `nuc_ish`, `arr`, …).
 **Acceptance:** KB examples of every type are detected correctly.
 **Notes:** From T-021: also infer the context from clear markers only (clones/`idem`/`sl`/`sdl`, `c`, ploidy `<Nn>` → acquired; `rec` → constitutional); otherwise unknown. An explicit context hint overrides it. From T-023: design in `docs/design/core.md` §3 (top-level `.` split, keyword type detection, `NotImplemented` segments, contradicting markers → unknown + info).
@@ -375,13 +376,13 @@ All KB tasks share these steps and criteria:
 **Status:** todo
 **Description:** Parser for karyotype notation producing an AST with character spans. It recovers from errors and reports all problems.
 **Acceptance:** Parses all valid karyotype examples from the KB; invalid examples produce errors with correct spans; more than one error is reported per string where present.
-**Notes:** From T-023: lossless syntax tree + binder to the semantic model (`docs/design/core.md` §4–§5); every recovery point names the KB rule of the expected form (§8.4).
+**Notes:** From T-023: lossless syntax tree + binder to the semantic model (`docs/design/core.md` §4–§5); every recovery point names the KB rule of the expected form (§8.4). From T-026: the parser works per karyotype segment from `Segmenter.Split` (spans are offsets in the whole input); it also detects the pilot's `NotImplemented` constructs inside a karyotype segment (`idem`/`sl`/`sdl`/`cp`/`//`, ch. 10/12 markers, U+0332; core.md §3.2) with their spans; it may replace the lexical scan in `ContextInference` with tokens behind the same API.
 
 ### T-028 — Version-profile rule engine
 **Status:** todo
 **Description:** Loads the KB bundle and applies the rule set for the chosen version (or all versions, returning an array of results).
 **Acceptance:** A single-version call and an all-versions call (2016 + `not-implemented` for 2020/2024) both work; diagnostics carry citations.
-**Notes:** From T-023: edition profiles, `[KbRule]`-bound checks, severity resolution and the result API in `docs/design/core.md` §7–§9. Proposed: depend on T-060 (runtime bundle). From T-025: implement `ValidatorAdapter.Current` in `tests/CytoLex.Core.Tests/KbExamples/ValidatorAdapter.cs` (map one edition's `ValidationReport` onto `ExampleRun`; the KB-example cases then run instead of skipping); rule checks use `CytoLex.Core.Rules.KbRuleAttribute` (already in Core); optionally replace `RuleImplementationScan` with the engine's coverage list. The adapter gets an `isFragment` flag for book fragments (`inv(2)`, `…` strings).
+**Notes:** From T-023: edition profiles, `[KbRule]`-bound checks, severity resolution and the result API in `docs/design/core.md` §7–§9. Proposed: depend on T-060 (runtime bundle). From T-025: implement `ValidatorAdapter.Current` in `tests/CytoLex.Core.Tests/KbExamples/ValidatorAdapter.cs` (map one edition's `ValidationReport` onto `ExampleRun`; the KB-example cases then run instead of skipping); rule checks use `CytoLex.Core.Rules.KbRuleAttribute` (already in Core); optionally replace `RuleImplementationScan` with the engine's coverage list. The adapter gets an `isFragment` flag for book fragments (`inv(2)`, `…` strings). From T-026: segments come from `Segmenter.Split` (`Segment.Type`); the profile's implemented types decide `NotImplemented` per segment. `ContextInference.Infer` gives `ContextInfo` (hint/inferred/effective/markers); when `IsContradictory`, emit the info diagnostic naming both markers — it needs a KB rule ID (or a core code like `CORE.UNPARSED`), decide which. Map the harness's own `SampleContext` enum onto `CytoLex.Core.Context.SampleContext`.
 
 ### T-029 — Rules: general + band validation
 **Status:** todo
