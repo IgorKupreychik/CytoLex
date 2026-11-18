@@ -13,6 +13,16 @@ Decisions made during planning (2026-11-16) and later `discussion` tasks. Each n
 - Input type detection (`ish`, `nuc ish`, `arr[...]`, …). Combined strings are split on `.` and each segment is typed.
 - The parser must recover from errors and report all problems, not stop at the first.
 
+## Pilot scope (T-021)
+- **Implemented:** karyotypes from ch. 2–9, constitutional and single-line acquired, numerical and structural, in the short and detailed systems, including mos/chi cell lines (`[n]`, `/`).
+- **Detected but `not-implemented`** (per segment): neoplastic clones (idem/sl/sdl, `//`, composite karyotypes), ish/nuc ish/other ch. 13 notations, arr, ch. 10 and 12 (breakage, meiotic), and underlined homologues (T-042).
+- **The core is designed for all types and implements a subset:** the data model covers every type, so later types extend it rather than requiring rework.
+- **Context (constitutional vs acquired) is never a required input:**
+  - It is inferred from clear markers only.
+  - Otherwise, context-dependent rules give conditional diagnostics, with fixes per context.
+  - An optional context hint makes the result firm.
+- **After the pilot:** clones, then arr, then FISH.
+
 ## Fix suggestions
 - **Pilot:** level 1 (deterministic fix, shown as a before/after diff with an "Apply" button) and level 3 (plain-language explanation with citation when no single fix exists).
 - **Later:** level 2, "did you mean" (typos, nearest band) — T-041.
@@ -218,3 +228,16 @@ _(entries added by `discussion` tasks: date — task — decision — rationale)
   - **KB at runtime:** the app reads the `kb build` output (`build/kb.json` via `System.Text.Json`; `build/kb.sqlite` via `Microsoft.Data.Sqlite` where FTS5 search is needed, e.g. in the rule browser). The Python tooling and the app still exchange only files (T-001). How the bundle is located or embedded is decided in T-023.
   - **Other languages considered:** TypeScript (best for in-browser checking, but the user prefers C#), Python (would share the tooling language, but slower batches and awkward desktop packaging), Rust (fastest, but a steep learning curve and slower rule iteration).
   - **Proposed layout for T-024:** app code at the repo root, apart from `tools/`: `CytoLex.slnx`, `src/CytoLex.Core/`, `src/CytoLex.Desktop/`, `tests/CytoLex.Core.Tests/`, shared settings in `Directory.Build.props`, and `global.json` pinning the .NET 10 SDK.
+
+- **2026-11-18 — T-021 — Pilot scope: karyotype ch. 2–9; context inferred, with conditional diagnostics; then clones → arr → FISH.**
+  - **Scope:** the pilot fully implements karyotypes from ch. 2–9: constitutional and single-line acquired, numerical and structural, short and detailed systems, and mos/chi cell lines with `[n]` and `/` (already in the ch. 4 KB). Rationale: it uses the KB that already exists (T-008–T-013) and is the fastest route to a working end-to-end pilot.
+  - **Out of the pilot:** neoplastic clones (idem/sl/sdl, `//`, composite karyotypes), ish/nuc ish/fib ish/cgh/painting, arr, ch. 10 and 12, and underlined homologues (T-042). These are detected and returned as `not-implemented` per segment.
+  - **Extension, not rework:** T-023 designs the data model for all types and the pilot implements a subset. A string is a list of typed segments (ish/arr then add sub-parsers and rule sets behind the same interface). A karyotype is one or more cell lines (optional `[n]`), with room for references to earlier clones. The one risk of rework, a "one karyotype = one abnormality list" model that clones would break, is avoided this way.
+  - **Context (constitutional vs acquired):** the user's goal is to submit only the ISCN string, with no extra context.
+    - Context is inferred from clear markers only: clones/`idem`/`sl`/`sdl`, a `c` marker or a ploidy `<Nn>` mean acquired; `rec` means constitutional. It is never guessed from weak hints.
+    - When context is still unknown, context-dependent rules (e.g. `47,XXX` vs `47,XX,+X`, `45,X` vs `45,X,–X`, `REC.*`, `ROB.NOT_ACQUIRED`, `KARYO.CONSTITUTIONAL_C`) give **conditional diagnostics** (a condition field: "valid if constitutional; if acquired write `47,XX,+X`") and fixes per context, never a firm error.
+    - An optional context hint (API parameter; an advanced app setting, default auto) makes the results firm.
+    - Accepted side effects: a real mistake in a context-dependent rule surfaces only as a note when context is unknown; fixes may be per context; the literal translation (T-054) uses neutral wording.
+    - Rejected: a required context input (contradicts the string-only goal); inference without a hint (lab systems that know the sample type couldn't use that knowledge).
+  - **Order after the pilot: clones → arr → FISH.** Clones extend the karyotype model directly (the mos/chi groundwork). Microarray is very common in labs and has a compact grammar. FISH is the largest grammar. T-014/T-032 and T-017/T-034 stay Pri 2; T-015, T-016 and T-033 move to Pri 3.
+  - Requirements were handed on as notes to T-022 (severity of conditional diagnostics), T-023 (model), T-025 (harness expectations), T-026 (context inference), T-035 (per-context fixes) and T-054 (wording, scope).

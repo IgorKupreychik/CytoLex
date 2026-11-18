@@ -24,13 +24,13 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-012 | done | 1 | T-008 | KB: ch. 9.1–9.2.10 (structural, part 1) |
 | T-013 | done | 1 | T-008 | KB: ch. 9.2.11–9.3 (structural, part 2 incl. translocations) |
 | T-014 | todo | 2 | T-013 | KB: ch. 11 (neoplasia) |
-| T-015 | todo | 2 | T-013 | KB: ch. 13.1–13.2 (metaphase ish) |
-| T-016 | todo | 2 | T-015 | KB: ch. 13.3–13.8 (nuc ish, fib/rev ish, cgh, painting) |
+| T-015 | todo | 3 | T-013 | KB: ch. 13.1–13.2 (metaphase ish) |
+| T-016 | todo | 3 | T-015 | KB: ch. 13.3–13.8 (nuc ish, fib/rev ish, cgh, painting) |
 | T-017 | todo | 2 | T-013 | KB: ch. 14 (microarray) |
 | T-018 | todo | 3 | T-013 | KB: ch. 10 & 12 (breakage, meiotic) |
 | T-019 | todo | 3 | T-017 | KB: ch. 15 & 16 (RSA, sequence-based) |
 | T-020 | done | 1 | T-013 | Tech stack for core library + desktop app |
-| T-021 | discussion | 1 | T-013 | Pilot validator scope (notation types implemented in the pilot) |
+| T-021 | done | 1 | T-013 | Pilot validator scope (notation types implemented in the pilot) |
 | T-022 | discussion | 1 | T-013 | Strictness & severity policy |
 | T-023 | todo | 1 | T-020, T-021, T-022 | Core design: data model, version profiles, result/diagnostic API, fix model |
 | T-024 | todo | 1 | T-023 | Project scaffolding; update CLAUDE.md with commands |
@@ -42,7 +42,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-030 | todo | 1 | T-029 | Rules: numerical + sex chromosomes + ordering |
 | T-031 | todo | 1 | T-029 | Rules: structural rearrangements |
 | T-032 | todo | 2 | T-031, T-014 | Rules: neoplastic (clones, idem/sl/sdl, composite) |
-| T-033 | todo | 2 | T-031, T-016 | Parser + rules: FISH (ish, nuc ish) |
+| T-033 | todo | 3 | T-031, T-016 | Parser + rules: FISH (ish, nuc ish) |
 | T-034 | todo | 2 | T-031, T-017 | Parser + rules: microarray (arr) |
 | T-035 | todo | 1 | T-030, T-031 | Level 1 deterministic fixes + level 3 explanations |
 | T-036 | todo | 2 | T-028 | Desktop: app shell + single-string check with highlighting |
@@ -249,10 +249,10 @@ All KB tasks share these steps and criteria:
 **Notes:** Decided C#/.NET 10 LTS core library with a hand-written lexer + recursive-descent parser; Avalonia + AvaloniaEdit desktop with CommunityToolkit.Mvvm; xUnit v3; ASP.NET Core for the later web service (default, not asked). Recorded in `docs/decisions.md` (Product & architecture + 2026-11-17 log entry with rejected alternatives and the proposed T-024 layout); `CLAUDE.md`/`README.md` status updated; note added to T-024. No deviations from the plan.
 
 ### T-021 — Pilot validator scope
-**Status:** discussion
+**Status:** done
 **Description:** Which notation types and contexts the pilot validator implements (e.g. constitutional karyotype only, or also neoplastic, ish, nuc ish, arr). Informed by the KB built so far.
 **Acceptance:** Decision in `docs/decisions.md`; T-032..T-034 priorities adjusted.
-**Notes:**
+**Notes:** Decided: pilot = karyotype ch. 2–9 (constitutional + single-line acquired, numerical + structural, mos/chi), other types `not-implemented` per segment; model designed for all types (T-023). Context never required: inferred from clear markers, else conditional diagnostics with per-context fixes, optional context hint. Order after the pilot: clones → arr → FISH (T-015, T-016, T-033 moved to Pri 3). Recorded in `docs/decisions.md` (Pilot scope section + log entry); README status updated; notes added to T-022, T-023, T-025, T-026, T-035, T-054. No deviations from the plan.
 
 ### T-022 — Strictness & severity policy
 **Status:** discussion
@@ -261,7 +261,7 @@ All KB tasks share these steps and criteria:
 - How book-ambiguous rules are reported.
 - What "valid" means when there are only warnings.
 **Acceptance:** Policy in `docs/decisions.md`.
-**Notes:** From T-007: include the severity for band names that exist in the genome assemblies but not in the book's idiograms (`book: false` in band data, e.g. 9q34.12 in a karyotype string). From T-009: severities in the ch. 4 rules are provisional ("always/is/must/should not" → error, descriptive → info); decide `KARYO.ABBREVIATED_FORM` (abbreviations such as `46,XX,der(5)mat` and copies without breakpoints are only valid after an earlier full form, which a single string can't show) and `REC.KNOWN_PARENTAL_REARRANGEMENT` (warn on `rec` without mat/pat/inh?), both `needs_review`. From T-010: `ORDER.SHORTEST_STRING_PREFERRED` (§6 E6 note: `+inv(3)(…)` preferred over `+3,inv(3)(…)`; info hint or nothing?), `needs_review`. From T-011: `UPD.FORMAT` (is `upd(n)` without `mat`/`pat` valid? every book example has one), `SEX.ACQUIRED_GAIN_LOSS` / `SEX.CONSTITUTIONAL_COMPLEMENT` (the same string, e.g. `47,XXX` or `45,X,–X`, is valid in one context and not the other: how to report when the context is unknown), severity of `NUM.COUNT_MATCHES_CHANGES` (provisional warning), all `needs_review` where noted. From T-012: `ADD.FORMAT` (add recommended over `t(n;?)`) is a `warning`; `REC.NOT_ACQUIRED` and `REC.KNOWN_PARENTAL_REARRANGEMENT` need the clinical context (constitutional vs neoplastic) or parental information that a string may not carry; several §9 conventions are `info` explanations that cannot be checked from the string (`ADD.INSERTED_UNKNOWN_USE_INS`, `DER.INSERTION_POINT_CONVENTION`, `DIC.PSEUDODICENTRIC_ORDER`, `INS.ORIENTATION` long form recommended). From T-013: decide `MAR.NO_SIZE_MORPHOLOGY` (warning, "discouraged"), `ACE.NOT_IN_KARYOTYPE`, `NEO.FORMAT` (info), the context-only `ROB.NOT_ACQUIRED` and `TRANSLOC.JUMPING`, and whether short-form trp band order carries orientation (`TRP.FORMAT`, `needs_review`: §9.2.19 ¶1 vs E2).
+**Notes:** From T-007: include the severity for band names that exist in the genome assemblies but not in the book's idiograms (`book: false` in band data, e.g. 9q34.12 in a karyotype string). From T-009: severities in the ch. 4 rules are provisional ("always/is/must/should not" → error, descriptive → info); decide `KARYO.ABBREVIATED_FORM` (abbreviations such as `46,XX,der(5)mat` and copies without breakpoints are only valid after an earlier full form, which a single string can't show) and `REC.KNOWN_PARENTAL_REARRANGEMENT` (warn on `rec` without mat/pat/inh?), both `needs_review`. From T-010: `ORDER.SHORTEST_STRING_PREFERRED` (§6 E6 note: `+inv(3)(…)` preferred over `+3,inv(3)(…)`; info hint or nothing?), `needs_review`. From T-011: `UPD.FORMAT` (is `upd(n)` without `mat`/`pat` valid? every book example has one), `SEX.ACQUIRED_GAIN_LOSS` / `SEX.CONSTITUTIONAL_COMPLEMENT` (the same string, e.g. `47,XXX` or `45,X,–X`, is valid in one context and not the other: how to report when the context is unknown), severity of `NUM.COUNT_MATCHES_CHANGES` (provisional warning), all `needs_review` where noted. From T-012: `ADD.FORMAT` (add recommended over `t(n;?)`) is a `warning`; `REC.NOT_ACQUIRED` and `REC.KNOWN_PARENTAL_REARRANGEMENT` need the clinical context (constitutional vs neoplastic) or parental information that a string may not carry; several §9 conventions are `info` explanations that cannot be checked from the string (`ADD.INSERTED_UNKNOWN_USE_INS`, `DER.INSERTION_POINT_CONVENTION`, `DIC.PSEUDODICENTRIC_ORDER`, `INS.ORIENTATION` long form recommended). From T-013: decide `MAR.NO_SIZE_MORPHOLOGY` (warning, "discouraged"), `ACE.NOT_IN_KARYOTYPE`, `NEO.FORMAT` (info), the context-only `ROB.NOT_ACQUIRED` and `TRANSLOC.JUMPING`, and whether short-form trp band order carries orientation (`TRP.FORMAT`, `needs_review`: §9.2.19 ¶1 vs E2). From T-021: the context question is settled: when context is unknown, context-dependent rules give **conditional** diagnostics ("valid if constitutional; if acquired …"), never a firm error. Decide their severity/display and how they count towards "valid".
 
 ### T-053 — Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`?
 **Status:** discussion
@@ -280,7 +280,7 @@ All KB tasks share these steps and criteria:
 - Language(s): English only for the pilot, or localisable templates.
 - Tests: book examples with their printed explanations as expected outputs (KB tasks T-008+ should capture those explanations), plus a reviewed set of non-book strings.
 **Acceptance:** Decision in `docs/decisions.md`; follow-up `todo` task(s) for the implementation added with Pri and Depends; T-023 requirements noted.
-**Notes:** Raised 2026-11-17 (user). Should be decided before T-023 (core design), so the data model supports it.
+**Notes:** Raised 2026-11-17 (user). Should be decided before T-023 (core design), so the data model supports it. From T-021: the pilot translation scope is karyotype (ch. 2–9). Use neutral wording when the context is unknown ("three X chromosomes", not a syndrome), or give both readings where context changes the meaning.
 
 ## Core library
 
@@ -300,7 +300,7 @@ All KB tasks share these steps and criteria:
 - Fix model (replace/insert/delete/reorder; per version).
 - Type detection and segment splitting.
 **Acceptance:** `docs/design/core.md` approved by the user.
-**Notes:**
+**Notes:** From T-021: design the model for **all** notation types and implement the pilot subset (karyotype, ch. 2–9). A string is a list of typed segments; types outside the pilot return `not-implemented` per segment. A karyotype is one or more cell lines (optional `[n]`, `/`, `mos`/`chi`), with room for references to earlier clones (`idem`/`sl`/`sdl`, T-032). Diagnostics carry an optional **condition** (context `constitutional`/`acquired`) for context-dependent rules, and fixes may be per context. The API takes an optional context hint (default auto/inferred).
 
 ### T-024 — Project scaffolding
 **Status:** todo
@@ -312,13 +312,13 @@ All KB tasks share these steps and criteria:
 **Status:** todo
 **Description:** Generate tests from all KB examples (valid → no errors; invalid → expected rule fires; corrected form → fixer output). Produce a coverage report: rules with no implementation or no examples.
 **Acceptance:** Harness runs in the normal test command; coverage report generated.
-**Notes:**
+**Notes:** From T-021: KB examples from the other context (e.g. a constitutional-only example run without a hint) must produce the conditional diagnostic, not silence; with a matching context hint, the firm result.
 
 ### T-026 — String type detection & segment splitting
 **Status:** todo
 **Description:** Split combined strings on `.` (respecting context) and detect each segment's type (`karyotype`, `ish`, `nuc_ish`, `arr`, …).
 **Acceptance:** KB examples of every type are detected correctly.
-**Notes:**
+**Notes:** From T-021: also infer the context from clear markers only (clones/`idem`/`sl`/`sdl`, `c`, ploidy `<Nn>` → acquired; `rec` → constitutional); otherwise unknown. An explicit context hint overrides it.
 
 ### T-027 — Karyotype tokenizer/parser
 **Status:** todo
@@ -375,7 +375,7 @@ All KB tasks share these steps and criteria:
 - Level 3: plain-language explanations when no single fix exists.
 - Fixes are per version.
 **Acceptance:** Corrected forms from the KB are reproduced exactly; explanations include citations.
-**Notes:**
+**Notes:** From T-021: where the correct form depends on context (e.g. `47,XXX` vs `47,XX,+X`) and the context is unknown, offer one fix per context instead of a single Apply.
 
 ## Desktop app (pilot)
 
