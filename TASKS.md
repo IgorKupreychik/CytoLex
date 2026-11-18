@@ -34,7 +34,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-022 | done | 1 | T-013 | Strictness & severity policy |
 | T-023 | done | 1 | T-020, T-021, T-022 | Core design: data model, version profiles, result/diagnostic API, fix model |
 | T-024 | done | 1 | T-023 | Project scaffolding; update CLAUDE.md with commands |
-| T-025 | todo | 1 | T-024 | KB-example test harness + rule coverage report |
+| T-025 | done | 1 | T-024 | KB-example test harness + rule coverage report |
 | T-026 | todo | 1 | T-024 | String type detection & segment splitting |
 | T-027 | todo | 1 | T-026 | Karyotype tokenizer/parser with spans and error recovery |
 | T-028 | todo | 1 | T-027 | Version-profile rule engine; multi-version results |
@@ -71,6 +71,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-059 | todo | 2 | T-058, T-036, T-039 | Desktop: translation view |
 | T-060 | todo | 1 | T-023 | `kb build`: lean runtime bundle (rules metadata, vocab, bands) for the core |
 | T-061 | discussion | 3 | – | Presentation & documentation material for the pilot: define what to prepare |
+| T-062 | todo | 2 | T-026 | Test corpus of ISCN strings per notation type (review-flagged) + mutation generator |
 
 ---
 
@@ -355,10 +356,11 @@ All KB tasks share these steps and criteria:
 **Notes:** Created 2026-11-18 from T-023 (decided with the user: lean in-memory bundle embedded in Core behind `IKnowledgeBase`; `kb.sqlite` for the rule browser). Proposed (not applied): add T-060 to T-028's Depends. From T-024: switching the core to the bundle = change the `CytoLexKbBundle` default in `src/CytoLex.Core/CytoLex.Core.csproj` (resource name `CytoLex.Kb.bundle.json` stays) and update the smoke test `EmbeddedBundleTests` and the CLAUDE.md/README.md notes on `build/kb.json`.
 
 ### T-025 — KB-example test harness
-**Status:** todo
+**Status:** done
 **Description:** Generate tests from all KB examples (valid → no errors; invalid → expected rule fires; corrected form → fixer output). Produce a coverage report: rules with no implementation or no examples.
 **Acceptance:** Harness runs in the normal test command; coverage report generated.
 **Notes:** From T-021: KB examples from the other context (e.g. a constitutional-only example run without a hint) must produce the conditional diagnostic, not silence; with a matching context hint, the firm result. From T-022: valid = no errors; expected severities follow the KB after T-056; `needs_review` rules are expected at most as warnings.
+**Outcome (2026-11-18):** Decided with the user: build the full harness now and skip per case until the code exists. `tests/CytoLex.Core.Tests/KbExamples/`: `KbCatalog` (reads `build/kb.json`, embedded in the test project as `CytoLex.Tests.kb.json`), `KbExampleTests` (one theory row per valid/invalid/corrected example, 813 for 2016, display name `[2016] RULE.ID kind#n: text`), `ExampleExpectations` (valid = valid without a hint and in the rule's contexts, no errors with a matching hint, own rule never fires; invalid = rule fires without a hint (firm or conditional) and firmly with a matching hint, severity = KB severity capped at warning for `needs_review`/uncertain; corrected = valid + exact `Fix.Preview`; `CORE.UNPARSED` always fails), `ValidatorAdapter` (`null` → skip "no validator yet (T-028)"), `RuleImplementationScan` (`[KbRule]` over Core), `RuleCoverageReport` → `build/review/rule-coverage.md` on every `dotnet test` (140 rules, 0 implemented, 12 without examples), and 47 self-tests with a fake validator. New in Core: `CytoLex.Core.Rules.KbRuleAttribute` (core.md §7.2). CLAUDE.md/README.md updated; notes added to T-028 and T-035. Deviations: book fragments (`inv(2)`, `+21`, `GTG`, `…` strings; `KbCatalog.IsFragment`) are checked only for their own rule (valid) or that it fires (invalid), and the adapter gets an `isFragment` flag; skipped cases print 3 lines each in `dotnet test` (MTP 2.5.2 ignores `--show-test-results failed` for skips), which ends once T-028 plugs in the validator. Follow-up: T-062 (test corpus).
 
 ### T-026 — String type detection & segment splitting
 **Status:** todo
@@ -376,7 +378,7 @@ All KB tasks share these steps and criteria:
 **Status:** todo
 **Description:** Loads the KB bundle and applies the rule set for the chosen version (or all versions, returning an array of results).
 **Acceptance:** A single-version call and an all-versions call (2016 + `not-implemented` for 2020/2024) both work; diagnostics carry citations.
-**Notes:** From T-023: edition profiles, `[KbRule]`-bound checks, severity resolution and the result API in `docs/design/core.md` §7–§9. Proposed: depend on T-060 (runtime bundle).
+**Notes:** From T-023: edition profiles, `[KbRule]`-bound checks, severity resolution and the result API in `docs/design/core.md` §7–§9. Proposed: depend on T-060 (runtime bundle). From T-025: implement `ValidatorAdapter.Current` in `tests/CytoLex.Core.Tests/KbExamples/ValidatorAdapter.cs` (map one edition's `ValidationReport` onto `ExampleRun`; the KB-example cases then run instead of skipping); rule checks use `CytoLex.Core.Rules.KbRuleAttribute` (already in Core); optionally replace `RuleImplementationScan` with the engine's coverage list. The adapter gets an `isFragment` flag for book fragments (`inv(2)`, `…` strings).
 
 ### T-029 — Rules: general + band validation
 **Status:** todo
@@ -421,7 +423,28 @@ All KB tasks share these steps and criteria:
 - Level 3: plain-language explanations when no single fix exists.
 - Fixes are per version.
 **Acceptance:** Corrected forms from the KB are reproduced exactly; explanations include citations.
-**Notes:** From T-021: where the correct form depends on context (e.g. `47,XXX` vs `47,XX,+X`) and the context is unknown, offer one fix per context instead of a single Apply. From T-023: fix model (`TextEdit`s on the original input, apply = edit + re-validate, fix all, `ForContext`) in `docs/design/core.md` §10.
+**Notes:** From T-021: where the correct form depends on context (e.g. `47,XXX` vs `47,XX,+X`) and the context is unknown, offer one fix per context instead of a single Apply. From T-023: fix model (`TextEdit`s on the original input, apply = edit + re-validate, fix all, `ForContext`) in `docs/design/core.md` §10. From T-025: set `SupportsFixes` in the harness adapter so the `corrected` cases also check `Fix.Preview`.
+
+### T-062 — Test corpus of ISCN strings per notation type
+**Status:** todo
+**Description:** A corpus of realistic ISCN strings, one file per notation type (e.g. `tests/corpus/karyotype.yaml`, `ish.yaml`, `nuc_ish.yaml`, `arr.yaml`, …), to complement the book-cited KB examples. The KB examples stay the reference suite; the corpus adds what they lack:
+- realistic, combined strings (several abnormalities, clones with `[n]`, mosaics/chimeras, karyotype + `ish` + `nuc ish` + `arr` joined by `.`);
+- volume for batch validation (T-038), the CytoGPS comparison (T-051) and the translation golden file (T-057);
+- robustness inputs: spacing, ASCII `-`/`x`/`->` (T-053), truncated strings, typos.
+
+Each entry records:
+- the string, its notation type(s) and the features it exercises;
+- the KB rule IDs it relies on;
+- the expected result per edition;
+- its source: `synthetic`, `book-adapted` or `lab` (anonymised);
+- a review flag.
+
+Expected results start as `unreviewed`. Until a person checks an entry, or every rule it relies on is in the KB, it is used only as a parse-only test: it must split, parse and produce no `CORE.UNPARSED`, with no claim about validity. Invalid strings come mainly from a **mutation generator** applied to trusted valid strings (drop a separator, swap the chromosome order, use a non-existent band such as `9q35`, …), so the expected error follows from the mutation, not from memory.
+**Acceptance:**
+- Karyotype file with ≥ 100 entries covering constitutional, acquired, mosaic/chimera, structural (incl. derivatives and complex rearrangements), uncertainty, and clone/composite strings.
+- Files for the other types aim at "every construct at least once" rather than a fixed count. For `ish`, `nuc_ish` and `arr`, expected results are labelled only once their KB tasks (T-015/T-016, T-017) are done; before that they are parse-only.
+- A schema for the corpus files, the mutation generator with tests, and the harness running the corpus in `dotnet test` (parse-only entries skip until the parser exists).
+**Notes:** Raised 2026-11-18 by the user, after T-025. Labels must trace to KB rules, never to ISCN from memory (CLAUDE.md). Anonymised real strings from the user's lab would be the most valuable source; check the data policy first (no patient identifiers in the repo). Builds on the T-025 harness (`tests/CytoLex.Core.Tests/KbExamples/`).
 
 ## Desktop app (pilot)
 

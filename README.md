@@ -21,7 +21,7 @@ The app stack is C# on .NET 10 LTS: a core library with a hand-written parser, a
 | `CytoLex.slnx` | .NET solution: the projects below |
 | `src/CytoLex.Core/` | UI-free core library (parser, validator, fixes); embeds the KB bundle from `build/` |
 | `src/CytoLex.Desktop/` | Desktop app (Avalonia + AvaloniaEdit, CommunityToolkit.Mvvm) |
-| `tests/CytoLex.Core.Tests/` | xUnit v3 tests for the core library |
+| `tests/CytoLex.Core.Tests/` | xUnit v3 tests for the core library, incl. the KB-example harness (`KbExamples/`, T-025) |
 | `global.json`, `Directory.Build.props`, `Directory.Packages.props`, `.editorconfig` | .NET SDK pin (+ test runner), shared build settings, central NuGet versions, code style |
 | `tools/` | Self-contained Python project for repo tooling: PDF extraction, KB build, band data |
 | `kb/schema/` | JSON Schemas for rule and quote files; format and conventions in [`kb/README.md`](kb/README.md) |
@@ -68,7 +68,8 @@ Requirements: the **.NET 10 SDK** (any 10.0.x; `global.json` pins the major vers
 2. Build, test and run:
    ```sh
    dotnet build                                   # whole solution (CytoLex.slnx); warnings are errors
-   dotnet test                                    # all tests
+   dotnet test                                    # all tests, incl. one case per KB example (skipped until the validator exists);
+                                                  # also writes build/review/rule-coverage.md
    dotnet test --filter-method "CytoLex.Core.Tests.EmbeddedBundleTests.EmbeddedBundle_IsPresentAndParses"   # single test
    dotnet run --project src/CytoLex.Desktop       # desktop app
    dotnet format --verify-no-changes              # lint (code style); `dotnet format` fixes
@@ -85,7 +86,7 @@ Requirements: the **.NET 10 SDK** (any 10.0.x; `global.json` pins the major vers
 | `kb ideograms [--version 2016]` | T-007 | Decodes the band labels of the book's idiograms (Fig. 5, pp.16–29; 24 chromosomes × 300/400/550/700/850) from the PDF text layer into `kb/bands/2016/ideograms.yaml` (committed; byte-identical re-runs) and writes a crop + decoded-label list per chromosome to `build/review/bands/2016/` for visual checks. Glyph map, pages and spot-check sign-off: `tools/src/cytolex_tools/bands/sources/<version>.yaml` → `ideograms` | **Rarely:** only after a decoder or `ideograms` config change. Needs the PDF; not needed after a clone. |
 | `kb bands [--version 2016]` | T-006 / T-007 | Downloads the sha256-pinned NCBI GDP ideograms (400/550/850, GRCh37/38) and UCSC cytoBand into `build/cache/bands/`, cross-checks names and coordinates, compares the result with the book's idiograms and applies `kb/bands/2016/exceptions.yaml`, then writes `kb/bands/2016/bands.yaml` (committed; byte-identical re-runs). Any book-vs-NCBI difference without an exception (or a stale exception) → exit 1, plus a draft of all differences in `build/review/bands/2016/exceptions-draft.yaml`. `--cache-only` = offline; `--update-pins` accepts changed upstream files | **Rarely:** after a change to the sources, the generator, `ideograms.yaml` or `exceptions.yaml`. The committed file is already current after a clone. |
 | `kb build [--version 2016]` | T-005 | Checks `kb/` (schemas, `version`/section vs path, unique IDs, `related` IDs, rule ↔ quote links, vocab tokens; with chunks present also cite labels/pages, verbatim quote text and vocab coverage of the printed lists) → `build/kb.sqlite` (FTS5) + `build/kb.json`; lists rules with `needs_review: true` / `paraphrase_checked: false` (also in `build/review/kb-review.md`). Default: every edition; exit 1 and nothing written on any error | **Often:** after every KB edit, and before running or testing the app (it loads the bundle). |
-| `dotnet build`, `dotnet test`, `dotnet format` | T-024 | Build the solution (embedding `build/kb.json` into `CytoLex.Core`), run the xUnit tests, check/fix code style | After any change in `src/` or `tests/`, and after every `kb build` (rebuild so the app and tests embed the new KB). |
+| `dotnet build`, `dotnet test`, `dotnet format` | T-024 / T-025 | Build the solution (embedding `build/kb.json` into `CytoLex.Core` and the test project), run the xUnit tests, including the KB-example harness: one case per valid/invalid/corrected KB example, skipped with a reason until the validator, the rule or the fixer exists. `dotnet test` also writes `build/review/rule-coverage.md` (rules without implementation or examples). Check/fix code style | After any change in `src/` or `tests/`, and after every `kb build` (rebuild so the app and tests embed the new KB). |
 | `pytest`, `ruff check`, `ruff format` | — | Test, lint and format the tooling code in `tools/` (not the validator) | After any change in `tools/`. |
 
 Typical flow:

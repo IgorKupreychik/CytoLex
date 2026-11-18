@@ -3,6 +3,9 @@
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <!-- Full KB (with examples) for the KB-example harness (T-025; docs/design/core.md §6).
+         Independent of the runtime bundle CytoLex.Core embeds. -->
+    <CytoLexKbExamples Condition="'$(CytoLexKbExamples)' == ''">$(RepoRoot)build/kb.json</CytoLexKbExamples>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,4 +19,18 @@
   <ItemGroup>
     <ProjectReference Include="../../src/CytoLex.Core/CytoLex.Core.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="$(CytoLexKbExamples)" LogicalName="CytoLex.Tests.kb.json" Visible="false" />
+    <!-- Repo root, used only to write build/review/rule-coverage.md. -->
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>RepoRoot</_Parameter1>
+      <_Parameter2>$(RepoRoot)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <Target Name="CheckKbExamples" BeforeTargets="BeforeBuild;PrepareResources">
+    <Error Condition="!Exists('$(CytoLexKbExamples)')"
+           Text="KB file not found: $(CytoLexKbExamples). Run 'uv run --directory tools kb build' from the repo root first." />
+  </Target>
 </Project>
