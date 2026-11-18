@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace CytoLex.Core.Kb;
 
 /// <summary>
@@ -15,4 +17,13 @@ internal static class EmbeddedBundle
         typeof(EmbeddedBundle).Assembly.GetManifestResourceStream(ResourceName)
         ?? throw new InvalidOperationException(
             $"Embedded KB bundle '{ResourceName}' is missing; rebuild after 'uv run --directory tools kb build'.");
+
+    private static readonly Lazy<JsonDocument> _document = new(() =>
+    {
+        using var stream = Open();
+        return JsonDocument.Parse(stream);
+    });
+
+    /// <summary>The embedded bundle, parsed once and shared by <see cref="KnowledgeBase"/> and <see cref="Vocabulary"/>.</summary>
+    public static JsonDocument Document => _document.Value;
 }

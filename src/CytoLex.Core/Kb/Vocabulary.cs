@@ -32,7 +32,7 @@ public sealed record VocabEntry(
 
 /// <summary>
 /// The printed vocabularies of one ISCN edition, read from the runtime KB bundle (docs/design/core.md §6).
-/// The lexer builds its symbol set from it, so tokens trace to the KB. T-028's <c>IEditionKb</c> wraps it.
+/// The lexer builds its symbol set from it, so tokens trace to the KB. <see cref="IEditionKb.Vocab"/> exposes it.
 /// </summary>
 public sealed class Vocabulary
 {
@@ -80,14 +80,8 @@ public sealed class Vocabulary
         };
     }
 
-    private static readonly Lazy<JsonDocument> _embedded = new(() =>
-    {
-        using var stream = EmbeddedBundle.Open();
-        return JsonDocument.Parse(stream);
-    });
-
     /// <summary>The vocabularies of <paramref name="edition"/> from the bundle embedded in this assembly.</summary>
-    public static Vocabulary LoadEmbedded(string edition) => FromBundle(_embedded.Value.RootElement, edition);
+    public static Vocabulary LoadEmbedded(string edition) => FromBundle(EmbeddedBundle.Document.RootElement, edition);
 
     /// <summary>The vocabularies of <paramref name="edition"/> from a runtime bundle stream (e.g. a test fixture).</summary>
     public static Vocabulary Load(Stream bundle, string edition)
@@ -97,15 +91,10 @@ public sealed class Vocabulary
         return FromBundle(doc.RootElement, edition);
     }
 
-    private static Vocabulary FromBundle(JsonElement root, string edition)
+    internal static Vocabulary FromBundle(JsonElement root, string edition)
     {
         ArgumentNullException.ThrowIfNull(edition);
-        var version = root.GetProperty("format_version").GetInt32();
-        if (version != SupportedFormatVersion)
-        {
-            throw new InvalidDataException(
-                $"KB runtime bundle format_version {version} is not supported (expected {SupportedFormatVersion}); rebuild with 'uv run --directory tools kb build'.");
-        }
+        KnowledgeBase.CheckFormat(root);
 
         if (!root.GetProperty("editions").TryGetProperty(edition, out var ed))
         {

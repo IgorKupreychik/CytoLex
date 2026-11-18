@@ -16,6 +16,10 @@ public class ContextInferenceTests
     [InlineData("mos 47,XXY[10]/46,XY[20]")]
     [InlineData("chi 46,XX[15]//46,XY[5]")]
     [InlineData("47,XX,+21/46,XX")]
+    [InlineData("47,XX,+8[10]/46,XX[20]")]
+    [InlineData("46,XX[20]//46,XY[10]")]
+    [InlineData("45,X[25]/46,X,i(X)(q10)[25]")]
+    [InlineData("46,XX,t(9;22)(q34;q11.2),del(11)(p11.2p15)[19]/46,XX[1]")]
     [InlineData("")]
     public void NoClearMarker_GivesUnknown(string input)
     {
@@ -33,8 +37,6 @@ public class ContextInferenceTests
     [InlineData("47,XX,+8,sdl,+9", ContextMarkerKind.StemlineReference, "sdl")]
     [InlineData("48,XY,+8,+21c", ContextMarkerKind.ConstitutionalAnomaly, "c")]
     [InlineData("69<3n>,XXX,-1", ContextMarkerKind.PloidyLevel, "<3n>")]
-    [InlineData("47,XX,+8[10]/46,XX[20]", ContextMarkerKind.CloneStructure, "/")]
-    [InlineData("46,XX[20]//46,XY[10]", ContextMarkerKind.CloneStructure, "//")]
     public void AcquiredMarker_GivesAcquired(string input, ContextMarkerKind kind, string markerText)
     {
         var info = Infer(input);
@@ -69,7 +71,7 @@ public class ContextInferenceTests
         Assert.Null(info.Inferred);
         Assert.Null(info.Effective);
         Assert.Equal(
-            [ContextMarkerKind.Recombinant, ContextMarkerKind.CloneStructure, ContextMarkerKind.StemlineReference],
+            [ContextMarkerKind.Recombinant, ContextMarkerKind.StemlineReference],
             info.Markers.Select(m => m.Kind));
     }
 
@@ -104,7 +106,7 @@ public class ContextInferenceTests
     }
 
     [Fact]
-    public void IshSegments_AreScannedButHaveNoCloneStructure()
+    public void IshSegments_AreScanned()
     {
         const string input = "46,XX.ish del(2)(q11.2q13)(RP11-11P22–)[10/30]";
         Assert.Empty(Infer(input).Markers);

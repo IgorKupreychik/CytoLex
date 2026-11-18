@@ -12,7 +12,8 @@ namespace CytoLex.Core.Context;
 /// A lexical scan, since it runs before the parser: words are maximal runs of ASCII letters matched exactly,
 /// so <c>cen</c>, <c>cp</c> or <c>idic</c> never count as the marker <c>c</c>. Only karyotype, in situ
 /// hybridization and cgh segments are scanned; arr, rsa and seq segments are skipped (HGVS <c>c.</c>, free
-/// probe and gene names). The parser (T-027) may later back the same API with tokens.
+/// probe and gene names). Cell lines with <c>[n]</c> counts (<c>/</c>, <c>//</c>) are not a marker: the book writes
+/// constitutional mosaics that way too (§4.1 ¶9, decided in T-028). The parser (T-027) may later back the same API with tokens.
 /// </remarks>
 public static partial class ContextInference
 {
@@ -52,7 +53,6 @@ public static partial class ContextInference
     {
         var text = input.AsSpan(segment.Span.Start, segment.Span.Length);
         var offset = segment.Span.Start;
-        var hasMosOrChi = false;
 
         foreach (var m in Word().EnumerateMatches(text))
         {
@@ -68,9 +68,6 @@ public static partial class ContextInference
                 case "rec":
                     markers.Add(new ContextMarker(ContextMarkerKind.Recombinant, SampleContext.Constitutional, span));
                     break;
-                case "mos" or "chi":
-                    hasMosOrChi = true;
-                    break;
             }
         }
 
@@ -79,33 +76,6 @@ public static partial class ContextInference
             markers.Add(new ContextMarker(ContextMarkerKind.PloidyLevel, SampleContext.Acquired, new TextSpan(offset + m.Index, m.Length)));
         }
 
-        if (segment.Type == NotationType.Karyotype && !hasMosOrChi && CellCount().IsMatch(text)
-            && FirstTopLevelSlash(text) is { } slash)
-        {
-            markers.Add(new ContextMarker(ContextMarkerKind.CloneStructure, SampleContext.Acquired, new TextSpan(offset + slash.Start, slash.Length)));
-        }
-    }
-
-    /// <summary>The first cell-line separator (<c>/</c> or <c>//</c>) outside brackets, relative to <paramref name="text"/>.</summary>
-    private static TextSpan? FirstTopLevelSlash(ReadOnlySpan<char> text)
-    {
-        var depth = 0;
-        for (var i = 0; i < text.Length; i++)
-        {
-            switch (text[i])
-            {
-                case '(' or '[' or '{':
-                    depth++;
-                    break;
-                case ')' or ']' or '}':
-                    depth = Math.Max(0, depth - 1);
-                    break;
-                case '/' when depth == 0:
-                    return new TextSpan(i, i + 1 < text.Length && text[i + 1] == '/' ? 2 : 1);
-            }
-        }
-
-        return null;
     }
 
     [GeneratedRegex("[A-Za-z]+")]
@@ -114,8 +84,4 @@ public static partial class ContextInference
     /// <summary>A ploidy level such as <c>&lt;2n&gt;</c>, <c>&lt;3n&gt;</c> or <c>&lt;4n±&gt;</c>.</summary>
     [GeneratedRegex("<[^<>]*n[^<>]*>")]
     private static partial Regex PloidyLevel();
-
-    /// <summary>A cell count <c>[n]</c>.</summary>
-    [GeneratedRegex(@"\[\d+\]")]
-    private static partial Regex CellCount();
 }

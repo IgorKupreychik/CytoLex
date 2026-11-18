@@ -51,9 +51,10 @@ The parser emits syntax diagnostics; the binder emits diagnostics it finds while
 
 ### 3.3 Context inference
 - `SampleContext` = `Constitutional | Acquired`. KB `context: neoplastic` maps to `Acquired`; KB `meiotic` is a notation type, not a sample context, and is ignored here.
-- Inferred **only from clear markers** (T-021): `idem`/`sl`/`sdl`, a clone structure, `c`, or a ploidy `<Nn>` → `Acquired`; `rec` → `Constitutional`. Anything else → `Unknown`. Contradicting markers → `Unknown` plus an info diagnostic naming both markers.
+- Inferred **only from clear markers** (T-021): `idem`/`sl`/`sdl`, `c`, or a ploidy `<Nn>` → `Acquired` (a clone structure was dropped in T-028, see below); `rec` → `Constitutional`. Anything else → `Unknown`. Contradicting markers → `Unknown` plus an info diagnostic naming both markers.
 - An explicit `ContextHint` overrides inference. The effective context per string is `Constitutional`, `Acquired` or `Unknown`; it drives conditional diagnostics (§8.3).
 - The result reports the inferred context and the marker span(s) that decided it.
+- **T-028 change (decided with the user):** cell lines with `[n]` counts (`/`, `//`) are **no longer** an acquired marker — the book writes constitutional mosaics that way without `mos` (§4.1 ¶9: `45,X[25]/46,X,i(X)(q10)[25]`), so the shape is not a clear marker. Such strings have an unknown context and context-limited rules report conditionally; a hint or a clear marker makes them firm. The T-026 note below is kept for history.
 - **As built (T-026, lexical scan, decided with the user):** words are maximal ASCII letter runs matched exactly (`cen`, `cp`, `idic` never count as `c`). Acquired: `idem`/`sl`/`sdl`, `c`, `<…n…>`, and a **clone structure** = a top-level `/` or `//` in a karyotype segment with a `[n]` cell count and no `mos`/`chi` word (constitutional mosaics and chimeras are not clone markers). Constitutional: `rec`. Only karyotype, ish-family and cgh segments are scanned (arr/rsa/seq skipped: HGVS `c.`, probe and gene names). Contradiction → `ContextInfo.IsContradictory` with all markers; the info diagnostic is emitted by the engine (T-028). Code: `CytoLex.Core.Context.ContextInference`; the parser (T-027) may back the same API with tokens.
 
 ## 4. Syntax layer (lossless)
@@ -115,7 +116,7 @@ sealed record DerivativeStructure(ImmutableArray<SegmentPiece> Pieces); // order
 **Decision (this task, with the user):** the validator reads a **lean runtime bundle** into memory, behind an interface; the bundle is **embedded in `CytoLex.Core`**; the rule browser and search use `build/kb.sqlite`.
 
 ```csharp
-interface IKnowledgeBase { IReadOnlyList<Edition> Editions { get; } IEditionKb? Get(Edition e); }
+interface IKnowledgeBase { IReadOnlyList<Edition> Editions { get; } IEditionKb? ForEdition(Edition e); }
 interface IEditionKb {
     Edition Edition { get; }
     KbRule? Rule(string id);                 // severity, title, statement, citations (rendered), applies_to,
@@ -157,6 +158,11 @@ sealed class ChromosomeOrderCheck : IRuleCheck {
 - `applies_to` filters which segments a rule sees; rules with `general` run on every implemented type.
 - Rules with KB `context` run in every context; the engine turns their findings into conditional diagnostics when the effective context is unknown (§8.3), and drops them when the effective context excludes them.
 
+- **As built (T-028):**
+  - Edition IDs are strings (`"2016"`), as in `Parser.ForEdition` and `[KbRule(Editions = …)]`. KB: `CytoLex.Core.Kb.KnowledgeBase` (`LoadEmbedded`, `Load(Stream)`) → `IKnowledgeBase.ForEdition` (renamed from `Get`, analyzer CA1716) → `IEditionKb` (`Rules`, `Rule(id)` → `KbRule` with rendered `Citation`s, `Vocab`, `BandSet? Bands`).
+  - Engine: `CytoLex.Core.Rules` — `IRuleCheck.Check(RuleContext)` (the context exposes input, segment, syntax tree, `ContextInfo`, `KbRule`, edition KB; `Report(span, detail, secondarySpans, certainty, contexts, cannotVerify)`), `RuleCatalog` (scan, startup check incl. `Parser.RuleIds`, most specific variant: exact edition > range > any; equally specific → exception), `EditionProfile` / `EditionProfiles` (pilot: 2016 → karyotype), `EditionCoverage` (checked rule IDs + parser-reported rule IDs, `Validator.Coverage(edition)`).
+  - Parse sharing is not implemented (optimisation only). The semantic model is added to `RuleContext` by T-065.
+
 ## 8. Diagnostics
 
 ### 8.1 Shape
@@ -196,6 +202,11 @@ sealed record ContextCondition(ImmutableDictionary<SampleContext, Severity?> Per
 - Each recovery point in the parser names the KB rule that defines the expected form (`KARYO.COUNT_SEX_ORDER`, `DEL.FORMAT`, `SYM.LISTED_ONLY` for an unknown symbol, `CHROM.IDENTIFIERS` for chromosome 23, `BAND.MUST_EXIST` for an unknown band).
 - If no KB rule describes an expected form, that is a KB gap to fix before implementing. As a safety net only, an internal `CORE.UNPARSED` code (no citation, severity error, flagged in the coverage report) marks text the parser could not attribute; T-025 treats any occurrence on a KB example as a test failure.
 
+### 8.5 As built (T-028)
+- `CytoLex.Core.Validation.Diagnostic` follows §8.1 plus `Detail` (the parser's or check's own message; `Message` is the KB title) and `Origin = Core` for engine codes. `Fixes` stays empty until T-035.
+- Severity resolution (§8.2 steps 1–5) and conditions (§8.3) are in `DiagnosticFactory`. A check may narrow the contexts of one finding (`contexts`); otherwise the KB `context` applies. Step 6 (band `book: false`) is T-029.
+- Contradicting context markers → **`CORE.CONTEXT_CONFLICT`** (decided with the user): info, no citation, the first marker as span and the others as secondary spans. It is a core code like `CORE.UNPARSED`, not a KB rule, because it comes from CytoLex's inference, not from the book.
+
 ## 9. Results API
 
 ```csharp
@@ -225,6 +236,7 @@ sealed record Validity(bool IsValid, ImmutableArray<SampleContext> ValidContexts
 - **Counts** per severity, conditional diagnostics counted by their worst severity and listed separately (`ConditionalCount`).
 - **Ordering:** diagnostics sorted by span start, then severity.
 - **Serialisation:** all result types serialise to JSON with System.Text.Json (KB IDs and spans included) for batch export (T-038) and the web service (T-044).
+- **As built (T-028):** `Validator(IKnowledgeBase)`, `Validator.Default` (embedded KB), `Validate(input, ValidationOptions)`. `ValidationOptions` has `Editions` (`EditionSelection.One(e) | All | Default`), `ContextHint` and `IsFragment` (book fragments use the parser's fragment entry; for the KB-example harness and the rule browser). Translation and coordinates options come with T-058. `EditionResult` has a `Reason` for not-implemented editions; segments are `SegmentResult(Segment, Status, Reason, Constructs)`. Known editions = KB editions ∪ `Validator.IscnEditions` (2016, 2020, 2024). `Validity.ValidContexts` with a known context is `[effective]` when valid. `Validator.JsonOptions` serialises enums by name (round-trip tested).
 - **Messages:** English in the pilot; messages are built from KB titles plus check arguments, so localisation is a data question later.
 
 ## 10. Fix model
@@ -278,4 +290,5 @@ The core model guarantees what the renderer needs; the renderer itself is T-058.
 - **T-056:** severities in the KB are applied to the policy; until then results use the current KB severities.
 - **`CORE.UNPARSED`** (§8.4): kept only as a safety net; every occurrence on a KB example is a KB/parser gap.
 - **Default edition** for `EditionSelection` when none is given: the newest implemented edition (2016 in the pilot).
+- **T-028** (done 2026-11-18): engine, KB loader and result API as built (§7.2, §8.5, §9); clone structure dropped as a context marker (§3.3).
 - **T-065** (from T-027): the binder (syntax tree → semantic model, §5) is its own task; T-027 delivers the syntax layer only.

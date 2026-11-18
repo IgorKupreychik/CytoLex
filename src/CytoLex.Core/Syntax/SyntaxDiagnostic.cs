@@ -37,4 +37,10 @@ public static class CoreCodes
 {
     /// <summary>Text the parser could not attribute to any KB rule; on a KB example it is a KB or parser gap.</summary>
     public const string Unparsed = "CORE.UNPARSED";
+
+    /// <summary>
+    /// The context markers contradict (e.g. <c>rec</c> and <c>idem</c>), so the context is unknown (§3.3). An info from the
+    /// engine, not an ISCN rule (decided in T-028): CytoLex's own context inference, so it has no book citation.
+    /// </summary>
+    public const string ContextConflict = "CORE.CONTEXT_CONFLICT";
 }

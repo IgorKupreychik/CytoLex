@@ -16,7 +16,9 @@ internal sealed record ExampleOutcome(string? SkipReason, IReadOnlyList<string> 
 /// <item><b>Valid</b> (whole string): valid without a hint, valid in the rule's contexts, no errors with a matching hint; the rule never fires.</item>
 /// <item><b>Valid</b> (fragment): only "the rule never fires".</item>
 /// <item><b>Invalid</b>: without a hint the rule fires (firm or conditional, never silence); with a matching hint it fires firmly;
-/// severity = KB severity, at most warning for <c>needs_review</c> rules and uncertain findings.</item>
+/// severity = KB severity, at most warning for <c>needs_review</c> rules and uncertain findings. A rule without a <c>[KbRule]</c>
+/// check is still run (the parser reports surface parts of some rules): if it fires without a hint the case is checked as
+/// usual, otherwise it is skipped as not implemented (decided in T-028).</item>
 /// <item><b>Corrected</b>: the corrected form passes as a valid example; with a fixer, a fix of the rule's diagnostic previews it exactly.</item>
 /// <item>No <c>CORE.UNPARSED</c> on any example.</item>
 /// </list>
@@ -33,7 +35,8 @@ internal static class ExampleExpectations
             return ExampleOutcome.Skip(NoValidator);
         }
 
-        if (c.Kind == ExampleKind.Invalid && !ruleImplemented)
+        if (c.Kind == ExampleKind.Invalid && !ruleImplemented
+            && !validator.Run(c.Rule.Edition, c.Text, null, c.IsFragment).Diagnostics.Any(d => d.RuleId == c.Rule.Id))
         {
             return ExampleOutcome.Skip($"rule {c.Rule.Id} not implemented");
         }
