@@ -233,6 +233,14 @@ public class ExampleExpectationsTests
     [InlineData("psu dic", true)]
     [InlineData("chr(2)", true)]
     [InlineData("43~47,XX,…", true)]
+    [InlineData("46XX", false)]
+    [InlineData("45,Z", false)]
+    [InlineData("58<2n>,XY", false)]
+    [InlineData("58(2n),XY", false)]
+    [InlineData("1p31", true)]
+    [InlineData("1P31", true)]
+    [InlineData("16qh+", true)]
+    [InlineData("1q23 or q24", true)]
     public void IsFragment(string text, bool expected) => Assert.Equal(expected, KbCatalog.IsFragment(text));
 
     [Fact]

@@ -95,12 +95,14 @@ internal sealed partial class KbCatalog
 
     /// <summary>
     /// A book fragment, not a whole notation string: it contains <c>…</c> (omitted abnormalities,
-    /// docs/decisions.md T-010), or it does not start like a whole string (a count, <c>mos</c>/<c>chi</c>,
-    /// <c>//</c>, <c>end</c>, or a technique keyword such as <c>ish</c>/<c>arr</c>), e.g. <c>inv(2)</c>, <c>+21</c>, <c>GTG</c>.
+    /// docs/decisions.md T-010), or it does not start like a whole string (a count followed by <c>,</c>, <c>~</c>,
+    /// <c>&lt;</c>, <c>X</c>/<c>Y</c> or the end; <c>mos</c>/<c>chi</c>, <c>//</c>, <c>end</c>, or a technique keyword such as
+    /// <c>ish</c>/<c>arr</c>), e.g. <c>inv(2)</c>, <c>+21</c>, <c>GTG</c>, and bare bands or variants such as <c>1p31</c>,
+    /// <c>16qh+</c> (T-027).
     /// </summary>
     public static bool IsFragment(string text) => text.Contains('…', StringComparison.Ordinal) || !WholeStringStart().IsMatch(text);
 
-    [GeneratedRegex(@"^(?:\d|//|(?:mos|chi|end|ish|nuc ish|fib ish|rev ish|cgh|arr|rsa|seq)(?![A-Za-z]))")]
+    [GeneratedRegex(@"^(?:\d+(?:[,~<(XY]|$)|//|(?:mos|chi|end|ish|nuc ish|fib ish|rev ish|cgh|arr|rsa|seq)(?![A-Za-z]))")]
     private static partial Regex WholeStringStart();
 
     public static KbCatalog Load(Stream json)

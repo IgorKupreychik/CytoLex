@@ -1,0 +1,1208 @@
+using System.Collections.Frozen;
+using System.Collections.Immutable;
+using CytoLex.Core.Kb;
+using CytoLex.Core.Segmentation;
+using CytoLex.Core.Text;
+
+namespace CytoLex.Core.Syntax;
+
+/// <summary>
+/// Hand-written recursive-descent parser for karyotype segments (docs/design/core.md §4, T-027). It builds a
+/// lossless tree, never stops at the first error and names the KB rule of the expected form at every recovery (§8.4).
+/// </summary>
+/// <remarks>
+/// The grammar is deliberately permissive where the tree can represent the text: symbol combinations
+/// (<c>der dic</c>, <c>min mar</c>), group counts (<c>t(2;5)(q21)</c>), order, spacing (kept as trivia), band
+/// existence, arms inside chromosome lists (<c>del(5q)</c>, needed for <c>rec(2)dup(2p)…</c>) and the like are judged by
+/// the rules (T-029+). The parser reports what breaks the surface form: missing or misplaced punctuation, signs on the
+/// wrong side, unlisted words, chromosomes without parentheses, malformed sub-bands, misplaced prefixes.
+/// </remarks>
+public sealed class Parser
+{
+    // Word classes. Each word is a ch. 3 symbol; a test checks them against the vocab (KB-traced).
+    internal static readonly FrozenSet<string> PrefixWords = Set("mos", "chi", "end");
+    internal static readonly FrozenSet<string> InheritanceWords = Set("mat", "pat", "inh", "dn");
+    internal static readonly FrozenSet<string> ArmWords = Set("p", "q");
+    internal static readonly FrozenSet<string> LandmarkWords = Set("pter", "qter", "cen", "ter", "hsr", "neo");
+
+    /// <summary>Variant features after a chromosome (§7.1): <c>h</c>, <c>s</c>, <c>stk</c>, <c>var</c>, satellited arms <c>ps</c>/<c>qs</c>, <c>cen</c>.</summary>
+    internal static readonly FrozenSet<string> FeatureWords = Set("h", "s", "stk", "var", "ps", "qs", "cen");
+
+    /// <summary>Symbols that take a number right after them (<c>mar1</c>, <c>r2</c>: MAR.NUMBERED, RING.UNIDENTIFIED; <c>sl1</c>, <c>sdl2</c>: §11.1.4).</summary>
+    internal static readonly FrozenSet<string> NumberedSymbols = Set("mar", "r", "sl", "sdl");
+
+    /// <summary>Words that never start or continue an abnormality's symbols.</summary>
+    internal static readonly FrozenSet<string> NonSymbolWords =
+        Set("c", "or", "mat", "pat", "inh", "dn", "p", "q", "pter", "qter", "cen", "ter", "h", "s", "stk", "var", "ps", "qs");
+
+    // KB rule IDs used at recovery points (docs/design/core.md §8.4).
+    internal const string CountSexOrder = "KARYO.COUNT_SEX_ORDER";
+    internal const string AbnormalityOrder = "KARYO.ABNORMALITY_ORDER";
+    internal const string ChromosomeInParentheses = "KARYO.CHROMOSOME_IN_PARENTHESES";
+    internal const string ChromosomeSeparator = "STRUCT.CHROMOSOME_SEPARATOR";
+    internal const string BreakpointGroups = "STRUCT.BREAKPOINT_GROUPS";
+    internal const string GainLossSign = "KARYO.GAIN_LOSS_SIGN";
+    internal const string NoArmLengthSign = "KARYO.NO_ARM_LENGTH_SIGN";
+    internal const string VarLengthSign = "VAR.LENGTH_SIGN";
+    internal const string ListedOnly = "SYM.LISTED_ONLY";
+    internal const string TypedSymbolForms = "SYM.TYPED_SYMBOL_FORMS";
+    internal const string ArmSymbol = "BAND.ARM_SYMBOL";
+    internal const string SubbandFormat = "BAND.SUBBAND_FORMAT";
+    internal const string ChromIdentifiers = "CHROM.IDENTIFIERS";
+    internal const string CloneSeparator = "KARYO.CLONE_SEPARATOR";
+    internal const string MosaicChimeraPrefix = "KARYO.MOSAIC_CHIMERA_PREFIX";
+    internal const string Endoreduplication = "KARYO.ENDOREDUPLICATION";
+    internal const string ParentalOrigin = "KARYO.PARENTAL_ORIGIN";
+    internal const string MultiplySignAfter = "KARYO.MULTIPLY_SIGN_AFTER_ABNORMALITY";
+    internal const string PloidyInAngleBrackets = "NUM.PLOIDY_IN_ANGLE_BRACKETS";
+    internal const string QuestionableItem = "UNCERTAIN.QUESTIONABLE_ITEM";
+    internal const string DminFormat = "DMIN.FORMAT";
+    internal const string UpdFormat = "UPD.FORMAT";
+
+    /// <summary>Every KB rule ID the parser can report (a test checks they exist in the KB).</summary>
+    internal static readonly ImmutableArray<string> RuleIds =
+    [
+        CountSexOrder, AbnormalityOrder, ChromosomeInParentheses, ChromosomeSeparator, BreakpointGroups, GainLossSign,
+        NoArmLengthSign, VarLengthSign, ListedOnly, TypedSymbolForms, ArmSymbol, SubbandFormat, ChromIdentifiers,
+        CloneSeparator, MosaicChimeraPrefix, Endoreduplication, ParentalOrigin, MultiplySignAfter, PloidyInAngleBrackets,
+        QuestionableItem, DminFormat, UpdFormat,
+    ];
+
+    private static readonly Dictionary<string, Parser> _byEdition = new(StringComparer.Ordinal);
+    private static readonly Lock _byEditionLock = new();
+
+    private readonly Vocabulary _vocab;
+    private readonly Lexer _lexer;
+
+    public Parser(Vocabulary vocab)
+    {
+        ArgumentNullException.ThrowIfNull(vocab);
+        _vocab = vocab;
+        _lexer = new Lexer(vocab);
+    }
+
+    /// <summary>A parser for <paramref name="edition"/> using the embedded KB vocab (cached; thread-safe).</summary>
+    public static Parser ForEdition(string edition)
+    {
+        lock (_byEditionLock)
+        {
+            if (!_byEdition.TryGetValue(edition, out var parser))
+            {
+                parser = new Parser(Vocabulary.LoadEmbedded(edition));
+                _byEdition[edition] = parser;
+            }
+
+            return parser;
+        }
+    }
+
+    /// <summary>The vocabularies the parser was built from.</summary>
+    public Vocabulary Vocabulary => _vocab;
+
+    /// <summary>Parses a whole karyotype segment: <c>[mos|chi|end] count[,sex][,abnormalities][cells] (/|// …)*</c>.</summary>
+    public SyntaxTree ParseKaryotype(string input, Segment segment) => Parse(input, segment, fragment: false);
+
+    /// <summary>
+    /// Parses a book fragment (<c>inv(2)</c>, <c>+21</c>, <c>1p31</c>, <c>16qh+</c>, <c>psu dic</c>, <c>43~47,XX,…</c>):
+    /// the same grammar with the count and sex chromosomes optional.
+    /// </summary>
+    public SyntaxTree ParseFragment(string input, Segment segment) => Parse(input, segment, fragment: true);
+
+    /// <summary>Parses <paramref name="segment"/> of <paramref name="input"/> as a whole karyotype or a fragment.</summary>
+    public SyntaxTree Parse(string input, Segment segment, bool fragment)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        ArgumentNullException.ThrowIfNull(segment);
+        var tokens = _lexer.Lex(input, segment.Span);
+        var run = new Run(tokens);
+        var root = run.ParseRoot(fragment);
+        return new SyntaxTree(
+            input,
+            segment,
+            root,
+            [.. run.Diagnostics.OrderBy(d => d.Span.Start)],
+            FindConstructs(tokens));
+    }
+
+    private ImmutableArray<NotImplementedConstruct> FindConstructs(ImmutableArray<SyntaxToken> tokens)
+    {
+        var result = ImmutableArray.CreateBuilder<NotImplementedConstruct>();
+        foreach (var t in tokens)
+        {
+            if (t.Kind == TokenKind.Word)
+            {
+                switch (t.Text)
+                {
+                    case "idem" or "sl" or "sdl":
+                        result.Add(new(ConstructKind.CloneReference, t.Span, $"clone reference '{t.Text}' (§11.1.4): not implemented in the pilot"));
+                        break;
+                    case "cp":
+                        result.Add(new(ConstructKind.Composite, t.Span, "composite karyotype 'cp' (§11.1.5): not implemented in the pilot"));
+                        break;
+                    default:
+                        if (_vocab.Find(t.Text) is { Sections.Length: > 0 } entry)
+                        {
+                            if (entry.Sections.All(s => s.StartsWith("10.", StringComparison.Ordinal)))
+                            {
+                                result.Add(new(ConstructKind.Breakage, t.Span, $"breakage symbol '{t.Text}' (ch. 10): not implemented in the pilot"));
+                            }
+                            else if (entry.Sections.All(s => s.StartsWith("12.", StringComparison.Ordinal)))
+                            {
+                                result.Add(new(ConstructKind.Meiotic, t.Span, $"meiotic symbol '{t.Text}' (ch. 12): not implemented in the pilot"));
+                            }
+                        }
+
+                        break;
+                }
+            }
+
+            if (t.IsUnderlined)
+            {
+                result.Add(new(ConstructKind.Underlining, t.Span, "underlined homologue (T-042): not implemented in the pilot"));
+            }
+        }
+
+        return result.ToImmutable();
+    }
+
+    private static FrozenSet<string> Set(params string[] words) => words.ToFrozenSet(StringComparer.Ordinal);
+
+    /// <summary>State of one parse.</summary>
+    private sealed class Run(ImmutableArray<SyntaxToken> tokens)
+    {
+        private int _pos;
+
+        public List<SyntaxDiagnostic> Diagnostics { get; } = [];
+
+        private SyntaxToken Current => tokens[_pos];
+
+        private SyntaxToken Peek(int k) => tokens[Math.Min(_pos + k, tokens.Length - 1)];
+
+        private SyntaxToken Previous => tokens[Math.Max(_pos - 1, 0)];
+
+        private bool At(TokenKind kind) => Current.Kind == kind;
+
+        private bool AtEnd => Current.Kind == TokenKind.EndOfSegment;
+
+        private bool AtWord(string word) => Current.Kind == TokenKind.Word && Current.Text == word;
+
+        private static bool IsWord(SyntaxToken t, FrozenSet<string> set) => t.Kind == TokenKind.Word && set.Contains(t.Text);
+
+        /// <summary>The current token directly follows the previous one (no whitespace between).</summary>
+        private bool Adjacent => _pos > 0 && !Previous.HasTrailingTrivia;
+
+        private bool AtCellLineEnd => Current.Kind is TokenKind.Slash or TokenKind.DoubleSlash or TokenKind.EndOfSegment;
+
+        /// <summary>Tokens that end an item: <c>,</c> <c>/</c> <c>//</c> <c>[</c> or the end.</summary>
+        private bool AtItemEnd => Current.Kind is TokenKind.Comma or TokenKind.Slash or TokenKind.DoubleSlash
+            or TokenKind.OpenBracket or TokenKind.EndOfSegment;
+
+        private SyntaxToken Eat()
+        {
+            var t = tokens[_pos];
+            if (t.Kind != TokenKind.EndOfSegment)
+            {
+                _pos++;
+            }
+
+            return t;
+        }
+
+        /// <summary>A zero-width token at the insertion point (the end of the previous token).</summary>
+        private SyntaxToken Missing(TokenKind kind, string text)
+        {
+            var at = _pos > 0 ? Previous.Span.End : Current.Span.Start;
+            return new SyntaxToken(kind, new TextSpan(at, 0), text, [], [], isMissing: true);
+        }
+
+        private void Report(string rule, TextSpan span, SyntaxDiagnosticKind kind, string message, string? expected = null) =>
+            Diagnostics.Add(new SyntaxDiagnostic(rule, span, kind, expected, message));
+
+        private static SyntaxNode Node(SyntaxKind kind, IEnumerable<SyntaxElement> children) => new(kind, [.. children]);
+
+        private static SyntaxNode Node(SyntaxKind kind, params SyntaxElement[] children) => new(kind, [.. children]);
+
+        private static TextSpan Cover(SyntaxElement first, SyntaxElement last) => TextSpan.FromBounds(first.Span.Start, last.Span.End);
+
+        /// <summary>Skips tokens up to (not including) one that <paramref name="stop"/> accepts; at least one token is skipped.</summary>
+        private SyntaxNode Skip(Func<SyntaxToken, bool> stop, string rule, string message)
+        {
+            var skipped = new List<SyntaxElement>();
+            do
+            {
+                skipped.Add(Eat());
+            }
+            while (!AtEnd && !stop(Current));
+
+            var node = Node(SyntaxKind.Skipped, skipped);
+            Report(rule, node.Span, SyntaxDiagnosticKind.Skipped, message);
+            return node;
+        }
+
+        // ── Root and cell lines ──────────────────────────────────────────────────────────────────────
+
+        public SyntaxNode ParseRoot(bool fragment)
+        {
+            var children = new List<SyntaxElement>();
+            if (AtEnd && !fragment)
+            {
+                Report(CountSexOrder, new TextSpan(Current.Span.Start, 0), SyntaxDiagnosticKind.Missing, "The karyotype is empty; it starts with the chromosome count.");
+            }
+
+            while (IsWord(Current, PrefixWords))
+            {
+                children.Add(Node(SyntaxKind.Prefix, Eat()));
+            }
+
+            while (true)
+            {
+                if (!AtCellLineEnd)
+                {
+                    children.Add(ParseCellLine(fragment));
+                }
+
+                if (At(TokenKind.Slash) || At(TokenKind.DoubleSlash))
+                {
+                    children.Add(Node(SyntaxKind.CellLineSeparator, Eat()));
+                    continue;
+                }
+
+                if (At(TokenKind.Comma) && children[^1] is SyntaxNode { Kind: SyntaxKind.CellLine } line
+                    && line.Children[^1] is SyntaxNode { Kind: SyntaxKind.CellCount })
+                {
+                    Report(CloneSeparator, Current.Span, SyntaxDiagnosticKind.Unexpected, "Cell lines are separated by a slant line (/), not a comma.", "/");
+                    children.Add(Node(SyntaxKind.CellLineSeparator, Eat()));
+                    continue;
+                }
+
+                if (IsWord(Current, PrefixWords))
+                {
+                    var word = Current;
+                    if (word.Text == "end")
+                    {
+                        Report(Endoreduplication, word.Span, SyntaxDiagnosticKind.Unexpected, "'end' goes before the karyotype designation.");
+                    }
+                    else
+                    {
+                        Report(MosaicChimeraPrefix, word.Span, SyntaxDiagnosticKind.Unexpected, $"'{word.Text}' goes before the karyotype designations.");
+                    }
+
+                    children.Add(Node(SyntaxKind.MisplacedPrefix, Eat()));
+                    continue;
+                }
+
+                if (AtEnd)
+                {
+                    break;
+                }
+
+                children.Add(Skip(t => t.Kind is TokenKind.Slash or TokenKind.DoubleSlash, CoreCodes.Unparsed, "Text not understood."));
+            }
+
+            children.Add(Eat()); // EndOfSegment: carries the whitespace of an empty segment
+            return Node(fragment ? SyntaxKind.Fragment : SyntaxKind.Karyotype, children);
+        }
+
+        private SyntaxNode ParseCellLine(bool fragment)
+        {
+            var children = new List<SyntaxElement>();
+            var needComma = true;
+
+            if (At(TokenKind.ChromosomeLetter) && SexThenCount())
+            {
+                // "XX,46": sex chromosomes before the count.
+                var sex = ParseSex();
+                var comma = Eat();
+                var count = ParseCount();
+                Report(CountSexOrder, Cover(sex, count), SyntaxDiagnosticKind.Unexpected, "The chromosome count comes before the sex chromosomes.");
+                children.AddRange([sex, comma, count]);
+            }
+            else if (!fragment || LooksLikeHeader())
+            {
+                needComma = ParseHeader(children);
+            }
+            else
+            {
+                children.Add(ParseItem());
+            }
+
+            while (true)
+            {
+                if (At(TokenKind.Comma))
+                {
+                    children.Add(Eat());
+                    children.Add(ParseItem());
+                    continue;
+                }
+
+                if (!needComma && !IsWord(Current, PrefixWords) && !At(TokenKind.OpenBracket) && !AtCellLineEnd)
+                {
+                    // The header's comma was already read (no sex chromosomes): the first item follows.
+                    needComma = true;
+                    children.Add(ParseItem());
+                    continue;
+                }
+
+                if (At(TokenKind.OpenBracket))
+                {
+                    children.Add(ParseCellCount());
+                    break;
+                }
+
+                if (At(TokenKind.OpenParen) && Peek(1).Kind == TokenKind.Number && Peek(2).Kind == TokenKind.CloseParen)
+                {
+                    var open = Eat();
+                    var n = Eat();
+                    var close = Eat();
+                    Report(CloneSeparator, Cover(open, close), SyntaxDiagnosticKind.Unexpected, "Cell counts are written in square brackets.", "[" + n.Text + "]");
+                    children.Add(Node(SyntaxKind.CellCount, open, n, close));
+                    break;
+                }
+
+                if (At(TokenKind.Plus) || At(TokenKind.Minus))
+                {
+                    var missing = Missing(TokenKind.Comma, ",");
+                    Report(AbnormalityOrder, missing.Span, SyntaxDiagnosticKind.Missing, "Abnormalities are separated by commas.", ",");
+                    children.Add(missing);
+                    children.Add(ParseItem());
+                    continue;
+                }
+
+                break;
+            }
+
+            return Node(SyntaxKind.CellLine, children);
+        }
+
+        /// <summary><c>XX,46</c>: X/Y letters, a comma, then a number.</summary>
+        private bool SexThenCount()
+        {
+            var k = 0;
+            while (Peek(k).Kind == TokenKind.ChromosomeLetter)
+            {
+                k++;
+            }
+
+            return Peek(k).Kind == TokenKind.Comma && Peek(k + 1).Kind == TokenKind.Number;
+        }
+
+        /// <summary>A fragment starts with a header: <c>count[~count][&lt;…&gt;],</c>.</summary>
+        private bool LooksLikeHeader()
+        {
+            var k = 0;
+            if (Peek(k).Kind != TokenKind.Number)
+            {
+                return false;
+            }
+
+            k++;
+            if (Peek(k).Kind == TokenKind.Tilde && Peek(k + 1).Kind == TokenKind.Number)
+            {
+                k += 2;
+            }
+
+            if (Peek(k).Kind == TokenKind.OpenAngle)
+            {
+                while (Peek(k).Kind is not (TokenKind.CloseAngle or TokenKind.EndOfSegment))
+                {
+                    k++;
+                }
+
+                k++;
+            }
+
+            return Peek(k).Kind == TokenKind.Comma;
+        }
+
+        /// <summary>Count, ploidy, comma, sex chromosomes. Returns whether the next item needs a comma first (false when no sex field follows the comma).</summary>
+        private bool ParseHeader(List<SyntaxElement> children)
+        {
+            if (!At(TokenKind.Number) && !At(TokenKind.Tilde))
+            {
+                var missing = Missing(TokenKind.Number, "46");
+                Report(CountSexOrder, missing.Span, SyntaxDiagnosticKind.Missing, "The karyotype starts with the chromosome count.");
+                children.Add(Node(SyntaxKind.ChromosomeCount, missing));
+                if (!AtItemEnd)
+                {
+                    children.Add(ParseItem());
+                }
+
+                return true;
+            }
+
+            children.Add(ParseCount());
+
+            if (At(TokenKind.OpenAngle))
+            {
+                children.Add(ParsePloidy());
+            }
+            else if (At(TokenKind.OpenParen) && Peek(1).Kind == TokenKind.Number && IsPloidyN(Peek(2)) && Peek(3).Kind == TokenKind.CloseParen)
+            {
+                var ploidy = Node(SyntaxKind.Ploidy, Eat(), Eat(), Eat(), Eat());
+                Report(PloidyInAngleBrackets, ploidy.Span, SyntaxDiagnosticKind.Unexpected, "The ploidy level is written in angle brackets.");
+                children.Add(ploidy);
+            }
+
+            if (At(TokenKind.Comma) && Peek(1).Kind == TokenKind.OpenAngle)
+            {
+                Report(PloidyInAngleBrackets, Current.Span, SyntaxDiagnosticKind.Unexpected, "The ploidy level follows the count directly, without a comma.");
+                children.Add(Eat());
+                children.Add(ParsePloidy());
+            }
+
+            if (At(TokenKind.Comma))
+            {
+                children.Add(Eat());
+            }
+            else if (AtCellLineEnd || At(TokenKind.OpenBracket))
+            {
+                return true;
+            }
+            else
+            {
+                var missing = Missing(TokenKind.Comma, ",");
+                Report(CountSexOrder, missing.Span, SyntaxDiagnosticKind.Missing, "A comma follows the chromosome count.", ",");
+                children.Add(missing);
+            }
+
+            if (At(TokenKind.ChromosomeLetter) && IsSexField())
+            {
+                children.Add(ParseSex());
+                return true;
+            }
+
+            if ((At(TokenKind.UnknownWord) || At(TokenKind.Word)) && Current.Text.All(char.IsAsciiLetterUpper)
+                && Current.Text.Length <= 2 && Peek(1).Kind is TokenKind.Comma or TokenKind.OpenBracket or TokenKind.Slash or TokenKind.DoubleSlash or TokenKind.EndOfSegment)
+            {
+                Report(ChromIdentifiers, Current.Span, SyntaxDiagnosticKind.Unexpected, $"'{Current.Text}' is not a sex chromosome; they are X and Y.");
+                children.Add(Node(SyntaxKind.SexChromosomes, Eat()));
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsPloidyN(SyntaxToken t) => t.Kind is TokenKind.UnknownWord or TokenKind.Word && t.Text == "n";
+
+        private SyntaxNode ParseCount()
+        {
+            var children = new List<SyntaxElement>();
+            if (At(TokenKind.Number))
+            {
+                children.Add(Eat());
+            }
+
+            if (At(TokenKind.Tilde))
+            {
+                children.Add(Eat());
+                children.Add(At(TokenKind.Number) ? Eat() : MissingReported(TokenKind.Number, "48", CoreCodes.Unparsed, "A number follows '~'."));
+            }
+
+            return Node(SyntaxKind.ChromosomeCount, children);
+        }
+
+        private SyntaxToken MissingReported(TokenKind kind, string text, string rule, string message)
+        {
+            var missing = Missing(kind, text);
+            Report(rule, missing.Span, SyntaxDiagnosticKind.Missing, message, text);
+            return missing;
+        }
+
+        private SyntaxNode ParsePloidy()
+        {
+            var children = new List<SyntaxElement> { Eat() };
+            while (!At(TokenKind.CloseAngle) && !AtItemEnd)
+            {
+                children.Add(Eat());
+            }
+
+            children.Add(At(TokenKind.CloseAngle) ? Eat() : MissingReported(TokenKind.CloseAngle, ">", CoreCodes.Unparsed, "'<' needs a closing '>'."));
+            return Node(SyntaxKind.Ploidy, children);
+        }
+
+        /// <summary>X/Y letters (then <c>c</c>, <c>?c</c>) not followed by an arm or a number: the sex chromosome field.</summary>
+        private bool IsSexField()
+        {
+            var k = 0;
+            while (Peek(k).Kind == TokenKind.ChromosomeLetter)
+            {
+                k++;
+            }
+
+            var next = Peek(k);
+            return !(next.Kind == TokenKind.Number || IsWord(next, ArmWords) || IsWord(next, FeatureWords) || IsWord(next, LandmarkWords));
+        }
+
+        private SyntaxNode ParseSex()
+        {
+            var children = new List<SyntaxElement>();
+            while (At(TokenKind.ChromosomeLetter))
+            {
+                children.Add(Eat());
+            }
+
+            if (AtWord("c") || (At(TokenKind.Question) && Peek(1) is { Kind: TokenKind.Word, Text: "c" }))
+            {
+                var suffix = new List<SyntaxElement>();
+                if (At(TokenKind.Question))
+                {
+                    suffix.Add(Eat());
+                }
+
+                suffix.Add(Eat());
+                if (At(TokenKind.Question) && Adjacent)
+                {
+                    suffix.Add(Eat()); // "c?": order judged by KARYO.UNCERTAIN_CONSTITUTIONAL
+                }
+
+                children.Add(Node(SyntaxKind.Suffix, suffix));
+            }
+
+            return Node(SyntaxKind.SexChromosomes, children);
+        }
+
+        private SyntaxNode ParseCellCount()
+        {
+            var children = new List<SyntaxElement> { Eat() };
+            while (!At(TokenKind.CloseBracket) && !AtCellLineEnd && !At(TokenKind.Comma))
+            {
+                children.Add(Eat());
+            }
+
+            children.Add(At(TokenKind.CloseBracket) ? Eat() : MissingReported(TokenKind.CloseBracket, "]", CoreCodes.Unparsed, "'[' needs a closing ']'."));
+            return Node(SyntaxKind.CellCount, children);
+        }
+
+        // ── Items ────────────────────────────────────────────────────────────────────────────────────
+
+        private SyntaxNode ParseItem()
+        {
+            var first = ParseItemCore();
+            if (!AtWord("or"))
+            {
+                return Node(SyntaxKind.Item, first);
+            }
+
+            var alternatives = new List<SyntaxElement> { first };
+            while (AtWord("or"))
+            {
+                alternatives.Add(Eat());
+                alternatives.Add(ParseItemCore());
+            }
+
+            return Node(SyntaxKind.Item, Node(SyntaxKind.Alternative, alternatives));
+        }
+
+        private SyntaxNode ParseItemCore()
+        {
+            if (At(TokenKind.Ellipsis))
+            {
+                return Node(SyntaxKind.Ellipsis, Eat());
+            }
+
+            if (At(TokenKind.OpenParen))
+            {
+                return ParseBreakpointList(); // a band composition on its own (book fragment)
+            }
+
+            if (IsWord(Current, InheritanceWords))
+            {
+                Report(ParentalOrigin, Current.Span, SyntaxDiagnosticKind.Unexpected, $"'{Current.Text}' follows the abnormality directly, not as a separate item.");
+                return Node(SyntaxKind.Suffix, Eat());
+            }
+
+            SyntaxNode? signs = null;
+            if (Current.Kind is TokenKind.Plus or TokenKind.Minus or TokenKind.Question)
+            {
+                var s = new List<SyntaxElement>();
+                while (Current.Kind is TokenKind.Plus or TokenKind.Minus or TokenKind.Question)
+                {
+                    s.Add(Eat());
+                }
+
+                signs = Node(SyntaxKind.Signs, s);
+            }
+
+            if ((At(TokenKind.Number) || At(TokenKind.Tilde)) && LeadingCountAhead())
+            {
+                return ParseAbnormality(signs, ParseLeadingCount());
+            }
+
+            if (At(TokenKind.Number) || At(TokenKind.ChromosomeLetter))
+            {
+                return ParseChromosomeItem(signs);
+            }
+
+            if (IsWord(Current, ArmWords) || IsArmSymbolTypo(Current))
+            {
+                // A band without its chromosome, e.g. the second reading of "1q23 or q24".
+                var children = new List<SyntaxElement>();
+                AddIfNotNull(children, signs);
+                children.Add(ParseBand(null));
+                return Node(SyntaxKind.ChromosomeRegion, children);
+            }
+
+            if ((At(TokenKind.Word) && !NonSymbolWords.Contains(Current.Text)) || At(TokenKind.UnknownWord))
+            {
+                return ParseAbnormality(signs, null);
+            }
+
+            if (signs is not null)
+            {
+                Report(CoreCodes.Unparsed, signs.Span, SyntaxDiagnosticKind.Unexpected, "A sign must be followed by a chromosome or an abnormality.");
+                return signs;
+            }
+
+            if (AtItemEnd)
+            {
+                var missing = MissingReported(TokenKind.Word, "", CoreCodes.Unparsed, "An abnormality is expected here.");
+                return Node(SyntaxKind.Skipped, missing);
+            }
+
+            return Skip(t => t.Kind is TokenKind.Comma or TokenKind.Slash or TokenKind.DoubleSlash or TokenKind.OpenBracket, CoreCodes.Unparsed, "Text not understood.");
+        }
+
+        private static void AddIfNotNull(List<SyntaxElement> list, SyntaxElement? element)
+        {
+            if (element is not null)
+            {
+                list.Add(element);
+            }
+        }
+
+        /// <summary><c>3mar</c>, <c>12~20dmin</c>, <c>~14dmin</c>, <c>5r</c>: a number (range) directly followed by a symbol.</summary>
+        private bool LeadingCountAhead()
+        {
+            var k = 0;
+            if (Peek(k).Kind == TokenKind.Number)
+            {
+                k++;
+            }
+
+            if (Peek(k).Kind == TokenKind.Tilde)
+            {
+                if (Peek(k + 1).Kind != TokenKind.Number)
+                {
+                    return false;
+                }
+
+                k += 2;
+            }
+
+            if (k == 0 || Peek(k - 1).HasTrailingTrivia)
+            {
+                return false;
+            }
+
+            var next = Peek(k);
+            return next.Kind == TokenKind.UnknownWord ? !IsArmSymbolTypo(next)
+                : next.Kind == TokenKind.Word && !NonSymbolWords.Contains(next.Text) && !IsArmSymbolTypo(next);
+        }
+
+        private SyntaxNode ParseLeadingCount()
+        {
+            var children = new List<SyntaxElement>();
+            if (At(TokenKind.Number))
+            {
+                children.Add(Eat());
+            }
+
+            if (At(TokenKind.Tilde))
+            {
+                children.Add(Eat());
+                children.Add(Eat());
+            }
+
+            return Node(SyntaxKind.LeadingCount, children);
+        }
+
+        /// <summary><c>P</c>/<c>Q</c> where an arm symbol belongs (BAND.ARM_SYMBOL).</summary>
+        private static bool IsArmSymbolTypo(SyntaxToken t) => t.Kind is TokenKind.UnknownWord or TokenKind.Word && t.Text is "P" or "Q";
+
+        /// <summary>An item led by a chromosome: a whole-chromosome change (<c>+21</c>, <c>–X</c>) or a region (<c>16qh+</c>, <c>1p31</c>).</summary>
+        private SyntaxNode ParseChromosomeItem(SyntaxNode? signs)
+        {
+            var children = new List<SyntaxElement>();
+            AddIfNotNull(children, signs);
+            var chrom = Eat();
+            children.Add(chrom);
+
+            if (IsRegionStart(Current))
+            {
+                ParseRegionTail(children, chrom);
+                ParseSuffixes(children);
+                return Node(SyntaxKind.ChromosomeRegion, children);
+            }
+
+            if ((At(TokenKind.Plus) || At(TokenKind.Minus)) && Adjacent)
+            {
+                var sign = Eat();
+                children.Add(sign);
+                Report(GainLossSign, Cover(chrom, sign), SyntaxDiagnosticKind.Unexpected, "The plus or minus sign goes before the chromosome.");
+            }
+            else if (At(TokenKind.Question) && Adjacent)
+            {
+                var q = Eat();
+                children.Add(q);
+                Report(QuestionableItem, q.Span, SyntaxDiagnosticKind.Unexpected, "The question mark goes before the questionable chromosome or abnormality.");
+            }
+            else if (signs is null)
+            {
+                Report(GainLossSign, chrom.Span, SyntaxDiagnosticKind.Unexpected, "A gained or lost chromosome is written with a plus or minus sign before it.");
+            }
+
+            ParseSuffixes(children);
+            return Node(SyntaxKind.WholeChromosome, children);
+        }
+
+        private static bool IsRegionStart(SyntaxToken t) =>
+            IsWord(t, ArmWords) || IsWord(t, FeatureWords) || IsWord(t, LandmarkWords) || IsArmSymbolTypo(t);
+
+        /// <summary>
+        /// Arms, bands and variant features after a chromosome: <c>q</c>, <c>p31.1</c>, <c>cenh+</c>, <c>pstk+</c>, <c>qh–</c>.
+        /// Reports arm-length signs (<c>5q–</c>) and features written before the arm (<c>16hq+</c>).
+        /// </summary>
+        private void ParseRegionTail(List<SyntaxElement> children, SyntaxToken chrom)
+        {
+            SyntaxToken? featureBeforeArm = null;
+            var sawArm = false;
+            var featureSinceArm = false;
+            var first = true;
+            while (true)
+            {
+                var isFirst = first;
+                first = false;
+                if (IsWord(Current, ArmWords) || IsArmSymbolTypo(Current))
+                {
+                    var band = ParseBand(null, allowCommaSubband: true);
+                    children.Add(band);
+                    if (featureBeforeArm is not null)
+                    {
+                        Report(VarLengthSign, Cover(featureBeforeArm, band.Children[0]), SyntaxDiagnosticKind.Unexpected, "The variant symbol follows the arm (e.g. 16qh+).");
+                        featureBeforeArm = null;
+                        sawArm = true;
+                        featureSinceArm = true; // reported once, not again as an arm-length sign
+                        continue;
+                    }
+
+                    sawArm = true;
+                    featureSinceArm = false;
+                    continue;
+                }
+
+                if (IsWord(Current, FeatureWords) || IsWord(Current, LandmarkWords))
+                {
+                    var word = Eat();
+                    children.Add(word);
+                    if (isFirst && word.Text is "h" or "s" or "stk" or "var")
+                    {
+                        featureBeforeArm = word; // "16hq+": the feature is written before the arm
+                    }
+
+                    featureSinceArm = true;
+                    continue;
+                }
+
+                if ((At(TokenKind.Plus) || At(TokenKind.Minus)) && Adjacent)
+                {
+                    var sign = Eat();
+                    children.Add(sign);
+                    if (sawArm && !featureSinceArm)
+                    {
+                        Report(NoArmLengthSign, Cover(chrom, sign), SyntaxDiagnosticKind.Unexpected, "Arm-length notation such as 5q– or 4p+ is not used in karyotypes.");
+                    }
+
+                    continue;
+                }
+
+                break;
+            }
+        }
+
+        /// <summary>
+        /// A band or region: <c>[chromosome]arm[digits[.digits]]</c> with <c>?</c> and <c>~</c> (<c>q2?3</c>, <c>q21~24</c>).
+        /// Reports a second decimal point (<c>36.3.3</c>) and, in an item, a comma used as the decimal point (<c>1p31,1</c>).
+        /// </summary>
+        private SyntaxNode ParseBand(SyntaxToken? chrom, bool allowCommaSubband = false)
+        {
+            var children = new List<SyntaxElement>();
+            AddIfNotNull(children, chrom);
+            var arm = Eat();
+            children.Add(arm);
+            if (IsArmSymbolTypo(arm))
+            {
+                Report(ArmSymbol, arm.Span, SyntaxDiagnosticKind.Unexpected, $"The arm symbol is lower-case: {arm.Text.ToLowerInvariant()}.", arm.Text.ToLowerInvariant());
+            }
+
+            var dots = 0;
+            var digits = false;
+            while (true)
+            {
+                if (At(TokenKind.Number) && (Adjacent || !digits))
+                {
+                    children.Add(Eat());
+                    digits = true;
+                    continue;
+                }
+
+                if (At(TokenKind.Dot) && Adjacent && Peek(1).Kind == TokenKind.Number)
+                {
+                    var dot = Eat();
+                    children.Add(dot);
+                    dots++;
+                    if (dots > 1)
+                    {
+                        Report(SubbandFormat, TextSpan.FromBounds(dot.Span.Start, Current.Span.End), SyntaxDiagnosticKind.Unexpected, "A sub-band has one decimal point; further digits follow it directly.");
+                    }
+
+                    continue;
+                }
+
+                if (At(TokenKind.Question) && Adjacent)
+                {
+                    children.Add(Eat());
+                    continue;
+                }
+
+                if (At(TokenKind.Tilde) && Adjacent && Peek(1).Kind == TokenKind.Number)
+                {
+                    children.Add(Eat());
+                    children.Add(Eat());
+                    continue;
+                }
+
+                break;
+            }
+
+            if (allowCommaSubband && digits && dots == 0 && At(TokenKind.Comma) && Adjacent
+                && Peek(1).Kind == TokenKind.Number && !Current.HasTrailingTrivia
+                && Peek(2).Kind is TokenKind.EndOfSegment or TokenKind.Comma)
+            {
+                var comma = Eat();
+                Report(SubbandFormat, comma.Span, SyntaxDiagnosticKind.Unexpected, "Sub-bands follow a decimal point, not a comma.", ".");
+                children.Add(comma);
+                children.Add(Eat());
+            }
+
+            return Node(SyntaxKind.Band, children);
+        }
+
+        // ── Abnormalities ────────────────────────────────────────────────────────────────────────────
+
+        private bool AtSymbolWord => (At(TokenKind.Word) && !NonSymbolWords.Contains(Current.Text)) || At(TokenKind.UnknownWord);
+
+        private SyntaxNode ParseAbnormality(SyntaxNode? signs, SyntaxNode? leadingCount)
+        {
+            var children = new List<SyntaxElement>();
+            AddIfNotNull(children, signs);
+            AddIfNotNull(children, leadingCount);
+
+            var hadGroup = true;
+            // Further parts (der(1)t(1;3)(…)inv(1)(…)) follow a part with parentheses directly, without a space.
+            while (hadGroup && (children.Count == (signs is null ? 0 : 1) + (leadingCount is null ? 0 : 1) || Adjacent)
+                && (AtSymbolWord || (At(TokenKind.Question) && IsSymbolWordToken(Peek(1)))))
+            {
+                var part = ParseAbnormalityPart(out hadGroup);
+                children.Add(part);
+            }
+
+            while (true)
+            {
+                var before = children.Count;
+                ParseSuffixes(children);
+                if (children.Count > before && children[^1] is SyntaxNode { Kind: SyntaxKind.Suffix } last
+                    && last.Children[0] is SyntaxToken { Kind: TokenKind.Multiply } && At(TokenKind.OpenParen))
+                {
+                    var group = ParseBreakpointList();
+                    Report(MultiplySignAfter, last.Span, SyntaxDiagnosticKind.Unexpected, "×n goes after the whole abnormality, including its breakpoints.");
+                    children.Add(group);
+                    continue;
+                }
+
+                break;
+            }
+
+            return Node(SyntaxKind.Abnormality, children);
+        }
+
+        private static bool IsSymbolWordToken(SyntaxToken t) =>
+            (t.Kind == TokenKind.Word && !NonSymbolWords.Contains(t.Text)) || t.Kind == TokenKind.UnknownWord;
+
+        /// <summary>One symbol group with its parentheses: <c>[?]symbols[number](chromosomes)(breakpoints)</c>.</summary>
+        private SyntaxNode ParseAbnormalityPart(out bool hadGroup)
+        {
+            var children = new List<SyntaxElement>();
+            if (At(TokenKind.Question))
+            {
+                children.Add(Eat());
+            }
+
+            var symbols = new List<SyntaxElement>();
+            while (AtSymbolWord)
+            {
+                if (At(TokenKind.UnknownWord))
+                {
+                    Report(ListedOnly, Current.Span, SyntaxDiagnosticKind.Unexpected, $"'{Current.Text}' is not a listed symbol or abbreviation.");
+                }
+
+                symbols.Add(Eat());
+            }
+
+            children.Add(Node(SyntaxKind.Symbols, symbols));
+            var lastSymbol = (SyntaxToken)symbols[^1];
+
+            var groups = 0;
+            if (At(TokenKind.Number) && Adjacent)
+            {
+                var number = Eat();
+                if (NumberedSymbols.Contains(lastSymbol.Text))
+                {
+                    children.Add(Node(SyntaxKind.SymbolNumber, number));
+                }
+                else
+                {
+                    var (rule, message) = lastSymbol.Text switch
+                    {
+                        "dmin" => (DminFormat, "The number of double minutes goes before dmin."),
+                        "upd" => (UpdFormat, "The chromosome of upd goes in parentheses."),
+                        _ => (ChromosomeInParentheses, $"The chromosome goes in parentheses after {lastSymbol.Text}."),
+                    };
+                    Report(rule, number.Span, SyntaxDiagnosticKind.Unexpected, message, "(" + number.Text + ")");
+                    children.Add(Node(lastSymbol.Text == "dmin" ? SyntaxKind.SymbolNumber : SyntaxKind.BareChromosome, number));
+                    groups = lastSymbol.Text == "dmin" ? 0 : 1;
+                }
+            }
+
+            while (At(TokenKind.OpenParen) && groups < 2)
+            {
+                children.Add(groups == 0 ? ParseChromosomeList() : ParseBreakpointList());
+                groups++;
+            }
+
+            if (groups == 1 && Adjacent && (IsWord(Current, ArmWords) || IsArmSymbolTypo(Current)))
+            {
+                var bare = ParseBreakpointList(withParens: false);
+                Report(BreakpointGroups, bare.Span, SyntaxDiagnosticKind.Unexpected, "Breakpoints are written in parentheses.");
+                children.Add(bare);
+                groups++;
+            }
+
+            hadGroup = groups > 0;
+            return Node(SyntaxKind.AbnormalityPart, children);
+        }
+
+        /// <summary>Suffixes: <c>×n</c>, <c>c</c>, <c>?c</c>, <c>mat</c>/<c>pat</c>/<c>inh</c>/<c>dn</c>; <c>X2</c> recovered as <c>×2</c>.</summary>
+        private void ParseSuffixes(List<SyntaxElement> children)
+        {
+            while (true)
+            {
+                if (At(TokenKind.Multiply))
+                {
+                    var times = Eat();
+                    var n = At(TokenKind.Number) ? Eat() : MissingReported(TokenKind.Number, "2", CoreCodes.Unparsed, "A number follows the multiplication sign.");
+                    children.Add(Node(SyntaxKind.Suffix, times, n));
+                    continue;
+                }
+
+                if (At(TokenKind.ChromosomeLetter) && Current.Text == "X" && Adjacent && !Current.HasTrailingTrivia && Peek(1).Kind == TokenKind.Number)
+                {
+                    var x = Eat();
+                    Report(TypedSymbolForms, x.Span, SyntaxDiagnosticKind.Unexpected, "Upper-case X is the sex chromosome; the multiplication sign is × (or x).", "×");
+                    children.Add(Node(SyntaxKind.Suffix, x, Eat()));
+                    continue;
+                }
+
+                if (AtWord("c") || (At(TokenKind.Question) && Peek(1) is { Kind: TokenKind.Word, Text: "c" }))
+                {
+                    var suffix = new List<SyntaxElement>();
+                    if (At(TokenKind.Question))
+                    {
+                        suffix.Add(Eat());
+                    }
+
+                    suffix.Add(Eat());
+                    children.Add(Node(SyntaxKind.Suffix, suffix));
+                    continue;
+                }
+
+                if (IsWord(Current, InheritanceWords))
+                {
+                    children.Add(Node(SyntaxKind.Suffix, Eat()));
+                    continue;
+                }
+
+                break;
+            }
+        }
+
+        // ── Parenthesised groups ─────────────────────────────────────────────────────────────────────
+
+        /// <summary><c>(1;3)</c>, <c>(X;18)</c>, <c>(?;6)</c>, <c>(2p)</c>: chromosomes separated by semicolons.</summary>
+        private SyntaxNode ParseChromosomeList()
+        {
+            var children = new List<SyntaxElement> { Eat() };
+            while (true)
+            {
+                if (At(TokenKind.CloseParen))
+                {
+                    children.Add(Eat());
+                    break;
+                }
+
+                if (AtItemEnd && !At(TokenKind.Comma))
+                {
+                    children.Add(MissingReported(TokenKind.CloseParen, ")", CoreCodes.Unparsed, "'(' needs a closing ')'."));
+                    break;
+                }
+
+                if (At(TokenKind.Number) || At(TokenKind.ChromosomeLetter) || At(TokenKind.Question))
+                {
+                    var spec = new List<SyntaxElement>();
+                    var chrom = Eat();
+                    spec.Add(chrom);
+                    if (chrom.Kind == TokenKind.Question && (At(TokenKind.Number) || At(TokenKind.ChromosomeLetter)) && Adjacent)
+                    {
+                        spec.Add(Eat());
+                    }
+
+                    if (IsRegionStart(Current) && Adjacent)
+                    {
+                        ParseRegionTail(spec, chrom);
+                    }
+
+                    children.Add(Node(SyntaxKind.ChromosomeSpec, spec));
+                }
+                else
+                {
+                    children.Add(Skip(t => t.Kind is TokenKind.Semicolon or TokenKind.Comma or TokenKind.CloseParen or TokenKind.Slash or TokenKind.DoubleSlash or TokenKind.OpenBracket,
+                        CoreCodes.Unparsed, "A chromosome is expected here."));
+                }
+
+                if (At(TokenKind.Semicolon))
+                {
+                    children.Add(Eat());
+                }
+                else if (At(TokenKind.Comma))
+                {
+                    Report(ChromosomeSeparator, Current.Span, SyntaxDiagnosticKind.Unexpected, "The chromosomes of a rearrangement are separated by a semicolon.", ";");
+                    children.Add(Eat());
+                }
+                else if (!At(TokenKind.CloseParen) && !AtItemEnd)
+                {
+                    children.Add(Skip(t => t.Kind is TokenKind.Semicolon or TokenKind.CloseParen or TokenKind.Comma or TokenKind.Slash or TokenKind.DoubleSlash,
+                        CoreCodes.Unparsed, "Text not understood in the chromosome list."));
+                }
+            }
+
+            return Node(SyntaxKind.ChromosomeList, children);
+        }
+
+        /// <summary>
+        /// Breakpoints in parentheses, short or detailed system: groups separated by semicolons, each a sequence of bands,
+        /// landmarks (<c>pter</c>, <c>cen</c>, <c>hsr</c>, <c>?</c>), <c>→</c>, <c>:</c>, <c>::</c>, <c>or</c>.
+        /// Without parentheses (recovery for <c>inv(2)p21q31</c>) it ends at an item end.
+        /// </summary>
+        private SyntaxNode ParseBreakpointList(bool withParens = true)
+        {
+            var children = new List<SyntaxElement>();
+            if (withParens)
+            {
+                children.Add(Eat());
+            }
+
+            while (true)
+            {
+                children.Add(ParseBreakpointGroup(withParens));
+                if (At(TokenKind.Semicolon))
+                {
+                    children.Add(Eat());
+                    continue;
+                }
+
+                if (withParens)
+                {
+                    children.Add(At(TokenKind.CloseParen) ? Eat() : MissingReported(TokenKind.CloseParen, ")", CoreCodes.Unparsed, "'(' needs a closing ')'."));
+                }
+
+                break;
+            }
+
+            return Node(SyntaxKind.BreakpointList, children);
+        }
+
+        private bool AtGroupEnd(bool withParens) =>
+            Current.Kind is TokenKind.Semicolon or TokenKind.EndOfSegment or TokenKind.Slash or TokenKind.DoubleSlash or TokenKind.OpenBracket
+            || (withParens ? Current.Kind == TokenKind.CloseParen : Current.Kind is TokenKind.Comma or TokenKind.CloseParen);
+
+        private SyntaxNode ParseBreakpointGroup(bool withParens)
+        {
+            var children = new List<SyntaxElement>();
+            while (!AtGroupEnd(withParens))
+            {
+                var t = Current;
+                switch (t.Kind)
+                {
+                    case TokenKind.Arrow or TokenKind.Colon or TokenKind.DoubleColon or TokenKind.Tilde:
+                        children.Add(Eat());
+                        continue;
+                    case TokenKind.Word when t.Text == "or":
+                        children.Add(Eat());
+                        continue;
+                    case TokenKind.Word when LandmarkWords.Contains(t.Text):
+                        children.Add(Node(SyntaxKind.Landmark, Eat()));
+                        continue;
+                    case TokenKind.Word when ArmWords.Contains(t.Text):
+                        children.Add(ParseBand(null));
+                        continue;
+                    case TokenKind.Number or TokenKind.ChromosomeLetter or TokenKind.Question:
+                        children.Add(ParseChromosomePoint());
+                        continue;
+                    case TokenKind.Comma when withParens:
+                        Report(BreakpointGroups, t.Span, SyntaxDiagnosticKind.Unexpected, "Breakpoint groups are separated by a semicolon.", ";");
+                        children.Add(Eat());
+                        continue;
+                    case TokenKind.UnknownWord or TokenKind.Word when IsArmSymbolTypo(t):
+                        children.Add(ParseBand(null));
+                        continue;
+                    case TokenKind.UnknownWord:
+                        Report(ListedOnly, t.Span, SyntaxDiagnosticKind.Unexpected, $"'{t.Text}' is not a listed symbol or abbreviation.");
+                        children.Add(Eat());
+                        continue;
+                    default:
+                        children.Add(Skip(_ => true, CoreCodes.Unparsed, "Text not understood in the breakpoints."));
+                        continue;
+                }
+            }
+
+            if (children.Count == 0)
+            {
+                children.Add(MissingReported(TokenKind.Word, "", CoreCodes.Unparsed, "A breakpoint is expected here."));
+            }
+
+            return Node(SyntaxKind.BreakpointGroup, children);
+        }
+
+        /// <summary><c>3q13.1</c>, <c>Xpter</c>, <c>9̲q34</c>, <c>?cen</c>, or a lone <c>?</c>/number.</summary>
+        private SyntaxNode ParseChromosomePoint()
+        {
+            var chrom = Eat();
+            if (Adjacent && (IsWord(Current, ArmWords) || IsArmSymbolTypo(Current)))
+            {
+                return ParseBand(chrom);
+            }
+
+            if (Adjacent && IsWord(Current, LandmarkWords))
+            {
+                return Node(SyntaxKind.Landmark, chrom, Eat());
+            }
+
+            if (chrom.Kind == TokenKind.Question)
+            {
+                return Node(SyntaxKind.Landmark, chrom);
+            }
+
+            Report(CoreCodes.Unparsed, chrom.Span, SyntaxDiagnosticKind.Unexpected, "A chromosome in a breakpoint is followed by its arm or band.");
+            return Node(SyntaxKind.Skipped, chrom);
+        }
+    }
+}
