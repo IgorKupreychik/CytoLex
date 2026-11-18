@@ -58,7 +58,11 @@ rules:
     review:
       paraphrase_checked: true
       needs_review: false
-      note: Whether the material is inserted or replaces a segment can't be read from the string, so this is an explanation, not a check.
+      note: >-
+        Whether the material is inserted or replaces a segment can't be read from the string, so
+        this is an explanation, not a check. Severity info (T-022/T-056): whether the added material
+        is inserted can't be read from an add string; an info note only when add is present, never a
+        violation.
     related: [ADD.FORMAT, DER.INSERTION_POINT_CONVENTION]
 
   - id: DER.MULTIPLE_ABERRATIONS_ONE_CHROMOSOME

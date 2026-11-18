@@ -50,4 +50,7 @@ rules:
         Two-chromosome detailed forms give both products, separated by a semicolon. Order of the
         breakpoints: STRUCT.INSERTION_SITE_FIRST; receiving chromosome first:
         STRUCT.INSERTION_RECEPTOR_FIRST.
+        Severity info (T-056): the long form is "recommended" (preference), but the short form is
+        valid and used in the book's own examples (E1, E3, …), so a warning would fire on book
+        examples.
     related: [STRUCT.INSERTION_SITE_FIRST, STRUCT.INSERTION_RECEPTOR_FIRST, DUP.FORMAT]

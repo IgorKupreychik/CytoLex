@@ -13,7 +13,8 @@ internal sealed record ExampleOutcome(string? SkipReason, IReadOnlyList<string> 
 /// <summary>
 /// What a KB example must produce (T-025; T-021/T-022 notes; docs/design/core.md §8–§9):
 /// <list type="bullet">
-/// <item><b>Valid</b> (whole string): valid without a hint, valid in the rule's contexts, no errors with a matching hint; the rule never fires.</item>
+/// <item><b>Valid</b> (whole string): valid without a hint, valid in the rule's contexts, no errors with a matching hint; the rule never fires
+/// (except a "can't be verified from the string" info, T-056).</item>
 /// <item><b>Valid</b> (fragment): only "the rule never fires".</item>
 /// <item><b>Invalid</b>: without a hint the rule fires (firm or conditional, never silence); with a matching hint it fires firmly;
 /// severity = KB severity, at most warning for <c>needs_review</c> rules and uncertain findings. A rule without a <c>[KbRule]</c>
@@ -83,7 +84,8 @@ internal static class ExampleExpectations
         foreach (var hint in Hints(c.Rule))
         {
             var run = Run(c, v, text, hint, failures);
-            foreach (var d in run.Diagnostics.Where(d => d.RuleId == c.Rule.Id))
+            // A "can't be verified from the string" info is expected on valid uses of the notation (T-056).
+            foreach (var d in run.Diagnostics.Where(d => d.RuleId == c.Rule.Id && !(d.CannotVerify && d.Severity == Severity.Info)))
             {
                 failures.Add($"{Label(text, hint)}: its own rule fired ({Describe(d)}).");
             }

@@ -33,5 +33,6 @@ rules:
       note: >-
         ¶1 says orientation cannot be shown in the short system, but E2 writes trp(1)(q32q21) for the
         opposite orientation. Both examples are kept valid as printed; whether the short-form band
-        order carries orientation (as for dup) is left to T-022/T-031.
+        order carries orientation (as for dup) stays open (T-031): book-ambiguous, so findings are
+        capped at warning (T-022/T-056).
     related: [QDP.FORMAT, DUP.FORMAT, STRUCT.PROXIMAL_BREAKPOINT_FIRST, STRUCT.BREAKPOINT_GROUPS]

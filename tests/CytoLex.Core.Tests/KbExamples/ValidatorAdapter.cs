@@ -41,7 +41,8 @@ internal static class ValidatorAdapter
                     Map(d.Severity),
                     d.IsConditional,
                     d.Certainty == Certainty.Uncertain,
-                    [.. d.Fixes.Select(f => f.Preview).OfType<string>()]))]);
+                    [.. d.Fixes.Select(f => f.Preview).OfType<string>()],
+                    d.CannotVerify))]);
         }
 
         private static SampleContext Map(CoreContext c) => c switch

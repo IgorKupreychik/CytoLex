@@ -63,7 +63,12 @@ rules:
           cite: {section: "9.2.9", page: 69, example: E1}
         - text: "46,XY,ins(2)(p13q31q21)"
           cite: {section: "9.2.9", page: 69, example: E2}
-    review: {paraphrase_checked: true, needs_review: false}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info (T-056): the band order defines which breakpoint is the insertion site and the
+        orientation, so a string can't violate it; it explains how to read the bands.
     related: [STRUCT.INSERTION_RECEPTOR_FIRST]
 
   - id: STRUCT.MULTI_CHROMOSOME_ORDER

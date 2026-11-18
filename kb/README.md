@@ -89,14 +89,14 @@ rules:
 | `title` | ✔ | Short name for lists and the rule browser |
 | `applies_to` | ✔ | Notation types, ≥1 (vocabulary below) |
 | `context` | | Clinical contexts; omit when the rule holds everywhere |
-| `severity` | ✔ | `error` · `warning` · `info`: default severity of a violation (policy: T-022) |
+| `severity` | ✔ | `error` · `warning` · `info`: severity of a violation, from the book's wording (see [Severity](#severity)) |
 | `statement` | ✔ | **Paraphrase** of the book's rule, never a verbatim copy |
 | `cite` | ✔ | ≥1 citation (below) |
 | `examples.valid` | ✔ | `{text, cite?, note?}`. **Every book example** in the section goes here, with its `En` cite. May be `[]` |
 | `examples.invalid` | | `{text, why, corrected?, cite?}`. `why` names the faulty part; `corrected` when there is exactly one valid form |
 | `fix` | | `level: 1` = deterministic edit (`kind`: `replace` · `insert` · `delete` · `reorder`, required); `level: 3` = explanation only (no `kind`). `hint` describes the edit or the explanation |
 | `review.paraphrase_checked` | ✔ | `true` once a person has approved `statement` against the quote |
-| `review.needs_review` | ✔ | `true` when the book is ambiguous or the section is listed in `docs/extraction-review-<version>.md`; then `review.note` (why) is required |
+| `review.needs_review` | ✔ | `true` when the book is ambiguous or the section is listed in `docs/extraction-review-<version>.md`; then `review.note` (why) is required. Caps findings at `warning` (see [Severity](#severity)) |
 | `related` | | IDs of related rules |
 
 Unknown fields are errors (catches typos). Example strings are written the way the book prints them (`→`, `–`, `×`, U+0332 for underlining); see T-053 for ASCII input forms.
@@ -135,6 +135,23 @@ Structured in YAML, rendered as text in diagnostics:
 - `page` is the **book** page of the cited label, as in the chunk (`[¶1 p.75]`, front matter `paragraphs`/`examples`/`floats`).
 - At least one anchor: `para` (`¶n`), `example` (`En`), or `float` (the chunk's float label: `Fig. 7`, `Fig. 6a`, `Table 1`, `Ploidy table`, `Alignment figure`, `Fibre diagram`).
 - Labels restart at every numbered section, so `section` + label is unique.
+
+### Severity
+Policy: `docs/decisions.md` → "Strictness & severity" (T-022); applied to the 2016 rules in T-056. The engine resolves the effective severity at runtime (`docs/design/core.md` §8.2–8.3); the KB states only the rule's own severity.
+
+| Book wording (for the violation a check flags) | `severity` |
+|---|---|
+| Mandatory: "is", "must", "always", a forbidding "should not", the printed format | `error` |
+| Preference: "recommended", "preferred", "discouraged", "may be simplified" | `warning` |
+| Explanation or convention | `info` |
+
+- **Judge the violation, not the whole rule.** "mos or chi may be used … a space should follow" allows an optional symbol but fixes how it is written, so the rule is `error`. "may" only grants the option.
+- **A different severity needs a reason** in `review.note` ("Severity info (T-056): …"). Typical reason: a string can't violate the rule (it defines how to read the notation), or a warning would fire on the book's own examples.
+- **`needs_review` caps findings at `warning`**, marked "book ambiguous" with the note, until a person resolves the reading. Set it only for real book ambiguity or extraction loss, not for open policy questions. Keep the rule's own severity in `severity`: it applies once the flag is cleared.
+- **Rules a single string can't verify** (they need the report or the family, e.g. `KARYO.ABBREVIATED_FORM`, `REC.KNOWN_PARENTAL_REARRANGEMENT`) are `info`. Their check reports a finding with `cannotVerify` **only when the string uses the notation concerned** ("can't be verified from the string: <what to check>"); otherwise it stays silent. A valid example may therefore show this note, and the KB-example harness accepts it.
+- **"Error when certain, else warning"** (e.g. `NUM.COUNT_MATCHES_CHANGES`) is `severity: error`. The check reports `Uncertain` where it can't decide (dic/rob/fis counts, `~`, `inc`, uncertain markers), and the engine caps those findings at warning. No schema field is needed.
+- **Context-limited rules** have a `context`. With the context unknown, the engine turns their findings into conditional diagnostics with a severity per context ("error if acquired"). The string is valid if one context has no errors.
+- **Valid examples never fire their own rule.** A book form the book prints as correct but that triggers a `warning` (e.g. the longer E6 form of `ORDER.SHORTEST_STRING_PREFERRED`) goes under `invalid` with its `cite`, a `why` that says it is a warning, and `corrected`.
 
 ### Vocabularies
 | Field | Values |

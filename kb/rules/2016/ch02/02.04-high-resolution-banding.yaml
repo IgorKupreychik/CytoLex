@@ -91,4 +91,9 @@ rules:
       - {section: "2.4", page: 13, para: "¶4"}
     examples:
       valid: []
-    review: {paraphrase_checked: true, needs_review: false}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info (T-056): describes how the idiograms draw variable regions; nothing to violate
+        in a string.

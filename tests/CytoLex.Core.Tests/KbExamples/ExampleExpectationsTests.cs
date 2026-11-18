@@ -81,6 +81,17 @@ public class ExampleExpectationsTests
         Assert.NotEmpty(ExampleExpectations.Evaluate(Case(Rule(), ExampleKind.Valid, "46,XX"), v, true).Failures);
     }
 
+    [Theory]
+    [InlineData("info", true)]
+    [InlineData("warning", false)]
+    public void Valid_OwnRuleCannotVerifyNote_Allowed(string reportedSeverity, bool passes)
+    {
+        var severity = reportedSeverity == "info" ? Severity.Info : Severity.Warning;
+        var rule = Rule(severity: Severity.Info);
+        var v = new FakeValidator((_, _) => With(true, new ExampleDiagnostic("TEST.RULE", severity, CannotVerify: true)));
+        Assert.Equal(passes, ExampleExpectations.Evaluate(Case(rule, ExampleKind.Valid, "46,XX,der(5)mat"), v, true).Passed);
+    }
+
     [Fact]
     public void ValidFragment_OnlyOwnRuleMatters()
     {
@@ -248,6 +259,7 @@ public class ExampleExpectationsTests
     {
         var rule = KbCatalog.Default.Rules.Single(r => r.Id == "SEX.ACQUIRED_GAIN_LOSS");
         Assert.Equal([SampleContext.Acquired], rule.SampleContexts);
-        Assert.True(rule.NeedsReview);
+        Assert.False(rule.NeedsReview); // cleared in T-056: conditional error if acquired
+        Assert.Equal(Severity.Error, rule.Severity);
     }
 }

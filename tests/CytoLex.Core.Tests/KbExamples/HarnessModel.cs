@@ -45,12 +45,14 @@ internal sealed record ExampleRun(
 /// <param name="Conditional">Depends on an unknown context (§8.3).</param>
 /// <param name="Uncertain">The check could not decide with certainty (§8.2 step 3).</param>
 /// <param name="FixPreviews">The full corrected string of each offered fix (§10 <c>Fix.Preview</c>).</param>
+/// <param name="CannotVerify">An info that the string alone can't show whether the rule is met (§8.2 step 5; T-056).</param>
 internal sealed record ExampleDiagnostic(
     string RuleId,
     Severity Severity,
     bool Conditional = false,
     bool Uncertain = false,
-    IReadOnlyList<string>? FixPreviews = null)
+    IReadOnlyList<string>? FixPreviews = null,
+    bool CannotVerify = false)
 {
     public IReadOnlyList<string> Previews => FixPreviews ?? [];
 }

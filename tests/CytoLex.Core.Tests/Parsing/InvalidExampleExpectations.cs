@@ -76,6 +76,7 @@ internal static class InvalidExampleExpectations
             ["50,XX,+1,+inv(1)(p31q41),+del(1)(p13),+dup(1)(q21q32),+8,r(10)(p12q25),–21"] = [], // ORDER.HOMOLOGUES_ALPHABETICAL
             ["52,XX,…,+mar,+r,12~20dmin"] = [], // ORDER.UNIDENTIFIED_LAST
             ["52,XX,…,+r,+der(?)t(?;6)(?;q16),+mar,5~9dmin"] = [], // ORDER.UNKNOWN_CENTROMERE_DER
+            ["49,X,inv(X)(p21q26),+3,inv(3)(q21q26.2),+7,+10,–20,del(20)(q11.2),+21"] = [], // ORDER.SHORTEST_STRING_PREFERRED
             ["16hq+"] = [("VAR.LENGTH_SIGN", "hq", 2)], // VAR.LENGTH_SIGN
             ["16q+"] = [("KARYO.NO_ARM_LENGTH_SIGN", "16q+", 0)], // VAR.LENGTH_SIGN
             ["21ps×2"] = [], // VAR.DUPLICATED_STRUCTURE_REPEATED

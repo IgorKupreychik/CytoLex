@@ -354,7 +354,7 @@ rules:
     title: mos / chi before the clone designations
     applies_to: [karyotype]
     context: [constitutional]
-    severity: info
+    severity: error
     statement: >-
       In constitutional cases, mos (mosaic: cell lines from one zygote) or chi (chimera: cell
       lines from different zygotes) may precede the karyotype designations, followed by a space.
@@ -373,7 +373,13 @@ rules:
           why: mos precedes the karyotype designations.
           corrected: "mos 45,X/46,XX"
     fix: {level: 1, kind: reorder, hint: "Move mos or chi to the front, followed by a space."}
-    review: {paraphrase_checked: true, needs_review: false}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity error (T-056): using mos/chi is optional ("may be used"), but where they appear the
+        printed form is mandatory: before the designations, followed by a space ("A space should
+        follow mos or chi").
     related: [SYM.SPACE_BEFORE_CHROMOSOME_COUNT, KARYO.CLONE_ORDER_CONSTITUTIONAL]
 
   - id: KARYO.CLONE_ORDER_CONSTITUTIONAL
@@ -487,7 +493,12 @@ rules:
         - text: "92,XXYY,del(7)(p11.2),del(7)(q22),del(7)(q34)"
           cite: {section: "9.1", page: 58, example: E5}
           note: One normal chromosome 7 and three with different deletions.
-    review: {paraphrase_checked: true, needs_review: false}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info (T-056): explains how counts and changes are read relative to the ploidy
+        level; the checkable arithmetic is NUM.COUNT_MATCHES_CHANGES.
 
   - id: KARYO.ENDOREDUPLICATION
     title: end before an endoreduplicated karyotype
@@ -616,9 +627,10 @@ rules:
           cite: {section: "4.4", page: 45, para: "¶3"}
     review:
       paraphrase_checked: true
-      needs_review: true
+      needs_review: false
       note: >-
         A single string cannot show whether the full form was given earlier in the report, so
-        the validator cannot tell an allowed abbreviation from an incomplete designation. How to
-        treat abbreviated forms (accept, info, warning) is for T-022.
+        the validator cannot tell an allowed abbreviation from an incomplete designation.
+        Severity (T-022/T-056): accepted, with an info note ("can't be verified from the string:
+        check that the full form was given earlier") only when an abbreviated form is present.
     related: [BREAK.NOT_REPEATED_FOR_COPIES]

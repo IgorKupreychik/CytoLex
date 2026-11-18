@@ -114,4 +114,6 @@ rules:
       note: >-
         Which centromere is active can't be read from the string, so a validator must not flag
         psu dic(15;13) under STRUCT.CHROMOSOME_ORDER. The space in psu dic: SYM.SPACE_BETWEEN_SYMBOLS.
+        Severity info (T-022/T-056): which centromere is active can't be read from the string, so
+        the order can't be verified; an info note only when psu dic is present.
     related: [STRUCT.CHROMOSOME_ORDER, SYM.SPACE_BETWEEN_SYMBOLS, DIC.FORMAT]

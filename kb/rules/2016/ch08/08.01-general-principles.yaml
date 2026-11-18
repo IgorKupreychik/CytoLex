@@ -66,7 +66,7 @@ rules:
   - id: NUM.COUNT_MATCHES_CHANGES
     title: Chromosome count equals the reference level plus gains minus losses
     applies_to: [karyotype]
-    severity: warning
+    severity: error
     statement: >-
       The chromosome count agrees with the reference ploidy level (from the count range, or the
       level given in angle brackets) plus the gained chromosomes minus the lost ones.
@@ -91,11 +91,13 @@ rules:
     fix: {level: 3, hint: Recount the gains and losses against the reference ploidy level and correct the count or the changes.}
     review:
       paraphrase_checked: true
-      needs_review: true
+      needs_review: false
       note: >-
-        Inference: the book never states the arithmetic; every ch. 8 example obeys it. Open points
-        for T-022/T-030: structural rearrangements change the count without a sign (rob, dic,
-        fis, …); the sex chromosome field lists the remaining chromosomes after a loss
-        (45,X,–X) but the constitutional ones before a gain (47,XX,+X), see SEX.ACQUIRED_GAIN_LOSS;
-        count ranges (~) and inc karyotypes cannot be checked exactly.
+        Inference: the book never states the arithmetic; every ch. 8 example obeys it. Severity
+        (T-022/T-056): error when the arithmetic is certain; the check reports uncertain findings
+        (capped at warning) where it can't count exactly. That covers structural rearrangements that
+        change the count without a sign (rob, dic, fis, …), count ranges (~), inc karyotypes and
+        uncertain markers. The sex chromosome field lists the remaining chromosomes after a loss
+        (45,X,–X) but the constitutional ones before a gain (47,XX,+X), see SEX.ACQUIRED_GAIN_LOSS
+        (T-030).
     related: [NUM.PLOIDY_REFERENCE, SEX.ACQUIRED_GAIN_LOSS]

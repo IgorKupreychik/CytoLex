@@ -79,12 +79,13 @@ rules:
     fix: {level: 1, kind: replace, hint: Write the constitutional sex chromosomes and add the acquired change with + or –.}
     review:
       paraphrase_checked: true
-      needs_review: true
+      needs_review: false
       note: >-
         Read from the examples, not stated: after a loss the sex chromosome field lists the
         chromosomes that remain (45,X,–X in a female; 45,Y,–X in a male), but with a gain it lists
         the constitutional ones (47,XX,+X). This matters for NUM.COUNT_MATCHES_CHANGES (T-030).
-        The invalid example needs the context to be known (T-022).
+        Severity (T-022/T-056): conditional via context neoplastic. With the context unknown,
+        47,XXX gives "error if acquired, valid if constitutional"; a hint makes it firm.
     related: [SEX.CONSTITUTIONAL_COMPLEMENT, NUM.COUNT_MATCHES_CHANGES, ORDER.X_BEFORE_Y]
 
   - id: KARYO.UNCERTAIN_CONSTITUTIONAL

@@ -39,5 +39,10 @@ rules:
       valid:
         - text: "46,XX,del(1)(q21),inc[4]"
           cite: {section: "5.4", page: 48, example: E1}
-    review: {paraphrase_checked: true, needs_review: false}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info (T-056): whether every abnormality could have been identified can't be read
+        from the string; explanation only.
     related: [UNCERTAIN.INC_AT_END]

@@ -54,7 +54,7 @@
       "enum": ["constitutional", "neoplastic", "meiotic"]
     },
     "severity": {
-      "description": "Default severity of a violation (policy refined in T-022).",
+      "description": "Severity of a violation, from the book's wording (policy T-022; conventions in kb/README.md → Severity).",
       "enum": ["error", "warning", "info"]
     },
     "text": { "type": "string", "minLength": 1 }

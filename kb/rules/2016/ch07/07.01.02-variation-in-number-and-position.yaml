@@ -26,7 +26,12 @@ rules:
           cite: {section: "7.1.2", page: 53, para: "¶2"}
         - text: "1q41h"
           cite: {section: "7.1.2", page: 53, para: "¶2"}
-    review: {paraphrase_checked: true, needs_review: false}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info (T-056): explains how the h/s/stk/var symbols are placed; the forms are
+        checked by the ch. 7 format rules.
     related: [VAR.LENGTH_SIGN, VAR.DUPLICATED_STRUCTURE_REPEATED]
 
   - id: VAR.DUPLICATED_STRUCTURE_REPEATED
@@ -95,4 +100,6 @@ rules:
         cells (h, cen, NOR, stain-specific bands) are examples of where heteromorphisms occur and
         are not encoded. A validator may use this list for an info note ("known population
         variant"), never to reject other inversions.
+        Severity info (T-056): population inversions are written as ordinary inversions; at most a
+        "known population variant" note.
     related: [VAR.POSITION_AND_NUMBER]

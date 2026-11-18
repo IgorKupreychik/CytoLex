@@ -67,7 +67,7 @@ rules:
   - id: REC.KNOWN_PARENTAL_REARRANGEMENT
     title: rec only with an identified parental inversion or insertion
     applies_to: [karyotype]
-    severity: warning
+    severity: info
     statement: >-
       rec is used only when the parental inversion or insertion has been identified. Otherwise
       an apparent recombinant is written as a derivative chromosome (der); the net imbalance
@@ -92,9 +92,10 @@ rules:
           note: Same imbalance without a known parental inversion (text-layer line-wrap space removed).
     review:
       paraphrase_checked: true
-      needs_review: true
+      needs_review: false
       note: >-
-        Whether the parent's rearrangement is known can't be read from the string; a validator
-        could at most warn when rec carries no mat/pat/inh. Whether that heuristic is wanted is
-        for T-022.
+        Whether the parent's rearrangement is known can't be read from the string. Severity
+        (T-022/T-056): a rule a string can't verify → an info note ("can't be verified from the
+        string: check that the parental rearrangement was identified") only when rec is present;
+        no warning on rec without mat/pat/inh.
     related: [REC.FORMAT, REC.NOT_ACQUIRED]

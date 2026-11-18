@@ -13,7 +13,12 @@ rules:
       - {section: "4.2", page: 40, para: "¶1"}
     examples:
       valid: []
-    review: {paraphrase_checked: true, needs_review: false}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info (T-056): a convention for the cytogeneticist assigning breakpoints; a string
+        can't show where the break really was.
 
   - id: BREAK.ALTERNATIVE_BANDS
     title: Two candidate bands or regions joined by or

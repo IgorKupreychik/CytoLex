@@ -65,7 +65,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-053 | done | 1 | T-003 | Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`? |
 | T-054 | done | 2 | T-021 | Literal translation of ISCN strings into plain language: scope, style, architecture |
 | T-055 | todo | 2 | T-007 | Tooling: LF line endings for committed generated files (CRLF checkout breaks the ideograms test) |
-| T-056 | todo | 1 | T-022 | KB: apply the strictness & severity policy to the 2016 rules |
+| T-056 | done | 1 | T-022 | KB: apply the strictness & severity policy to the 2016 rules |
 | T-057 | todo | 2 | T-023 | Translation templates + schema; reviewed golden file (ISCN 2016) |
 | T-058 | todo | 2 | T-030, T-031, T-057 | Literal translation renderer in the core library |
 | T-059 | todo | 2 | T-058, T-036, T-039 | Desktop: translation view |
@@ -250,7 +250,7 @@ All KB tasks share these steps and criteria:
 **Notes:** Before starting, person sign-off of the **Alignment figure** (§16.2, p.126): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`. Its shading/bold/italic carry meaning and are lost: `needs_review`.
 
 ### T-056 — KB: apply the strictness & severity policy
-**Status:** todo
+**Status:** done
 **Description:** Apply the T-022 policy (`docs/decisions.md` → "Strictness & severity") to the ISCN 2016 rules:
 - Re-check every rule's `severity` against the wording map (mandatory → error, preference → warning, explanation → info).
 - Apply the dispositions listed in the T-022 decision log entry (info when triggered, conditional, warning, capped while `needs_review`, `NUM.COUNT_MATCHES_CHANGES` error-when-certain).
@@ -258,6 +258,7 @@ All KB tasks share these steps and criteria:
 - Run `kb build`.
 **Acceptance:** Every severity matches the wording map or has a recorded reason; `kb build` passes; the changed severities are listed in the task's Notes.
 **Notes:** Should be done before T-029 (rule implementation); proposed to add it to T-029's Depends.
+Changed severities (ISCN 2016): `NUM.COUNT_MATCHES_CHANGES` warning → error; `ORDER.SHORTEST_STRING_PREFERRED` info → warning; `REC.KNOWN_PARENTAL_REARRANGEMENT` warning → info; `KARYO.MOSAIC_CHIMERA_PREFIX` info → error. `needs_review` cleared (with the user) on `NUM.COUNT_MATCHES_CHANGES`, `ORDER.SHORTEST_STRING_PREFERRED`, `REC.KNOWN_PARENTAL_REARRANGEMENT`, `KARYO.ABBREVIATED_FORM` and `SEX.ACQUIRED_GAIN_LOSS`. Reasons recorded in `review.note` for 16 rules whose severity departs from the literal wording; the `UPD.FORMAT`/`TRP.FORMAT` notes updated (still capped). Details: `docs/decisions.md` (T-056 log entry). Outcome (2026-11-18): done. Files: 19 rule files in `kb/rules/2016/`, `kb/README.md` (new Severity section), `kb/schema/common.schema.json` (description), `docs/decisions.md`, `docs/design/core.md` (47,XXX example). Deviations: the E6 long form of `ORDER.SHORTEST_STRING_PREFERRED` moved to `invalid` (a warning fires on it; also classified in `InvalidExampleExpectations.cs`); the KB-example harness accepts a cannot-verify info on a rule's own valid example (`ExampleDiagnostic.CannotVerify`, new test). T-056 not yet added to T-029's Depends (proposed).
 
 ## Decisions before code
 

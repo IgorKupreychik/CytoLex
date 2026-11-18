@@ -51,7 +51,10 @@ rules:
     review:
       paraphrase_checked: true
       needs_review: false
-      note: Ph is in the ch. 3 symbol list, so SYM.LISTED_ONLY does not catch it.
+      note: >-
+        Ph is in the ch. 3 symbol list, so SYM.LISTED_ONLY does not catch it. Severity error
+        (T-056): "not in the description of the karyotype" forbids Ph; "recommended" refers only to
+        the der(22) wording that replaces it.
     related: [DER.CENTROMERE_CHROMOSOME, SYM.LISTED_ONLY]
 
   - id: DER.INSERTION_POINT_CONVENTION
@@ -254,4 +257,7 @@ rules:
     review:
       paraphrase_checked: true
       needs_review: false
+      note: >-
+        Severity info (T-056): rearrangements the short system can't express fail its format rules;
+        "illustrated and described in words" can't be checked from a string.
     related: [DER.UNBALANCED_USE_DER, STRUCT.DETAILED_SYSTEM, STRUCT.SHORT_AND_DETAILED_SYSTEMS]
