@@ -35,7 +35,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-023 | done | 1 | T-020, T-021, T-022 | Core design: data model, version profiles, result/diagnostic API, fix model |
 | T-024 | done | 1 | T-023 | Project scaffolding; update CLAUDE.md with commands |
 | T-025 | done | 1 | T-024 | KB-example test harness + rule coverage report |
-| T-026 | in_progress | 1 | T-024 | String type detection & segment splitting |
+| T-026 | done | 1 | T-024 | String type detection & segment splitting |
 | T-027 | todo | 1 | T-026 | Karyotype tokenizer/parser with spans and error recovery |
 | T-028 | todo | 1 | T-027, T-063 | Version-profile rule engine; multi-version results |
 | T-029 | todo | 1 | T-028, T-007 | Rules: general + band validation |
@@ -367,10 +367,11 @@ Outcome (2026-11-18): Decided that `->`, `-` (and U+2212) and lowercase `x` in m
 **Outcome (2026-11-18):** Decided with the user: build the full harness now and skip per case until the code exists. `tests/CytoLex.Core.Tests/KbExamples/`: `KbCatalog` (reads `build/kb.json`, embedded in the test project as `CytoLex.Tests.kb.json`), `KbExampleTests` (one theory row per valid/invalid/corrected example, 813 for 2016, display name `[2016] RULE.ID kind#n: text`), `ExampleExpectations` (valid = valid without a hint and in the rule's contexts, no errors with a matching hint, own rule never fires; invalid = rule fires without a hint (firm or conditional) and firmly with a matching hint, severity = KB severity capped at warning for `needs_review`/uncertain; corrected = valid + exact `Fix.Preview`; `CORE.UNPARSED` always fails), `ValidatorAdapter` (`null` → skip "no validator yet (T-028)"), `RuleImplementationScan` (`[KbRule]` over Core), `RuleCoverageReport` → `build/review/rule-coverage.md` on every `dotnet test` (140 rules, 0 implemented, 12 without examples), and 47 self-tests with a fake validator. New in Core: `CytoLex.Core.Rules.KbRuleAttribute` (core.md §7.2). CLAUDE.md/README.md updated; notes added to T-028 and T-035. Deviations: book fragments (`inv(2)`, `+21`, `GTG`, `…` strings; `KbCatalog.IsFragment`) are checked only for their own rule (valid) or that it fires (invalid), and the adapter gets an `isFragment` flag; skipped cases print 3 lines each in `dotnet test` (MTP 2.5.2 ignores `--show-test-results failed` for skips), which ends once T-028 plugs in the validator. Follow-up: T-062 (test corpus).
 
 ### T-026 — String type detection & segment splitting
-**Status:** in_progress
+**Status:** done
 **Description:** Split combined strings on `.` (respecting context) and detect each segment's type (`karyotype`, `ish`, `nuc_ish`, `arr`, …).
 **Acceptance:** KB examples of every type are detected correctly.
 **Notes:** From T-021: also infer the context from clear markers only (clones/`idem`/`sl`/`sdl`, `c`, ploidy `<Nn>` → acquired; `rec` → constitutional); otherwise unknown. An explicit context hint overrides it. From T-023: design in `docs/design/core.md` §3 (top-level `.` split, keyword type detection, `NotImplemented` segments, contradicting markers → unknown + info).
+Outcome (2026-11-18): `Segmenter.Split` (top-level `.` followed by a letter separates segments; leading-keyword type detection with vocab refs) and `ContextInference.Infer` (lexical marker scan, decided with the user: idem/sl/sdl, `c`, `<…n>`, clone structure without mos/chi → acquired; `rec` → constitutional; contradiction → unknown) in `src/CytoLex.Core/{Text,Segmentation,Context}/`; tests in `tests/CytoLex.Core.Tests/{Segmentation,Context}/` (all KB examples split losslessly and match their rule's `applies_to`; other types covered by hand-written strings until their KB chapters exist). Docs: `docs/design/core.md` §3/§14, `docs/decisions.md` T-026 entry, CLAUDE.md/README status. Deviations: segment-level `NotImplemented` left to the edition profile (T-028) and construct-level detection to T-027 (notes added there); the contradiction info diagnostic is emitted in T-028.
 
 ### T-027 — Karyotype tokenizer/parser
 **Status:** todo
