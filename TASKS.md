@@ -32,7 +32,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-020 | done | 1 | T-013 | Tech stack for core library + desktop app |
 | T-021 | done | 1 | T-013 | Pilot validator scope (notation types implemented in the pilot) |
 | T-022 | done | 1 | T-013 | Strictness & severity policy |
-| T-023 | todo | 1 | T-020, T-021, T-022 | Core design: data model, version profiles, result/diagnostic API, fix model |
+| T-023 | done | 1 | T-020, T-021, T-022 | Core design: data model, version profiles, result/diagnostic API, fix model |
 | T-024 | todo | 1 | T-023 | Project scaffolding; update CLAUDE.md with commands |
 | T-025 | todo | 1 | T-024 | KB-example test harness + rule coverage report |
 | T-026 | todo | 1 | T-024 | String type detection & segment splitting |
@@ -69,6 +69,8 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-057 | todo | 2 | T-023 | Translation templates + schema; reviewed golden file (ISCN 2016) |
 | T-058 | todo | 2 | T-030, T-031, T-057 | Literal translation renderer in the core library |
 | T-059 | todo | 2 | T-058, T-036, T-039 | Desktop: translation view |
+| T-060 | todo | 1 | T-023 | `kb build`: lean runtime bundle (rules metadata, vocab, bands) for the core |
+| T-061 | discussion | 3 | – | Presentation & documentation material for the pilot: define what to prepare |
 
 ---
 
@@ -328,7 +330,7 @@ All KB tasks share these steps and criteria:
 **Notes:** Found during T-008 (2026-11-17); unrelated to T-008's changes. After adding `.gitattributes`, re-normalise the working tree (`git add --renormalize .`).
 
 ### T-023 — Core design
-**Status:** todo
+**Status:** done
 **Description:** Design doc covering:
 - Data model (AST with spans).
 - Version profiles (shared parser, per-version rules from the KB).
@@ -338,12 +340,19 @@ All KB tasks share these steps and criteria:
 - Type detection and segment splitting.
 **Acceptance:** `docs/design/core.md` approved by the user.
 **Notes:** From T-021: design the model for **all** notation types and implement the pilot subset (karyotype, ch. 2–9). A string is a list of typed segments; types outside the pilot return `not-implemented` per segment. A karyotype is one or more cell lines (optional `[n]`, `/`, `mos`/`chi`), with room for references to earlier clones (`idem`/`sl`/`sdl`, T-032). Diagnostics carry an optional **condition** (context `constitutional`/`acquired`) for context-dependent rules, and fixes may be per context. The API takes an optional context hint (default auto/inferred). From T-022: per-version result = validity (valid = no errors; per context when unknown, naming the context(s) it is valid in) + counts per severity; diagnostics carry a "book ambiguous" flag (rules with `needs_review` are capped at warning) and a per-context severity for conditional rules; checks the engine can't decide with certainty report a warning, not an error. From T-054 (literal translation, `docs/decisions.md` → "Literal translation"): AST nodes keep their meaning (event type, chromosome(s), arm(s), breakpoints/bands, derivative structure with segment order/orientation, sex-chromosome field, count/ploidy, cell-line and clone membership incl. `[n]`, `/`, mos/chi and room for idem/sl/sdl, uncertainty `?`/`~`/`or`, inheritance mat/pat/inh/dn); each node carries its span and the KB entry IDs (rule or vocab item) that define it; partial ASTs from error recovery are marked so the renderer can skip bad parts; the result API offers a translation per edition next to the diagnostics, with per-context readings where needed.
+**Outcome (2026-11-18):** `docs/design/core.md` written and approved by the user: pipeline; top-level `.` segment split, keyword type detection, `NotImplemented` segments, marker-only context inference; two layers (lossless syntax tree + semantic model with spans and `KbRef`s `rule:`/`vocab:<key>/<label>`/`band:`, `IsPartial`); lean KB bundle in memory behind `IKnowledgeBase`, embedded in `CytoLex.Core`, `kb.sqlite` for the rule browser; edition profiles and `[KbRule]`-bound checks; diagnostics with T-022 severity resolution, conditional per-context severity, book-ambiguous flag; results API (validity per context, `IsComplete`, counts, translation slot); fix model (text edits, apply = re-validate, fix all, per-context fixes); worked examples. Two design choices decided with the user (two layers; bundle + SQLite, embedded). Recorded in `docs/decisions.md` (Core design section + log entry); `CLAUDE.md`/`README.md` point to the doc; new task T-060 (runtime bundle); notes on T-024, T-026, T-027, T-028, T-035. Deviation: `CORE.UNPARSED` safety-net code (not a KB rule) added to §8.4.
 
 ### T-024 — Project scaffolding
 **Status:** todo
 **Description:** Create the solution/packages for the core library, desktop app and tests, using the T-020 stack. Build/test/lint commands work from the command line.
 **Acceptance:** Build and an empty test run succeed; `CLAUDE.md` lists the exact commands, including how to run a single test.
-**Notes:** Stack from T-020: .NET 10 SDK (pin it in `global.json`), xUnit v3, Avalonia + AvaloniaEdit, CommunityToolkit.Mvvm. Proposed layout (the decision log, T-020 entry): `CytoLex.slnx`, `src/CytoLex.Core/`, `src/CytoLex.Desktop/`, `tests/CytoLex.Core.Tests/`, `Directory.Build.props`. Update `README.md` with `CLAUDE.md` (new top-level folders and commands).
+**Notes:** Stack from T-020: .NET 10 SDK (pin it in `global.json`), xUnit v3, Avalonia + AvaloniaEdit, CommunityToolkit.Mvvm. Proposed layout (the decision log, T-020 entry): `CytoLex.slnx`, `src/CytoLex.Core/`, `src/CytoLex.Desktop/`, `tests/CytoLex.Core.Tests/`, `Directory.Build.props`. Update `README.md` with `CLAUDE.md` (new top-level folders and commands). From T-023 (`docs/design/core.md` §6): `CytoLex.Core` embeds the runtime bundle from `build/` (T-060) as a resource (until T-060 is done, `build/kb.json` stands in); `dotnet build` fails with a "run `kb build`" message when it is missing.
+
+### T-060 — `kb build`: lean runtime bundle for the core
+**Status:** todo
+**Description:** New `kb build` output for the core library (`docs/design/core.md` §6): per edition, rule metadata (id, title, statement, applies_to, context, severity, rendered citations, fix, review), vocabularies, and band names with levels, `book` flag and GRCh37/38 coordinates from `kb/bands/<version>/bands.yaml`; no quotes, no example lists. Carries its own `format_version`. Later also translation templates (T-057).
+**Acceptance:** `kb build` writes the bundle (atomically, like the other outputs, byte-identical across runs); tests cover its content; `kb/README.md`, `CLAUDE.md` and `README.md` describe it.
+**Notes:** Created 2026-11-18 from T-023 (decided with the user: lean in-memory bundle embedded in Core behind `IKnowledgeBase`; `kb.sqlite` for the rule browser). Proposed (not applied): add T-060 to T-028's Depends.
 
 ### T-025 — KB-example test harness
 **Status:** todo
@@ -355,19 +364,19 @@ All KB tasks share these steps and criteria:
 **Status:** todo
 **Description:** Split combined strings on `.` (respecting context) and detect each segment's type (`karyotype`, `ish`, `nuc_ish`, `arr`, …).
 **Acceptance:** KB examples of every type are detected correctly.
-**Notes:** From T-021: also infer the context from clear markers only (clones/`idem`/`sl`/`sdl`, `c`, ploidy `<Nn>` → acquired; `rec` → constitutional); otherwise unknown. An explicit context hint overrides it.
+**Notes:** From T-021: also infer the context from clear markers only (clones/`idem`/`sl`/`sdl`, `c`, ploidy `<Nn>` → acquired; `rec` → constitutional); otherwise unknown. An explicit context hint overrides it. From T-023: design in `docs/design/core.md` §3 (top-level `.` split, keyword type detection, `NotImplemented` segments, contradicting markers → unknown + info).
 
 ### T-027 — Karyotype tokenizer/parser
 **Status:** todo
 **Description:** Parser for karyotype notation producing an AST with character spans. It recovers from errors and reports all problems.
 **Acceptance:** Parses all valid karyotype examples from the KB; invalid examples produce errors with correct spans; more than one error is reported per string where present.
-**Notes:**
+**Notes:** From T-023: lossless syntax tree + binder to the semantic model (`docs/design/core.md` §4–§5); every recovery point names the KB rule of the expected form (§8.4).
 
 ### T-028 — Version-profile rule engine
 **Status:** todo
 **Description:** Loads the KB bundle and applies the rule set for the chosen version (or all versions, returning an array of results).
 **Acceptance:** A single-version call and an all-versions call (2016 + `not-implemented` for 2020/2024) both work; diagnostics carry citations.
-**Notes:**
+**Notes:** From T-023: edition profiles, `[KbRule]`-bound checks, severity resolution and the result API in `docs/design/core.md` §7–§9. Proposed: depend on T-060 (runtime bundle).
 
 ### T-029 — Rules: general + band validation
 **Status:** todo
@@ -412,7 +421,7 @@ All KB tasks share these steps and criteria:
 - Level 3: plain-language explanations when no single fix exists.
 - Fixes are per version.
 **Acceptance:** Corrected forms from the KB are reproduced exactly; explanations include citations.
-**Notes:** From T-021: where the correct form depends on context (e.g. `47,XXX` vs `47,XX,+X`) and the context is unknown, offer one fix per context instead of a single Apply.
+**Notes:** From T-021: where the correct form depends on context (e.g. `47,XXX` vs `47,XX,+X`) and the context is unknown, offer one fix per context instead of a single Apply. From T-023: fix model (`TextEdit`s on the original input, apply = edit + re-validate, fix all, `ForContext`) in `docs/design/core.md` §10.
 
 ## Desktop app (pilot)
 
@@ -530,3 +539,14 @@ All KB tasks share these steps and criteria:
 **Description:** Same as T-045, for ISCN 2024.
 **Acceptance:** All-versions mode returns real 2024 results.
 **Notes:**
+
+### T-061 — Presentation & documentation material for the pilot
+**Status:** discussion
+**Description:** Once the pilot works, the user will present CytoLex to colleagues. Decide what material to prepare, for whom and in what form, then create the `todo` tasks to produce it. Questions for the interview:
+- Audience(s) and setting: cytogeneticists/lab staff, management, developers; talk length; live demo or not.
+- Deliverables, e.g. a slide deck (claude.ai Slides artifact or `.pptx`), architecture and pipeline diagrams (from `docs/design/core.md`: segment → parse → bind → rules → result; KB build pipeline book → chunks → rules → bundle), a one-page overview/handout, a demo script with prepared example strings (valid, invalid with fixes, conditional context, multi-edition), screenshots or a short screen recording of the desktop app, an FAQ (scope, ISCN editions, limits, copyright).
+- Format and source of truth: where the sources live (e.g. `docs/presentation/`, diagrams as Mermaid/SVG kept in git so they can be regenerated), branding/design system.
+- Copyright: what book content may appear on slides (paraphrases and citations only, no verbatim quotes or idiogram images; see T-043).
+- Timing: what can be drafted now (architecture, KB pipeline) and what needs the finished pilot (demo, screenshots).
+**Acceptance:** Decision in `docs/decisions.md` (audiences, deliverables, formats, location, copyright limits); follow-up `todo` task(s) for producing the material added with Pri and Depends (the demo-dependent ones depending on the pilot desktop tasks, e.g. T-040).
+**Notes:** Raised 2026-11-18 by the user, at the end of T-023.

@@ -59,6 +59,14 @@ Decisions made during planning (2026-11-16) and later `discussion` tasks. Each n
 - **Language:** English in the pilot, from template data files per edition keyed by KB entry (proposed `kb/translation/<version>/`, schema-checked, in the bundle), so other languages are a new template set.
 - **Tests:** a per-edition golden file (string → summary, items, spans, KB IDs), seeded from book examples (compared with the printed explanation, cited not quoted) plus non-book strings; entries count only after a person's review.
 
+## Core design (T-023)
+Full design: [`docs/design/core.md`](design/core.md).
+- **Pipeline:** segmenter/type detector → per-segment parser (lossless syntax tree) → binder (semantic model) → rule engine per edition → result.
+- **Two layers:** a lossless syntax tree (every character, trivia, missing/skipped tokens, spans) for spacing rules and exact fixes; a semantic model (cell lines, abnormalities, breakpoints, derivative structure…) with spans and KB refs for rules and the translation.
+- **KB at runtime:** a lean bundle (rule metadata, vocab, bands; no quotes/examples) embedded in `CytoLex.Core`, read into memory behind `IKnowledgeBase`; `build/kb.sqlite` serves the rule browser. Bundle output: T-060.
+- **Rules in code are bound to KB IDs** (`[KbRule("…")]`); severity, citation, review state and context always come from the KB.
+- **API context:** `Constitutional | Acquired` (KB `neoplastic` = acquired); fixes are text edits on the original input; applying a fix re-validates.
+
 ## Knowledge base (KB)
 The KB is the single source for all validation decisions.
 
@@ -301,3 +309,12 @@ _(entries added by `discussion` tasks: date — task — decision — rationale)
   - **Language:** English templates in data files per edition. Rejected: strings in C# (refactor for any other language; templates can't be reviewed like KB files) and localising now (no need yet).
   - **Tests:** a person-reviewed golden file. Rejected: an `explanation` field on KB examples (re-touches six finished KB tasks and mixes test expectations into rules) and snapshot-only tests (no independent expectation).
   - **Follow-up:** T-057 (templates, schema, golden file), T-058 (renderer), T-059 (desktop view); requirements noted on T-023 and T-038.
+
+- **2026-11-18 — T-023 — Core design: two-layer model, lean KB bundle embedded in Core, KB-bound rule checks.**
+  - **Document:** `docs/design/core.md` (pipeline, segments/type detection/context inference, syntax and semantic layers, KB at runtime, edition profiles and rule engine, diagnostics and severity resolution, results API, fix model, translation hooks, extensibility, worked examples).
+  - **Two layers (decided with the user):** lossless syntax tree + semantic model. Rationale: spacing rules (`SYM.NO_SPACE_AT_PARENTHESIS`, …) and exact level-1 fixes need every character; rules and the translation need meaning independent of short/detailed system. Rejected: one AST with trivia attached (spacing and recovery logic would leak into every meaning node).
+  - **KB storage (decided with the user):** the validator reads a lean in-memory bundle behind `IKnowledgeBase`; the rule browser uses `build/kb.sqlite` (FTS5). Rationale: the engine runs every rule of an edition on every string, so it needs the whole edition in memory anyway; a few MB load in tens of ms; growth goes mostly into quotes/examples, which stay out of the bundle; the interface lets the format change later. Rejected: SQLite for everything (native dependency in the core, mapping code, still loaded whole at startup) and the full `kb.json` (grows the most, carries quotes the validator never reads).
+  - **Shipping (decided with the user; answers the open point from T-020):** the bundle is embedded in `CytoLex.Core` at `dotnet build` (build fails with a "run `kb build`" message when missing); `Load(Stream)` allows another bundle in tests. Rationale: desktop, tests and web service always carry the KB the code was built with. Rejected: a file beside each app (each host must ship and locate it; KB and code can drift).
+  - **Rule binding:** C# checks carry `[KbRule("ID")]` and report only facts (span, arguments, edits, certainty); an edition runs a check only if its KB has the ID; startup check + coverage list for T-025. Parser/binder errors also name a KB rule; `CORE.UNPARSED` is a flagged safety net only.
+  - **References:** `KbRef` forms `rule:<ID>`, `vocab:<key>/<label>` (vocab entries have no IDs; key + label is unique), `band:<name>`.
+  - **Follow-up:** T-060 (`kb build` runtime bundle; proposed as a dependency of T-028); notes added to T-024, T-026, T-027, T-028, T-035.
