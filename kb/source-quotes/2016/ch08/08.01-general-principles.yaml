@@ -9,6 +9,10 @@ quotes:
       in near-diploid cells (chromosome numbers 35–57) in relation to 46, in near-triploid cells
       (chromosome numbers 58–80) in relation to 69, in near-tetraploid cells (chromosome numbers
       81– 103) in relation to 92, and so on.
+  - rule: NUM.PLOIDY_REFERENCE
+    cite: {section: "11.2", page: 90, para: "¶2"}
+    text: >-
+      Each range is determined as n±n/2, with n/2 defined operationally as 11 chromosomes.
   - rule: NUM.PLOIDY_IN_ANGLE_BRACKETS
     cite: {section: "8.1", page: 54, para: "¶3"}
     text: >-

@@ -12,6 +12,7 @@ rules:
       on for higher levels (Section 11.2).
     cite:
       - {section: "8.1", page: 54, para: "¶2"}
+      - {section: "11.2", page: 90, para: "¶2"}
     examples:
       valid:
         - text: "26,X,+4,+6,+21"
@@ -27,7 +28,13 @@ rules:
             (listing every gained chromosome against the diploid level).
           corrected: "71,XXX,+8,+10"
     fix: {level: 3, hint: "Restate the gains and losses relative to the ploidy level of the count, or give the chosen level in angle brackets (<2n>)."}
-    review: {paraphrase_checked: true, needs_review: false}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The levels beyond near-tetraploid follow §11.2 ¶2 (each range is n ± n/2, n/2 = 11
+        chromosomes) and the Ploidy table on p.90: a count c lies on level 1 up to 34, else on
+        level ⌊(c + 11) / 23⌋ (T-030).
     related: [KARYO.PLOIDY_RELATIVE, NUM.PLOIDY_IN_ANGLE_BRACKETS, NUM.COUNT_MATCHES_CHANGES]
 
   - id: NUM.PLOIDY_IN_ANGLE_BRACKETS
@@ -98,6 +105,12 @@ rules:
         (capped at warning) where it can't count exactly. That covers structural rearrangements that
         change the count without a sign (rob, dic, fis, …), count ranges (~), inc karyotypes and
         uncertain markers. The sex chromosome field lists the remaining chromosomes after a loss
-        (45,X,–X) but the constitutional ones before a gain (47,XX,+X), see SEX.ACQUIRED_GAIN_LOSS
-        (T-030).
-    related: [NUM.PLOIDY_REFERENCE, SEX.ACQUIRED_GAIN_LOSS]
+        (45,X,–X) but the constitutional ones before a gain (47,XX,+X), see SEX.ACQUIRED_GAIN_LOSS;
+        a constitutional field marked c keeps the lost chromosome (46,XXYc,–X, §8.2 E16).
+        Counting conventions (T-030), read from the rules cited: a rearranged X/Y is not in the sex
+        field, so it adds one (SEX.ABNORMAL_SEX_CHROMOSOME_IN_LIST); dic, trc, rob, whole-arm der and
+        other one-chromosome products of several chromosomes replace all of them
+        (KARYO.REPLACED_NORMAL_NOT_MISSING); dmin is not counted (DMIN.FORMAT); fis products are
+        written separately (FIS.FORMAT). Composite karyotypes ([cp]), inc and omitted abnormalities
+        are not counted.
+    related: [NUM.PLOIDY_REFERENCE, SEX.ACQUIRED_GAIN_LOSS, SEX.ABNORMAL_SEX_CHROMOSOME_IN_LIST, KARYO.REPLACED_NORMAL_NOT_MISSING, DMIN.FORMAT, FIS.FORMAT]

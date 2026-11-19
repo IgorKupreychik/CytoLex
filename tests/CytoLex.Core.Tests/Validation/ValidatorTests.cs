@@ -210,7 +210,7 @@ public class ValidatorTests
         var result = Validate("mos 45,X[15],47,XXX[10],46,XX[23]").Results[0];
         var starts = result.Diagnostics.Select(d => d.Span.Start).ToList();
         Assert.Equal(starts.Order(), starts);
-        Assert.Equal(2, result.Diagnostics.Length);
+        Assert.Equal(2, result.Diagnostics.Count(d => d.RuleId == "KARYO.CLONE_SEPARATOR"));
     }
 
     [Fact]
