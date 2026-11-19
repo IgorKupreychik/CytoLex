@@ -53,9 +53,8 @@ internal static class InvalidExampleExpectations
             ["46,XX,t(5;6)(q34;q23),mat"] = [("KARYO.PARENTAL_ORIGIN", "mat", 22)], // KARYO.PARENTAL_ORIGIN
             ["47,XY,+mardn[14]/46,XY[16]"] = [], // KARYO.DE_NOVO_SPACE
             ["47,XXY c,t(9;22)(q34;q11.2)[20]"] = [], // KARYO.CONSTITUTIONAL_C
-            ["46,XX,inv(2)(p21;q31)"] = [], // STRUCT.BREAKPOINT_GROUPS
-            ["46,XY,t(12;16)(q13)"] = [], // STRUCT.BREAKPOINT_GROUPS
-            ["46,XY,t(5;6)(q13;q23;q15;q23)"] = [], // STRUCT.BREAKPOINT_GROUPS
+            ["46,XX,ins(5;2)(p14q22q32)"] = [], // STRUCT.BREAKPOINT_GROUPS
+            ["46,XX,ins(5;2)(p14;q22;q32)"] = [], // STRUCT.BREAKPOINT_GROUPS
             ["46,XX,inv(2)p21q31"] = [("STRUCT.BREAKPOINT_GROUPS", "p21q31", 12)], // STRUCT.BREAKPOINT_GROUPS
             ["46,XX,inv(2)(q31p21)"] = [], // STRUCT.SHORT_ARM_BREAKPOINT_FIRST
             ["46,XX,inv(2)(p23p13)"] = [], // STRUCT.PROXIMAL_BREAKPOINT_FIRST
@@ -138,6 +137,7 @@ internal static class InvalidExampleExpectations
             ["46,Y,tas(3;12;X)(q29;q24.3p13;q28)"] = [], // TAS.FORMAT
             ["45,XX,tas(12;13)(q24.3;q34)"] = [], // TAS.FORMAT
             ["46,XY,t(2;5)(q21)"] = [], // TRANSLOC.FORMAT
+            ["46,XY,t(5;6)(q13;q23;q15;q23)"] = [], // TRANSLOC.FORMAT
             ["46,XY,t(1;3)(q10;p10)"] = [], // TRANSLOC.WHOLE_ARM
             ["46,XY,t(1;3)(p11.1;q11.1)"] = [], // TRANSLOC.WHOLE_ARM
             ["45,XX,der(1)t(1;3)(p10;q10)"] = [], // DER.WHOLE_ARM_TWO_CHROMOSOMES

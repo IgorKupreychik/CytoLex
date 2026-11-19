@@ -42,7 +42,8 @@ internal static class ValidatorAdapter
                     d.IsConditional,
                     d.Certainty == Certainty.Uncertain,
                     [.. d.Fixes.Select(f => f.Preview).OfType<string>()],
-                    d.CannotVerify))]);
+                    d.CannotVerify))],
+                report.Context.Inferred is { } inferred ? Map(inferred) : null);
         }
 
         private static SampleContext Map(CoreContext c) => c switch

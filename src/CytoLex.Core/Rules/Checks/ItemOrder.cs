@@ -126,8 +126,8 @@ internal static class ItemOrder
 
     private static Key? KeyOf(KaryotypeItem item) => item switch
     {
-        WholeChromosomeChange w => Rank(w.Chromosome) is { } r ? new Key(Category.Identified, r, 0, null) : null,
-        ChromosomeRegion { Chromosome: { } c } => Rank(c) is { } r ? new Key(Category.Identified, r, 1, null) : null,
+        WholeChromosomeChange w => Structure.Rank(w.Chromosome) is { } r ? new Key(Category.Identified, r, 0, null) : null,
+        ChromosomeRegion { Chromosome: { } c } => Structure.Rank(c) is { } r ? new Key(Category.Identified, r, 1, null) : null,
         Abnormality a => AbnormalityKey(a),
         _ => null,
     };
@@ -166,16 +166,6 @@ internal static class ItemOrder
             return isDerivative ? new Key(Category.UnknownDer, 0, 1, null) : null;
         }
 
-        return Rank(chromosome) is { } rank ? new Key(Category.Identified, rank, 1, part.Symbols[0].Symbol) : null;
+        return Structure.Rank(chromosome) is { } rank ? new Key(Category.Identified, rank, 1, part.Symbols[0].Symbol) : null;
     }
-
-    /// <summary>X = 0, Y = 1, autosome n = n + 1; <c>null</c> for <c>?</c> or an invalid identifier.</summary>
-    private static int? Rank(ChromosomeRef c) =>
-        c.Name switch
-        {
-            "X" => 0,
-            "Y" => 1,
-            _ when c.IsValidIdentifier() && c.Number is { } n => n + 1,
-            _ => null,
-        };
 }

@@ -27,6 +27,9 @@ internal enum CountVerdict
     /// </summary>
     LostSexInField,
 
+    /// <summary>The count fits only with each telomeric association counted as one chromosome (<c>TAS.FORMAT</c>, §9.2.16).</summary>
+    TasCountedOnce,
+
     /// <summary>No reading fits (<c>NUM.COUNT_MATCHES_CHANGES</c>).</summary>
     Mismatch,
 }
@@ -227,6 +230,14 @@ internal static class ChromosomeCount
         if (sexLosses > 0 && !hasConstitutionalSex && Fits(Shift(expected, -sexLosses), count))
         {
             return Result(CountVerdict.LostSexInField, true);
+        }
+
+        var tasExtra = line.Items.OfType<Abnormality>()
+            .Where(a => a.Sign == GainLoss.None && a.Parts is [{ Head: "tas", Symbols.Length: 1 } tas] && !tas.Chromosomes.IsEmpty)
+            .Sum(a => a.Parts[0].Chromosomes.Length - 1);
+        if (tasExtra > 0 && Fits(Shift(expected, -tasExtra), count))
+        {
+            return Result(CountVerdict.TasCountedOnce, true);
         }
 
         return Result(CountVerdict.Mismatch, true);

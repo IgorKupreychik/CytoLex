@@ -19,7 +19,9 @@ internal sealed record ExampleOutcome(string? SkipReason, IReadOnlyList<string> 
 /// <item><b>Invalid</b>: without a hint the rule fires (firm or conditional, never silence); with a matching hint it fires firmly;
 /// severity = KB severity, at most warning for <c>needs_review</c> rules and uncertain findings. A rule without a <c>[KbRule]</c>
 /// check is still run (the parser reports surface parts of some rules): if it fires without a hint the case is checked as
-/// usual, otherwise it is skipped as not implemented (decided in T-028).</item>
+/// usual, otherwise it is skipped as not implemented (decided in T-028). An invalid example whose own markers set a
+/// context outside the rule's contexts (<c>rec</c> → constitutional for the neoplastic-only <c>REC.NOT_ACQUIRED</c>) is
+/// checked only with the matching hint: without one the string is consistent with itself (decided in T-031).</item>
 /// <item><b>Corrected</b>: the corrected form passes as a valid example; with a fixer, a fix of the rule's diagnostic previews it exactly.</item>
 /// <item>No <c>CORE.UNPARSED</c> on any example.</item>
 /// </list>
@@ -120,6 +122,12 @@ internal static class ExampleExpectations
         {
             var run = Run(c, v, c.Text, hint, failures);
             var own = run.Diagnostics.Where(d => d.RuleId == c.Rule.Id).ToList();
+            if (own.Count == 0 && hint is null && run.InferredContext is { } inferred
+                && c.Rule.SampleContexts.Count > 0 && !c.Rule.SampleContexts.Contains(inferred))
+            {
+                continue;
+            }
+
             if (own.Count == 0)
             {
                 var others = run.Diagnostics.Count == 0 ? "none" : string.Join(", ", run.Diagnostics.Select(Describe));

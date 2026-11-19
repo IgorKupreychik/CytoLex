@@ -92,6 +92,21 @@ public class ExampleExpectationsTests
         Assert.Equal(passes, ExampleExpectations.Evaluate(Case(rule, ExampleKind.Valid, "46,XX,der(5)mat"), v, true).Passed);
     }
 
+    // --- invalid: the string's own markers set another context (T-031) ---
+
+    [Theory]
+    [InlineData(true, true)] // rec → constitutional: silent without a hint is fine
+    [InlineData(false, false)] // inferred inside the rule's context (acquired): it must fire
+    public void Invalid_OwnMarkersSetOtherContext_CheckedWithHintOnly(bool inferredConstitutional, bool passes)
+    {
+        var inferred = inferredConstitutional ? SampleContext.Constitutional : SampleContext.Acquired;
+        var rule = Rule(context: "neoplastic");
+        var v = new FakeValidator((_, hint) => hint is null
+            ? new ExampleRun(true, _both, [], inferred)
+            : With(false, new ExampleDiagnostic("TEST.RULE", Severity.Error)));
+        Assert.Equal(passes, ExampleExpectations.Evaluate(Case(rule, ExampleKind.Invalid, "46,XX,rec(6)dup(6p)"), v, true).Passed);
+    }
+
     [Fact]
     public void ValidFragment_OnlyOwnRuleMatters()
     {

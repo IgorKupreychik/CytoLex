@@ -28,7 +28,7 @@ public class GeneralRuleChecksTests
     [InlineData("BAND.GENOME_ASSEMBLY_ONLY", "9q34.11", true, "9q34.11")]
     [InlineData("BAND.GENOME_ASSEMBLY_ONLY", "46,XX,del(9)(q34.11)", false, "q34.11")]
     [InlineData("SYM.SPACE_BETWEEN_SYMBOLS", "psudic", true, "psudic")]
-    [InlineData("SYM.SPACE_BETWEEN_SYMBOLS", "47,XX,+dicr(1;3)(p36.1q32;p24q26.2)", false, "dicr")]
+    [InlineData("SYM.SPACE_BETWEEN_SYMBOLS", "45,XX,psudic(15;13)(q12;q12)", false, "psudic")]
     [InlineData("SYM.SPACE_BEFORE_CHROMOSOME_COUNT", "mos47,XXX[25]/46,XX[5]", false, "mos47")]
     [InlineData("SYM.SPACE_BEFORE_CHROMOSOME_COUNT", "chi46,XX/46,XY", false, "chi46")]
     [InlineData("SYM.NO_SPACE_AT_PARENTHESIS", "46,XX,del (5)(q13q33)", false, " ")]
@@ -63,6 +63,7 @@ public class GeneralRuleChecksTests
     [InlineData("SYM.SPACE_BETWEEN_SYMBOLS", "psu dic", true)]
     [InlineData("SYM.SPACE_BETWEEN_SYMBOLS", "47,XY,+mardn[14]/46,XY[16]", false)] // suffix: KARYO.DE_NOVO_SPACE
     [InlineData("SYM.SPACE_BETWEEN_SYMBOLS", "14cenh+", true)] // variant features are written together
+    [InlineData("SYM.SPACE_BETWEEN_SYMBOLS", "47,XX,+dicr(1;3)(p36.1q32;p24q26.2)", false)] // RING.DIC_TRC_ORDER (T-031)
     [InlineData("SYM.SPACE_BEFORE_CHROMOSOME_COUNT", "mos 47,XXX[25]/46,XX[5]", false)]
     [InlineData("SYM.NO_SPACE_AT_PARENTHESIS", "46,XX,del(5)(q13q33)", false)]
     [InlineData("SYM.NO_SPACE_AT_PARENTHESIS", "46,XY,del(8)(q21.1) or i(8)(p10)", false)]
