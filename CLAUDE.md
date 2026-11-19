@@ -47,6 +47,7 @@ Repo tooling is a **self-contained Python 3.14 project in `tools/`**, managed by
   - `kb extract` after a fresh clone, a new edition, or an extraction-script or table-layout (`extract/tables/<version>.yaml`) change;
   - `kb ideograms` then `kb bands` after a decoder or `ideograms` config change; `kb bands` after an `exceptions.yaml` or band source change;
   - `kb build` after any KB edit (including a new `bands.yaml` from `kb bands`: bands go into the runtime bundle), or before running the app — then `dotnet build` so `CytoLex.Core` embeds the new bundle.
+- **Line endings: LF everywhere** (`.gitattributes` `* text=auto eol=lf`, T-055). Generators must write LF (`newline="\n"` / `write_bytes`); byte-compare tests rely on it.
 - The tools resolve repo paths (`config/`, `kb/`, `build/`) from the repo root, not the working directory.
 - ISCN PDF path: `config/local.yaml` (`iscn_pdf.<version>`), or env var `CYTOLEX_ISCN_PDF_2016` to override.
 

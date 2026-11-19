@@ -121,5 +121,7 @@ uv run --directory tools ruff format .                                          
 
 You can also `cd tools` and drop `--directory tools`.
 
+**Line endings:** every file is LF on every OS (`.gitattributes`: `* text=auto eol=lf`, T-055), so generated committed files (`kb/bands/…`) match their generators byte for byte. If a working copy from before T-055 still has CRLF files (`git ls-files --eol | grep w/crlf`), convert it once on a clean tree: `git rm -r --cached -q . && git reset --hard`.
+
 ## Copyright
 CytoLex is a private project for now. The ISCN book and its extracted text never enter the repo. Verbatim quotes are kept in separate, removable files, and will be removed before any public release (T-043).

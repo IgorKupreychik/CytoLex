@@ -64,7 +64,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-052 | todo | 3 | T-051, T-038 | Desktop: comparison view |
 | T-053 | done | 1 | T-003 | Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`? |
 | T-054 | done | 2 | T-021 | Literal translation of ISCN strings into plain language: scope, style, architecture |
-| T-055 | todo | 2 | T-007 | Tooling: LF line endings for committed generated files (CRLF checkout breaks the ideograms test) |
+| T-055 | done | 2 | T-007 | Tooling: LF line endings for committed generated files (CRLF checkout breaks the ideograms test) |
 | T-056 | done | 1 | T-022 | KB: apply the strictness & severity policy to the 2016 rules |
 | T-057 | todo | 2 | T-023 | Translation templates + schema; reviewed golden file (ISCN 2016) |
 | T-058 | todo | 2 | T-030, T-031, T-057 | Literal translation renderer in the core library |
@@ -73,7 +73,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-061 | discussion | 3 | – | Presentation & documentation material for the pilot: define what to prepare |
 | T-062 | todo | 2 | T-026 | Test corpus of ISCN strings per notation type (review-flagged) + mutation generator |
 | T-063 | done | 1 | T-053 | KB: typed symbol forms (`-`/`x`/`->`) in the ch. 3 vocab + rule `SYM.TYPED_SYMBOL_FORMS` |
-| T-064 | todo | 3 | – | Line endings: generated committed files vs `core.autocrlf` (ideograms test fails on Windows) |
+| T-064 | done | 3 | – | Merged into T-055 (line endings of generated committed files) |
 | T-065 | done | 1 | T-027 | Binder: syntax tree → semantic model (meaning nodes, KbRefs, IsPartial) |
 | T-066 | todo | 2 | T-065 | Band composition from the short system (derivative structure for short-form abnormalities) |
 
@@ -331,10 +331,13 @@ Outcome (2026-11-18): Decided that `->`, `-` (and U+2212) and lowercase `x` in m
 ## Core library
 
 ### T-055 — Tooling: LF line endings for committed generated files
-**Status:** todo
-**Description:** With `core.autocrlf=true` (Windows), git checks out `kb/bands/2016/ideograms.yaml` with CRLF, while `kb ideograms` writes LF, so `tests/test_ideograms.py::test_pdf_decodes_every_chromosome_and_matches_committed` (byte comparison) fails. The same can happen to `bands.yaml` and any other generated, committed file.
-**Acceptance:** A `.gitattributes` that keeps `kb/**/*.yaml` (and other generated files) LF on checkout, or tests that compare text with normalised line endings (decide which); the full test suite passes on a Windows checkout with `core.autocrlf=true`.
-**Notes:** Found during T-008 (2026-11-17); unrelated to T-008's changes. After adding `.gitattributes`, re-normalise the working tree (`git add --renormalize .`).
+**Status:** done
+**Description:** With `core.autocrlf=true` (Windows), git checks out `kb/bands/2016/ideograms.yaml` with CRLF, while `kb ideograms` writes LF bytes, so `tools/tests/test_ideograms.py::test_pdf_decodes_every_chromosome_and_matches_committed` fails on a byte comparison, even on a clean tree. The same can happen to `bands.yaml` and any other generated, committed file. Options (decide which):
+- a `.gitattributes`: `eol=lf` for the generated `kb/**` YAML, or repo-wide `* text=auto eol=lf`, plus a renormalise;
+- tests that compare text with normalised line endings.
+**Acceptance:** `uv run --directory tools pytest` (the full Python suite) passes on a Windows checkout with `core.autocrlf=true`; the generators and the checkout agree on line endings.
+**Notes:** Found during T-008 (2026-11-17), again during T-063 (2026-11-18, filed as T-064); unrelated to either task. T-064 merged into this task on 2026-11-18. After adding `.gitattributes`, re-normalise the working tree (`git add --renormalize .`). Observed in T-056: the working copy has CRLF throughout (KB YAML, docs, C#), so a repo-wide `eol=lf` would touch most files in the renormalise commit.
+**Outcome (2026-11-18):** done. That concern didn't apply. Every tracked file was already LF in the index (CRLF only in the working copy), so `git add --renormalize .` changes nothing. Decided `.gitattributes` `* text=auto eol=lf` (repo-wide) over normalising tests; the byte-compare tests stay strict. The local working copy was converted CRLF → LF in place (263 files, content identical to the index). Docs: `docs/decisions.md` (Workflow bullet + log entry), README (Development → line endings, how to convert an old CRLF working copy), CLAUDE.md (convention line). `bands/generate.py`'s `\r\n` stripping kept as a fallback.
 
 ### T-023 — Core design
 **Status:** done
@@ -476,13 +479,13 @@ Outcome (2026-11-18):
 - `kb/schema/vocab.schema.json`: the flag. `kb build`: the flag is an error with `pair` or fewer than 2 tokens; new SQLite column `vocab.equivalent_forms`; the valid-example lookup counts typed forms as printed, so typed examples cite their `En` block without a warning.
 - Rule `SYM.TYPED_SYMBOL_FORMS` (`kb/rules/2016/ch03/…`, paraphrase approved) with 4 quotes; valid examples are typed forms of §8.2 E10, §9.3 E1 and §9.2.2 E2; invalid `…X2` with a level-1 fix to `×2`.
 - Docs `kb/README.md`; tests `tools/tests/test_kb_build.py` + fixtures.
-- Follow-up: T-064 (an ideograms test fails on CRLF checkouts, unrelated).
+- Follow-up: T-064 (an ideograms test fails on CRLF checkouts, unrelated; merged into T-055).
 
-### T-064 — Line endings of generated committed files
-**Status:** todo
-**Description:** With `core.autocrlf=true` (Windows), git checks out `kb/bands/2016/ideograms.yaml` with CRLF, but `kb ideograms` writes LF bytes. So `tools/tests/test_ideograms.py::test_pdf_decodes_every_chromosome_and_matches_committed` fails on a byte compare, even on a clean tree. The same risk applies to `bands.yaml` and any other generated file that is committed. Fix with a `.gitattributes` (`eol=lf` for `kb/**` generated YAML, or `* text=auto eol=lf`) plus a renormalise, or compare normalised text in the test.
-**Acceptance:** `uv run --directory tools pytest` passes on Windows with `core.autocrlf=true`; the generators and the checkout agree on line endings.
-**Notes:** Found during T-063 (2026-11-18); the failure is unrelated to T-063.
+### T-064 — Line endings of generated committed files (merged into T-055)
+**Status:** done
+**Description:** Duplicate of T-055 (same ideograms test failure on CRLF checkouts).
+**Acceptance:** –
+**Notes:** Found during T-063 (2026-11-18). Merged into T-055 on 2026-11-18 at the user's request: its description, acceptance (`uv run --directory tools pytest` passes on Windows with `core.autocrlf=true`; generators and checkout agree) and fix options now live there. No work done here; the ID is kept so references stay valid.
 
 ## Desktop app (pilot)
 

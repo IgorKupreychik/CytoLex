@@ -1,0 +1,2 @@
+# LF everywhere (T-055): generators write LF; byte-compare tests need the checkout to match.
+* text=auto eol=lf
