@@ -21,6 +21,7 @@ internal static class InvalidExampleExpectations
             ["1p31,1"] = [("BAND.SUBBAND_FORMAT", ",", 4)], // BAND.SUBBAND_FORMAT
             ["9q35"] = [], // BAND.MUST_EXIST
             ["9q34.4"] = [], // BAND.MUST_EXIST
+            ["9q34.11"] = [], // BAND.GENOME_ASSEMBLY_ONLY
             ["46,XX,dl(5)(q13q33)"] = [("SYM.LISTED_ONLY", "dl", 6)], // SYM.LISTED_ONLY
             ["psudic"] = [], // SYM.SPACE_BETWEEN_SYMBOLS
             ["mos47,XXX[25]/46,XX[5]"] = [], // SYM.SPACE_BEFORE_CHROMOSOME_COUNT

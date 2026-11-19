@@ -168,6 +168,7 @@ sealed class ChromosomeOrderCheck : IRuleCheck {
   - Edition IDs are strings (`"2016"`), as in `Parser.ForEdition` and `[KbRule(Editions = …)]`. KB: `CytoLex.Core.Kb.KnowledgeBase` (`LoadEmbedded`, `Load(Stream)`) → `IKnowledgeBase.ForEdition` (renamed from `Get`, analyzer CA1716) → `IEditionKb` (`Rules`, `Rule(id)` → `KbRule` with rendered `Citation`s, `Vocab`, `BandSet? Bands`).
   - Engine: `CytoLex.Core.Rules` — `IRuleCheck.Check(RuleContext)` (the context exposes input, segment, syntax tree, `ContextInfo`, `KbRule`, edition KB; `Report(span, detail, secondarySpans, certainty, contexts, cannotVerify)`), `RuleCatalog` (scan, startup check incl. `Parser.RuleIds`, most specific variant: exact edition > range > any; equally specific → exception), `EditionProfile` / `EditionProfiles` (pilot: 2016 → karyotype), `EditionCoverage` (checked rule IDs + parser-reported rule IDs, `Validator.Coverage(edition)`).
   - Parse sharing is not implemented (optimisation only). The semantic model is on `RuleContext.Model` (T-065).
+- **As built (T-029):** checks live in `src/CytoLex.Core/Rules/Checks/`: one `internal sealed` class per rule, named `<Rule>Check`, with shared model/token queries in `CheckHelpers` (`Breakpoints()`, `Chromosomes()`, `IsValidIdentifier()`, `BandSpan()`, `PresentTokens()`). A rule the parser already reports gets no duplicate check (`BAND.ARM_SYMBOL`, `BAND.SUBBAND_FORMAT`, `SYM.LISTED_ONLY`, `SYM.TYPED_SYMBOL_FORMS`). Spacing rules read token trivia from the syntax tree or compare node spans of the model. `BandSet.ContainsRegion` supports region-only breakpoints (`1p1`).
 
 ## 8. Diagnostics
 
@@ -194,7 +195,7 @@ enum Severity { Info, Warning, Error }
 3. `Certainty.Uncertain` (the check can't decide with certainty, e.g. counts with dic/psu dic, ploidy ranges, `?`/`~`, uncertain mar) → at most `Warning`. `NUM.COUNT_MATCHES_CHANGES` thus reports an error when the arithmetic is certain, else a warning.
 4. Context (§8.3): if the effective context is known, keep the result only when the rule applies to it; if it is unknown, build a per-context severity.
 5. "Can't verify from a single string" rules (e.g. `KARYO.ABBREVIATED_FORM`, `REC.KNOWN_PARENTAL_REARRANGEMENT`) → `Info` with `CannotVerify`, emitted **only when the string uses the notation concerned**.
-6. Band names with `book: false` → `Info` in karyotype/ish segments (accepted, source named), nothing in arr/seq; names that exist nowhere stay `BAND.MUST_EXIST` errors.
+6. Band names with `book: false` → `Info` in karyotype/ish segments (accepted, source named), nothing in arr/seq; names that exist nowhere stay `BAND.MUST_EXIST` errors. As built (T-029): a KB info rule of its own, `BAND.GENOME_ASSEMBLY_ONLY`, whose `applies_to` leaves out arr/seq, so this step needs no code in `DiagnosticFactory`.
 
 ### 8.3 Conditional diagnostics
 ```csharp
@@ -210,7 +211,7 @@ sealed record ContextCondition(ImmutableDictionary<SampleContext, Severity?> Per
 
 ### 8.5 As built (T-028)
 - `CytoLex.Core.Validation.Diagnostic` follows §8.1 plus `Detail` (the parser's or check's own message; `Message` is the KB title) and `Origin = Core` for engine codes. `Fixes` stays empty until T-035.
-- Severity resolution (§8.2 steps 1–5) and conditions (§8.3) are in `DiagnosticFactory`. A check may narrow the contexts of one finding (`contexts`); otherwise the KB `context` applies. Step 6 (band `book: false`) is T-029.
+- Severity resolution (§8.2 steps 1–5) and conditions (§8.3) are in `DiagnosticFactory`. A check may narrow the contexts of one finding (`contexts`); otherwise the KB `context` applies. Step 6 (band `book: false`) is the KB info rule `BAND.GENOME_ASSEMBLY_ONLY` (T-029).
 - Contradicting context markers → **`CORE.CONTEXT_CONFLICT`** (decided with the user): info, no citation, the first marker as span and the others as secondary spans. It is a core code like `CORE.UNPARSED`, not a KB rule, because it comes from CytoLex's inference, not from the book.
 
 ## 9. Results API

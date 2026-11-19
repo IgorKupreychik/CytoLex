@@ -32,12 +32,17 @@ public sealed record Band(
 public sealed class BandSet
 {
     private readonly FrozenDictionary<string, Band> _byName;
+    private readonly FrozenSet<string> _regions;
 
     private BandSet(ImmutableArray<int> levelsAvailable, ImmutableArray<Band> bands)
     {
         LevelsAvailable = levelsAvailable;
         Bands = bands;
         _byName = bands.ToFrozenDictionary(b => b.Name, StringComparer.Ordinal);
+        _regions = bands
+            .Select(b => b.Name.Length > b.Chromosome.Length + 1 ? b.Name[..(b.Chromosome.Length + 2)] : null)
+            .OfType<string>()
+            .ToFrozenSet(StringComparer.Ordinal);
     }
 
     /// <summary>The band levels the data covers, e.g. 300, 400, 550, 700, 850.</summary>
@@ -48,6 +53,12 @@ public sealed class BandSet
 
     /// <summary>Whether <paramref name="name"/> is a band name of the edition (exact, case-sensitive).</summary>
     public bool Contains(string name) => _byName.ContainsKey(name);
+
+    /// <summary>
+    /// Whether <paramref name="name"/> is a region of the edition (chromosome, arm and one region digit, e.g. <c>1p1</c>):
+    /// some band of that chromosome arm lies in it (§4.2, region-only breakpoints).
+    /// </summary>
+    public bool ContainsRegion(string name) => _regions.Contains(name);
 
     /// <summary>The band called <paramref name="name"/>; <c>null</c> if none.</summary>
     public Band? Find(string name) => _byName.GetValueOrDefault(name);

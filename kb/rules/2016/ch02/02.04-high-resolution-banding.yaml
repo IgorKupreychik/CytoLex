@@ -39,7 +39,8 @@ rules:
       A band or sub-band name must be one defined by the ISCN idiograms (Fig. 5) at one of the
       standard resolution levels. Besides these, p10 and q10 (the centromere) are valid. The
       list of valid names is kb/bands/2016/bands.yaml (the book's idiograms, checked against
-      NCBI, with cited exceptions).
+      NCBI, with cited exceptions). Names found only in the genome assemblies are accepted
+      with a note (BAND.GENOME_ASSEMBLY_ONLY).
     cite:
       - {section: "2.4", page: 12, para: "¶2"}
       - {section: "2.5", page: 16, float: "Fig. 5"}
@@ -50,7 +51,8 @@ rules:
         - text: "9q34.11"
           note: >-
             Not in the book's idiograms, but kept from NCBI with book: false
-            (kb/bands/2016/exceptions.yaml; §15.3 uses it).
+            (kb/bands/2016/exceptions.yaml; §15.3 uses it). Accepted here; the info note comes
+            from BAND.GENOME_ASSEMBLY_ONLY.
       invalid:
         - text: "9q35"
           why: Chromosome 9 has no band q35; its long arm ends at region 3, band 4.
@@ -58,7 +60,39 @@ rules:
           why: Band 9q34 has only sub-bands 9q34.1–9q34.3.
     fix: {level: 3, hint: "Name an existing band; check the idiogram of the chromosome at the resolution level used."}
     review: {paraphrase_checked: true, needs_review: false}
-    related: [BAND.CENTROMERE_10, BAND.RESOLUTION_LEVELS]
+    related: [BAND.CENTROMERE_10, BAND.RESOLUTION_LEVELS, BAND.GENOME_ASSEMBLY_ONLY]
+
+  - id: BAND.GENOME_ASSEMBLY_ONLY
+    title: Band from the genome assemblies, not in the idiograms
+    applies_to: [karyotype, breakage, meiotic, ish, nuc_ish, fib_ish, rev_ish]
+    severity: info
+    statement: >-
+      The band names the book defines are those of the idiograms (Fig. 5). A few names are
+      bands of the GRCh37/GRCh38 genome assemblies (NCBI) but do not appear in the idiograms
+      (book: false in kb/bands/2016/bands.yaml, e.g. 9q34.11). In a karyotype or in situ
+      hybridization string such a name is accepted with a note naming its source; array and
+      sequence strings, which describe genome bands, get no note.
+    cite:
+      - {section: "2.4", page: 12, para: "¶2"}
+      - {section: "2.5", page: 16, float: "Fig. 5"}
+    examples:
+      valid:
+        - text: "9q34.1"
+          note: Not a book example in this section; a band of the idiograms, so no note.
+      invalid:
+        - text: "9q34.11"
+          why: >-
+            Not in the ISCN 2016 idiograms; a band of the genome assemblies (NCBI). Accepted,
+            with an info note naming the source.
+    review:
+      paraphrase_checked: false
+      needs_review: false
+      note: >-
+        Not book text: the info note is a project decision (T-007 kept the six NCBI-only names
+        6p24.1–3 and 9q34.11–13 because §15.3 uses 9q34.11; T-022 set info in karyotype/ish and
+        nothing in arr/seq; T-029 made it a rule of its own). The citations give the idiograms
+        as the book's band list.
+    related: [BAND.MUST_EXIST]
 
   - id: BAND.PERICENTROMERIC_11
     title: Bands next to the centromere are 11, 11.1 or 11.11

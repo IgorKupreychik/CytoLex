@@ -25,6 +25,11 @@ quotes:
     text: >-
       Fig. 5. Idiograms of G-banding patterns for normal human chromosomes at five different
       levels of resolution.
+  - rule: BAND.GENOME_ASSEMBLY_ONLY
+    cite: {section: "2.4", page: 12, para: "¶2"}
+    text: >-
+      The standard idiograms shown in Fig. 5 provide schematic representations of chromosomes
+      corresponding to approximately 300, 400, 550, 700 and 850 bands.
   - rule: BAND.PERICENTROMERIC_11
     cite: {section: "2.4", page: 14, para: "¶5"}
     text: >-

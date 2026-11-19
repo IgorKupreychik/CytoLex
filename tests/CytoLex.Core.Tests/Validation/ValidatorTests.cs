@@ -281,7 +281,8 @@ public class ValidatorTests
     {
         var coverage = V.Coverage("2016")!;
         Assert.True(coverage.IsParserReported("KARYO.COUNT_SEX_ORDER"));
-        Assert.Empty(coverage.CheckedRuleIds);
+        Assert.True(coverage.IsChecked("BAND.MUST_EXIST"));
+        Assert.False(coverage.IsChecked("KARYO.COUNT_SEX_ORDER"));
         Assert.Null(V.Coverage("2020"));
     }
 
