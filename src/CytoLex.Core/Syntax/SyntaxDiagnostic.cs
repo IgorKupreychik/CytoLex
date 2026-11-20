@@ -1,4 +1,6 @@
+using System.Collections.Immutable;
 using CytoLex.Core.Text;
+using CytoLex.Core.Validation;
 
 namespace CytoLex.Core.Syntax;
 
@@ -30,7 +32,21 @@ public sealed record SyntaxDiagnostic(
     TextSpan Span,
     SyntaxDiagnosticKind Kind,
     string? Expected,
-    string Message);
+    string Message)
+{
+    /// <summary>
+    /// Explicit fix edits (T-035), for recoveries that <see cref="Expected"/> alone can't express (reorders such as
+    /// <c>21+</c> → <c>+21</c>). Empty = derive the fix from <see cref="Expected"/>: insert it for a missing token, else
+    /// replace <see cref="Span"/> with it.
+    /// </summary>
+    public ImmutableArray<TextEdit> Edits { get; init; } = [];
+
+    /// <summary>The fix edits: <see cref="Edits"/>, or the ones <see cref="Expected"/> implies; empty = no deterministic fix.</summary>
+    public ImmutableArray<TextEdit> FixEdits =>
+        !Edits.IsDefaultOrEmpty ? Edits
+        : Expected is null || Kind == SyntaxDiagnosticKind.Skipped ? []
+        : [new TextEdit(Kind == SyntaxDiagnosticKind.Missing ? new TextSpan(Span.Start, 0) : Span, Expected)];
+}
 
 /// <summary>Codes the core uses that are not KB rules (docs/design/core.md §8.4).</summary>
 public static class CoreCodes

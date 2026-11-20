@@ -104,9 +104,11 @@ rules:
           cite: {section: "9.2.12", page: 71, example: E7}
           note: Partial string as printed.
       invalid:
-        - text: "52,XX,…,+mar,+r,12~20dmin"
-          why: The marker is listed before the unidentified ring.
-          corrected: "52,XX,…,+r,+mar,12~20dmin"
+        - text: "48,XX,+mar,+8"
+          why: >-
+            The marker chromosome is listed before an identified abnormality (inferred, not a book example; a ring after
+            a marker is RING.UNIDENTIFIED's and double minutes before a marker DMIN.FORMAT's).
+          corrected: "48,XX,+8,+mar"
     fix: {level: 1, kind: reorder, hint: "Move unidentified r, mar and dmin to the end, in that order."}
     review: {paraphrase_checked: true, needs_review: false}
     related: [ORDER.UNKNOWN_CENTROMERE_DER, UNCERTAIN.INC_AT_END, RING.UNIDENTIFIED, MAR.PLUS_SIGN, DMIN.FORMAT]

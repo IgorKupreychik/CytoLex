@@ -27,6 +27,7 @@ rules:
         - text: "46,XX,trp(1)(q21;q32)"
           why: Both breakpoints are in one chromosome, so they are written together without a semicolon.
           corrected: "46,XX,trp(1)(q21q32)"
+    fix: {level: 1, kind: delete, hint: "Remove the semicolon: the breakpoints of a triplication form one group."}
     review:
       paraphrase_checked: true
       needs_review: true

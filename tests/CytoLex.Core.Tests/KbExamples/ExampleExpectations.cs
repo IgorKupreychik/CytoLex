@@ -22,7 +22,9 @@ internal sealed record ExampleOutcome(string? SkipReason, IReadOnlyList<string> 
 /// usual, otherwise it is skipped as not implemented (decided in T-028). An invalid example whose own markers set a
 /// context outside the rule's contexts (<c>rec</c> → constitutional for the neoplastic-only <c>REC.NOT_ACQUIRED</c>) is
 /// checked only with the matching hint: without one the string is consistent with itself (decided in T-031).</item>
-/// <item><b>Corrected</b>: the corrected form passes as a valid example; with a fixer, a fix of the rule's diagnostic previews it exactly.</item>
+/// <item><b>Corrected</b>: the corrected form passes as a valid example; with a fixer, when the KB fix is level 1 and the
+/// rule is implemented or reported by the parser, a fix of the rule's diagnostic previews it exactly (T-035). Level-3
+/// rules have no single fix, so their corrected forms are checked for validity only.</item>
 /// <item>No <c>CORE.UNPARSED</c> on any example.</item>
 /// </list>
 /// </summary>
@@ -55,9 +57,9 @@ internal static class ExampleExpectations
                 break;
             case ExampleKind.Corrected:
                 CheckValid(c, c.Corrected!, validator, failures);
-                if (ruleImplemented && validator.SupportsFixes)
+                if (validator.SupportsFixes && c.Rule.FixLevel == 1)
                 {
-                    CheckFixPreview(c, validator, failures);
+                    CheckFixPreview(c, validator, ruleImplemented, failures);
                 }
 
                 break;
@@ -151,11 +153,18 @@ internal static class ExampleExpectations
         }
     }
 
-    private static void CheckFixPreview(KbExampleCase c, IExampleValidator v, List<string> failures)
+    private static void CheckFixPreview(KbExampleCase c, IExampleValidator v, bool ruleImplemented, List<string> failures)
     {
-        var previews = Hints(c.Rule)
+        var own = Hints(c.Rule)
             .SelectMany(hint => Run(c, v, c.Text, hint, failures).Diagnostics)
             .Where(d => d.RuleId == c.Rule.Id)
+            .ToList();
+        if (!ruleImplemented && own.Count == 0)
+        {
+            return; // neither a check nor the parser reports the rule yet
+        }
+
+        var previews = own
             .SelectMany(d => d.Previews)
             .Distinct(StringComparer.Ordinal)
             .ToList();

@@ -1,6 +1,7 @@
 using System.Globalization;
 using CytoLex.Core.Semantics;
 using CytoLex.Core.Text;
+using CytoLex.Core.Validation;
 
 namespace CytoLex.Core.Rules.Checks;
 
@@ -17,7 +18,7 @@ internal static class BreakpointOrder
     public const string ShortArmFirstRule = "STRUCT.SHORT_ARM_BREAKPOINT_FIRST";
     public const string ProximalFirstRule = "STRUCT.PROXIMAL_BREAKPOINT_FIRST";
 
-    public static IEnumerable<StructuralFinding> Analyze(KaryotypeModel model)
+    public static IEnumerable<StructuralFinding> Analyze(KaryotypeModel model, string input)
     {
         foreach (var r in Structure.Parts(model))
         {
@@ -31,19 +32,22 @@ internal static class BreakpointOrder
 
             var bands = $"{first.Text}{second.Text}";
             var swapped = $"{second.Text}{first.Text}";
+            var swap = new FixProposal([new TextEdit(first.Span, second.Span.Of(input)), new TextEdit(second.Span, first.Span.Of(input))]);
             if (a.Arm > b.Arm)
             {
                 yield return new StructuralFinding(
                     ShortArmFirstRule,
                     group.Span,
-                    $"The short-arm breakpoint {second.Text} is given before the long-arm one: write ({swapped}), not ({bands}).");
+                    $"The short-arm breakpoint {second.Text} is given before the long-arm one: write ({swapped}), not ({bands}).",
+                    Fix: swap);
             }
             else if (a.CompareDistance(b) > 0)
             {
                 yield return new StructuralFinding(
                     ProximalFirstRule,
                     group.Span,
-                    $"{second.Text} is nearer the centromere than {first.Text} and is given first: write ({swapped}), not ({bands}).");
+                    $"{second.Text} is nearer the centromere than {first.Text} and is given first: write ({swapped}), not ({bands}).",
+                    Fix: swap);
             }
         }
     }
@@ -90,7 +94,42 @@ internal static class BreakpointGroups
                 : string.Create(
                     CultureInfo.InvariantCulture,
                     $"{head}{part.ChromosomeList()} has {part.Chromosomes.Length} chromosomes but {part.Groups.Length} breakpoint group(s): one group per chromosome, separated by semicolons; the bands of one chromosome are written together.");
-            yield return new StructuralFinding(rule, span, detail);
+            yield return new StructuralFinding(rule, span, detail, Fix: Regroup(part, span, input));
         }
+    }
+
+    /// <summary>
+    /// The breakpoints regrouped one group per chromosome (T-035), when the split is certain: one chromosome → one group
+    /// (<c>inv(3)(q21;q26.2)</c> → <c>(q21q26.2)</c>); an insertion of two chromosomes with three breakpoints → the receiving
+    /// chromosome's one, then the donor's two (<c>ins(5;2)(p14q22q32)</c> → <c>(p14;q22q32)</c>); otherwise an even split
+    /// (<c>t(5;6)(q13;q23;q15;q23)</c> → <c>(q13q23;q15q23)</c>). <c>null</c> when a group holds more than its breakpoints.
+    /// </summary>
+    private static FixProposal? Regroup(AbnormalityPart part, TextSpan span, string input)
+    {
+        if (part.Groups.Any(g => string.Concat(g.Breakpoints.Select(b => b.Span.Of(input))) != g.Span.Of(input)))
+        {
+            return null;
+        }
+
+        var points = part.Groups.SelectMany(g => g.Breakpoints).Select(b => b.Span.Of(input)).ToList();
+        var n = part.Chromosomes.Length;
+        int[]? sizes = n == 1 ? [points.Count]
+            : part.Head == "ins" && n == 2 && points.Count == 3 ? [1, 2]
+            : points.Count % n == 0 ? [.. Enumerable.Repeat(points.Count / n, n)]
+            : null;
+        if (sizes is null)
+        {
+            return null;
+        }
+
+        var groups = new List<string>();
+        var at = 0;
+        foreach (var size in sizes)
+        {
+            groups.Add(string.Concat(points.Skip(at).Take(size)));
+            at += size;
+        }
+
+        return FixProposal.Replace(span, string.Join(";", groups));
     }
 }

@@ -34,7 +34,11 @@ public sealed record RuleFinding(
     ImmutableArray<TextSpan> SecondarySpans,
     Certainty Certainty,
     ImmutableArray<SampleContext> Contexts,
-    bool CannotVerify);
+    bool CannotVerify)
+{
+    /// <summary>The edits the check proposes (T-035); empty = no deterministic fix for this finding.</summary>
+    public ImmutableArray<FixProposal> Fixes { get; init; } = [];
+}
 
 /// <summary>What a check sees of one segment in one edition, and where it reports (docs/design/core.md §7.2).</summary>
 public sealed class RuleContext
@@ -86,18 +90,27 @@ public sealed class RuleContext
     /// <param name="certainty">Whether the check is certain; uncertain findings are capped at warning.</param>
     /// <param name="contexts">The contexts the finding applies to, when the check itself knows (e.g. <c>47,XXX</c>); default = the rule's KB contexts.</param>
     /// <param name="cannotVerify">The string alone cannot show whether the rule is met: reported as info.</param>
+    /// <param name="fixes">The edits proposed for this finding (T-035); default = none (the engine gives an explanation).</param>
     public void Report(
         TextSpan span,
         string? detail = null,
         ImmutableArray<TextSpan> secondarySpans = default,
         Certainty certainty = Certainty.Certain,
         ImmutableArray<SampleContext> contexts = default,
-        bool cannotVerify = false) =>
+        bool cannotVerify = false,
+        ImmutableArray<FixProposal> fixes = default) =>
         _findings.Add(new RuleFinding(
             span,
             detail,
             secondarySpans.IsDefault ? [] : secondarySpans,
             certainty,
             contexts.IsDefault ? [] : contexts,
-            cannotVerify));
+            cannotVerify)
+        {
+            Fixes = fixes.IsDefault ? [] : fixes,
+        });
+
+    /// <summary>Reports a finding with one proposed fix (T-035); <c>null</c> = none (the engine gives an explanation).</summary>
+    public void ReportWithFix(TextSpan span, string? detail, FixProposal? fix, ImmutableArray<TextSpan> secondarySpans = default, ImmutableArray<SampleContext> contexts = default) =>
+        Report(span, detail, secondarySpans, contexts: contexts, fixes: fix is null ? [] : [fix]);
 }

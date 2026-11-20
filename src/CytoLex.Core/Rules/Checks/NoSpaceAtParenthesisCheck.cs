@@ -1,6 +1,7 @@
 using CytoLex.Core.Semantics;
 using CytoLex.Core.Syntax;
 using CytoLex.Core.Text;
+using CytoLex.Core.Validation;
 
 namespace CytoLex.Core.Rules.Checks;
 
@@ -28,7 +29,7 @@ internal sealed class NoSpaceAtParenthesisCheck : IRuleCheck
                 if (left.HasTrailingTrivia && ((IsSymbol(left) && IsParen(right)) || (IsParen(left) && IsSymbol(right))))
                 {
                     var gap = TextSpan.FromBounds(left.Span.End, right.Span.Start);
-                    context.Report(gap, $"No space between '{left.Text}' and '{right.Text}'.", [left.Span, right.Span]);
+                    context.ReportWithFix(gap, $"No space between '{left.Text}' and '{right.Text}'.", FixProposal.Delete(gap), [left.Span, right.Span]);
                 }
             }
         }

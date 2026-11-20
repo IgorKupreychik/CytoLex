@@ -30,6 +30,7 @@ rules:
         - text: "46,XX,dup(1)(q22→q25)"
           why: The short system uses no arrow; the band order alone gives the orientation.
           corrected: "46,XX,dup(1)(q22q25)"
+    fix: {level: 1, kind: delete, hint: "Remove the arrow between the breakpoints: dup(1)(q22q25)."}
     review:
       paraphrase_checked: true
       needs_review: false

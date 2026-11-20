@@ -1,5 +1,6 @@
 using CytoLex.Core.Semantics;
 using CytoLex.Core.Text;
+using CytoLex.Core.Validation;
 
 namespace CytoLex.Core.Rules.Checks;
 
@@ -21,9 +22,10 @@ internal sealed class SpaceBetweenSymbolsCheck : IRuleCheck
                 var (first, second) = (part.Symbols[i], part.Symbols[i + 1]);
                 if (first.Span.End == second.Span.Start && !(first.Symbol is "dic" or "trc" && second.Symbol == "r"))
                 {
-                    context.Report(
+                    context.ReportWithFix(
                         TextSpan.FromBounds(first.Span.Start, second.Span.End),
-                        $"'{first.Symbol}' and '{second.Symbol}' are separated by a space.");
+                        $"'{first.Symbol}' and '{second.Symbol}' are separated by a space.",
+                        FixProposal.Insert(first.Span.End, " "));
                 }
             }
         }

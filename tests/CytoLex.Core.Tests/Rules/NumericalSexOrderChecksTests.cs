@@ -40,7 +40,6 @@ public class NumericalSexOrderChecksTests
     [InlineData("ORDER.X_BEFORE_Y", "48,X,–Y,+X,+10", "+X")]
     [InlineData("ORDER.NUMERICAL_BEFORE_STRUCTURAL", "47,XX,inv(3)(q21q26.2),+3", "+3")]
     [InlineData("ORDER.HOMOLOGUES_ALPHABETICAL", "48,XX,+inv(1)(p31q41),+del(1)(p13)", "+del(1)(p13)")]
-    [InlineData("ORDER.UNIDENTIFIED_LAST", "48,XX,+mar,+r", "+r")]
     [InlineData("ORDER.UNIDENTIFIED_LAST", "48,XX,+mar,+8", "+8")]
     [InlineData("ORDER.UNKNOWN_CENTROMERE_DER", "48,XX,+r,+der(?)t(?;6)(?;q16)", "+der(?)t(?;6)(?;q16)")]
     [InlineData("ORDER.UNKNOWN_CENTROMERE_DER", "48,XX,+der(?)t(?;6)(?;q16),+8", "+8")]

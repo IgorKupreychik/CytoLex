@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using CytoLex.Core.Kb;
 using CytoLex.Core.Segmentation;
 using CytoLex.Core.Text;
+using CytoLex.Core.Validation;
 
 namespace CytoLex.Core.Syntax;
 
@@ -58,6 +59,21 @@ public sealed class Parser
     internal const string QuestionableItem = "UNCERTAIN.QUESTIONABLE_ITEM";
     internal const string DminFormat = "DMIN.FORMAT";
     internal const string UpdFormat = "UPD.FORMAT";
+    internal const string IsoFormat = "ISO.FORMAT";
+    internal const string HsrNoAbrSymbol = "HSR.NO_ABR_SYMBOL";
+    internal const string MarNoSizeMorphology = "MAR.NO_SIZE_MORPHOLOGY";
+
+    /// <summary>
+    /// Unlisted words that a symbol rule names (one fault, one finding; T-068), reported by that rule instead of
+    /// <c>SYM.LISTED_ONLY</c>: <c>iso</c> (ISO.FORMAT: "i, never iso") and <c>abr</c> (HSR.NO_ABR_SYMBOL: no symbol for
+    /// abnormally banded regions). An unlisted word directly before <c>mar</c> (<c>acro mar</c>) is MAR.NO_SIZE_MORPHOLOGY's.
+    /// </summary>
+    private static readonly FrozenDictionary<string, (string Rule, string Message)> _unlistedWordRules =
+        new Dictionary<string, (string, string)>(StringComparer.Ordinal)
+        {
+            ["iso"] = (IsoFormat, "The symbol for an isochromosome is i, not iso."),
+            ["abr"] = (HsrNoAbrSymbol, "There is no symbol for an abnormally banded region; abr is not used in karyotypes."),
+        }.ToFrozenDictionary(StringComparer.Ordinal);
 
     /// <summary>Every KB rule ID the parser can report (a test checks they exist in the KB).</summary>
     internal static readonly ImmutableArray<string> RuleIds =
@@ -65,7 +81,7 @@ public sealed class Parser
         CountSexOrder, AbnormalityOrder, ChromosomeInParentheses, ChromosomeSeparator, BreakpointGroups, GainLossSign,
         NoArmLengthSign, VarLengthSign, ListedOnly, TypedSymbolForms, ArmSymbol, SubbandFormat, ChromIdentifiers,
         CloneSeparator, MosaicChimeraPrefix, Endoreduplication, ParentalOrigin, MultiplySignAfter, PloidyInAngleBrackets,
-        QuestionableItem, DminFormat, UpdFormat,
+        QuestionableItem, DminFormat, UpdFormat, IsoFormat, HsrNoAbrSymbol, MarNoSizeMorphology,
     ];
 
     private static readonly Dictionary<string, Parser> _byEdition = new(StringComparer.Ordinal);
@@ -114,7 +130,7 @@ public sealed class Parser
         ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(segment);
         var tokens = _lexer.Lex(input, segment.Span);
-        var run = new Run(tokens);
+        var run = new Run(tokens, input);
         var root = run.ParseRoot(fragment);
         return new SyntaxTree(
             input,
@@ -168,7 +184,7 @@ public sealed class Parser
     private static FrozenSet<string> Set(params string[] words) => words.ToFrozenSet(StringComparer.Ordinal);
 
     /// <summary>State of one parse.</summary>
-    private sealed class Run(ImmutableArray<SyntaxToken> tokens)
+    private sealed class Run(ImmutableArray<SyntaxToken> tokens, string input)
     {
         private int _pos;
 
@@ -217,6 +233,16 @@ public sealed class Parser
 
         private void Report(string rule, TextSpan span, SyntaxDiagnosticKind kind, string message, string? expected = null) =>
             Diagnostics.Add(new SyntaxDiagnostic(rule, span, kind, expected, message));
+
+        /// <summary>Reports a recovery whose fix is not a plain insert or replace of the span (T-035), e.g. a reorder.</summary>
+        private void Report(string rule, TextSpan span, SyntaxDiagnosticKind kind, string message, params TextEdit[] edits) =>
+            Diagnostics.Add(new SyntaxDiagnostic(rule, span, kind, null, message) { Edits = [.. edits] });
+
+        private string TextOf(TextSpan span) => span.Of(input);
+
+        private static TextEdit Delete(TextSpan span) => new(span, string.Empty);
+
+        private static TextEdit Insert(int offset, string text) => new(new TextSpan(offset, 0), text);
 
         private static SyntaxNode Node(SyntaxKind kind, IEnumerable<SyntaxElement> children) => new(kind, [.. children]);
 
@@ -278,13 +304,14 @@ public sealed class Parser
                 if (IsWord(Current, PrefixWords))
                 {
                     var word = Current;
+                    TextEdit[] move = [Insert(tokens[0].Span.Start, word.Text + " "), Delete(TextSpan.FromBounds(Previous.Span.End, word.Span.End))];
                     if (word.Text == "end")
                     {
-                        Report(Endoreduplication, word.Span, SyntaxDiagnosticKind.Unexpected, "'end' goes before the karyotype designation.");
+                        Report(Endoreduplication, word.Span, SyntaxDiagnosticKind.Unexpected, "'end' goes before the karyotype designation.", move);
                     }
                     else
                     {
-                        Report(MosaicChimeraPrefix, word.Span, SyntaxDiagnosticKind.Unexpected, $"'{word.Text}' goes before the karyotype designations.");
+                        Report(MosaicChimeraPrefix, word.Span, SyntaxDiagnosticKind.Unexpected, $"'{word.Text}' goes before the karyotype designations.", move);
                     }
 
                     children.Add(Node(SyntaxKind.MisplacedPrefix, Eat()));
@@ -314,7 +341,12 @@ public sealed class Parser
                 var sex = ParseSex();
                 var comma = Eat();
                 var count = ParseCount();
-                Report(CountSexOrder, Cover(sex, count), SyntaxDiagnosticKind.Unexpected, "The chromosome count comes before the sex chromosomes.");
+                Report(
+                    CountSexOrder,
+                    Cover(sex, count),
+                    SyntaxDiagnosticKind.Unexpected,
+                    "The chromosome count comes before the sex chromosomes.",
+                    new TextEdit(Cover(sex, count), TextOf(count.Span) + "," + TextOf(sex.Span)));
                 children.AddRange([sex, comma, count]);
             }
             else if (!fragment || LooksLikeHeader())
@@ -439,13 +471,14 @@ public sealed class Parser
             else if (At(TokenKind.OpenParen) && Peek(1).Kind == TokenKind.Number && IsPloidyN(Peek(2)) && Peek(3).Kind == TokenKind.CloseParen)
             {
                 var ploidy = Node(SyntaxKind.Ploidy, Eat(), Eat(), Eat(), Eat());
-                Report(PloidyInAngleBrackets, ploidy.Span, SyntaxDiagnosticKind.Unexpected, "The ploidy level is written in angle brackets.");
+                var level = TextSpan.FromBounds(ploidy.Children[1].Span.Start, ploidy.Children[2].Span.End);
+                Report(PloidyInAngleBrackets, ploidy.Span, SyntaxDiagnosticKind.Unexpected, "The ploidy level is written in angle brackets.", new TextEdit(ploidy.Span, "<" + TextOf(level) + ">"));
                 children.Add(ploidy);
             }
 
             if (At(TokenKind.Comma) && Peek(1).Kind == TokenKind.OpenAngle)
             {
-                Report(PloidyInAngleBrackets, Current.Span, SyntaxDiagnosticKind.Unexpected, "The ploidy level follows the count directly, without a comma.");
+                Report(PloidyInAngleBrackets, Current.Span, SyntaxDiagnosticKind.Unexpected, "The ploidy level follows the count directly, without a comma.", Delete(TextSpan.FromBounds(Current.Span.Start, Peek(1).Span.Start)));
                 children.Add(Eat());
                 children.Add(ParsePloidy());
             }
@@ -607,7 +640,8 @@ public sealed class Parser
 
             if (IsWord(Current, InheritanceWords))
             {
-                Report(ParentalOrigin, Current.Span, SyntaxDiagnosticKind.Unexpected, $"'{Current.Text}' follows the abnormality directly, not as a separate item.");
+                var from = Previous.Kind == TokenKind.Comma && _pos > 1 ? tokens[_pos - 2].Span.End : Previous.Span.End;
+                Report(ParentalOrigin, Current.Span, SyntaxDiagnosticKind.Unexpected, $"'{Current.Text}' follows the abnormality directly, not as a separate item.", Delete(TextSpan.FromBounds(from, Current.Span.Start)));
                 return Node(SyntaxKind.Suffix, Eat());
             }
 
@@ -738,13 +772,13 @@ public sealed class Parser
             {
                 var sign = Eat();
                 children.Add(sign);
-                Report(GainLossSign, Cover(chrom, sign), SyntaxDiagnosticKind.Unexpected, "The plus or minus sign goes before the chromosome.");
+                Report(GainLossSign, Cover(chrom, sign), SyntaxDiagnosticKind.Unexpected, "The plus or minus sign goes before the chromosome.", new TextEdit(Cover(chrom, sign), sign.Text + TextOf(chrom.Span)));
             }
             else if (At(TokenKind.Question) && Adjacent)
             {
                 var q = Eat();
                 children.Add(q);
-                Report(QuestionableItem, q.Span, SyntaxDiagnosticKind.Unexpected, "The question mark goes before the questionable chromosome or abnormality.");
+                Report(QuestionableItem, q.Span, SyntaxDiagnosticKind.Unexpected, "The question mark goes before the questionable chromosome or abnormality.", Insert(chrom.Span.Start, q.Text), Delete(q.Span));
             }
             else if (signs is null)
             {
@@ -852,7 +886,7 @@ public sealed class Parser
                     dots++;
                     if (dots > 1)
                     {
-                        Report(SubbandFormat, TextSpan.FromBounds(dot.Span.Start, Current.Span.End), SyntaxDiagnosticKind.Unexpected, "A sub-band has one decimal point; further digits follow it directly.");
+                        Report(SubbandFormat, TextSpan.FromBounds(dot.Span.Start, Current.Span.End), SyntaxDiagnosticKind.Unexpected, "A sub-band has one decimal point; further digits follow it directly.", Delete(dot.Span));
                     }
 
                     continue;
@@ -914,7 +948,7 @@ public sealed class Parser
                     && last.Children[0] is SyntaxToken { Kind: TokenKind.Multiply } && At(TokenKind.OpenParen))
                 {
                     var group = ParseBreakpointList();
-                    Report(MultiplySignAfter, last.Span, SyntaxDiagnosticKind.Unexpected, "×n goes after the whole abnormality, including its breakpoints.");
+                    Report(MultiplySignAfter, last.Span, SyntaxDiagnosticKind.Unexpected, "×n goes after the whole abnormality, including its breakpoints.", Delete(last.Span), Insert(group.Span.End, TextOf(last.Span)));
                     children.Add(group);
                     continue;
                 }
@@ -942,7 +976,21 @@ public sealed class Parser
             {
                 if (At(TokenKind.UnknownWord))
                 {
-                    Report(ListedOnly, Current.Span, SyntaxDiagnosticKind.Unexpected, $"'{Current.Text}' is not a listed symbol or abbreviation.");
+                    var (rule, message) = _unlistedWordRules.TryGetValue(Current.Text, out var named) ? named
+                        : Peek(1) is { Kind: TokenKind.Word, Text: "mar" } ? (MarNoSizeMorphology, $"The size or shape of a marker ('{Current.Text}') is not described in the karyotype.")
+                        : (ListedOnly, $"'{Current.Text}' is not a listed symbol or abbreviation.");
+                    if (rule == IsoFormat)
+                    {
+                        Report(rule, Current.Span, SyntaxDiagnosticKind.Unexpected, message, new TextEdit(Current.Span, "i"));
+                    }
+                    else if (rule == MarNoSizeMorphology)
+                    {
+                        Report(rule, Current.Span, SyntaxDiagnosticKind.Unexpected, message, Delete(TextSpan.FromBounds(Current.Span.Start, Peek(1).Span.Start)));
+                    }
+                    else
+                    {
+                        Report(rule, Current.Span, SyntaxDiagnosticKind.Unexpected, message);
+                    }
                 }
 
                 symbols.Add(Eat());
@@ -967,7 +1015,14 @@ public sealed class Parser
                         "upd" => (UpdFormat, "The chromosome of upd goes in parentheses."),
                         _ => (ChromosomeInParentheses, $"The chromosome goes in parentheses after {lastSymbol.Text}."),
                     };
-                    Report(rule, number.Span, SyntaxDiagnosticKind.Unexpected, message, "(" + number.Text + ")");
+                    if (lastSymbol.Text == "dmin")
+                    {
+                        Report(rule, number.Span, SyntaxDiagnosticKind.Unexpected, message, Insert(lastSymbol.Span.Start, number.Text), Delete(number.Span));
+                    }
+                    else
+                    {
+                        Report(rule, number.Span, SyntaxDiagnosticKind.Unexpected, message, "(" + number.Text + ")");
+                    }
                     children.Add(Node(lastSymbol.Text == "dmin" ? SyntaxKind.SymbolNumber : SyntaxKind.BareChromosome, number));
                     groups = lastSymbol.Text == "dmin" ? 0 : 1;
                 }
@@ -982,7 +1037,7 @@ public sealed class Parser
             if (groups == 1 && Adjacent && (IsWord(Current, ArmWords) || IsArmSymbolTypo(Current)))
             {
                 var bare = ParseBreakpointList(withParens: false);
-                Report(BreakpointGroups, bare.Span, SyntaxDiagnosticKind.Unexpected, "Breakpoints are written in parentheses.");
+                Report(BreakpointGroups, bare.Span, SyntaxDiagnosticKind.Unexpected, "Breakpoints are written in parentheses.", Insert(bare.Span.Start, "("), Insert(bare.Span.End, ")"));
                 children.Add(bare);
                 groups++;
             }

@@ -40,6 +40,7 @@ rules:
         - text: "46,XX,del(5)(q13→q33)"
           why: The short system uses no arrows between the breakpoints.
           corrected: "46,XX,del(5)(q13q33)"
+    fix: {level: 1, kind: delete, hint: "Write the breakpoints together in their own parentheses, without an arrow: del(5)(q13q33)."}
     review:
       paraphrase_checked: true
       needs_review: false

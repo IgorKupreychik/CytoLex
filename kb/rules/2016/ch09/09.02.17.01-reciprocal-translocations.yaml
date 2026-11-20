@@ -70,6 +70,7 @@ rules:
         - text: "46,XY,t(5;6)(q13;q23;q15;q23)"
           why: The two bands of an exchanged interstitial segment form one group; semicolons separate the chromosomes' groups only.
           corrected: "46,XY,t(5;6)(q13q23;q15q23)"
+    fix: {level: 1, kind: replace, hint: "Group the breakpoints by chromosome: one group per chromosome, groups separated by semicolons."}
     review:
       paraphrase_checked: true
       needs_review: false

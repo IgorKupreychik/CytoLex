@@ -12,7 +12,7 @@ namespace CytoLex.Core.Kb;
 /// <param name="Rendered">The citation as shown to users: <c>ISCN 2016 §9.2.17.1, p.75, ¶1</c>.</param>
 public sealed record Citation(string Section, int Page, string? Anchor, string Rendered);
 
-/// <summary>The KB fix hint of a rule (level, kind, wording); fixes themselves are built by T-035.</summary>
+/// <summary>The KB fix hint of a rule (level, kind, wording); <c>DiagnosticFactory</c> builds the fixes from it (T-035).</summary>
 /// <param name="Level">1 = deterministic edit, 2 = "did you mean", 3 = explanation only.</param>
 /// <param name="Kind">The KB <c>fix.kind</c> (<c>replace</c>, <c>insert</c>, <c>delete</c>, <c>reorder</c>), if any.</param>
 /// <param name="Hint">The KB hint text, if any.</param>

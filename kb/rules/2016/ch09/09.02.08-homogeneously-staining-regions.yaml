@@ -41,6 +41,7 @@ rules:
         - text: "46,XY,der(1)del(1)(p21p33)hsr(1)(p33)"
           why: The hsr is assigned to the proximal deletion breakpoint, p21, not the distal one.
           corrected: "46,XY,der(1)del(1)(p21p33)hsr(1)(p21)"
+    fix: {level: 1, kind: replace, hint: "Assign the hsr to the proximal breakpoint of the deletion."}
     review:
       paraphrase_checked: true
       needs_review: false

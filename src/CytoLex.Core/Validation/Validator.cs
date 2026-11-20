@@ -110,13 +110,13 @@ public sealed class Validator
 
             var tree = profile.Parser.Parse(input, segment, isFragment);
             var model = profile.Binder.Bind(tree);
-            diagnostics.AddRange(tree.Diagnostics.Select(d => DiagnosticFactory.FromSyntax(profile.Kb, d, context.Effective)).OfType<Diagnostic>());
+            diagnostics.AddRange(tree.Diagnostics.Select(d => DiagnosticFactory.FromSyntax(profile.Kb, input, d, context.Effective)).OfType<Diagnostic>());
 
             foreach (var (rule, check) in profile.Checks.Where(c => c.Rule.AppliesToType(segment.Type)))
             {
                 var ctx = new RuleContext(input, segment, tree, model, context, rule, profile.Kb);
                 check.Check(ctx);
-                diagnostics.AddRange(ctx.Findings.Select(f => DiagnosticFactory.FromFinding(rule, f, DiagnosticOrigin.Rule, context.Effective)).OfType<Diagnostic>());
+                diagnostics.AddRange(ctx.Findings.Select(f => DiagnosticFactory.FromFinding(rule, input, f, DiagnosticOrigin.Rule, context.Effective)).OfType<Diagnostic>());
             }
 
             segmentResults.Add(new SegmentResult(segment, EditionStatus.Implemented, null, tree.Constructs));
@@ -129,7 +129,7 @@ public sealed class Validator
 
         ImmutableArray<Diagnostic> sorted =
         [
-            .. diagnostics
+            .. DiagnosticFactory.WithRuleWideFixes(diagnostics, input)
                 .OrderBy(d => d.Span.Start)
                 .ThenByDescending(d => d.Severity)
                 .ThenBy(d => d.RuleId, StringComparer.Ordinal),

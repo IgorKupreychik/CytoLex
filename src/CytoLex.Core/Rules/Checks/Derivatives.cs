@@ -1,4 +1,5 @@
 using CytoLex.Core.Semantics;
+using CytoLex.Core.Text;
 using CytoLex.Core.Validation;
 
 namespace CytoLex.Core.Rules.Checks;
@@ -42,10 +43,14 @@ internal static class Derivatives
 
             if (a.Parts.Length > 1 && head.Head == "dic")
             {
+                // dic(5;7)(q22;p13)t(3;7)(…) → der(5;7)t(5;7)(q22;p13)t(3;7)(…): the dicentric becomes the derivative's first aberration.
+                var symbol = head.Symbols[^1].Span;
+                var list = TextSpan.FromBounds(symbol.End, head.HeadSpan().End);
                 yield return new StructuralFinding(
                     DicentricFormatRule,
                     head.Span,
-                    $"A dicentric chromosome with further aberrations is a derivative: write der{head.ChromosomeList()} followed by all its aberrations.");
+                    $"A dicentric chromosome with further aberrations is a derivative: write der{head.ChromosomeList()} followed by all its aberrations.",
+                    Fix: head.Symbols.Length == 1 && head.HasChromosomeList ? FixProposal.Replace(symbol, "der" + list.Of(input) + "t") : null);
             }
             else if (a.Parts.Length > 1 && head.Head is not ("der" or "rec" or "ider"))
             {
@@ -53,7 +58,10 @@ internal static class Derivatives
                 yield return new StructuralFinding(
                     MultipleAberrationsRule,
                     a.Parts[1].Span,
-                    $"A chromosome with more than one aberration is a derivative: write der({own}) before '{a.Span.Of(input)}'.");
+                    $"A chromosome with more than one aberration is a derivative: write der({own}) before '{a.Span.Of(input)}'.",
+                    Fix: head.Chromosomes is [{ IsUnknown: false } c] && a.Parts.All(p => p.Chromosomes.Any(x => x.Name == c.Name))
+                        ? FixProposal.Insert(head.Span.Start, $"der({c.Span.Of(input)})")
+                        : null);
             }
 
             if (head.Head == "der" && AberrationOrder(a, input) is { } order)
@@ -66,7 +74,7 @@ internal static class Derivatives
         {
             for (var i = 0; i + 1 < line.Items.Length; i++)
             {
-                if (SplitOff(line.Items[i], line.Items[i + 1], input) is { } split)
+                if (SplitOff(line, i, input) is { } split)
                 {
                     yield return split;
                 }
@@ -103,7 +111,8 @@ internal static class Derivatives
                     AberrationOrderRule,
                     part.Span,
                     $"'{part.Span.Of(input)}' has a breakpoint on chromosome {own.Name} nearer pter than '{p.Part.Span.Of(input)}' and is listed before it.",
-                    [p.Part.Span]);
+                    [p.Part.Span],
+                    Fix: new FixProposal([new TextEdit(p.Part.Span, part.Span.Of(input)), new TextEdit(part.Span, p.Part.Span.Of(input))]));
             }
 
             previous = (part, nearest);
@@ -112,16 +121,26 @@ internal static class Derivatives
         return null;
     }
 
-    /// <summary>A <c>der(n)</c>/<c>rec(n)</c> followed by a comma and an unsigned aberration of n.</summary>
-    private static StructuralFinding? SplitOff(KaryotypeItem item, KaryotypeItem next, string input)
+    /// <summary>
+    /// A <c>der(n)</c>/<c>rec(n)</c> followed by a comma and an unsigned aberration of n. The fix joins the derivative and
+    /// the run of such aberrations after it (<c>rec(2),dup(2p),inv(2)(p21q31)</c> → <c>rec(2)dup(2p)inv(2)(p21q31)</c>).
+    /// </summary>
+    private static StructuralFinding? SplitOff(CellLine line, int index, string input)
     {
+        var (item, next) = (line.Items[index], line.Items[index + 1]);
         if (item is not Abnormality { IsPartial: false, Kind: "der" or "rec", Parts: [var head, ..] } derivative
             || head.Chromosomes is not [{ IsUnknown: false } own]
-            || next is not Abnormality { IsPartial: false, Sign: GainLoss.None, Kind: not ("der" or "rec" or "ider"), Parts: [var first, ..] } aberration
-            || !first.Chromosomes.Any(c => c.Name == own.Name)
+            || !IsAberrationOf(next, own.Name)
             || (head.Groups.Length > 0 && derivative.Parts.Length == 1))
         {
             return null;
+        }
+
+        var aberration = (Abnormality)next;
+        var commas = new List<TextEdit>();
+        for (var j = index + 1; j < line.Items.Length && IsAberrationOf(line.Items[j], own.Name); j++)
+        {
+            commas.Add(new TextEdit(TextSpan.FromBounds(line.Items[j - 1].Span.End, line.Items[j].Span.Start), string.Empty));
         }
 
         var bare = derivative.Parts.Length == 1;
@@ -131,6 +150,11 @@ internal static class Derivatives
             aberration.Span,
             $"The aberrations of {symbol}({own.Name}) follow it directly, without a comma: '{derivative.Span.Of(input)}{aberration.Span.Of(input)}'.",
             [derivative.Span],
-            bare ? Certainty.Certain : Certainty.Uncertain);
+            bare ? Certainty.Certain : Certainty.Uncertain,
+            new FixProposal([.. commas]));
     }
+
+    private static bool IsAberrationOf(KaryotypeItem item, string chromosome) =>
+        item is Abnormality { IsPartial: false, Sign: GainLoss.None, Kind: not ("der" or "rec" or "ider"), Parts: [var first, ..] }
+        && first.Chromosomes.Any(c => c.Name == chromosome);
 }

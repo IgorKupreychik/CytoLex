@@ -1,4 +1,6 @@
 using CytoLex.Core.Semantics;
+using CytoLex.Core.Text;
+using CytoLex.Core.Validation;
 
 namespace CytoLex.Core.Rules.Checks;
 
@@ -13,7 +15,11 @@ internal sealed class MultiplySignRearrangedOnlyCheck : IRuleCheck
     {
         foreach (var w in context.Model.DescendantsAndSelf().OfType<WholeChromosomeChange>().Where(w => w.Copies is not null))
         {
-            context.Report(w.Span, $"Chromosome {w.Chromosome.Name} is a normal chromosome; write each extra copy separately with a sign.");
+            // +21×2 → +21,+21
+            var fix = w.Copies is { Count: int n and > 0 } copies && copies.Span.End == w.Span.End && w.Sign != GainLoss.None
+                ? FixProposal.Replace(w.Span, string.Join(",", Enumerable.Repeat(TextSpan.FromBounds(w.Span.Start, w.Chromosome.Span.End).Of(context.Input), n)))
+                : null;
+            context.ReportWithFix(w.Span, $"Chromosome {w.Chromosome.Name} is a normal chromosome; write each extra copy separately with a sign.", fix);
         }
     }
 }

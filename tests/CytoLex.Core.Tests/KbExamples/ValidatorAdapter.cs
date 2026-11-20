@@ -6,7 +6,7 @@ namespace CytoLex.Core.Tests.KbExamples;
 
 /// <summary>
 /// The validator the KB-example harness runs against (T-028): <see cref="Validator.Default"/> for one edition, its
-/// <see cref="EditionResult"/> mapped onto <see cref="ExampleRun"/>. T-035 sets <see cref="IExampleValidator.SupportsFixes"/>.
+/// <see cref="EditionResult"/> mapped onto <see cref="ExampleRun"/>. Fix previews are checked since T-035 (<see cref="IExampleValidator.SupportsFixes"/>).
 /// </summary>
 internal static class ValidatorAdapter
 {
@@ -16,7 +16,7 @@ internal static class ValidatorAdapter
 
     private sealed class CoreValidatorAdapter(Validator validator) : IExampleValidator
     {
-        public bool SupportsFixes => false;
+        public bool SupportsFixes => true;
 
         public ExampleRun Run(string edition, string text, SampleContext? hint, bool isFragment)
         {

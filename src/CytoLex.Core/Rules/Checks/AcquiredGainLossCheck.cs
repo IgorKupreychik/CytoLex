@@ -1,5 +1,6 @@
 using System.Globalization;
 using CytoLex.Core.Semantics;
+using CytoLex.Core.Validation;
 
 namespace CytoLex.Core.Rules.Checks;
 
@@ -45,8 +46,25 @@ internal sealed class AcquiredGainLossCheck : IRuleCheck
                 var detail = string.Create(
                     CultureInfo.InvariantCulture,
                     $"A {ChromosomeCount.LevelName(level)} cell line has {level} constitutional sex chromosome(s), but the field, the lost and the rearranged ones make {total}; an acquired gain or loss is written with + or –.");
-                context.Report(sex.Span, detail);
+                context.ReportWithFix(sex.Span, detail, total > level && losses == 0 && rearranged == 0 ? GainFix(line, sex, total - level) : null);
             }
         }
+    }
+
+    /// <summary>
+    /// <c>47,XXX</c> → <c>47,XX,+X</c>: only when every letter of the field is the same, so the gained one is certain
+    /// (<c>47,XXY</c> could be <c>XY,+X</c> or <c>XX,+Y</c>: no single fix).
+    /// </summary>
+    private static FixProposal? GainFix(CellLine line, SexComplement sex, int excess)
+    {
+        if (!FixHelpers.IsPlainSexField(sex, line) || sex.Chromosomes.Distinct().Count() != 1)
+        {
+            return null;
+        }
+
+        var letter = sex.Chromosomes[0];
+        var kept = string.Concat(Enumerable.Repeat(letter, sex.Chromosomes.Length - excess));
+        var gains = string.Concat(Enumerable.Repeat(",+" + letter, excess));
+        return FixProposal.Replace(sex.Span, kept + gains);
     }
 }

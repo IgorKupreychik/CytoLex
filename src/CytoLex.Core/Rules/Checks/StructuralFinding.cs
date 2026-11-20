@@ -11,7 +11,8 @@ internal sealed record StructuralFinding(
     TextSpan Span,
     string Detail,
     ImmutableArray<TextSpan> SecondarySpans = default,
-    Certainty Certainty = Certainty.Certain);
+    Certainty Certainty = Certainty.Certain,
+    FixProposal? Fix = null);
 
 /// <summary>
 /// A check that reports the findings of one structural analysis addressed to its own rule (<see cref="RuleContext.Rule"/>).
@@ -23,7 +24,7 @@ internal abstract class StructuralCheck(Func<KaryotypeModel, string, IEnumerable
     {
         foreach (var f in analysis(context.Model, context.Input).Where(f => f.Rule == context.Rule.Id))
         {
-            context.Report(f.Span, f.Detail, f.SecondarySpans, f.Certainty);
+            context.Report(f.Span, f.Detail, f.SecondarySpans, f.Certainty, fixes: f.Fix is null ? [] : [f.Fix]);
         }
     }
 }

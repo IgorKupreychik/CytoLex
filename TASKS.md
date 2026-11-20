@@ -44,7 +44,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-032 | todo | 2 | T-031, T-068, T-014 | Rules: neoplastic (clones, idem/sl/sdl, composite) |
 | T-033 | todo | 3 | T-031, T-016 | Parser + rules: FISH (ish, nuc ish) |
 | T-034 | todo | 2 | T-031, T-017 | Parser + rules: microarray (arr) |
-| T-035 | todo | 1 | T-030, T-031, T-068 | Level 1 deterministic fixes + level 3 explanations |
+| T-035 | done | 1 | T-030, T-031, T-068 | Level 1 deterministic fixes + level 3 explanations |
 | T-036 | todo | 2 | T-028 | Desktop: app shell + single-string check with highlighting |
 | T-037 | todo | 2 | T-036 | Desktop: version selector |
 | T-038 | todo | 2 | T-036 | Desktop: batch validation + export |
@@ -77,7 +77,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-065 | done | 1 | T-027 | Binder: syntax tree → semantic model (meaning nodes, KbRefs, IsPartial) |
 | T-066 | todo | 2 | T-065 | Band composition from the short system (derivative structure for short-form abnormalities) |
 | T-067 | discussion | 3 | T-045, T-046 | Revisit genome-assembly-only bands per edition (2016 error vs. later-edition valid?) |
-| T-068 | todo | 1 | T-031 | Rules: ch. 9 symbol rules (split from T-031) |
+| T-068 | done | 1 | T-031 | Rules: ch. 9 symbol rules (split from T-031) |
 
 ---
 
@@ -434,13 +434,19 @@ Outcome (2026-11-18): `Segmenter.Split` (top-level `.` followed by a letter sepa
 **Notes:**
 
 ### T-035 — Level 1 fixes + level 3 explanations
-**Status:** todo
+**Status:** done
 **Description:**
 - Level 1: deterministic fixes (spacing, letter case, chromosome/breakpoint order, redundant sex chromosome as in `46,XX,t(X;13)` → `46,X,t(X;13)`).
 - Level 3: plain-language explanations when no single fix exists.
 - Fixes are per version.
 **Acceptance:** Corrected forms from the KB are reproduced exactly; explanations include citations.
 **Notes:** From T-021: where the correct form depends on context (e.g. `47,XXX` vs `47,XX,+X`) and the context is unknown, offer one fix per context instead of a single Apply. From T-023: fix model (`TextEdit`s on the original input, apply = edit + re-validate, fix all, `ForContext`) in `docs/design/core.md` §10. From T-025: set `SupportsFixes` in the harness adapter so the `corrected` cases also check `Fix.Preview`.
+Outcome (2026-11-20):
+- Core: `Fix` (+ `Citations`), `FixProposal`, `Fixer` (`Apply`, `ApplyAll` → `FixAllResult`) in `src/CytoLex.Core/Validation/`; `DiagnosticFactory` builds level-1 fixes (KB level/kind/hint, preview, `ForContext` from the rule's single context) and a level-3 explanation (statement + hint + citations) for every other diagnostic; core codes have none. `RuleContext.Report(…, fixes)` / `ReportWithFix`, `StructuralFinding.Fix`, `SyntaxDiagnostic.Edits`/`FixEdits`.
+- Edits in the checks (shared analyses: item order as one stable sort per cell line, chromosome order/rotation/chain reversal, breakpoint swap and regrouping, composition reversal and chromosome numbers, derivatives, centromeric breakpoints, symbol forms, markers/dmin/copies, sex field, replaced losses) and in the parser recoveries (inserts/replaces from `Expected`, plus reorders); helper `Rules/Checks/FixHelpers.cs`.
+- KB: level-1 fix blocks for 11 ch. 9 rules (DEL/DUP/INV/QDP/TRP/TRANSLOC.FORMAT, FIS, FRA, HSR.REPLACED_SEGMENT_PROXIMAL, DER.ISODERIVATIVE, DER.DICENTRIC_FORMAT); `DER.NO_PH_SYMBOL` hint names the short form (§9.2.3 E35).
+- Harness: `SupportsFixes` on; previews checked for KB level-1 rules that are implemented or parser-reported. Tests: `tests/CytoLex.Core.Tests/Validation/FixTests.cs`; 2540 pass, 13 skipped (unimplemented rules' invalid examples).
+- Deviations: an "all occurrences" fix when one rule reports several faults; `Fix.Citations` added; the one-fix report method is `ReportWithFix`. Decisions in `docs/decisions.md` (2026-11-20), design in `docs/design/core.md` §10 "As built (T-035)".
 
 ### T-062 — Test corpus of ISCN strings per notation type
 **Status:** todo
@@ -640,7 +646,7 @@ Outcome (2026-11-18):
 **Notes:** Created 2026-11-19 during T-029 at the user's request. The current behaviour is unchanged until then. The design already supports a per-edition answer: band data and the `book` flag are per edition (`kb/bands/<version>/`), and a rule runs only in editions whose KB has it.
 
 ### T-068 — Rules: ch. 9 symbol rules
-**Status:** todo
+**Status:** done
 **Description:** The ch. 9 symbol rules left over when T-031 was split (decided with the user, 2026-11-19): `ADD.FORMAT`, `DEL.FORMAT`, `DUP.FORMAT`, `FIS.FORMAT`, `FRA.FORMAT`, `ISO.FORMAT`, `DER.NO_PH_SYMBOL`, `DER.ISODERIVATIVE`, `DIC.FORMAT`, `DIC.NO_DER_DIC`, `HSR.REPLACED_SEGMENT_PROXIMAL`, `HSR.INTERFACE_TWO_CHROMOSOMES`, `HSR.NO_ABR_SYMBOL`, `MAR.PLUS_SIGN`, `MAR.NO_SIZE_MORPHOLOGY`, `MAR.NUMBERED`, `DMIN.FORMAT`, `ACE.NOT_IN_KARYOTYPE`, `RING.UNIDENTIFIED`, `TRANSLOC.WHOLE_ARM`, `DER.WHOLE_ARM_TWO_CHROMOSOMES`, `ROB.FORMAT`, `ROB.NOT_ACQUIRED`, `ROB.DICENTRIC_USE_DIC`, `KARYO.MULTIPLY_SIGN_AFTER_ABNORMALITY`.
 **Acceptance:** Related KB examples pass.
-**Notes:** Created 2026-11-19 from T-031 (split agreed with the user); added to the Depends of T-032 and T-035. Reuse the T-031 analyses in `src/CytoLex.Core/Rules/Checks/` (`BandOrder`, `ChromosomeOrder`, `BreakpointGroups`) and `ChromosomeCount` (the `–13,–15,dic`/`–13,–21,rob`/`–1,–3,der(1;3)` examples are count verdicts, like `KARYO.REPLACED_NORMAL_NOT_MISSING`). A semicolon error in a symbol without a group rule of its own goes to `STRUCT.BREAKPOINT_GROUPS` (T-031); if a FORMAT rule here takes one over, add its kind to `BreakpointGroups`.
+**Notes:** Created 2026-11-19 from T-031 (split agreed with the user); added to the Depends of T-032 and T-035. Reuse the T-031 analyses in `src/CytoLex.Core/Rules/Checks/` (`BandOrder`, `ChromosomeOrder`, `BreakpointGroups`) and `ChromosomeCount` (the `–13,–15,dic`/`–13,–21,rob`/`–1,–3,der(1;3)` examples are count verdicts, like `KARYO.REPLACED_NORMAL_NOT_MISSING`). A semicolon error in a symbol without a group rule of its own goes to `STRUCT.BREAKPOINT_GROUPS` (T-031); if a FORMAT rule here takes one over, add its kind to `BreakpointGroups`. **Outcome (2026-11-19):** 24 `[KbRule]` checks in `src/CytoLex.Core/Rules/Checks/` (thin `StructuralCheck` subclasses) over four new shared analyses: `SymbolForms.cs` (arm in the chromosome list for del/i/fra, short-system arrows for del/dup, `Ph`, `ace`, `der dic`, size terms before `mar`, `t(n;?)` → `add`), `CentromericBreakpoints.cs` (p10/q10 for i/ider/fis, `TRANSLOC.WHOLE_ARM`, `DER.WHOLE_ARM_TWO_CHROMOSOMES`, `ROB.*`), `Unidentified.cs` (signs of mar/r/dmin, `MAR.NUMBERED`, leading counts and excess `×n`) and `Hsr.cs`. `HSR.NO_ABR_SYMBOL` is parser-only. One fault, one finding (decided with the user): symbol rules take over from the general rules: replaced losses via `ReplacedLoss.Rule` (dic/rob/whole-arm der), ring and dmin order faults via new `OrderRule.Ring`/`DoubleMinute` in `ItemOrder`, and excess copies via the new count verdict `ExcessReplacingCopies`. The parser names `iso` (ISO.FORMAT), `abr` (HSR.NO_ABR_SYMBOL) and an unlisted word before `mar` (MAR.NO_SIZE_MORPHOLOGY) instead of SYM.LISTED_ONLY. KB edits: `45,XX,–1,–3,der(1;3)(p10;q10)` dropped from KARYO.REPLACED_NORMAL_NOT_MISSING; ORDER.UNIDENTIFIED_LAST invalid example → `48,XX,+mar,+8`; the inferred `t(1;3)(p11.1;q11.1)` dropped from TRANSLOC.WHOLE_ARM (the book prints `t(X;18)(p11.1;q11.1)` as valid; decided with the user). Tests: new `tests/CytoLex.Core.Tests/Rules/SymbolChecksTests.cs`; `InvalidExampleExpectations` and `NumericalSexOrderChecksTests` updated. `dotnet test`: 2,533 total, 0 failed, 13 skipped (was 51; none of them T-068 rules); coverage 72 rules implemented (was 48). Docs: `docs/decisions.md`, `docs/design/core.md` §7.2, `CLAUDE.md`/`README.md` status. Deviations from the plan: the p11.1 heuristic was dropped; arms in the list are allowed inside derivatives and recombinants (§4.5); homologues per level = k, not 2k; no yield logic was needed for `del/dup(…→…)`. `del` keeps no group rule of its own (`del(5)(q13;q33)` stays STRUCT.BREAKPOINT_GROUPS).

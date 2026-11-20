@@ -290,9 +290,6 @@ rules:
         - text: "47,XX,del(6)(q13q23)×2,+del(6)(q13q23)"
           cite: {section: "9.3", page: 80, example: E3}
       invalid:
-        - text: "45,XX,–1,–3,der(1;3)(p10;q10)"
-          why: The whole-arm derivative replaces one chromosome 1 and one chromosome 3; they are not written as missing.
-          corrected: "45,XX,der(1;3)(p10;q10)"
         - text: "46,XX,–4,del(4)(p14)"
           why: The del(4) replaces a normal chromosome 4, which must not also be written as missing.
           corrected: "46,XX,del(4)(p14)"

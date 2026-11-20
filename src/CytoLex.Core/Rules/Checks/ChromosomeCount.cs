@@ -30,6 +30,12 @@ internal enum CountVerdict
     /// <summary>The count fits only with each telomeric association counted as one chromosome (<c>TAS.FORMAT</c>, §9.2.16).</summary>
     TasCountedOnce,
 
+    /// <summary>
+    /// The count fits only with the copies of an unsigned rearrangement beyond the normal homologues counted as gains
+    /// (<c>47,XX,del(6)(q13q23)×3</c>): reported by <c>KARYO.MULTIPLY_SIGN_AFTER_ABNORMALITY</c> at the item (§9.3, T-068).
+    /// </summary>
+    ExcessReplacingCopies,
+
     /// <summary>No reading fits (<c>NUM.COUNT_MATCHES_CHANGES</c>).</summary>
     Mismatch,
 }
@@ -38,7 +44,23 @@ internal enum CountVerdict
 internal sealed record RearrangedSex(Abnormality Item, string Letter);
 
 /// <summary>A loss of a normal autosome that an unsigned rearrangement of the same line replaces (<c>–4</c> with <c>del(4)</c>).</summary>
-internal sealed record ReplacedLoss(WholeChromosomeChange Loss, Abnormality Replacement);
+internal sealed record ReplacedLoss(WholeChromosomeChange Loss, Abnormality Replacement)
+{
+    public const string GeneralRule = "KARYO.REPLACED_NORMAL_NOT_MISSING";
+
+    /// <summary>
+    /// The rule that reports the loss (one fault, one finding; T-068): the replacement's own format rule for a dicentric
+    /// (<c>DIC.FORMAT</c>), a Robertsonian translocation (<c>ROB.FORMAT</c>) and a whole-arm <c>der(a;b)</c>
+    /// (<c>DER.WHOLE_ARM_TWO_CHROMOSOMES</c>); else <c>KARYO.REPLACED_NORMAL_NOT_MISSING</c>.
+    /// </summary>
+    public string Rule => Replacement.Parts switch
+    {
+        [{ Head: "dic" or "idic" }, ..] => "DIC.FORMAT",
+        [{ Head: "rob" }] => "ROB.FORMAT",
+        [{ Head: "der", Chromosomes.Length: 2 }] => "DER.WHOLE_ARM_TWO_CHROMOSOMES",
+        _ => GeneralRule,
+    };
+}
 
 /// <summary>The count analysis of one cell line.</summary>
 internal sealed record CountResult(
@@ -240,6 +262,12 @@ internal static class ChromosomeCount
             return Result(CountVerdict.TasCountedOnce, true);
         }
 
+        var excess = line.Items.OfType<Abnormality>().Sum(a => ExcessCopies(a, level));
+        if (excess > 0 && Fits(Shift(expected, excess), count))
+        {
+            return Result(CountVerdict.ExcessReplacingCopies, true);
+        }
+
         return Result(CountVerdict.Mismatch, true);
     }
 
@@ -377,6 +405,16 @@ internal static class ChromosomeCount
                 return new ItemDelta([(products - autosomes) * multiplier], !hasUnknown);
         }
     }
+
+    /// <summary>
+    /// The copies of an unsigned rearrangement of one autosome beyond the <paramref name="level"/> normal homologues it can
+    /// replace (<c>del(6)(q13q23)×3</c> at the diploid level → 1): extra copies are written with a plus sign (§9.3 ¶1).
+    /// </summary>
+    public static int ExcessCopies(Abnormality a, int level) =>
+        a.Sign == GainLoss.None && a.Copies?.Count is { } copies && copies > level && !IsUnidentified(a)
+        && a.Parts is [{ Chromosomes: [{ IsSexChromosome: false, IsUnknown: false }] }, ..] && a.Kind is not ("dmin" or "fis" or "upd")
+            ? copies - level
+            : 0;
 
     /// <summary>An unidentified <c>mar</c> or <c>r</c> (no chromosome list), counted only when signed.</summary>
     public static bool IsUnidentified(Abnormality a) =>

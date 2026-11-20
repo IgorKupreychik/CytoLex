@@ -1,5 +1,7 @@
 using CytoLex.Core.Semantics;
 using CytoLex.Core.Syntax;
+using CytoLex.Core.Text;
+using CytoLex.Core.Validation;
 
 namespace CytoLex.Core.Rules.Checks;
 
@@ -14,7 +16,7 @@ internal sealed class UncertainConstitutionalCheck : IRuleCheck
             var tokens = mark.Syntax?.PresentTokens() ?? [];
             if (tokens.Count >= 2 && tokens[^1].Kind == TokenKind.Question && tokens[^2] is { Kind: TokenKind.Word, Text: "c" })
             {
-                context.Report(mark.Span, "The question mark goes before c: ?c.");
+                context.ReportWithFix(mark.Span, "The question mark goes before c: ?c.", FixProposal.Replace(TextSpan.FromBounds(tokens[^2].Span.Start, tokens[^1].Span.End), "?c"));
             }
         }
     }

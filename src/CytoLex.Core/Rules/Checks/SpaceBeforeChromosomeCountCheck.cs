@@ -1,4 +1,5 @@
 using CytoLex.Core.Text;
+using CytoLex.Core.Validation;
 
 namespace CytoLex.Core.Rules.Checks;
 
@@ -16,9 +17,10 @@ internal sealed class SpaceBeforeChromosomeCountCheck : IRuleCheck
         {
             foreach (var prefix in model.Prefixes.Where(p => p.Span.End == count!.Span.Start))
             {
-                context.Report(
+                context.ReportWithFix(
                     TextSpan.FromBounds(prefix.Span.Start, count!.Span.End),
-                    $"A space separates '{prefix.Symbol}' from the chromosome count.");
+                    $"A space separates '{prefix.Symbol}' from the chromosome count.",
+                    FixProposal.Insert(count.Span.Start, " "));
             }
         }
     }

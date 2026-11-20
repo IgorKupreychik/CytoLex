@@ -1,4 +1,6 @@
 using CytoLex.Core.Semantics;
+using CytoLex.Core.Text;
+using CytoLex.Core.Validation;
 
 namespace CytoLex.Core.Rules.Checks;
 
@@ -22,10 +24,20 @@ internal enum OrderRule
 
     /// <summary><c>ORDER.UNIDENTIFIED_LAST</c>.</summary>
     UnidentifiedLast,
+
+    /// <summary><c>RING.UNIDENTIFIED</c>: an unidentified ring after a marker, or a ring of known origin out of number order (T-068).</summary>
+    Ring,
+
+    /// <summary><c>DMIN.FORMAT</c>: a marker or unidentified ring after double minutes (T-068).</summary>
+    DoubleMinute,
 }
 
 /// <summary>An item listed after <see cref="Before"/> although it belongs before it.</summary>
-internal sealed record OrderViolation(OrderRule Rule, KaryotypeItem Item, KaryotypeItem Before);
+/// <param name="Rule">The order rule the item breaks.</param>
+/// <param name="Item">The out-of-order item.</param>
+/// <param name="Before">The earlier item it belongs before.</param>
+/// <param name="Fix">The cell line's items in the right order (T-035): every violation of a line shares it.</param>
+internal sealed record OrderViolation(OrderRule Rule, KaryotypeItem Item, KaryotypeItem Before, FixProposal? Fix = null);
 
 /// <summary>
 /// The order of abnormalities within a cell line (§4.1 ¶2, §6). Each item gets a key:
@@ -38,7 +50,9 @@ internal sealed record OrderViolation(OrderRule Rule, KaryotypeItem Item, Karyot
 /// </list>
 /// Items without a key (<c>or</c> readings, <c>…</c>, <c>inc</c>, <c>idem</c>, items of an unknown chromosome other than
 /// <c>der(?)</c>) take no part. An item whose key is less than that of an earlier item is reported once, against the
-/// earlier item with the greatest key, by the rule of the first key part that differs.
+/// earlier item with the greatest key, by the rule of the first key part that differs. Two symbol rules take over from the
+/// general ones (one fault, one finding; T-068): an unidentified ring after a marker and a ring of known origin out of
+/// number order go to <c>RING.UNIDENTIFIED</c>; a marker or unidentified ring after double minutes goes to <c>DMIN.FORMAT</c>.
 /// </summary>
 internal static class ItemOrder
 {
@@ -55,10 +69,14 @@ internal static class ItemOrder
     private readonly record struct Key(Category Category, int Chromosome, int Structural, string? Symbol);
 
     /// <summary>Every out-of-order item of the model, in input order.</summary>
-    public static IEnumerable<OrderViolation> Violations(KaryotypeModel model)
+    /// <param name="model">The segment's model.</param>
+    /// <param name="input">The whole input, for the fix (<c>null</c>: no fix).</param>
+    public static IEnumerable<OrderViolation> Violations(KaryotypeModel model, string? input = null)
     {
         foreach (var line in model.CellLines)
         {
+            FixProposal? fix = null;
+            var fixBuilt = false;
             var seen = new List<(KaryotypeItem Item, Key Key)>();
             foreach (var item in line.Items)
             {
@@ -78,12 +96,54 @@ internal static class ItemOrder
 
                 if (worst is { } w)
                 {
-                    yield return new OrderViolation(RuleOf(w.Key, key), item, w.Item);
+                    if (!fixBuilt && input is not null)
+                    {
+                        fix = SortFix(line, input);
+                        fixBuilt = true;
+                    }
+
+                    yield return new OrderViolation(RuleOf(w.Key, key), item, w.Item, fix);
                 }
 
                 seen.Add((item, key));
             }
         }
+    }
+
+    /// <summary>
+    /// The fix of a line's order (T-035): a stable sort of the items that have a key, written back into the positions of
+    /// keyed items (items without a key, such as <c>…</c> or <c>inc</c>, stay where they are), joined by commas. The edit
+    /// covers only the run from the first to the last item that moves; <c>null</c> if nothing moves.
+    /// </summary>
+    private static FixProposal? SortFix(CellLine line, string input)
+    {
+        var items = line.Items;
+        if (items.Any(i => i.IsPartial))
+        {
+            return null;
+        }
+
+        var keyed = items.Select((item, index) => (Item: item, Index: index, Key: KeyOf(item))).Where(x => x.Key is not null).ToList();
+        var sorted = keyed.Select((x, order) => (x, order))
+            .OrderBy(p => p.x.Key!.Value, Comparer<Key>.Create(Compare))
+            .ThenBy(p => p.order)
+            .Select(p => p.x.Item)
+            .ToList();
+        var result = items.ToArray();
+        for (var k = 0; k < keyed.Count; k++)
+        {
+            result[keyed[k].Index] = sorted[k];
+        }
+
+        var changed = Enumerable.Range(0, items.Length).Where(i => !ReferenceEquals(result[i], items[i])).ToList();
+        if (changed.Count == 0)
+        {
+            return null;
+        }
+
+        var (from, to) = (changed[0], changed[^1]);
+        var text = string.Join(",", result[from..(to + 1)].Select(i => i.Span.Of(input)));
+        return FixProposal.Replace(TextSpan.FromBounds(items[from].Span.Start, items[to].Span.End), text);
     }
 
     private static int Compare(Key a, Key b)
@@ -113,12 +173,20 @@ internal static class ItemOrder
     {
         if (earlier.Category != later.Category)
         {
-            return earlier.Category == Category.UnknownDer || later.Category == Category.UnknownDer ? OrderRule.UnknownCentromereDer : OrderRule.UnidentifiedLast;
+            return (earlier.Category, later.Category) switch
+            {
+                (Category.UnknownDer, _) or (_, Category.UnknownDer) => OrderRule.UnknownCentromereDer,
+                (Category.Marker, Category.UnidentifiedRing) => OrderRule.Ring,
+                (Category.DoubleMinute, Category.Marker or Category.UnidentifiedRing) => OrderRule.DoubleMinute,
+                _ => OrderRule.UnidentifiedLast,
+            };
         }
 
         if (earlier.Chromosome != later.Chromosome)
         {
-            return earlier.Chromosome <= 1 && later.Chromosome <= 1 ? OrderRule.XBeforeY : OrderRule.ChromosomeNumber;
+            return earlier.Chromosome <= 1 && later.Chromosome <= 1 ? OrderRule.XBeforeY
+                : later.Symbol == "r" ? OrderRule.Ring
+                : OrderRule.ChromosomeNumber;
         }
 
         return earlier.Structural != later.Structural ? OrderRule.NumericalBeforeStructural : OrderRule.HomologuesAlphabetical;

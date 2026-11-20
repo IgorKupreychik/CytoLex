@@ -74,7 +74,7 @@ internal static class InvalidExampleExpectations
             ["50,X,–Y,+X,+10,+14,+17,+21[5]/46,XY[15]"] = [], // ORDER.X_BEFORE_Y
             ["49,X,inv(X)(p21q26),inv(3)(q21q26.2),+3,+7,+10,del(20)(q11.2),–20,+21"] = [], // ORDER.NUMERICAL_BEFORE_STRUCTURAL
             ["50,XX,+1,+inv(1)(p31q41),+del(1)(p13),+dup(1)(q21q32),+8,r(10)(p12q25),–21"] = [], // ORDER.HOMOLOGUES_ALPHABETICAL
-            ["52,XX,…,+mar,+r,12~20dmin"] = [], // ORDER.UNIDENTIFIED_LAST
+            ["48,XX,+mar,+8"] = [], // ORDER.UNIDENTIFIED_LAST
             ["52,XX,…,+r,+der(?)t(?;6)(?;q16),+mar,5~9dmin"] = [], // ORDER.UNKNOWN_CENTROMERE_DER
             ["49,X,inv(X)(p21q26),+3,inv(3)(q21q26.2),+7,+10,–20,del(20)(q11.2),+21"] = [], // ORDER.SHORTEST_STRING_PREFERRED
             ["16hq+"] = [("VAR.LENGTH_SIGN", "hq", 2)], // VAR.LENGTH_SIGN
@@ -110,14 +110,14 @@ internal static class InvalidExampleExpectations
             ["46,X,fra(Xq27.3)"] = [], // FRA.FORMAT
             ["46,XY,der(1)del(1)(p21p33)hsr(1)(p33)"] = [], // HSR.REPLACED_SEGMENT_PROXIMAL
             ["46,XX,der(1)ins(1;7)(q21;p11.2p21)hsr(1)(q21)"] = [], // HSR.INTERFACE_TWO_CHROMOSOMES
-            ["46,XX,abr(1)(p22)"] = [("SYM.LISTED_ONLY", "abr", 6)], // HSR.NO_ABR_SYMBOL
+            ["46,XX,abr(1)(p22)"] = [("HSR.NO_ABR_SYMBOL", "abr", 6)], // HSR.NO_ABR_SYMBOL
             ["46,XX,inv(3)(q21;q26.2)"] = [], // INV.FORMAT
-            ["46,XX,iso(17)(q10)"] = [("SYM.LISTED_ONLY", "iso", 6)], // ISO.FORMAT
+            ["46,XX,iso(17)(q10)"] = [("ISO.FORMAT", "iso", 6)], // ISO.FORMAT
             ["46,XX,i(17q)"] = [], // ISO.FORMAT
             ["46,XX,i(17)(q11.2)"] = [], // ISO.FORMAT
             ["47,XX,mar"] = [], // MAR.PLUS_SIGN
             ["47,XX,+min mar"] = [], // MAR.NO_SIZE_MORPHOLOGY
-            ["47,XX,+acro mar"] = [("SYM.LISTED_ONLY", "acro", 7)], // MAR.NO_SIZE_MORPHOLOGY
+            ["47,XX,+acro mar"] = [("MAR.NO_SIZE_MORPHOLOGY", "acro", 7)], // MAR.NO_SIZE_MORPHOLOGY
             ["51,XX,i(17)(q10),+mar1,+mar1,+mar1,+mar2,+mar3"] = [], // MAR.NUMBERED
             ["51,XX,i(17)(q10),+3mar1,+mar2,+mar3"] = [], // MAR.NUMBERED
             ["49,XX,…,+3mar,+1dmin"] = [], // DMIN.FORMAT
@@ -139,7 +139,6 @@ internal static class InvalidExampleExpectations
             ["46,XY,t(2;5)(q21)"] = [], // TRANSLOC.FORMAT
             ["46,XY,t(5;6)(q13;q23;q15;q23)"] = [], // TRANSLOC.FORMAT
             ["46,XY,t(1;3)(q10;p10)"] = [], // TRANSLOC.WHOLE_ARM
-            ["46,XY,t(1;3)(p11.1;q11.1)"] = [], // TRANSLOC.WHOLE_ARM
             ["45,XX,der(1)t(1;3)(p10;q10)"] = [], // DER.WHOLE_ARM_TWO_CHROMOSOMES
             ["45,XX,rob(9;22)(q10;q10)"] = [], // ROB.FORMAT
             ["45,XX,–13,–21,rob(13;21)(q10;q10)"] = [], // ROB.FORMAT

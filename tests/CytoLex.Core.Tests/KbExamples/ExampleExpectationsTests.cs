@@ -217,6 +217,24 @@ public class ExampleExpectationsTests
     }
 
     [Fact]
+    public void Corrected_Level3Rule_ChecksValidityOnly()
+    {
+        var rule = Rule() with { FixLevel = 3, FixKind = null };
+        Assert.True(ExampleExpectations.Evaluate(Case(rule, ExampleKind.Corrected, "46XX", "46,XX"), Fixer("46, XX"), true).Passed);
+    }
+
+    [Fact]
+    public void Corrected_ParserReportedRule_ChecksPreview() =>
+        Assert.NotEmpty(ExampleExpectations.Evaluate(Case(Rule(), ExampleKind.Corrected, "46XX", "46,XX"), Fixer("46, XX"), ruleImplemented: false).Failures);
+
+    [Fact]
+    public void Corrected_UnreportedRule_ChecksValidityOnly()
+    {
+        var v = new FakeValidator((_, _) => Clean(), supportsFixes: true);
+        Assert.True(ExampleExpectations.Evaluate(Case(Rule(), ExampleKind.Corrected, "46XX", "46,XX"), v, ruleImplemented: false).Passed);
+    }
+
+    [Fact]
     public void Corrected_StillInvalid_Fails()
     {
         var v = new FakeValidator((_, _) => With(false, new ExampleDiagnostic("TEST.RULE", Severity.Error)));

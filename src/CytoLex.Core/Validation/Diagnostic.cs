@@ -71,7 +71,7 @@ public sealed record ContextCondition(ImmutableDictionary<SampleContext, Severit
 /// <param name="Certainty">Whether the check was certain.</param>
 /// <param name="Condition">Set when the finding depends on the unknown sample context (§8.3).</param>
 /// <param name="CannotVerify">An info that the string alone cannot show whether the rule is met (§8.2 step 5).</param>
-/// <param name="Fixes">Proposed fixes (T-035); empty for now.</param>
+/// <param name="Fixes">Proposed fixes (T-035): level-1 edits (one per alternative or context, plus "all occurrences" when one rule reports several faults), else one level-3 explanation; empty only for core codes.</param>
 public sealed record Diagnostic(
     string RuleId,
     Severity Severity,

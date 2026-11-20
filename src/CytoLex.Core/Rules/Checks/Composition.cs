@@ -1,4 +1,6 @@
 using CytoLex.Core.Semantics;
+using CytoLex.Core.Text;
+using CytoLex.Core.Validation;
 
 namespace CytoLex.Core.Rules.Checks;
 
@@ -63,10 +65,11 @@ internal static class Composition
             yield return new StructuralFinding(
                 CompositionOrderRule,
                 piece.Span,
-                $"'{piece.Span.Of(input)}' runs from the long arm to the short arm; the composition starts at the short-arm end (pter) and runs to qter.");
+                $"'{piece.Span.Of(input)}' runs from the long arm to the short arm; the composition starts at the short-arm end (pter) and runs to qter.",
+                Fix: Reversed(structure, input));
         }
 
-        if (NumbersFinding(part, points) is { } numbers)
+        if (NumbersFinding(part, points, input) is { } numbers)
         {
             yield return numbers;
         }
@@ -79,11 +82,12 @@ internal static class Composition
                 CentromereChromosomeRule,
                 own.Span,
                 $"The centromere in this composition is chromosome {centromere}'s ('{crossing[0].Piece.Span.Of(input)}'), so the derivative is der({centromere}).",
-                [crossing[0].Piece.Span]);
+                [crossing[0].Piece.Span],
+                Fix: FixProposal.Replace(own.Span, centromere));
         }
     }
 
-    private static StructuralFinding? NumbersFinding(AbnormalityPart part, List<Breakpoint> points)
+    private static StructuralFinding? NumbersFinding(AbnormalityPart part, List<Breakpoint> points, string input)
     {
         var written = points.Where(p => p.ChromosomeWritten && p.Chromosome is { IsUnknown: false }).ToList();
         var names = part.Chromosomes.Where(c => !c.IsUnknown).Select(c => c.Name)
@@ -95,18 +99,70 @@ internal static class Composition
                 ? new StructuralFinding(
                     ChromosomeNumbersRule,
                     written[0].Span,
-                    $"Only chromosome {only.Name} is involved, so its number is not repeated in the band composition.")
+                    $"Only chromosome {only.Name} is involved, so its number is not repeated in the band composition.",
+                    Fix: new FixProposal([.. written.Select(p => new TextEdit(WrittenChromosome(p), string.Empty))]))
                 : null;
         }
 
-        var missing = points.FirstOrDefault(p => !p.ChromosomeWritten && (p.Landmark is null or "pter" or "qter" or "ter"));
-        return missing is null
-            ? null
-            : new StructuralFinding(
-                ChromosomeNumbersRule,
-                missing.Span,
-                $"Several chromosomes are involved, so every band and arm end carries its chromosome number ('{missing.Text}' has none).");
+        var unnumbered = points.Where(p => !p.ChromosomeWritten && (p.Landmark is null or "pter" or "qter" or "ter")).ToList();
+        if (unnumbered.Count == 0)
+        {
+            return null;
+        }
+
+        // Each point takes the number written elsewhere in its own piece (3qter→q13.1 → 3q13.1).
+        var pieces = part.Groups.Where(g => g.Structure is not null).SelectMany(g => g.Structure!.Pieces).ToList();
+        var numbers = unnumbered
+            .Select(p => pieces.FirstOrDefault(piece => piece.Points.Any(q => ReferenceEquals(q, p))) is { } piece
+                ? piece.Points.Where(q => q.ChromosomeWritten && q.Chromosome is { IsUnknown: false }).Select(q => q.Chromosome!.Name).Distinct().SingleOrDefault()
+                : null)
+            .ToList();
+        var add = numbers.All(n => n is not null)
+            ? new FixProposal([.. unnumbered.Select((p, i) => new TextEdit(new TextSpan(p.Span.Start, 0), numbers[i]!))])
+            : null;
+        return new StructuralFinding(
+            ChromosomeNumbersRule,
+            unnumbered[0].Span,
+            $"Several chromosomes are involved, so every band and arm end carries its chromosome number ('{unnumbered[0].Text}' has none).",
+            Fix: add);
     }
+
+    /// <summary>The chromosome number written before a band (<c>6</c> in <c>6q25.2</c>).</summary>
+    private static TextSpan WrittenChromosome(Breakpoint p) =>
+        p.Chromosome is { } c && c.Span.End <= p.Span.End && c.Span.Start >= p.BandSpan().Start && c.Span.Length < p.BandSpan().Length
+            ? c.Span
+            : TextSpan.FromBounds(p.BandSpan().Start, p.Span.Start);
+
+    /// <summary>
+    /// The composition read from its other end (T-035): pieces in reverse order, each piece's points reversed, and the
+    /// written arrows and joins kept (<c>1qter→1p22::3q13.1→3qter</c> → <c>3qter→3q13.1::1p22→1qter</c>). <c>null</c> for a
+    /// composition with a leading or trailing join.
+    /// </summary>
+    private static FixProposal? Reversed(DerivativeStructure structure, string input)
+    {
+        if (structure.LeadingJoin is not null || structure.TrailingJoin is not null)
+        {
+            return null;
+        }
+
+        var pieces = structure.Pieces;
+        var joins = Enumerable.Range(0, pieces.Length - 1)
+            .Select(i => TextSpan.FromBounds(PieceSpan(pieces[i]).End, PieceSpan(pieces[i + 1]).Start).Of(input))
+            .Reverse()
+            .ToList();
+        var texts = pieces.Reverse().Select(piece =>
+        {
+            var spans = piece.Points.Select(p => p.BandSpan()).ToList();
+            var arrows = Enumerable.Range(0, spans.Count - 1).Select(i => TextSpan.FromBounds(spans[i].End, spans[i + 1].Start).Of(input)).Reverse().ToList();
+            var reversed = spans.AsEnumerable().Reverse().Select(s => s.Of(input)).ToList();
+            return reversed[0] + string.Concat(arrows.Select((a, i) => a + reversed[i + 1]));
+        }).ToList();
+        var text = texts[0] + string.Concat(joins.Select((j, i) => j + texts[i + 1]));
+        return FixProposal.Replace(TextSpan.FromBounds(PieceSpan(pieces[0]).Start, PieceSpan(pieces[^1]).End), text);
+    }
+
+    /// <summary>A piece from its first point's band (with a written chromosome) to its last point.</summary>
+    private static TextSpan PieceSpan(SegmentPiece piece) => TextSpan.FromBounds(piece.From.BandSpan().Start, piece.To.Span.End);
 
     /// <summary>
     /// The composition starts on the long arm of the centromere's chromosome (<c>1qter→1p22::…</c>). An inverted centromere

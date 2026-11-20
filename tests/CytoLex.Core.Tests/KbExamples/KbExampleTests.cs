@@ -2,7 +2,7 @@ namespace CytoLex.Core.Tests.KbExamples;
 
 /// <summary>
 /// One test per KB example (T-025): valid, invalid, and corrected forms from <c>build/kb.json</c>.
-/// Cases skip with a reason until the validator (T-028), the rule (T-029+) or the fixer (T-035) exists.
+/// Invalid cases skip with a reason while their rule is not implemented (T-029+); corrected cases check fix previews (T-035).
 /// </summary>
 public class KbExampleTests
 {

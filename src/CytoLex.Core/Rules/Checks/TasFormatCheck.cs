@@ -1,4 +1,6 @@
+using System.Globalization;
 using CytoLex.Core.Semantics;
+using CytoLex.Core.Validation;
 
 namespace CytoLex.Core.Rules.Checks;
 
@@ -25,7 +27,10 @@ internal sealed class TasFormatCheck() : StructuralCheck(Analyze)
                 ChromosomeOrder.TasFormatRule,
                 r.CountSpan,
                 $"The chromosomes of a telomeric association are counted separately: '{tas.Span.Of(input)}' does not lower the count.",
-                [tas.Span]);
+                [tas.Span],
+                Fix: r.Expected is [var count] && r.Line.Count is { IsRange: false } written
+                    ? FixProposal.Replace(written.Span, count.ToString(CultureInfo.InvariantCulture))
+                    : null);
         }
     }
 }

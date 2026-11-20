@@ -1,5 +1,7 @@
+using System.Collections.Immutable;
 using CytoLex.Core.Syntax;
 using CytoLex.Core.Text;
+using CytoLex.Core.Validation;
 
 namespace CytoLex.Core.Rules.Checks;
 
@@ -40,7 +42,11 @@ internal sealed class BandDesignationFormatCheck : IRuleCheck
         if (tokens.Count > 1 && tokens.Take(tokens.Count - 1).Any(t => t.HasTrailingTrivia))
         {
             var span = TextSpan.FromBounds(tokens[0].Span.Start, tokens[^1].Span.End);
-            context.Report(span, $"Space inside the band designation '{span.Of(context.Input)}'.");
+            var gaps = tokens.Zip(tokens.Skip(1))
+                .Where(p => p.First.HasTrailingTrivia)
+                .Select(p => new TextEdit(TextSpan.FromBounds(p.First.Span.End, p.Second.Span.Start), string.Empty))
+                .ToImmutableArray();
+            context.Report(span, $"Space inside the band designation '{span.Of(context.Input)}'.", fixes: [new FixProposal(gaps)]);
         }
     }
 }

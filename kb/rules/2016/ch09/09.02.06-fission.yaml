@@ -22,6 +22,7 @@ rules:
         - text: "47,XY,–10,+fis(10)(p11.1),+fis(10)(q11.1)"
           why: The breakpoints of a centric fission are assigned to the centromeric bands p10 and q10.
           corrected: "47,XY,–10,+fis(10)(p10),+fis(10)(q10)"
+    fix: {level: 1, kind: replace, hint: "Write the breakpoint as the centromeric band p10 or q10."}
     review:
       paraphrase_checked: true
       needs_review: false

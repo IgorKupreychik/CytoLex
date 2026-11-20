@@ -10,9 +10,9 @@ internal abstract class OrderCheck(OrderRule rule) : IRuleCheck
 {
     public void Check(RuleContext context)
     {
-        foreach (var v in ItemOrder.Violations(context.Model).Where(v => v.Rule == rule))
+        foreach (var v in ItemOrder.Violations(context.Model, context.Input).Where(v => v.Rule == rule))
         {
-            context.Report(v.Item.Span, Detail(context.Input, v), [v.Before.Span]);
+            context.ReportWithFix(v.Item.Span, Detail(context.Input, v), v.Fix, [v.Before.Span]);
         }
     }
 

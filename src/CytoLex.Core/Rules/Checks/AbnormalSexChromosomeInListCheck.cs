@@ -1,3 +1,5 @@
+using CytoLex.Core.Validation;
+
 namespace CytoLex.Core.Rules.Checks;
 
 /// <summary>
@@ -17,7 +19,26 @@ internal sealed class AbnormalSexChromosomeInListCheck : IRuleCheck
             context.Report(
                 r.Line.Sex!.Span,
                 $"The sex chromosome field lists only normal sex chromosomes; the {letters} in {items} is written there too.",
-                [.. r.RearrangedSex.Select(s => s.Item.Span).Distinct()]);
+                [.. r.RearrangedSex.Select(s => s.Item.Span).Distinct()],
+                fixes: Fix(r) is { } fix ? [fix] : []);
         }
+    }
+
+    /// <summary><c>46,XY,t(X;8)</c> → <c>46,Y,t(X;8)</c>: one letter leaves the field per rearranged X or Y.</summary>
+    private static FixProposal? Fix(CountResult r)
+    {
+        var sex = r.Line.Sex!;
+        if (!FixHelpers.IsPlainSexField(sex, r.Line))
+        {
+            return null;
+        }
+
+        var letters = sex.Chromosomes.ToList();
+        foreach (var s in r.RearrangedSex)
+        {
+            letters.RemoveAt(letters.LastIndexOf(s.Letter));
+        }
+
+        return letters.Count == 0 ? null : FixProposal.Replace(sex.Span, string.Concat(letters));
     }
 }

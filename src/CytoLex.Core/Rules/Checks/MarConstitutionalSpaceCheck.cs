@@ -1,4 +1,5 @@
 using CytoLex.Core.Semantics;
+using CytoLex.Core.Validation;
 
 namespace CytoLex.Core.Rules.Checks;
 
@@ -13,7 +14,10 @@ internal sealed class MarConstitutionalSpaceCheck : IRuleCheck
             if (a.Constitutional is { } mark && !a.Parts.IsEmpty && a.Parts[^1].Head == "mar"
                 && mark.Span.Start > 0 && !char.IsWhiteSpace(context.Input[mark.Span.Start - 1]))
             {
-                context.Report(Text.TextSpan.FromBounds(a.Parts[^1].Span.Start, mark.Span.End), "A space separates mar from c: mar c.");
+                context.ReportWithFix(
+                    Text.TextSpan.FromBounds(a.Parts[^1].Span.Start, mark.Span.End),
+                    "A space separates mar from c: mar c.",
+                    FixProposal.Insert(mark.Span.Start, " "));
             }
         }
     }
