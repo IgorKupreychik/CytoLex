@@ -27,10 +27,10 @@ internal static class InvalidExampleExpectations
             ["psudic"] = [], // SYM.SPACE_BETWEEN_SYMBOLS
             ["mos47,XXX[25]/46,XX[5]"] = [], // SYM.SPACE_BEFORE_CHROMOSOME_COUNT
             ["46,XX,del (5)(q13q33)"] = [], // SYM.NO_SPACE_AT_PARENTHESIS
-            ["47,XY, +21"] = [], // SYM.NO_OTHER_SPACE (check: T-074)
-            ["46,X Y,dup(1)(q21q32)"] = [], // SYM.NO_OTHER_SPACE (check: T-074)
-            ["46,xy"] = [("SYM.LISTED_ONLY", "xy", 3)], // SYM.LETTER_CASE (T-074 names it SYM.LETTER_CASE)
-            ["46,XX,Del(5)(q13q33)"] = [("SYM.LISTED_ONLY", "Del", 6)], // SYM.LETTER_CASE (T-074 names it SYM.LETTER_CASE)
+            ["47,XY, +21"] = [], // SYM.NO_OTHER_SPACE
+            ["46,X Y,dup(1)(q21q32)"] = [], // SYM.NO_OTHER_SPACE
+            ["46,xy"] = [], // SYM.LETTER_CASE (read as XY by the lexer, reported by the check)
+            ["46,XX,Del(5)(q13q33)"] = [], // SYM.LETTER_CASE (read as del by the lexer, reported by the check)
             ["46,XX,del(6)(q13q23)X2"] = [("SYM.TYPED_SYMBOL_FORMS", "X", 20)], // SYM.TYPED_SYMBOL_FORMS
             ["46XX"] = [("KARYO.COUNT_SEX_ORDER", "", 2)], // KARYO.COUNT_SEX_ORDER
             ["XX,46"] = [("KARYO.COUNT_SEX_ORDER", "XX,46", 0)], // KARYO.COUNT_SEX_ORDER

@@ -37,7 +37,9 @@ public abstract class SyntaxElement
 /// <summary>
 /// A lexical token (docs/design/core.md §4). Whitespace after a token is its trailing trivia; only the first
 /// token of a segment has leading trivia. A <see cref="IsMissing"/> token is zero-width and inserted by error
-/// recovery; its <see cref="Text"/> is the expected text.
+/// recovery; its <see cref="Text"/> is the expected text. A <see cref="IsCaseFolded"/> token was written in another
+/// letter case than its listed form (<c>Del</c>, <c>xy</c>; T-074): <see cref="Text"/> is the listed form the parser reads,
+/// <see cref="WrittenText"/> the input.
 /// </summary>
 public sealed class SyntaxToken : SyntaxElement
 {
@@ -52,7 +54,8 @@ public sealed class SyntaxToken : SyntaxElement
         ImmutableArray<Trivia> trailing,
         bool isMissing = false,
         string? vocabRef = null,
-        bool isTypedForm = false)
+        bool isTypedForm = false,
+        string? writtenText = null)
     {
         ArgumentNullException.ThrowIfNull(text);
         Kind = kind;
@@ -63,6 +66,7 @@ public sealed class SyntaxToken : SyntaxElement
         IsMissing = isMissing;
         VocabRef = vocabRef;
         IsTypedForm = isTypedForm;
+        WrittenText = writtenText ?? text;
     }
 
     private readonly TextSpan _span;
@@ -75,8 +79,17 @@ public sealed class SyntaxToken : SyntaxElement
         Leading.IsEmpty ? _span.Start : Leading[0].Span.Start,
         Trailing.IsEmpty ? _span.End : Trailing[^1].Span.End);
 
-    /// <summary>The token text as written (for a missing token: the expected text).</summary>
+    /// <summary>
+    /// The token text as read: as written, or the listed form of a case-folded token (<see cref="IsCaseFolded"/>);
+    /// for a missing token, the expected text.
+    /// </summary>
     public string Text { get; }
+
+    /// <summary>The token text exactly as written in the input (differs from <see cref="Text"/> only by letter case).</summary>
+    public string WrittenText { get; }
+
+    /// <summary>The token was written in another letter case than its listed form (<c>Del</c> → <c>del</c>; SYM.LETTER_CASE, T-074).</summary>
+    public bool IsCaseFolded => !string.Equals(Text, WrittenText, StringComparison.Ordinal);
 
     /// <summary>The text without underline marks (U+0332), e.g. <c>10</c> for <c>1̲0̲</c>.</summary>
     public string ValueText => IsUnderlined ? Text.Replace(Underline.ToString(), "", StringComparison.Ordinal) : Text;
@@ -105,6 +118,10 @@ public sealed class SyntaxToken : SyntaxElement
         yield return this;
     }
 
+    /// <summary>This token read as <paramref name="listed"/> (a listed form in another case, decided by position; T-074).</summary>
+    internal SyntaxToken AsFolded(TokenKind kind, string listed, string? vocabRef) =>
+        new(kind, _span, listed, Leading, Trailing, vocabRef: vocabRef, writtenText: WrittenText);
+
     internal void AppendFullText(StringBuilder sb)
     {
         foreach (var t in Leading)
@@ -114,7 +131,7 @@ public sealed class SyntaxToken : SyntaxElement
 
         if (!IsMissing)
         {
-            sb.Append(Text);
+            sb.Append(WrittenText);
         }
 
         foreach (var t in Trailing)
@@ -123,7 +140,7 @@ public sealed class SyntaxToken : SyntaxElement
         }
     }
 
-    public override string ToString() => IsMissing ? $"{Kind}<missing '{Text}'>" : $"{Kind} '{Text}'";
+    public override string ToString() => IsMissing ? $"{Kind}<missing '{Text}'>" : IsCaseFolded ? $"{Kind} '{WrittenText}'→'{Text}'" : $"{Kind} '{Text}'";
 }
 
 /// <summary>An inner node of the syntax tree: a kind and its children, in input order (docs/design/core.md §4).</summary>

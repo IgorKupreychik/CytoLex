@@ -17,26 +17,28 @@ internal sealed class NoSpaceAtParenthesisCheck : IRuleCheck
 {
     public void Check(RuleContext context)
     {
-        if (context.Arr is { } arr)
+        foreach (var (gap, left, right) in Gaps(context))
         {
-            if (arr.Syntax is { } root)
-            {
-                CheckTokens(context, root.PresentTokens(), skip: t => t.Kind == TokenKind.Word && (t.Text == "or" || Parser.ArrQualifierWords.Contains(t.Text)));
-            }
-
-            return;
-        }
-
-        foreach (var abnormality in context.SegmentModel.DescendantsAndSelf().OfType<Abnormality>())
-        {
-            if (abnormality.Syntax is { } syntax)
-            {
-                CheckTokens(context, syntax.PresentTokens(), skip: _ => false);
-            }
+            context.ReportWithFix(gap, $"No space between '{left.Text}' and '{right.Text}'.", FixProposal.Delete(gap), [left.Span, right.Span]);
         }
     }
 
-    private static void CheckTokens(RuleContext context, List<SyntaxToken> tokens, Func<SyntaxToken, bool> skip)
+    /// <summary>Each space this rule reports, with the tokens around it (also read by <see cref="NoOtherSpaceCheck"/>).</summary>
+    internal static IEnumerable<(TextSpan Gap, SyntaxToken Left, SyntaxToken Right)> Gaps(RuleContext context)
+    {
+        if (context.Arr is { } arr)
+        {
+            return arr.Syntax is { } root
+                ? Gaps(root.PresentTokens(), skip: t => t.Kind == TokenKind.Word && (t.Text == "or" || Parser.ArrQualifierWords.Contains(t.Text)))
+                : [];
+        }
+
+        return context.SegmentModel.DescendantsAndSelf().OfType<Abnormality>()
+            .Where(a => a.Syntax is not null)
+            .SelectMany(a => Gaps(a.Syntax!.PresentTokens(), skip: _ => false));
+    }
+
+    private static IEnumerable<(TextSpan Gap, SyntaxToken Left, SyntaxToken Right)> Gaps(List<SyntaxToken> tokens, Func<SyntaxToken, bool> skip)
     {
         for (var i = 0; i + 1 < tokens.Count; i++)
         {
@@ -44,8 +46,7 @@ internal sealed class NoSpaceAtParenthesisCheck : IRuleCheck
             if (left.HasTrailingTrivia && !skip(left) && !skip(right)
                 && ((IsSymbol(left) && IsParen(right)) || (IsParen(left) && IsSymbol(right))))
             {
-                var gap = TextSpan.FromBounds(left.Span.End, right.Span.Start);
-                context.ReportWithFix(gap, $"No space between '{left.Text}' and '{right.Text}'.", FixProposal.Delete(gap), [left.Span, right.Span]);
+                yield return (TextSpan.FromBounds(left.Span.End, right.Span.Start), left, right);
             }
         }
     }

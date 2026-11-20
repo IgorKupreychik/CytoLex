@@ -63,6 +63,14 @@ public class FixToValidTests
         { "46,XY,add(19)(p13.3),del(6)(q21)", null, "46,XY,del(6)(q21),add(19)(p13.3)" },
         // arr: aberration order (chromosome 1 first) and the space before the origin.
         { "arr[GRCh38] 7q11.23(73330452_74989354)×1dn,1p36.33(1_2000000)×3", null, "arr[GRCh38] 1p36.33(1_2000000)×3,7q11.23(73330452_74989354)×1 dn" },
+        // Stray spaces (T-074): after a comma, inside the sex chromosome field.
+        { "47,XY, +21", null, "47,XY,+21" },
+        { "46,X Y,dup(1)(q21q32)", null, "46,XY,dup(1)(q21q32)" },
+        // Letter case (T-074): sex chromosomes, a symbol.
+        { "46,xy", null, "46,XY" },
+        { "46,XY,T(9;22)(q34;q11.2)", null, "46,XY,t(9;22)(q34;q11.2)" },
+        // Case, a stray space and the order of abnormalities together.
+        { "47,xy, +21,Del(5)(q13q33)", null, "47,XY,del(5)(q13q33),+21" },
     };
 
     [Theory]

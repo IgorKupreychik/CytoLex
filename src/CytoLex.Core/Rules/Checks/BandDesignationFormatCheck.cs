@@ -15,8 +15,17 @@ internal sealed class BandDesignationFormatCheck : IRuleCheck
 {
     public void Check(RuleContext context)
     {
+        foreach (var (span, gaps) in Designations(context.Syntax.Root))
+        {
+            context.Report(span, $"Space inside the band designation '{span.Of(context.Input)}'.", fixes: [new FixProposal(gaps)]);
+        }
+    }
+
+    /// <summary>Each band designation with whitespace inside, and the edits deleting it (also read by <see cref="NoOtherSpaceCheck"/>).</summary>
+    internal static IEnumerable<(TextSpan Span, ImmutableArray<TextEdit> Gaps)> Designations(SyntaxNode root)
+    {
         var withChromosome = new HashSet<SyntaxNode>();
-        foreach (var region in context.Syntax.Root.DescendantNodesAndSelf().Where(n => n.Kind == SyntaxKind.ChromosomeRegion))
+        foreach (var region in root.DescendantNodesAndSelf().Where(n => n.Kind == SyntaxKind.ChromosomeRegion))
         {
             // A region's chromosome token and the band right after it form one designation (1p31).
             for (var i = 0; i + 1 < region.Children.Length; i++)
@@ -25,19 +34,25 @@ internal sealed class BandDesignationFormatCheck : IRuleCheck
                     && region.Children[i + 1] is SyntaxNode { Kind: SyntaxKind.Band } band)
                 {
                     withChromosome.Add(band);
-                    CheckTokens(context, [chromosome, .. band.PresentTokens()]);
+                    if (WithSpace([chromosome, .. band.PresentTokens()]) is { } found)
+                    {
+                        yield return found;
+                    }
                 }
             }
         }
 
-        foreach (var band in context.Syntax.Root.DescendantNodesAndSelf().Where(n => n.Kind == SyntaxKind.Band && !withChromosome.Contains(n)))
+        foreach (var band in root.DescendantNodesAndSelf().Where(n => n.Kind == SyntaxKind.Band && !withChromosome.Contains(n)))
         {
-            CheckTokens(context, band.PresentTokens());
+            if (WithSpace(band.PresentTokens()) is { } found)
+            {
+                yield return found;
+            }
         }
     }
 
-    /// <summary>Reports the designation when whitespace follows any of its tokens but the last.</summary>
-    private static void CheckTokens(RuleContext context, List<SyntaxToken> tokens)
+    /// <summary>The designation when whitespace follows any of its tokens but the last.</summary>
+    private static (TextSpan Span, ImmutableArray<TextEdit> Gaps)? WithSpace(List<SyntaxToken> tokens)
     {
         if (tokens.Count > 1 && tokens.Take(tokens.Count - 1).Any(t => t.HasTrailingTrivia))
         {
@@ -46,7 +61,9 @@ internal sealed class BandDesignationFormatCheck : IRuleCheck
                 .Where(p => p.First.HasTrailingTrivia)
                 .Select(p => new TextEdit(TextSpan.FromBounds(p.First.Span.End, p.Second.Span.Start), string.Empty))
                 .ToImmutableArray();
-            context.Report(span, $"Space inside the band designation '{span.Of(context.Input)}'.", fixes: [new FixProposal(gaps)]);
+            return (span, gaps);
         }
+
+        return null;
     }
 }

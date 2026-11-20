@@ -97,6 +97,37 @@ public class LexerTests
         Assert.Equal("X̲", letters[0].Text);
     }
 
+    [Theory]
+    [InlineData("Del", "Word:del")]
+    [InlineData("DEL", "Word:del")]
+    [InlineData("T", "Word:t")]
+    [InlineData("INV", "Word:inv")]
+    [InlineData("y", "ChromosomeLetter:Y")]
+    [InlineData("xy", "ChromosomeLetter:X ChromosomeLetter:Y")]
+    [InlineData("xx", "ChromosomeLetter:X ChromosomeLetter:X")]
+    [InlineData("Xy", "ChromosomeLetter:X ChromosomeLetter:Y")]
+    public void WrongCase_IsReadAsTheListedForm(string text, string expected)
+    {
+        Assert.Equal(expected, Kinds(text));
+        var tokens = Lex(text);
+        Assert.Contains(tokens, t => t.IsCaseFolded);
+        Assert.Equal(text, string.Concat(tokens.Select(t => t.ToFullString())));
+        Assert.Equal(text, string.Concat(tokens.Select(t => t.WrittenText)));
+    }
+
+    [Theory]
+    [InlineData("dl", "UnknownWord:dl")] // no listed token in any case
+    [InlineData("P", "UnknownWord:P")] // arm letter: BAND.ARM_SYMBOL
+    [InlineData("x", "Multiply:x")] // decided by position (the parser)
+    [InlineData("I", "Word:I")] // meiosis numeral; i before "(" is decided by the parser
+    [InlineData("R", "Word:R")] // listed banding code
+    [InlineData("del", "Word:del")]
+    public void ListedOrUnfoldable_IsNotFolded(string text, string expected)
+    {
+        Assert.Equal(expected, Kinds(text));
+        Assert.DoesNotContain(Lex(text), t => t.IsCaseFolded);
+    }
+
     [Fact]
     public void Whitespace_IsTrivia_AndLossless()
     {

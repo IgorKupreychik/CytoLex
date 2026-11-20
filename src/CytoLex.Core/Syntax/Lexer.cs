@@ -19,6 +19,9 @@ namespace CytoLex.Core.Syntax;
 /// <item>Typed forms (<c>-</c>, <c>−</c>, <c>x</c>, <c>-&gt;</c>) get the printed symbol's kind with
 /// <see cref="SyntaxToken.IsTypedForm"/> (T-053, T-063), and only where the vocab lists them as equivalent forms.</item>
 /// <item>The underline mark U+0332 stays inside the token of the character it follows (T-042).</item>
+/// <item>A run that is not listed but folds to exactly one listed token ignoring case (<c>Del</c>, <c>T</c>, <c>y</c>), or a
+/// run of sex chromosome letters with a lower-case one (<c>xy</c>), is read as the listed form
+/// (<see cref="SyntaxToken.IsCaseFolded"/>; SYM.LETTER_CASE, T-074).</item>
 /// </list>
 /// </remarks>
 public sealed class Lexer
@@ -28,6 +31,7 @@ public sealed class Lexer
     private readonly Vocabulary _vocab;
     private readonly FrozenSet<string> _letterPieces;
     private readonly int _longestPiece;
+    private readonly FrozenDictionary<string, string> _caseFoldedByUpper;
 
     public Lexer(Vocabulary vocab)
     {
@@ -38,6 +42,7 @@ public sealed class Lexer
             .Concat(_chromosomeLetters)
             .ToFrozenSet(StringComparer.Ordinal);
         _longestPiece = _letterPieces.Max(p => p.Length);
+        _caseFoldedByUpper = CaseFoldedPieces(_letterPieces);
     }
 
     /// <summary>Tokens of <paramref name="span"/> in <paramref name="input"/>, ending with a zero-width <see cref="TokenKind.EndOfSegment"/>.</summary>
@@ -45,7 +50,7 @@ public sealed class Lexer
     {
         ArgumentNullException.ThrowIfNull(input);
         // Whitespace runs are recorded as EndOfSegment placeholders and turned into trivia by Assemble.
-        var raw = new List<(TokenKind Kind, TextSpan Span, string? VocabRef, bool Typed)>();
+        var raw = new List<RawToken>();
 
         var i = span.Start;
         while (i < span.End)
@@ -59,7 +64,7 @@ public sealed class Lexer
                     i++;
                 }
 
-                raw.Add((TokenKind.EndOfSegment, TextSpan.FromBounds(start, i), null, false));
+                raw.Add(new(TokenKind.EndOfSegment, TextSpan.FromBounds(start, i), null, false));
                 continue;
             }
 
@@ -71,7 +76,7 @@ public sealed class Lexer
                     i++;
                 }
 
-                raw.Add((TokenKind.Number, TextSpan.FromBounds(start, i), null, false));
+                raw.Add(new(TokenKind.Number, TextSpan.FromBounds(start, i), null, false));
                 continue;
             }
 
@@ -95,7 +100,7 @@ public sealed class Lexer
                 typed = true;
             }
 
-            raw.Add((kind, new TextSpan(i, length), kind == TokenKind.Dot ? null : entry?.KbRef, typed));
+            raw.Add(new(kind, new TextSpan(i, length), kind == TokenKind.Dot ? null : entry?.KbRef, typed));
             i += length;
         }
 
@@ -106,11 +111,11 @@ public sealed class Lexer
     private static ImmutableArray<SyntaxToken> Assemble(
         string input,
         TextSpan span,
-        List<(TokenKind Kind, TextSpan Span, string? VocabRef, bool Typed)> raw)
+        List<RawToken> raw)
     {
         var tokens = ImmutableArray.CreateBuilder<SyntaxToken>();
         var leading = ImmutableArray<Trivia>.Empty;
-        var pending = (Kind: TokenKind.EndOfSegment, Span: default(TextSpan), VocabRef: (string?)null, Typed: false, Leading: ImmutableArray<Trivia>.Empty);
+        var pending = (Raw: default(RawToken), Leading: ImmutableArray<Trivia>.Empty);
         var hasPending = false;
         var trailing = new List<Trivia>();
 
@@ -118,7 +123,16 @@ public sealed class Lexer
         {
             if (hasPending)
             {
-                tokens.Add(new SyntaxToken(pending.Kind, pending.Span, pending.Span.Of(input), pending.Leading, [.. trailing], vocabRef: pending.VocabRef, isTypedForm: pending.Typed));
+                var written = pending.Raw.Span.Of(input);
+                tokens.Add(new SyntaxToken(
+                    pending.Raw.Kind,
+                    pending.Raw.Span,
+                    pending.Raw.Listed ?? written,
+                    pending.Leading,
+                    [.. trailing],
+                    vocabRef: pending.Raw.VocabRef,
+                    isTypedForm: pending.Raw.Typed,
+                    writtenText: written));
                 trailing.Clear();
                 hasPending = false;
             }
@@ -142,7 +156,7 @@ public sealed class Lexer
             }
 
             Flush();
-            pending = (r.Kind, r.Span, r.VocabRef, r.Typed, tokens.Count == 0 ? leading : []);
+            pending = (r, tokens.Count == 0 ? leading : []);
             hasPending = true;
         }
 
@@ -188,7 +202,7 @@ public sealed class Lexer
     }
 
     /// <summary>Splits a letter run into listed pieces (fewest pieces, then longest first piece); underline marks stay with their letter.</summary>
-    private IEnumerable<(TokenKind Kind, TextSpan Span, string? VocabRef, bool Typed)> SplitLetters(string input, TextSpan run)
+    private IEnumerable<RawToken> SplitLetters(string input, TextSpan run)
     {
         // Letters without underline marks, with their positions in the input.
         var letters = new List<int>();
@@ -201,10 +215,28 @@ public sealed class Lexer
         }
 
         var plain = string.Concat(letters.Select(p => input[p]));
+        if (letters.Count == run.Length && IsFoldedSexRun(plain))
+        {
+            // "xy", "xx", "Xy": the sex chromosomes in lower case (SYM.LETTER_CASE, T-074); "x" alone is decided by the parser.
+            for (var k = 0; k < plain.Length; k++)
+            {
+                yield return Letter(new TextSpan(run.Start + k, 1), char.ToUpperInvariant(plain[k]).ToString(), plain[k]);
+            }
+
+            yield break;
+        }
+
         var pieces = Segment(plain);
         if (pieces is null)
         {
-            yield return (TokenKind.UnknownWord, run, null, false);
+            if (letters.Count == run.Length && _caseFoldedByUpper.TryGetValue(plain.ToUpperInvariant(), out var listed))
+            {
+                // "Del", "T", "INV": one listed token in another case (SYM.LETTER_CASE, T-074).
+                yield return Piece(run, listed, listed);
+                yield break;
+            }
+
+            yield return new(TokenKind.UnknownWord, run, null, false);
             yield break;
         }
 
@@ -215,20 +247,44 @@ public sealed class Lexer
             var start = from == 0 ? run.Start : letters[from];
             var end = from + length < letters.Count ? letters[from + length] : run.End;
             var span = TextSpan.FromBounds(start, end);
-            if (_chromosomeLetters.Contains(text))
-            {
-                yield return (TokenKind.ChromosomeLetter, span, null, false);
-            }
-            else
-            {
-                var entry = _vocab.Find(text);
-                var kind = entry?.Kind == "punctuation" && entry.Tokens.Contains("×") ? TokenKind.Multiply : TokenKind.Word;
-                yield return (kind, span, entry?.KbRef, entry is not null && entry.IsTypedForm(text));
-            }
-
+            yield return Piece(span, text, null);
             from += length;
         }
     }
+
+    /// <summary>A listed piece <paramref name="text"/>; <paramref name="listed"/> is set when it was written in another case.</summary>
+    private RawToken Piece(TextSpan span, string text, string? listed)
+    {
+        if (_chromosomeLetters.Contains(text))
+        {
+            return new(TokenKind.ChromosomeLetter, span, null, false, listed);
+        }
+
+        var entry = _vocab.Find(text);
+        var kind = entry?.Kind == "punctuation" && entry.Tokens.Contains("×") ? TokenKind.Multiply : TokenKind.Word;
+        return new(kind, span, entry?.KbRef, entry is not null && entry.IsTypedForm(text), listed);
+    }
+
+    private static RawToken Letter(TextSpan span, string listed, char written) =>
+        new(TokenKind.ChromosomeLetter, span, null, false, listed[0] == written ? null : listed);
+
+    /// <summary>Two or more sex chromosome letters, at least one in lower case (<c>xy</c>, <c>xx</c>, <c>Xy</c>).</summary>
+    private static bool IsFoldedSexRun(string run) =>
+        run.Length >= 2 && run.All(c => c is 'x' or 'X' or 'y' or 'Y') && run.Any(char.IsLower);
+
+    /// <summary>
+    /// Letter tokens by their case-folded form, for forms that fold to exactly one listed token (SYM.LETTER_CASE, T-074):
+    /// <c>del</c>, <c>Ph</c>, <c>Y</c>. Clashing folds (<c>c</c>/<c>C</c>, <c>i</c>/<c>I</c>, <c>x</c>/<c>X</c>, …) and
+    /// the arm letters <c>p</c>/<c>q</c> (BAND.ARM_SYMBOL) are left out.
+    /// </summary>
+    private static FrozenDictionary<string, string> CaseFoldedPieces(IEnumerable<string> pieces) =>
+        pieces
+            .GroupBy(p => p.ToUpperInvariant(), StringComparer.Ordinal)
+            .Where(g => g.Count() == 1 && g.Key is not ("P" or "Q"))
+            .ToFrozenDictionary(g => g.Key, g => g.Single(), StringComparer.Ordinal);
+
+    /// <summary>A raw token; <see cref="Listed"/> is the listed form of a token written in another case.</summary>
+    private readonly record struct RawToken(TokenKind Kind, TextSpan Span, string? VocabRef, bool Typed, string? Listed = null);
 
     /// <summary>Piece lengths covering <paramref name="text"/> (fewest pieces, ties: longest first piece), or <c>null</c>.</summary>
     private List<int>? Segment(string text)

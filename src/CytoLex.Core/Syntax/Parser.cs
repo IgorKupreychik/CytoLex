@@ -135,6 +135,11 @@ public sealed partial class Parser
         ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(segment);
         var tokens = _lexer.Lex(input, segment.Span);
+        if (segment.Type != NotationType.Arr)
+        {
+            tokens = FoldByPosition(tokens);
+        }
+
         var run = new Run(tokens, input);
         var root = segment.Type == NotationType.Arr ? run.ParseArrRoot() : run.ParseRoot(fragment);
         return new SyntaxTree(
@@ -143,6 +148,61 @@ public sealed partial class Parser
             root,
             [.. run.Diagnostics.OrderBy(d => d.Span.Start)],
             FindConstructs(tokens));
+    }
+
+    /// <summary>
+    /// Reads the two case-folded clashes by their position (SYM.LETTER_CASE, T-074): a typed <c>x</c> alone in the sex
+    /// chromosome field (<c>45,x</c>) is <c>X</c>; the meiosis numeral <c>I</c> directly before <c>(</c> in an abnormality
+    /// (<c>I(17)(q10)</c>) is <c>i</c>. An <c>x</c> elsewhere stays the multiplication sign (SYM.TYPED_SYMBOL_FORMS).
+    /// </summary>
+    private ImmutableArray<SyntaxToken> FoldByPosition(ImmutableArray<SyntaxToken> tokens)
+    {
+        ImmutableArray<SyntaxToken>.Builder? folded = null;
+        for (var i = 0; i < tokens.Length - 1; i++)
+        {
+            var t = tokens[i];
+            SyntaxToken? replacement = null;
+            if (t is { Kind: TokenKind.Multiply, IsTypedForm: true, Text: "x" } && InSexField(tokens, i))
+            {
+                replacement = t.AsFolded(TokenKind.ChromosomeLetter, "X", null);
+            }
+            else if (t is { Kind: TokenKind.Word, Text: "I", HasTrailingTrivia: false } && tokens[i + 1].Kind == TokenKind.OpenParen
+                && (i == 0 || tokens[i - 1].Kind is TokenKind.Comma or TokenKind.Plus or TokenKind.Minus or TokenKind.Question or TokenKind.CloseParen))
+            {
+                replacement = t.AsFolded(TokenKind.Word, "i", _vocab.Find("i")?.KbRef);
+            }
+
+            if (replacement is not null)
+            {
+                folded ??= tokens.ToBuilder();
+                folded[i] = replacement;
+            }
+        }
+
+        return folded?.ToImmutable() ?? tokens;
+    }
+
+    /// <summary>Token <paramref name="i"/> stands alone right after the comma that follows a cell line's chromosome count.</summary>
+    private static bool InSexField(ImmutableArray<SyntaxToken> tokens, int i)
+    {
+        if (i < 2 || tokens[i - 1].Kind != TokenKind.Comma || tokens[i].HasTrailingTrivia
+            || tokens[i + 1].Kind is not (TokenKind.Comma or TokenKind.OpenBracket or TokenKind.Slash or TokenKind.DoubleSlash or TokenKind.EndOfSegment))
+        {
+            return false;
+        }
+
+        var k = i - 2;
+        if (tokens[k].Kind != TokenKind.Number)
+        {
+            return false;
+        }
+
+        if (k >= 2 && tokens[k - 1].Kind == TokenKind.Tilde && tokens[k - 2].Kind == TokenKind.Number)
+        {
+            k -= 2; // 45~46,x
+        }
+
+        return k == 0 || tokens[k - 1].Kind is TokenKind.Slash or TokenKind.DoubleSlash or TokenKind.Word;
     }
 
     private ImmutableArray<NotImplementedConstruct> FindConstructs(ImmutableArray<SyntaxToken> tokens)
