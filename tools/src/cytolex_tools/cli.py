@@ -14,6 +14,7 @@ SUBCOMMANDS = {
     "build": ("Validate the KB and build SQLite (FTS5) + JSON bundle", "T-005"),
     "bands": ("Generate band data from NCBI GDP ideograms + UCSC cytoBand", "T-006"),
     "ideograms": ("Decode the band labels of the book's idiograms from the ISCN PDF", "T-007"),
+    "samples": ("Write batch sample files from the KB examples to tests/data/batch/", "T-038"),
 }
 
 
@@ -66,6 +67,11 @@ def build_parser() -> argparse.ArgumentParser:
             p.add_argument("--sources", type=Path, help=argparse.SUPPRESS)  # tests
             p.add_argument("--book", type=Path, help=argparse.SUPPRESS)  # tests
             p.add_argument("--review", type=Path, help=argparse.SUPPRESS)  # tests
+        if name == "samples":
+            p.add_argument(
+                "--out", type=Path, help="output dir (default: tests/data/batch/<version>)"
+            )
+            p.add_argument("--kb", type=Path, help=argparse.SUPPRESS)  # tests
         if name == "ideograms":
             p.add_argument(
                 "--review",
@@ -265,6 +271,23 @@ def cmd_ideograms(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_samples(args: argparse.Namespace) -> int:
+    from .kb.samples import run
+
+    out = args.out or REPO_ROOT / "tests" / "data" / "batch" / args.version
+    try:
+        report = run(args.version, args.kb or REPO_ROOT / "build" / "kb.json", out)
+    except (FileNotFoundError, KeyError) as exc:
+        print(f"kb samples: {exc}", file=sys.stderr)
+        return 1
+    files = ", ".join(f"{name} ({n})" for name, n in report.per_file.items())
+    print(
+        f"kb samples: ISCN {args.version}: {report.rows} rows, {report.unique} unique strings "
+        f"-> {report.out}: {files}"
+    )
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "extract":
@@ -277,6 +300,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_build(args)
     if args.command == "ideograms":
         return cmd_ideograms(args)
+    if args.command == "samples":
+        return cmd_samples(args)
     return cmd_bands(args)
 
 

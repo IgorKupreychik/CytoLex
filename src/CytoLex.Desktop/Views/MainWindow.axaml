@@ -7,7 +7,10 @@
         Title="CytoLex"
         Icon="/Assets/cytolex.ico"
         Width="1000" Height="680">
-  <DockPanel Margin="16">
+  <!-- Main tabs: single-string check (T-036) and batch validation (T-038) -->
+  <TabControl x:Name="MainTabs" SelectedIndex="{Binding SelectedMainTab}" Margin="8,4,8,8">
+  <TabItem Header="Single string">
+  <DockPanel Margin="8">
     <!-- Input -->
     <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,8">
       <TextBlock Grid.Column="0" Text="ISCN string" FontWeight="SemiBold" VerticalAlignment="Center" />
@@ -206,6 +209,119 @@
       </TabControl.ContentTemplate>
     </TabControl>
   </DockPanel>
+  </TabItem>
+
+  <TabItem Header="Batch">
+    <DockPanel Margin="8" DataContext="{Binding Batch}" x:DataType="vm:BatchViewModel">
+      <!-- File, edition, run -->
+      <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
+        <Button Content="Open file…" Click="OnOpenBatchFile" IsEnabled="{Binding !IsRunning}" />
+        <ComboBox MinWidth="220" ToolTip.Tip="ISCN edition to validate against"
+                  ItemsSource="{Binding EditionChoices}" SelectedItem="{Binding SelectedEditionChoice}"
+                  IsEnabled="{Binding !IsRunning}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:EditionChoice">
+              <TextBlock Text="{Binding Label}" />
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Button Content="Run" Command="{Binding RunCommand}" />
+        <Button Content="Cancel" Command="{Binding RunCancelCommand}" IsVisible="{Binding IsRunning}" />
+        <Button Content="Export CSV…" Click="OnExportBatchCsv" IsEnabled="{Binding CanExport}"
+                ToolTip.Tip="Summary: one row per string and edition" />
+        <Button Content="Export JSON…" Click="OnExportBatchJson" IsEnabled="{Binding CanExport}"
+                ToolTip.Tip="Full reports: diagnostics, citations, fixes, abnormalities" />
+      </StackPanel>
+      <ProgressBar DockPanel.Dock="Top" Minimum="0" Maximum="{Binding ProgressMax}" Value="{Binding Progress}"
+                   IsVisible="{Binding IsRunning}" Margin="0,0,0,8" />
+      <TextBlock DockPanel.Dock="Top" Text="{Binding Status}" Opacity="0.8" TextWrapping="Wrap" Margin="0,0,0,6" />
+      <Expander DockPanel.Dock="Top" Header="Reader warnings" IsVisible="{Binding HasWarnings}" Margin="0,0,0,6">
+        <ScrollViewer MaxHeight="120">
+          <ItemsControl ItemsSource="{Binding Warnings}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="x:String">
+                <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Expander>
+
+      <!-- Summary per edition -->
+      <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding Summaries}" IsVisible="{Binding HasResult}" Margin="0,0,0,8">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="x:String">
+            <TextBlock Text="{Binding}" FontWeight="SemiBold" TextWrapping="Wrap" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <!-- Filter + open -->
+      <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,6" IsVisible="{Binding HasResult}">
+        <ComboBox ItemsSource="{Binding Filters}" SelectedItem="{Binding SelectedFilter}" MinWidth="220">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:BatchFilterChoice">
+              <TextBlock Text="{Binding Label}" />
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Button Content="Open in single-string check" Command="{Binding OpenSelectedCommand}"
+                ToolTip.Tip="Or double-click a row" />
+        <TextBlock VerticalAlignment="Center" Opacity="0.7" Text="{Binding Rows.Count, StringFormat='{}{0} row(s)'}" />
+      </StackPanel>
+
+      <!-- Table header -->
+      <Grid DockPanel.Dock="Top" ColumnDefinitions="60,90,2*,Auto,*" Margin="4,0,4,2" IsVisible="{Binding HasResult}">
+        <TextBlock Grid.Column="0" Text="Line" FontWeight="SemiBold" />
+        <TextBlock Grid.Column="1" Text="ID" FontWeight="SemiBold" />
+        <TextBlock Grid.Column="2" Text="ISCN string" FontWeight="SemiBold" />
+        <ItemsControl Grid.Column="3" ItemsSource="{Binding Editions}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="x:String">
+              <TextBlock Text="{Binding StringFormat='ISCN {0}'}" Width="90" FontWeight="SemiBold" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBlock Grid.Column="4" Text="First problem" FontWeight="SemiBold" Margin="8,0,0,0" />
+      </Grid>
+
+      <!-- Rows (virtualised) -->
+      <ListBox x:Name="BatchRows" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}"
+               IsVisible="{Binding HasResult}" DoubleTapped="OnBatchRowDoubleTapped">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:BatchRowViewModel">
+            <Grid ColumnDefinitions="60,90,2*,Auto,*">
+              <TextBlock Grid.Column="0" Text="{Binding Line}" Opacity="0.7" />
+              <TextBlock Grid.Column="1" Text="{Binding Id}" Opacity="0.7" TextTrimming="CharacterEllipsis" />
+              <TextBlock Grid.Column="2" Text="{Binding Input}" FontFamily="Cascadia Mono,Consolas,monospace"
+                         TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Input}" Margin="0,0,8,0" />
+              <ItemsControl Grid.Column="3" ItemsSource="{Binding Cells}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:BatchCellViewModel">
+                    <TextBlock Text="{Binding Text}" Width="90" ToolTip.Tip="{Binding Tip}"
+                               Classes.valid="{Binding IsValid}" Classes.invalid="{Binding IsInvalid}" Classes.notimpl="{Binding IsNotImplemented}" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock Grid.Column="4" Text="{Binding FirstProblem}" TextTrimming="CharacterEllipsis"
+                         ToolTip.Tip="{Binding FirstProblem}" Margin="8,0,0,0" Opacity="0.85" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+  </TabItem>
+  </TabControl>
 
   <Window.Styles>
     <Style Selector="TextBlock.valid">

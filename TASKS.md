@@ -47,7 +47,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-035 | done | 1 | T-030, T-031, T-068 | Level 1 deterministic fixes + level 3 explanations |
 | T-036 | done | 2 | T-028 | Desktop: app shell + single-string check with highlighting |
 | T-037 | done | 2 | T-036 | Desktop: version selector |
-| T-038 | todo | 2 | T-036 | Desktop: batch validation + export |
+| T-038 | done | 2 | T-036 | Desktop: batch validation + export |
 | T-039 | todo | 2 | T-036, T-005 | Desktop: rule browser |
 | T-040 | todo | 2 | T-036, T-035 | Desktop: fix UI (diff view, Apply → re-validate) |
 | T-041 | todo | 3 | T-035 | Level 2 "did you mean" suggestions |
@@ -563,10 +563,33 @@ Outcome (2026-11-18):
 **Notes:** Done 2026-11-20. Edition selector in the desktop top bar (`MainWindowViewModel.EditionChoices`/`SelectedEditionChoice`: known editions, unimplemented ones labelled, plus "All editions"; default = newest implemented). Results are one tab per `EditionResult` (new `ViewModels/EditionPanelViewModel.cs`: header with status, verdict, counts, segment notes, diagnostics, abnormalities, highlights); the editor draws the selected tab's highlights, and the selected tab is kept while re-typing. Not-implemented editions show their reason in grey with no diagnostics/abnormalities. A diagnostic click is routed through `SelectedSpan`. Layout decided with the user: tabs (not side-by-side columns). Tests: `MainWindowViewModelTests` (7 new), `AbnormalityPanelTests` read through the selected panel. Files: `MainWindowViewModel.cs`, `EditionPanelViewModel.cs`, `Views/MainWindow.axaml(.cs)`, CLAUDE.md/README.md status. Core unchanged.
 
 ### T-038 — Batch validation
-**Status:** todo
+**Status:** done
 **Description:** Load a text/CSV file, validate all strings, show a summary table, export to CSV/JSON.
 **Acceptance:** A batch of 1,000+ strings completes; exports round-trip.
-**Notes:** From T-054: exports may optionally include the literal translation with its KB entry IDs (once T-058 exists).
+**Notes:** From T-054: exports may optionally include the literal translation with its KB entry IDs (once T-058 exists; still open).
+**Outcome (2026-11-20):**
+- **Core (`src/CytoLex.Core/Batch/`):**
+  - `BatchReader`: text, or CSV/TSV with a header. String column `iscn`/`karyotype`/`input`/`string`, else the first; optional `id`. Decodes UTF-8 or UTF-16 by BOM, falling back to Latin-1 with a warning. Content problems are warnings that name the line. It also reads its own CSV export back.
+  - `BatchRunner`: parallel, input order, progress, cancel.
+  - `BatchSummary`: per edition.
+  - `BatchExport`: JSON `cytolex-batch` v1 with full reports; CSV summary with one row per string × edition, UTF-8 BOM. Values are written raw (no formula-injection prefix, which would break the round-trip).
+  - Internal RFC 4180 `Csv`.
+- **Desktop:** main tabs "Single string" / "Batch". `ViewModels/BatchViewModel.cs` and `BatchRowViewModel.cs`: open, edition, run/cancel with progress, summary, filter, export CSV/JSON, open a row in the single check. File pickers are in `Views/MainWindow.axaml.cs`.
+- **Sample files (added at the user's request):** `kb samples` (`tools/src/cytolex_tools/kb/samples.py`) writes `tests/data/batch/2016/` from the KB examples:
+  - `karyotype.txt`, `arr.txt`, `combined.txt`;
+  - `all.csv`/`all.tsv` (940 rows with rule, kind and citation);
+  - `large.csv` (1,200 rows);
+  - plus `tests/data/batch/README.md`.
+
+  A C# test checks the `type` column against `Segmenter`. No ish-only file until T-015/T-016.
+- **Tests:**
+  - `tests/CytoLex.Core.Tests/Batch/` (reader, the 1,200-string run against sequential validation, cancellation, summary, sample files, JSON/CSV round-trips, export re-read as input);
+  - `tests/CytoLex.Desktop.Tests/BatchViewModelTests.cs`;
+  - `tools/tests/test_kb_samples.py`.
+- **Docs:** CLAUDE.md, README.md, `docs/design/core.md` §9.
+- **Deviations from the plan:**
+  - The "Not implemented" filter was dropped as useless with all editions; "partly validated" covers it.
+  - JSON items nest `Item {Line, Id, Input}` next to `Report`.
 
 ### T-039 — Rule browser
 **Status:** todo

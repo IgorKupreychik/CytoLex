@@ -57,7 +57,34 @@ public partial class MainWindowViewModel : ObservableObject
             Status = "The knowledge base could not be loaded: " + ex.Message;
         }
 
+        Batch = new BatchViewModel(_validator, EditionChoices, SelectedEditionChoice, OpenInSingleCheck);
         Validate();
+    }
+
+    /// <summary>Index of the main tab: <see cref="SingleTab"/> or <see cref="BatchTab"/>.</summary>
+    [ObservableProperty]
+    public partial int SelectedMainTab { get; set; }
+
+    /// <summary>The single-string check tab.</summary>
+    public const int SingleTab = 0;
+
+    /// <summary>The batch tab (T-038).</summary>
+    public const int BatchTab = 1;
+
+    /// <summary>Batch validation (T-038).</summary>
+    public BatchViewModel Batch { get; }
+
+    /// <summary>Shows <paramref name="input"/> in the single-string check, in <paramref name="choice"/> when given (from a batch row).</summary>
+    public void OpenInSingleCheck(string input, EditionChoice? choice)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        if (choice is not null && EditionChoices.Contains(choice))
+        {
+            SelectedEditionChoice = choice;
+        }
+
+        Input = input.ReplaceLineEndings(" ");
+        SelectedMainTab = SingleTab;
     }
 
     /// <summary>The editions to pick from (T-037): every known edition, oldest first, then "All editions".</summary>
