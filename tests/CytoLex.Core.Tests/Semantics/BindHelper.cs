@@ -1,4 +1,5 @@
 using CytoLex.Core.Kb;
+using CytoLex.Core.Segmentation;
 using CytoLex.Core.Semantics;
 using CytoLex.Core.Tests.Parsing;
 
@@ -13,7 +14,14 @@ internal static class BindHelper
 
     /// <summary>The models of the karyotype segments of <paramref name="text"/>.</summary>
     public static IReadOnlyList<KaryotypeModel> Bind(string text, bool fragment = false) =>
-        [.. ParseHelper.Parse(text, fragment).Select(Binder2016.Bind)];
+        [.. ParseHelper.Parse(text, fragment).Where(t => t.Segment.Type == NotationType.Karyotype).Select(Binder2016.Bind)];
+
+    /// <summary>The models of every parsed segment of <paramref name="text"/> (karyotype and arr), as the validator binds them.</summary>
+    public static IReadOnlyList<SegmentModel> BindAll(string text, bool fragment = false) =>
+        [.. ParseHelper.Parse(text, fragment).Select(t => t.Segment.Type == NotationType.Arr ? (SegmentModel)Binder2016.BindArr(t) : Binder2016.Bind(t))];
+
+    /// <summary>The model of a one-segment arr string (T-034).</summary>
+    public static ArrModel BindArr(string text) => Assert.IsType<ArrModel>(Assert.Single(BindAll(text)));
 
     /// <summary>The model of a one-segment string.</summary>
     public static KaryotypeModel BindOne(string text, bool fragment = false) => Assert.Single(Bind(text, fragment));

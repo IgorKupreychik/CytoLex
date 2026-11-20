@@ -15,7 +15,7 @@ internal sealed class SpaceBetweenSymbolsCheck : IRuleCheck
 {
     public void Check(RuleContext context)
     {
-        foreach (var part in context.Model.DescendantsAndSelf().OfType<AbnormalityPart>())
+        foreach (var part in context.SegmentModel.DescendantsAndSelf().OfType<AbnormalityPart>())
         {
             for (var i = 0; i + 1 < part.Symbols.Length; i++)
             {

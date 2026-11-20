@@ -45,15 +45,26 @@ public sealed class RuleContext
 {
     private readonly List<RuleFinding> _findings = [];
 
-    internal RuleContext(string input, Segment segment, SyntaxTree syntax, KaryotypeModel model, ContextInfo context, KbRule rule, IEditionKb kb)
+    internal RuleContext(
+        string input,
+        Segment segment,
+        SyntaxTree syntax,
+        SegmentModel model,
+        ContextInfo context,
+        KbRule rule,
+        IEditionKb kb,
+        ImmutableArray<Segment> segments = default,
+        ImmutableHashSet<NotationType>? implementedTypes = null)
     {
         Input = input;
         Segment = segment;
         Syntax = syntax;
-        Model = model;
+        SegmentModel = model;
         Context = context;
         Rule = rule;
         Kb = kb;
+        Segments = segments.IsDefault ? [segment] : segments;
+        ImplementedTypes = implementedTypes ?? [segment.Type];
     }
 
     /// <summary>The whole input string; every span refers to it.</summary>
@@ -65,8 +76,29 @@ public sealed class RuleContext
     /// <summary>The segment's lossless syntax tree (for spans, spacing and system-specific rules).</summary>
     public SyntaxTree Syntax { get; }
 
-    /// <summary>The segment's semantic model (T-065). Partial nodes (<see cref="MeaningNode.IsPartial"/>) come from recovered input.</summary>
-    public KaryotypeModel Model { get; }
+    /// <summary>The segment's semantic model, of any notation type (T-065, T-034). Checks of general rules walk this one.</summary>
+    public SegmentModel SegmentModel { get; }
+
+    /// <summary>
+    /// The semantic model of a karyotype segment (T-065). Partial nodes (<see cref="MeaningNode.IsPartial"/>) come from
+    /// recovered input. Karyotype segments only: a check of a general rule, which also runs on arr segments, uses
+    /// <see cref="SegmentModel"/> or <see cref="Arr"/>.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The segment is not a karyotype segment.</exception>
+    public KaryotypeModel Model => SegmentModel as KaryotypeModel
+        ?? throw new InvalidOperationException($"RuleContext.Model is for karyotype segments; this is a {Segment.Type.ToKbName()} segment (use SegmentModel).");
+
+    /// <summary>The model of an arr segment (T-034); <c>null</c> for other segments.</summary>
+    public ArrModel? Arr => SegmentModel as ArrModel;
+
+    /// <summary>The karyotype model, or <c>null</c> for other segments.</summary>
+    public KaryotypeModel? Karyotype => SegmentModel as KaryotypeModel;
+
+    /// <summary>Every segment of the input, in order (for rules on the order of combined results, T-034).</summary>
+    public ImmutableArray<Segment> Segments { get; }
+
+    /// <summary>The notation types the edition implements; segments of other types are not checked.</summary>
+    public ImmutableHashSet<NotationType> ImplementedTypes { get; }
 
     /// <summary>The sample context of the whole string (hint, inferred, effective).</summary>
     public ContextInfo Context { get; }

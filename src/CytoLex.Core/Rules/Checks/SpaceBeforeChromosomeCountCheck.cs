@@ -12,7 +12,11 @@ internal sealed class SpaceBeforeChromosomeCountCheck : IRuleCheck
 {
     public void Check(RuleContext context)
     {
-        var model = context.Model;
+        if (context.Karyotype is not { } model)
+        {
+            return; // only karyotypes have a chromosome count
+        }
+
         foreach (var count in model.CellLines.Select(l => l.Count).Where(c => c is { IsMissing: false }))
         {
             foreach (var prefix in model.Prefixes.Where(p => p.Span.End == count!.Span.Start))

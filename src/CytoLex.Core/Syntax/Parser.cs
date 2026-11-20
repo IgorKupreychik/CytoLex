@@ -18,7 +18,7 @@ namespace CytoLex.Core.Syntax;
 /// the rules (T-029+). The parser reports what breaks the surface form: missing or misplaced punctuation, signs on the
 /// wrong side, unlisted words, chromosomes without parentheses, malformed sub-bands, misplaced prefixes.
 /// </remarks>
-public sealed class Parser
+public sealed partial class Parser
 {
     // Word classes. Each word is a ch. 3 symbol; a test checks them against the vocab (KB-traced).
     internal static readonly FrozenSet<string> PrefixWords = Set("mos", "chi", "end");
@@ -83,6 +83,7 @@ public sealed class Parser
         NoArmLengthSign, VarLengthSign, ListedOnly, TypedSymbolForms, ArmSymbol, SubbandFormat, ChromIdentifiers,
         CloneSeparator, MosaicChimeraPrefix, Endoreduplication, ParentalOrigin, MultiplySignAfter, PloidyInAngleBrackets,
         QuestionableItem, DminFormat, UpdFormat, IsoFormat, HsrNoAbrSymbol, MarNoSizeMorphology, PolyploidSubclone,
+        GenomeBuildRequired, ArrNormalResult, ArrRegionFormat, ArrMosaicProportion, ArrCombinedWithOtherMethods,
     ];
 
     private static readonly Dictionary<string, Parser> _byEdition = new(StringComparer.Ordinal);
@@ -125,14 +126,17 @@ public sealed class Parser
     /// </summary>
     public SyntaxTree ParseFragment(string input, Segment segment) => Parse(input, segment, fragment: true);
 
-    /// <summary>Parses <paramref name="segment"/> of <paramref name="input"/> as a whole karyotype or a fragment.</summary>
+    /// <summary>
+    /// Parses <paramref name="segment"/> of <paramref name="input"/>: an arr segment with the arr grammar (T-034), any other
+    /// as a whole karyotype or a fragment.
+    /// </summary>
     public SyntaxTree Parse(string input, Segment segment, bool fragment)
     {
         ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(segment);
         var tokens = _lexer.Lex(input, segment.Span);
         var run = new Run(tokens, input);
-        var root = run.ParseRoot(fragment);
+        var root = segment.Type == NotationType.Arr ? run.ParseArrRoot() : run.ParseRoot(fragment);
         return new SyntaxTree(
             input,
             segment,
@@ -170,7 +174,7 @@ public sealed class Parser
     private static FrozenSet<string> Set(params string[] words) => words.ToFrozenSet(StringComparer.Ordinal);
 
     /// <summary>State of one parse.</summary>
-    private sealed class Run(ImmutableArray<SyntaxToken> tokens, string input)
+    private sealed partial class Run(ImmutableArray<SyntaxToken> tokens, string input)
     {
         private int _pos;
 

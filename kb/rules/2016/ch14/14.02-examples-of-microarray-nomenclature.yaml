@@ -211,7 +211,7 @@ rules:
         The invalid example is inferred. Several printed examples labelled [GRCh38] carry GRCh37
         positions (E23, E24, E34, E40, E44, E45; some lie past the chromosome end in GRCh38).
         Their format is correct and they stay valid as printed (decided with the user in T-017);
-        a position-vs-band or position-vs-build check (T-034) must account for them.
+        a position-vs-band or position-vs-build check (deferred from T-034 to T-071) must account for them.
     related: [ARR.ABERRATION_ORDER, ARR.NUCLEOTIDE_FORMAT, ARR.REGION_FORMAT]
 
   - id: ARR.COPY_NUMBER

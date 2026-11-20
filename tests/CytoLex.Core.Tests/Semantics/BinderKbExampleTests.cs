@@ -5,7 +5,7 @@ using CytoLex.Core.Tests.Parsing;
 namespace CytoLex.Core.Tests.Semantics;
 
 /// <summary>
-/// T-065 acceptance: every valid and <c>corrected</c> karyotype/general KB example binds to a complete model, and every
+/// T-065 acceptance: every valid and <c>corrected</c> karyotype/arr/general KB example binds (arr: T-034) to a complete model, and every
 /// syntax error of an invalid example is named by a partial node below the root.
 /// </summary>
 public class BinderKbExampleTests
@@ -24,7 +24,7 @@ public class BinderKbExampleTests
     [MemberData(nameof(ValidCases))]
     public void ValidExample_BindsToACompleteModel(string text, bool fragment)
     {
-        var models = BindHelper.Bind(text, fragment);
+        var models = BindHelper.BindAll(text, fragment);
         Assert.NotEmpty(models);
         PendingExamples.SkipOrFailIfFixed(text, models.All(m => !m.DescendantsAndSelf().Any(n => n.IsPartial)));
         foreach (var model in models)
@@ -54,12 +54,12 @@ public class BinderKbExampleTests
     [MemberData(nameof(InvalidCases))]
     public void InvalidExample_SyntaxErrorsAreNamedByPartialNodes(string text, bool fragment)
     {
-        foreach (var model in BindHelper.Bind(text, fragment))
+        foreach (var model in BindHelper.BindAll(text, fragment))
         {
             Assert.Equal(model.Tree.Diagnostics, model.Issues);
             var below = model.DescendantsAndSelf().Skip(1).Where(n => n.IsPartial).SelectMany(n => n.Issues).ToHashSet();
             var unnamed = model.Tree.Diagnostics.Where(d => !below.Contains(d)).Select(d => $"{d.RuleId} '{d.Span.Of(text)}'@{d.Span.Start}");
-            if (!model.CellLines.IsEmpty || !model.Prefixes.IsEmpty)
+            if (model is ArrModel || model is KaryotypeModel { CellLines.IsEmpty: false } || model is KaryotypeModel { Prefixes.IsEmpty: false })
             {
                 Assert.Empty(unnamed);
             }

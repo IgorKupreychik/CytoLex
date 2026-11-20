@@ -65,6 +65,12 @@ rules:
             18q22.1–18q22.3). The positions lie in 18q21.33–18q22.1, the range §14.2 E29 prints
             for a nearby region.
           corrected: "arr[GRCh38] 9p24.3(1310386_1709409)×1 mat,9p22.3p22.2(16455330_16763471)×1 dn,18q21.33q22.1(62747805_67920791)×1 dn"
+        - text: "arr[GRCh38] 15q11.2q26.3(23123715_101888908)×2 hmz pat,21q11.21q22.3(14595263_48084819)×2 hmz pat"
+          cite: {section: "14.2.1", page: 121, example: E4}
+          why: >-
+            Printed error in the book: band 21q11.21 does not exist (21q11.2 has no sub-bands).
+            The start position 14595263 lies in 21q11.2. §14.2.1 E5 repeats it in the long form.
+          corrected: "arr[GRCh38] 15q11.2q26.3(23123715_101888908)×2 hmz pat,21q11.2q22.3(14595263_48084819)×2 hmz pat"
     fix: {level: 3, hint: "Name an existing band; check the idiogram of the chromosome at the resolution level used."}
     review:
       paraphrase_checked: true
@@ -72,7 +78,9 @@ rules:
       note: >-
         §14.2 E27 (T-017, decided with the user): the printed 18q22.33q22.1 is a misprint. The
         printed string is kept here as an invalid example; ARR.ABERRATION_ORDER holds the
-        corrected form as its valid example.
+        corrected form as its valid example. §14.2.1 E4/E5 (T-034, decided with the user): the
+        printed 21q11.21 is a misprint, treated the same way; ARR.ZYGOSITY holds the corrected
+        forms.
     related: [BAND.CENTROMERE_10, BAND.RESOLUTION_LEVELS, BAND.GENOME_ASSEMBLY_ONLY]
 
   - id: BAND.GENOME_ASSEMBLY_ONLY

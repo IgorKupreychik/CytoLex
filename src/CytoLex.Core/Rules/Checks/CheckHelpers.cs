@@ -9,14 +9,14 @@ namespace CytoLex.Core.Rules.Checks;
 internal static class CheckHelpers
 {
     /// <summary>Every breakpoint and band of the model (interval ends and <c>or</c> readings included), in input order.</summary>
-    public static IEnumerable<Breakpoint> Breakpoints(this KaryotypeModel model) =>
+    public static IEnumerable<Breakpoint> Breakpoints(this MeaningNode model) =>
         model.DescendantsAndSelf().OfType<Breakpoint>();
 
     /// <summary>
     /// Every chromosome named in the model: chromosome lists, gained/lost chromosomes, regions, and chromosomes written with
     /// a band (<c>3q13</c>); each once (by span).
     /// </summary>
-    public static IEnumerable<ChromosomeRef> Chromosomes(this KaryotypeModel model) =>
+    public static IEnumerable<ChromosomeRef> Chromosomes(this MeaningNode model) =>
         model.DescendantsAndSelf()
             .OfType<ChromosomeRef>()
             .Concat(model.Breakpoints().Where(b => b.ChromosomeWritten).Select(b => b.Chromosome).OfType<ChromosomeRef>())

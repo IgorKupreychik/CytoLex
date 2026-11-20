@@ -25,14 +25,19 @@ rules:
           cite: {section: "14.2.1", page: 121, example: E2}
         - text: "upd(16)mat.arr[GRCh38] 16p13.3q23.1(31010_78001824)×2 htz,16q23.1q24.2(78003664_88690776)×2 hmz"
           cite: {section: "14.2.1", page: 121, example: E3}
-        - text: "arr[GRCh38] 15q11.2q26.3(23123715_101888908)×2 hmz pat,21q11.21q22.3(14595263_48084819)×2 hmz pat"
+        - text: "arr[GRCh38] 15q11.2q26.3(23123715_101888908)×2 hmz pat,21q11.2q22.3(14595263_48084819)×2 hmz pat"
           cite: {section: "14.2.1", page: 121, example: E4}
+          note: >-
+            Printed 21q11.21q22.3, a band that does not exist (misprint; the printed form is an
+            invalid example of BAND.MUST_EXIST). Written with 21q11.2, which the start position fits.
         - text: "arr(15q,21q)×2 hmz pat"
           cite: {section: "14.2.1", page: 121, example: E5}
           note: Short form.
-        - text: "arr[GRCh38] (15q11.2q26.3(23123715_101888908),21q11.21q22.3(14595263_48084819))×2 hmz pat"
+        - text: "arr[GRCh38] (15q11.2q26.3(23123715_101888908),21q11.2q22.3(14595263_48084819))×2 hmz pat"
           cite: {section: "14.2.1", page: 121, example: E5}
-          note: Long form; the two regions of homozygosity are grouped in parentheses.
+          note: >-
+            Long form; the two regions of homozygosity are grouped in parentheses. Printed with
+            21q11.21 (misprint, as in E4); written with 21q11.2.
         - text: "arr(7)×2 htz mat"
           cite: {section: "14.2.1", page: 121, example: E6}
         - text: "arr[GRCh38] 11p15.5p15.4(2265338_6275434)×2 hmz c,19q13.33qter(49759500_58586384)×2 hmz"

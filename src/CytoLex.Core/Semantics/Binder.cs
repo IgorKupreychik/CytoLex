@@ -25,7 +25,7 @@ namespace CytoLex.Core.Semantics;
 /// rule IDs the edition's KB has are attached.</item>
 /// </list>
 /// </remarks>
-public sealed class Binder
+public sealed partial class Binder
 {
     /// <summary>
     /// The rule(s) that define each abnormality symbol's format. Each rule's section is one of the symbol's vocab sections
@@ -89,6 +89,8 @@ public sealed class Binder
         MosaicChimeraPrefix, Endoreduplication, TransplantChimera, CountSexOrder, PloidyInAngleBrackets, ConstitutionalC,
         ParentalOrigin, MultipleCopies, GainLossSign, QuestionableItem, QuestionMarkDesignation, ApproxInterval, OrAlternative,
         DetailedSystem, BreakpointGroups, VarDefinition, VarLengthSign,
+        GenomeBuildRequired, ArrRegionFormat, ArrNucleotideFormat, ArrCopyNumberRule, ArrComplex, ArrChromothripsis,
+        ArrMosaicProportion, ArrInheritanceSpacing, ArrZygosity, ArrAberrationsOnly,
     ];
 
     private readonly IEditionKb _kb;
@@ -107,7 +109,7 @@ public sealed class Binder
     }
 
     /// <summary>State of one bind.</summary>
-    private sealed class Run(Binder binder, SyntaxTree tree)
+    private sealed partial class Run(Binder binder, SyntaxTree tree)
     {
         private readonly IEditionKb _kb = binder._kb;
 

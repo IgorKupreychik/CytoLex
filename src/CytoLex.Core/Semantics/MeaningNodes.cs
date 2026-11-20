@@ -101,12 +101,16 @@ public enum JoinKind
     Junction,
 }
 
-/// <summary>The meaning of one karyotype segment (or book fragment).</summary>
-public sealed record KaryotypeModel : MeaningNode
+/// <summary>The meaning of one segment of a notation string: a <see cref="KaryotypeModel"/> or an <see cref="ArrModel"/> (T-034).</summary>
+public abstract record SegmentModel : MeaningNode
 {
     /// <summary>The syntax tree the model was bound from.</summary>
     public required SyntaxTree Tree { get; init; }
+}
 
+/// <summary>The meaning of one karyotype segment (or book fragment).</summary>
+public sealed record KaryotypeModel : SegmentModel
+{
     /// <summary>Parsed with the fragment entry (count and sex chromosomes optional).</summary>
     public bool IsFragment { get; init; }
 

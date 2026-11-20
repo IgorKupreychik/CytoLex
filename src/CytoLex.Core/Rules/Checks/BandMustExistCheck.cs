@@ -16,7 +16,7 @@ internal sealed class BandMustExistCheck : IRuleCheck
             return;
         }
 
-        foreach (var bp in context.Model.Breakpoints())
+        foreach (var bp in context.SegmentModel.Breakpoints())
         {
             if (bp.IsPartial || bp.KbBand is not null || bp.Name is not { } name || bp.Arm is not ("p" or "q")
                 || bp.Chromosome is not { } chromosome || !chromosome.IsValidIdentifier())

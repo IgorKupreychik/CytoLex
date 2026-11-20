@@ -1,7 +1,7 @@
 namespace CytoLex.Core.Tests.Parsing;
 
 /// <summary>
-/// What the parser reports for each invalid karyotype/general KB example (T-027, decided with the user: kept test-side,
+/// What the parser reports for each invalid karyotype/arr/general KB example (T-027, decided with the user: kept test-side,
 /// not in the KB). An empty list means the string is well formed and its fault is left to a rule (T-029+): order,
 /// counts, context, spacing (kept as trivia), band existence, symbol combinations, group counts. Otherwise each entry
 /// is the KB rule the parser names, the text of the span and its offset (zero-length span = an inserted token).
@@ -170,5 +170,31 @@ internal static class InvalidExampleExpectations
             ["68<3n>,XY,–Y[10]"] = [], // SEX.UNEVEN_PLOIDY_MALE
             ["45,XY,–7[5]/46,idem,+8[6]/46,XY,t(9;22)(q34;q11.2)[3]/92,XXYY,t(9;22)×2[5]/93,XXYY,t(9;22)×2,+8[2]"] = [], // KARYO.ABNORMALITY_ORDER (§11.1.4 E7, printed)
             ["47,XY,+mar.arr[GRCh38] 1p12p11.2(117596421_121013236)×3 dn.ish r(1)(p13.1q11?)(D1Z1+)"] = [], // ARR.COMBINED_WITH_OTHER_METHODS
+            // arr (T-034): the parser keeps these faults in the tree; the checks report them.
+            ["arr (1–22,X)×2"] = [], // SYM.NO_SPACE_AT_PARENTHESIS
+            ["arr[GRCh38] 6q21q6q25.1(113900000_149100000)×1"] = [], // ARR.REGION_FORMAT
+            ["arr[GRCh38] 6q21-q25.1(113900000_149100000)×1"] = [], // ARR.REGION_FORMAT
+            ["arr[GRCh38]6q21q25.1(113900000_149100000)×1"] = [], // GEN.GENOME_BUILD_REQUIRED
+            ["arr Xp22.33q28(168546_155233730)×1[0.6]"] = [], // GEN.GENOME_BUILD_REQUIRED
+            ["arr(X)[0.6]×1"] = [], // ARR.MOSAIC_PROPORTION
+            ["arr(X)×1[60%]"] = [], // ARR.MOSAIC_PROPORTION
+            ["arr[GRCh38] 4q35.1q32.2(183022312_163146681)×1"] = [], // ARR.PTER_TO_QTER
+            ["arr(21)×3,(8)×3"] = [], // ARR.ABERRATION_ORDER
+            ["arr[GRCh38] 14q32.33(105643093_106109395)×3,14q31.1(82695844_82855387)×1"] = [], // ARR.ABERRATION_ORDER
+            ["arr[GRCh38] Xp22.31(6923924_7253485)×3,5q14.3(88018766_89063989)×1"] = [], // ARR.ABERRATION_ORDER
+            ["arr[GRCh38] 11p12(37741458_39209912)"] = [], // ARR.COPY_NUMBER
+            ["arr[GRCh38] 12p13.33p11.1(84917_34382567)×2-4"] = [], // ARR.COPY_NUMBER
+            ["arr[GRCh38] 4q32.2q35.1(163146681_183022312)×1dn"] = [], // ARR.INHERITANCE_SPACING
+            ["arr[GRCh38] 4q32.2q35.1(163002425×2,163146681_183022312×1,184322231×2) dn"] = [], // ARR.INHERITANCE_SPACING
+            ["arr(X,Y)×1,(1–22)×2"] = [], // ARR.NORMAL_RESULT
+            ["arr(X,1–22)×2"] = [], // ARR.NORMAL_RESULT
+            ["arr[GRCh38] 9p24.3(1310386_1709409)×1 mat,9p22.3p22.2(16455330_16763471)×1 dn,18q22.33q22.1(62747805_67920791)×1 dn"] = [], // BAND.MUST_EXIST
+            ["arr[GRCh38] 15q11.2q26.3(23123715_101888908)×2 hmz pat,21q11.21q22.3(14595263_48084819)×2 hmz pat"] = [], // BAND.MUST_EXIST (§14.2.1 E4 misprint)
+            ["arr[GRCh38] 11p12(37741458_39209912)×2 mat mos hmz"] = [], // ARR.ZYGOSITY
+            ["arr[GRCh38] 11p12(37741458_39209912)×2hmz"] = [], // ARR.ZYGOSITY
+            ["arr[GRCh38] (1–22,X)×2,6q21q25.1(113900000_149100000)×1"] = [], // ARR.ABERRATIONS_ONLY
+            ["arr[GRCh38] 4q32.2q35.1(163,146,681_183,022,312)×1"] = [], // ARR.NUCLEOTIDE_FORMAT
+            ["arr[GRCh38] 4q32.2q35.1(163146681-183022312)×1"] = [], // ARR.NUCLEOTIDE_FORMAT
+            ["arr[GRCh38] 1p12p11.2(117596421_121013236)×3 dn.47,XY,+mar"] = [("ARR.COMBINED_WITH_OTHER_METHODS", ".47,XY,+mar", 47)], // the segmenter splits only before a letter
         };
 }

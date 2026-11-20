@@ -9,7 +9,7 @@ internal sealed class ChromosomeIdentifiersCheck : IRuleCheck
 {
     public void Check(RuleContext context)
     {
-        foreach (var chromosome in context.Model.Chromosomes().Where(c => !c.IsPartial && !c.IsValidIdentifier()))
+        foreach (var chromosome in context.SegmentModel.Chromosomes().Where(c => !c.IsPartial && !c.IsValidIdentifier()))
         {
             context.Report(chromosome.Span, $"There is no chromosome {chromosome.Name}; chromosomes are 1–22, X and Y.");
         }

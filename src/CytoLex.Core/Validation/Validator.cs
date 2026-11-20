@@ -110,13 +110,17 @@ public sealed class Validator
             }
 
             var tree = profile.Parser.Parse(input, segment, isFragment);
-            var model = profile.Binder.Bind(tree);
-            abnormalities.Add(segment.Index, model);
+            SegmentModel model = segment.Type == NotationType.Arr ? profile.Binder.BindArr(tree) : profile.Binder.Bind(tree);
+            if (model is KaryotypeModel karyotype)
+            {
+                abnormalities.Add(segment.Index, karyotype); // arr entries: T-072
+            }
+
             diagnostics.AddRange(tree.Diagnostics.Select(d => DiagnosticFactory.FromSyntax(profile.Kb, input, d, context.Effective)).OfType<Diagnostic>());
 
             foreach (var (rule, check) in profile.Checks.Where(c => c.Rule.AppliesToType(segment.Type)))
             {
-                var ctx = new RuleContext(input, segment, tree, model, context, rule, profile.Kb);
+                var ctx = new RuleContext(input, segment, tree, model, context, rule, profile.Kb, segments, profile.ImplementedTypes);
                 check.Check(ctx);
                 diagnostics.AddRange(ctx.Findings.Select(f => DiagnosticFactory.FromFinding(rule, input, f, DiagnosticOrigin.Rule, context.Effective)).OfType<Diagnostic>());
             }

@@ -43,7 +43,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-031 | done | 1 | T-029, T-065 | Rules: structural rearrangements |
 | T-032 | done | 2 | T-031, T-068, T-014 | Rules: neoplastic (clones, idem/sl/sdl, composite) |
 | T-033 | todo | 3 | T-031, T-016 | Parser + rules: FISH (ish, nuc ish) |
-| T-034 | todo | 2 | T-031, T-017 | Parser + rules: microarray (arr) |
+| T-034 | in_progress | 2 | T-031, T-017 | Parser + rules: microarray (arr) |
 | T-035 | done | 1 | T-030, T-031, T-068 | Level 1 deterministic fixes + level 3 explanations |
 | T-036 | done | 2 | T-028 | Desktop: app shell + single-string check with highlighting |
 | T-037 | todo | 2 | T-036 | Desktop: version selector |
@@ -80,6 +80,8 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-068 | done | 1 | T-031 | Rules: ch. 9 symbol rules (split from T-031) |
 | T-069 | done | 2 | T-036 | Abnormality list: core API + desktop panel |
 | T-070 | todo | 3 | T-032, T-069 | Abnormality list: inherited changes of idem/sl/sdl clones |
+| T-071 | discussion | 2 | T-034 | Arr: nucleotide positions vs. bands of the stated build (KB rule, GRCh37-under-[GRCh38] book examples) |
+| T-072 | todo | 3 | T-034, T-069 | Abnormality list: arr aberrations (core API + desktop panel) |
 
 ---
 
@@ -451,7 +453,7 @@ Outcome (2026-11-18): `Segmenter.Split` (top-level `.` followed by a letter sepa
 **Notes:**
 
 ### T-034 — Parser + rules: microarray
-**Status:** todo
+**Status:** in_progress
 **Description:** `arr` grammar and rules, including the genome build and coordinate vs. band consistency.
 **Acceptance:** Related KB examples pass.
 **Notes:** From T-017:
@@ -569,6 +571,21 @@ Outcome (2026-11-18):
 **Description:** A cell line written with `idem`/`sl`/`sdl` lists only its own items in `EditionResult.Abnormalities`. Show the changes it inherits from the clone it refers to (`CellLineSummary.BasedOn`, T-032), e.g. as entries marked inherited, in the core list and the desktop panel.
 **Acceptance:** For every KB example with idem/sl/sdl, each subclone lists the referenced clone's changes (× the `×n` of a polyploid subclone) plus its own; minus-signed stemline abnormalities (`–inv(6)`) remove the inherited one.
 **Notes:** Created 2026-11-20 from T-032 (out of its scope, decided with the user at plan approval).
+
+### T-071 — Arr: nucleotide positions vs. bands of the stated build
+**Status:** discussion
+**Description:** T-034 checks the form of arr results but does not compare the nucleotide positions with the bands written before them, or with the genome build in brackets (the band data has GRCh37 and GRCh38 coordinates, `kb/bands/2016/bands.yaml`). No KB rule states that the positions must lie in the named bands; §14.2 ¶3 ("as in the current genome builds") and ¶6 (array bands come from the genome browsers) are the nearest text. Decide:
+- whether to add a rule (ID, citation, statement, severity: info, warning or error) and what it compares: start/end in the first/last band, a tolerance at band borders, a position beyond the chromosome end of the build;
+- how to treat the book examples that print GRCh37 positions under `[GRCh38]` (§14.2 E23/E24, E34, E40, E44, E45; kept valid as printed in T-017): flagged as warnings, listed as known misprints, or exempt;
+- whether a build-mismatch hint (positions fit the other build) is useful.
+**Acceptance:** Decision in `docs/decisions.md`; if a rule is added, it goes into the KB (with citation and approved paraphrase) and a follow-up `todo` task implements the check.
+**Notes:** Created 2026-11-20 from T-034 (deferred, decided with the user at plan approval). The misprinted bands found so far (§14.2 E27 18q22.33, §14.2.1 E4/E5 21q11.21) are `BAND.MUST_EXIST` invalid examples.
+
+### T-072 — Abnormality list: arr aberrations
+**Status:** todo
+**Description:** `EditionResult.Abnormalities` and the desktop "Abnormalities" panel list karyotype segments only (T-069). Add the aberrations of arr segments (T-034, `ArrModel`): region or chromosome group, bands, positions and build, copy number (gain/loss/amp/cx/cth), proportion, zygosity and origin, linked diagnostics; one group per arr segment.
+**Acceptance:** Every valid arr KB example lists one entry per aberration with its bands, positions and copy number; the desktop panel shows them, and clicking an entry selects its span.
+**Notes:** Created 2026-11-20 from T-034 (out of its scope, decided with the user at plan approval). `Validator.Run` adds only `KaryotypeModel`s to `AbnormalityList` today.
 
 ## External comparison (CytoGPS)
 
