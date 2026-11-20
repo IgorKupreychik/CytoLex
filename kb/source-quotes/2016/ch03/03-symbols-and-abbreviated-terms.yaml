@@ -41,3 +41,17 @@ quotes:
     text: >-
       In order to avoid an unwieldy description, an arrow (→ or ->), meaning from – to, is
       employed.
+  - rule: SYM.NO_OTHER_SPACE
+    cite: {section: "4.1", page: 37, para: "¶1"}
+    text: >-
+      In the description of a karyotype the first item to be recorded is the total number of
+      chromosomes, including the sex chromosomes, followed by a comma (,). The sex chromosome
+      constitution is given next.
+  - rule: SYM.NO_OTHER_SPACE
+    cite: {section: "4.1", page: 37, para: "¶2"}
+    text: "Each abnormality is separated by a comma."
+  - rule: SYM.LETTER_CASE
+    cite: {section: "3", page: 34, para: "¶1"}
+    text: >-
+      All symbols and abbreviated terms used in the description of chromosomes and chromosome
+      abnormalities are listed below.

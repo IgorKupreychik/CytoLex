@@ -62,7 +62,7 @@ rules:
           corrected: "psu dic"
     fix: {level: 1, kind: insert, hint: Insert a space between the two abbreviations.}
     review: {paraphrase_checked: true, needs_review: false}
-    related: [SYM.NO_SPACE_AT_PARENTHESIS]
+    related: [SYM.NO_SPACE_AT_PARENTHESIS, SYM.NO_OTHER_SPACE]
 
   - id: SYM.SPACE_BEFORE_CHROMOSOME_COUNT
     title: Space between a symbol and the chromosome count
@@ -86,6 +86,7 @@ rules:
           corrected: "mos 47,XXX[25]/46,XX[5]"
     fix: {level: 1, kind: insert, hint: Insert a space between the abbreviation and the chromosome number.}
     review: {paraphrase_checked: true, needs_review: false}
+    related: [SYM.NO_OTHER_SPACE]
 
   - id: SYM.NO_SPACE_AT_PARENTHESIS
     title: No space next to a parenthesis
@@ -110,6 +111,86 @@ rules:
           corrected: "arr(1–22,X)×2"
     fix: {level: 1, kind: delete, hint: Remove the space next to the parenthesis.}
     review: {paraphrase_checked: true, needs_review: false}
+    related: [SYM.NO_OTHER_SPACE]
+
+  - id: SYM.NO_OTHER_SPACE
+    title: No space outside the prescribed places
+    applies_to: [general]
+    severity: error
+    statement: >-
+      A space is written only where a rule prescribes one: between symbols or abbreviations used
+      together (psu dic, +mar dn, +mar c), after a symbol or abbreviation that precedes the number
+      of chromosomes (mos 47,XXX), after the genome build of a microarray result, between a copy
+      number and the inheritance or zygosity symbol after it, and around "or" between alternative
+      interpretations. Nowhere else does a string contain a space: the number of chromosomes is
+      followed directly by a comma, the sex chromosome constitution is written as one item, and the
+      abnormalities are separated by commas alone.
+    cite:
+      - {section: "3", page: 34, para: "¶1"}
+      - {section: "4.1", page: 37, para: "¶1"}
+      - {section: "4.1", page: 37, para: "¶2"}
+    examples:
+      valid:
+        - text: "46,XY"
+          cite: {section: "4.1", page: 37, example: E1}
+        - text: "mos 47,XY,+21/46,XY"
+          cite: {section: "4.1", page: 38, para: "¶9"}
+      invalid:
+        - text: "47,XY, +21"
+          why: A space after the comma that separates the abnormalities.
+          corrected: "47,XY,+21"
+        - text: "46,X Y,dup(1)(q21q32)"
+          why: A space inside the sex chromosome constitution.
+          corrected: "46,XY,dup(1)(q21q32)"
+    fix: {level: 1, kind: delete, hint: Remove the space.}
+    review:
+      paraphrase_checked: false
+      needs_review: false
+      note: >-
+        The book never states "no other spaces"; it names where a space is placed (§3 ¶1, §4.1 ¶9
+        and ¶13, the build rule GEN.GENOME_BUILD_REQUIRED, ARR.INHERITANCE_SPACING, the "or" of
+        §4.2/§5.3) and gives the printed format of §4.1 ¶1–2. The closed reading is taken from that
+        format: all 720 valid KB examples (T-073 survey, 2026-11-20) put spaces only in those
+        places. Severity error per the T-022 wording map (printed format) and its decision on
+        non-canonical input. A spacing form added by a later section or edition needs its own rule
+        and must be added to the list above.
+    related: [SYM.SPACE_BETWEEN_SYMBOLS, SYM.SPACE_BEFORE_CHROMOSOME_COUNT, SYM.NO_SPACE_AT_PARENTHESIS, KARYO.DE_NOVO_SPACE, MAR.CONSTITUTIONAL_C_SPACE, ARR.INHERITANCE_SPACING, GEN.GENOME_BUILD_REQUIRED, BREAK.ALTERNATIVE_BANDS, BAND.DESIGNATION_FORMAT]
+
+  - id: SYM.LETTER_CASE
+    title: Symbols and sex chromosomes in the printed case
+    applies_to: [general]
+    severity: error
+    statement: >-
+      Symbols and abbreviations are written in the letter case of the chapter 3 list (del, t, mos,
+      but Ph, GRCh, MI), and the sex chromosomes as the capital letters X and Y. A form that
+      differs only in case is not the listed symbol.
+    cite:
+      - {section: "3", page: 34, para: "¶1"}
+      - {section: "4.1", page: 37, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX"
+          cite: {section: "4.1", page: 37, example: E1}
+      invalid:
+        - text: "46,xy"
+          why: The sex chromosomes are the capital letters X and Y.
+          corrected: "46,XY"
+        - text: "46,XX,Del(5)(q13q33)"
+          why: The deletion symbol is listed as lower-case del.
+          corrected: "46,XX,del(5)(q13q33)"
+    fix: {level: 1, kind: replace, hint: Write the symbol in its listed letter case.}
+    review:
+      paraphrase_checked: false
+      needs_review: false
+      note: >-
+        The case follows the printed list (vocabulary symbols) and the printed sex chromosome
+        constitution (§4.1 ¶1, E1); severity error per the T-022 decision on non-canonical input.
+        A level-1 fix is given only when the form matches exactly one listed token ignoring case,
+        or when its position decides between the two clashes (i isochromosome vs I meiosis
+        numeral; x multiplication sign vs X sex chromosome: sex chromosome field → X/Y, symbol
+        before "(" → i, multiplier position → SYM.TYPED_SYMBOL_FORMS). Otherwise SYM.LISTED_ONLY
+        applies. Arm letters are BAND.ARM_SYMBOL.
+    related: [SYM.LISTED_ONLY, SYM.TYPED_SYMBOL_FORMS, BAND.ARM_SYMBOL]
 
   - id: SYM.TYPED_SYMBOL_FORMS
     title: Typed forms of the arrow, minus and multiplication signs
@@ -150,4 +231,4 @@ rules:
       note: >-
         The arrow forms are book text (§3 p.34, §4.3.2.1 ¶1). The minus and x equivalences are a
         project decision (T-053, docs/decisions.md), not book text.
-    related: [SYM.LISTED_ONLY]
+    related: [SYM.LISTED_ONLY, SYM.LETTER_CASE]

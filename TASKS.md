@@ -82,7 +82,9 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-070 | todo | 3 | T-032, T-069 | Abnormality list: inherited changes of idem/sl/sdl clones |
 | T-071 | discussion | 2 | T-034 | Arr: nucleotide positions vs. bands of the stated build (KB rule, GRCh37-under-[GRCh38] book examples) |
 | T-072 | todo | 3 | T-034, T-069 | Abnormality list: arr aberrations (core API + desktop panel) |
-| T-073 | discussion | 2 | T-029 | Stray spaces inside a karyotype (`47,XY, +21`, `46,X Y`) are not reported: KB basis and fix |
+| T-073 | done | 2 | T-029 | Stray spaces inside a karyotype (`47,XY, +21`, `46,X Y`) are not reported: KB basis and fix |
+| T-074 | todo | 2 | T-073, T-035 | Checks for `SYM.NO_OTHER_SPACE` and `SYM.LETTER_CASE` (stray spaces, letter case; level-1 fixes) |
+| T-075 | discussion | 3 | T-047, T-073 | Severity of stray spaces and letter case (`SYM.NO_OTHER_SPACE`, `SYM.LETTER_CASE`) vs. CytoGPS behaviour |
 
 ---
 
@@ -640,13 +642,31 @@ Outcome (2026-11-18):
 **Notes:** Created 2026-11-20 from T-034 (out of its scope, decided with the user at plan approval). `Validator.Run` adds only `KaryotypeModel`s to `AbnormalityList` today.
 
 ### T-073 — Stray spaces inside a karyotype
-**Status:** discussion
+**Status:** done
 **Description:** Found while writing the T-040 non-book fix tests: `47,XY, +21` (space after a comma) and `46,X Y,dup(1)(q21q32)` (space inside the sex chromosome field) validate with no diagnostic. The KB has only `SYM.NO_SPACE_AT_PARENTHESIS`, `SYM.SPACE_BETWEEN_SYMBOLS` and `SYM.SPACE_BEFORE_CHROMOSOME_COUNT` (§3 ¶1). Decide:
 - whether the book states (or its examples imply) that a karyotype has no spaces other than those rules; find the citation (§3, §4.1 chunks) or record that there is none;
 - if there is a basis: a KB rule (ID, statement, severity, level-1 delete fix) and a follow-up `todo` to implement it in the parser/checks; if not, whether a warning is still wanted and how it's labelled.
 Related: lower-case `46,xy` gets only `SYM.LISTED_ONLY` (warning, explanation); an upper-case fix fits T-041 ("did you mean") or a level-1 fix, part of the same decision.
 **Acceptance:** Decision in `docs/decisions.md`; if a rule is added, it's in the KB with citation and a `todo` task implements the check.
-**Notes:** Created 2026-11-20 from T-040.
+**Notes:** Created 2026-11-20 from T-040. **Outcome (2026-11-20):** two KB rules in `kb/rules/2016/ch03/03-symbols-and-abbreviated-terms.yaml` (quotes in `kb/source-quotes/2016/ch03/`): `SYM.NO_OTHER_SPACE` (error, level-1 delete; §3 ¶1, §4.1 ¶1–2; the list of space places read as closed from the printed format, all 720 valid KB examples agree) and `SYM.LETTER_CASE` (error, level-1 replace; §3 ¶1, §4.1 ¶1; `i`/`I` and `x`/`X` decided by position). Decision in `docs/decisions.md`. Both rules have `paraphrase_checked: false` (awaiting the statement sign-off). The four new invalid examples are classified in `tests/CytoLex.Core.Tests/Parsing/InvalidExampleExpectations.cs` and skip in the harness until T-074; `kb samples` re-run. `dotnet test`: 4,517 total, 0 failed, 24 skipped. Follow-ups: T-074 (checks), T-075 (severity vs. CytoGPS, after T-047; a warning for the space rule was considered and kept open).
+
+### T-074 — Checks for stray spaces and letter case
+**Status:** todo
+**Description:** Implement the T-073 rules (`docs/decisions.md`, 2026-11-20):
+- `SYM.NO_OTHER_SPACE`: scan the token trivia for whitespace in a place no spacing rule prescribes (`SYM.SPACE_BETWEEN_SYMBOLS`, `SYM.SPACE_BEFORE_CHROMOSOME_COUNT`, `KARYO.DE_NOVO_SPACE`, `MAR.CONSTITUTIONAL_C_SPACE`, `GEN.GENOME_BUILD_REQUIRED`, `ARR.INHERITANCE_SPACING`/`ARR.ZYGOSITY`, "or"). One finding per space run, level-1 delete. A space already reported by another rule (`SYM.NO_SPACE_AT_PARENTHESIS`, `BAND.DESIGNATION_FORMAT`, the arr qualifier rules) is not reported twice. The parser must keep reading across the space (`46,X Y` → sex field `XY`).
+- `SYM.LETTER_CASE`: case-folded lookup in the `symbols` vocabulary, plus the sex chromosome field. Level-1 replace when the match is unique or decided by position (`i`/`I`, `x`/`X`); this replaces `SYM.LISTED_ONLY` for those tokens. Arm letters stay `BAND.ARM_SYMBOL`. Update `tests/CytoLex.Core.Tests/Parsing/InvalidExampleExpectations.cs`: `46,xy` and `46,XX,Del(5)(q13q33)` are recorded with today's parser finding `SYM.LISTED_ONLY`.
+- Remove the matching entries from `FixToValidTests` `Pending` / `PendingExamples.cs` if any; add the non-book strings `47,XY, +21`, `46,X Y,dup(1)(q21q32)`, `46,xy`, `T(9;22)(q34;q11.2)` to the fix-to-valid acceptance test.
+**Acceptance:** the new KB examples of both rules pass the harness, with their `corrected` forms as fix previews; no valid KB example gets either diagnostic; `dotnet test` green; `dotnet format` clean.
+**Notes:** Created 2026-11-20 from T-073.
+
+### T-075 — Stray spaces and letter case: severity vs. CytoGPS
+**Status:** discussion
+**Description:** T-073 made `SYM.NO_OTHER_SPACE` (spaces outside the prescribed places) and `SYM.LETTER_CASE` (symbols/sex chromosomes not in the printed case) `error` with a level-1 fix. The space rule rests on the printed format, not on an explicit book sentence, so a `warning` + fix was also considered (2026-11-20, kept as error for now). Once CytoGPS is researched (T-047), compare:
+- how CytoGPS treats stray spaces (`47,XY, +21`, `46,X Y,dup(1)(q21q32)`, `46 ,XX`, `47,XX,+ 21`) and wrong letter case (`46,xy`, `46,XX,Del(5)(q13q33)`, `46,XY,T(9;22)(q34;q11.2)`): rejected, accepted silently, or normalised;
+- what each choice means for the CytoGPS 2×2 comparison and batch results.
+Then decide whether each rule stays `error` or becomes `warning` (book-stated spacing rules such as `SYM.SPACE_BETWEEN_SYMBOLS` stay `error` either way). The book, not CytoGPS, remains the basis; CytoGPS informs the choice.
+**Acceptance:** Decision in `docs/decisions.md`; if a severity changes, the rule's `severity` and review note are updated in the KB (then `kb build`, `dotnet build`).
+**Notes:** Created 2026-11-20 from T-073.
 
 ## External comparison (CytoGPS)
 

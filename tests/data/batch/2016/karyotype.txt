@@ -7,13 +7,20 @@ mos 47,XXX[25]/46,XX[5]
 mos 45,X/46,XX
 mos47,XXX[25]/46,XX[5]
 46,XX,del (5)(q13q33)
+mos 47,XY,+21/46,XY
+47,XY, +21
+47,XY,+21
+46,X Y,dup(1)(q21q32)
+46,XY,dup(1)(q21q32)
+46,XX
+46,xy
+46,XX,Del(5)(q13q33)
 45,X,-X
 45,X,−X
 46,XX,del(6)(q13q23)x2
 46,XX,del(5)(pter->q13::q33->qter)
 46,XX,del(6)(q13q23)X2
 46,XX,del(6)(q13q23)×2
-46,XX
 46XX
 47,XY,del(5)(q13q33),+21
 47,X,t(X;13)(q27;q12),inv(10)(p13q22),+21
@@ -73,7 +80,6 @@ mos 45,X[15],47,XXX[10],46,XX[23]
 mos 45,X(15)/47,XXX(10)/46,XX(23)
 chi 46,XX/46,XY
 45,X/46,XX mos
-mos 47,XY,+21/46,XY
 mos 47,XXY/46,XY
 chi 46,XX[25]/46,XY[10]
 45,X[25]/46,X,i(X)(q10)[25]
