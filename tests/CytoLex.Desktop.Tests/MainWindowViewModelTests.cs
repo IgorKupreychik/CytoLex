@@ -48,7 +48,7 @@ public class MainWindowViewModelTests
         Assert.Equal("insert at col 3", item.Location);
         Assert.NotNull(item.Citations);
         Assert.Contains("ISCN 2016 §", item.Citations, StringComparison.Ordinal);
-        Assert.Contains(item.Fixes, f => f.StartsWith("Fix", StringComparison.Ordinal) && f.EndsWith("→ 46,XX", StringComparison.Ordinal));
+        Assert.Contains(item.Fixes, f => f.Label.StartsWith("Fix", StringComparison.Ordinal) && f.Preview == "46,XX");
         Assert.Contains(vm.Highlights, h => h.Kind == HighlightKind.Insert && h.InsertText == ",");
     }
 
@@ -62,7 +62,7 @@ public class MainWindowViewModelTests
         Assert.StartsWith("Context: unknown", vm.ContextText, StringComparison.Ordinal);
         var item = Assert.Single(panel.Diagnostics);
         Assert.Equal("no finding if constitutional; error if acquired", item.Condition);
-        Assert.Contains(item.Fixes, f => f.Contains("(if acquired)", StringComparison.Ordinal) && f.EndsWith("47,XX,+X", StringComparison.Ordinal));
+        Assert.Contains(item.Fixes, f => f.Label.Contains("(if acquired)", StringComparison.Ordinal) && f.Preview == "47,XX,+X");
     }
 
     [Fact]

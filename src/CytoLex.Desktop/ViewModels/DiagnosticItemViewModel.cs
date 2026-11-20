@@ -11,7 +11,7 @@ namespace CytoLex.Desktop.ViewModels;
 /// <summary>One row of the diagnostics list: a <see cref="Diagnostic"/> rendered as text.</summary>
 public sealed class DiagnosticItemViewModel
 {
-    public DiagnosticItemViewModel(string input, Diagnostic diagnostic, int index, string? edition = null)
+    public DiagnosticItemViewModel(string input, Diagnostic diagnostic, int index, string? edition = null, ApplyFixHandler? applyFix = null)
     {
         ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(diagnostic);
@@ -34,7 +34,7 @@ public sealed class DiagnosticItemViewModel
             ? "Book-ambiguous rule (capped at warning)" + (diagnostic.ReviewNote is { Length: > 0 } note ? ": " + note.Trim() : string.Empty)
             : null;
         Citations = diagnostic.Citations.IsDefaultOrEmpty ? null : string.Join("; ", diagnostic.Citations.Select(c => c.Rendered));
-        Fixes = diagnostic.Fixes.IsDefaultOrEmpty ? [] : [.. diagnostic.Fixes.Select(FixText)];
+        Fixes = diagnostic.Fixes.IsDefaultOrEmpty ? [] : [.. diagnostic.Fixes.Select(f => new FixItemViewModel(input, f, applyFix))];
     }
 
     /// <summary>The diagnostic shown.</summary>
@@ -82,8 +82,8 @@ public sealed class DiagnosticItemViewModel
     /// <summary>The rendered KB citations.</summary>
     public string? Citations { get; }
 
-    /// <summary>The fixes as text: level-1 description and preview, or the level-3 explanation.</summary>
-    public ImmutableArray<string> Fixes { get; }
+    /// <summary>The fixes: level-1 fixes with a diff and Apply (T-040), or the level-3 explanation.</summary>
+    public ImmutableArray<FixItemViewModel> Fixes { get; }
 
     /// <summary>Whether <see cref="Detail"/> is set.</summary>
     public bool HasDetail => Detail is not null;
@@ -129,15 +129,4 @@ public sealed class DiagnosticItemViewModel
         Enum.GetValues<SampleContext>().Select(c => condition.In(c) is { } s
             ? $"{Label(s)} if {Label(c)}"
             : $"no finding if {Label(c)}"));
-
-    private static string FixText(Fix fix)
-    {
-        var context = fix.ForContext is { } c ? $" (if {Label(c)})" : string.Empty;
-        return fix.Level switch
-        {
-            FixLevel.Deterministic when fix.Preview is not null => $"Fix{context}: {fix.Description} → {fix.Preview}",
-            FixLevel.Explanation => $"Explanation{context}: {fix.Description}",
-            _ => $"Suggestion{context}: {fix.Description}",
-        };
-    }
 }

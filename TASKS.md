@@ -49,7 +49,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-037 | done | 2 | T-036 | Desktop: version selector |
 | T-038 | done | 2 | T-036 | Desktop: batch validation + export |
 | T-039 | done | 2 | T-036, T-005 | Desktop: rule browser |
-| T-040 | todo | 2 | T-036, T-035 | Desktop: fix UI (diff view, Apply → re-validate) |
+| T-040 | done | 2 | T-036, T-035 | Desktop: fix UI (diff view, Apply → re-validate) |
 | T-041 | todo | 3 | T-035 | Level 2 "did you mean" suggestions |
 | T-042 | todo | 3 | T-027 | Handling of underlined homologue notation |
 | T-043 | discussion | 3 | – | Copyright cleanup before any public deployment |
@@ -82,6 +82,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-070 | todo | 3 | T-032, T-069 | Abnormality list: inherited changes of idem/sl/sdl clones |
 | T-071 | discussion | 2 | T-034 | Arr: nucleotide positions vs. bands of the stated build (KB rule, GRCh37-under-[GRCh38] book examples) |
 | T-072 | todo | 3 | T-034, T-069 | Abnormality list: arr aberrations (core API + desktop panel) |
+| T-073 | discussion | 2 | T-029 | Stray spaces inside a karyotype (`47,XY, +21`, `46,X Y`) are not reported: KB basis and fix |
 
 ---
 
@@ -604,10 +605,10 @@ Outcome (2026-11-18):
 - **Deviations from the plan:** no search debounce (FTS search is fast enough per keystroke); the browser is created at startup rather than lazily (a missing database still doesn't block the app).
 
 ### T-040 — Fix UI
-**Status:** todo
+**Status:** done
 **Description:** Before/after diff of a fix (additions green, removals red) with an "Apply" button that re-validates.
 **Acceptance:** Applying the fixes for the KB's invalid examples yields valid strings.
-**Notes:**
+**Notes:** **Outcome (2026-11-20):** core: `FixDiff` (`src/CytoLex.Core/Validation/FixDiff.cs`: same/removed/added runs built from a fix's edits, trimmed per edit by the shared prefix/suffix, adjacent runs merged). Desktop: each level-1 fix is shown as a diff (removed red + struck through, added green, changed spaces as `·`) with Apply (`ViewModels/FixItemViewModel.cs`, `DiffPartViewModel.cs`, colours in `Highlighting/DiffBrushes.cs`); "Fix all (N)" previews one `Fixer.ApplyAll` round for the effective context, offered for ≥2 fixes (`FixAllViewModel.cs`); `MainWindowViewModel.ApplyFix` sets the input (re-validates) and shows "Applied: …"; the editor takes programmatic text through a document replace, so Ctrl+Z undoes an Apply. Acceptance: `tests/CytoLex.Core.Tests/KbExamples/FixToValid.cs` + `FixToValidTests.cs` (repeated fix all, up to 5 rounds, on every invalid KB example: 125 fixed to valid, 33 stop at an explanation, 16 valid as is, 8 skipped, 0 failed; 11 non-book strings end valid), report `build/review/fix-coverage.md`; `FixDiff` unit tests in `Validation/FixTests.cs`; desktop `tests/CytoLex.Desktop.Tests/FixUiTests.cs`. `dotnet test`: 4,484 total, 0 failed, 16 skipped; `dotnet format` clean. Docs: `docs/design/core.md` §10, `CLAUDE.md`/`README.md`. Deviations from the plan: the reorder diff is trimmed by prefix/suffix, not character by character (`t(5;2)` → marks `5;2`); `DiffPart` colours come from style classes, not bound brushes. Follow-up: T-073 (stray spaces inside a karyotype are not reported).
 
 ### T-069 — Abnormality list: core API + desktop panel
 **Status:** done
@@ -637,6 +638,15 @@ Outcome (2026-11-18):
 **Description:** `EditionResult.Abnormalities` and the desktop "Abnormalities" panel list karyotype segments only (T-069). Add the aberrations of arr segments (T-034, `ArrModel`): region or chromosome group, bands, positions and build, copy number (gain/loss/amp/cx/cth), proportion, zygosity and origin, linked diagnostics; one group per arr segment.
 **Acceptance:** Every valid arr KB example lists one entry per aberration with its bands, positions and copy number; the desktop panel shows them, and clicking an entry selects its span.
 **Notes:** Created 2026-11-20 from T-034 (out of its scope, decided with the user at plan approval). `Validator.Run` adds only `KaryotypeModel`s to `AbnormalityList` today.
+
+### T-073 — Stray spaces inside a karyotype
+**Status:** discussion
+**Description:** Found while writing the T-040 non-book fix tests: `47,XY, +21` (space after a comma) and `46,X Y,dup(1)(q21q32)` (space inside the sex chromosome field) validate with no diagnostic. The KB has only `SYM.NO_SPACE_AT_PARENTHESIS`, `SYM.SPACE_BETWEEN_SYMBOLS` and `SYM.SPACE_BEFORE_CHROMOSOME_COUNT` (§3 ¶1). Decide:
+- whether the book states (or its examples imply) that a karyotype has no spaces other than those rules; find the citation (§3, §4.1 chunks) or record that there is none;
+- if there is a basis: a KB rule (ID, statement, severity, level-1 delete fix) and a follow-up `todo` to implement it in the parser/checks; if not, whether a warning is still wanted and how it's labelled.
+Related: lower-case `46,xy` gets only `SYM.LISTED_ONLY` (warning, explanation); an upper-case fix fits T-041 ("did you mean") or a level-1 fix, part of the same decision.
+**Acceptance:** Decision in `docs/decisions.md`; if a rule is added, it's in the KB with citation and a `todo` task implements the check.
+**Notes:** Created 2026-11-20 from T-040.
 
 ## External comparison (CytoGPS)
 

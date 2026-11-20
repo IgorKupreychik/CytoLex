@@ -3,6 +3,7 @@
         xmlns:ae="using:AvaloniaEdit"
         xmlns:vm="using:CytoLex.Desktop.ViewModels"
         xmlns:rules="using:CytoLex.Desktop.Rules"
+        xmlns:hl="using:CytoLex.Desktop.Highlighting"
         x:Class="CytoLex.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="CytoLex"
@@ -37,6 +38,8 @@
 
     <!-- Status -->
     <TextBlock DockPanel.Dock="Bottom" Text="{Binding Status}" Margin="0,8,0,0" Opacity="0.7" />
+    <TextBlock DockPanel.Dock="Bottom" Text="{Binding LastApplied}" IsVisible="{Binding HasLastApplied}" Margin="0,8,0,0"
+               ToolTip.Tip="Ctrl+Z in the input undoes it" />
 
     <!-- Shared: context (the same in every edition), or the placeholder for blank input -->
     <TextBlock DockPanel.Dock="Top" Text="{Binding Placeholder}" Margin="0,10,0,0" Opacity="0.7" IsVisible="{Binding !HasResult}" />
@@ -62,6 +65,21 @@
                            Classes.valid="{Binding IsValid}" Classes.invalid="{Binding IsInvalid}" Classes.notimpl="{Binding IsNotImplemented}" />
                 <TextBlock Text="{Binding CountsText}" VerticalAlignment="Center" Opacity="0.8" />
               </StackPanel>
+              <!-- Fix all (T-040): one previewed round of every applicable fix -->
+              <Border IsVisible="{Binding HasFixAll}" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Padding="6,4">
+                <Grid ColumnDefinitions="Auto,*">
+                  <Button Grid.Column="0" Content="{Binding FixAll.Header}" Command="{Binding FixAll.ApplyCommand}"
+                          ToolTip.Tip="{Binding FixAll.Tip}" Padding="10,2" Margin="0,0,10,0" VerticalAlignment="Center" />
+                  <ItemsControl Grid.Column="1" ItemsSource="{Binding FixAll.DiffParts}" VerticalAlignment="Center"
+                                ItemTemplate="{StaticResource DiffPartTemplate}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <WrapPanel />
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                  </ItemsControl>
+                </Grid>
+              </Border>
               <ItemsControl ItemsSource="{Binding Segments}">
                 <ItemsControl.ItemsPanel>
                   <ItemsPanelTemplate>
@@ -105,10 +123,26 @@
                       <TextBlock Text="{Binding Detail}" IsVisible="{Binding HasDetail}" TextWrapping="Wrap" />
                       <TextBlock Text="{Binding Condition}" IsVisible="{Binding HasCondition}" TextWrapping="Wrap" FontStyle="Italic" />
                       <TextBlock Text="{Binding Review}" IsVisible="{Binding HasReview}" TextWrapping="Wrap" FontStyle="Italic" Opacity="0.8" />
+                      <!-- Fixes (T-040): a level-1 fix as a before/after diff with Apply; an explanation as text -->
                       <ItemsControl ItemsSource="{Binding Fixes}">
                         <ItemsControl.ItemTemplate>
-                          <DataTemplate x:DataType="x:String">
-                            <TextBlock Text="{Binding}" TextWrapping="Wrap" Opacity="0.9" />
+                          <DataTemplate x:DataType="vm:FixItemViewModel">
+                            <StackPanel Spacing="2" Margin="0,2,0,0">
+                              <TextBlock Text="{Binding Label}" TextWrapping="Wrap" Opacity="0.9" />
+                              <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsEdit}">
+                                <Button Grid.Column="0" Content="Apply" Command="{Binding ApplyCommand}" IsVisible="{Binding CanApply}"
+                                        Padding="10,1" Margin="0,0,8,0" VerticalAlignment="Center"
+                                        ToolTip.Tip="{Binding Preview, StringFormat='Change the input to: {0}'}" />
+                                <ItemsControl Grid.Column="1" ItemsSource="{Binding DiffParts}" VerticalAlignment="Center"
+                                              ItemTemplate="{StaticResource DiffPartTemplate}">
+                                  <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                      <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                  </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                              </Grid>
+                            </StackPanel>
                           </DataTemplate>
                         </ItemsControl.ItemTemplate>
                       </ItemsControl>
@@ -461,9 +495,30 @@
                 Margin="8,0,0,0" ToolTip.Tip="Open in the single-string check" />
       </Grid>
     </DataTemplate>
+
+    <!-- One run of a fix diff (T-040): removed text red and struck through, added text green -->
+    <DataTemplate x:Key="DiffPartTemplate" x:DataType="vm:DiffPartViewModel">
+      <Border Classes="diff" Classes.removed="{Binding IsRemoved}" Classes.added="{Binding IsAdded}" CornerRadius="2">
+        <TextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" FontSize="14" />
+      </Border>
+    </DataTemplate>
   </Window.Resources>
 
   <Window.Styles>
+    <!-- Fix diff runs (T-040); colours in DiffBrushes -->
+    <Style Selector="Border.diff.removed">
+      <Setter Property="Background" Value="{x:Static hl:DiffBrushes.Removed}" />
+    </Style>
+    <Style Selector="Border.diff.removed > TextBlock">
+      <Setter Property="Foreground" Value="{x:Static hl:DiffBrushes.OnChange}" />
+      <Setter Property="TextDecorations" Value="Strikethrough" />
+    </Style>
+    <Style Selector="Border.diff.added">
+      <Setter Property="Background" Value="{x:Static hl:DiffBrushes.Added}" />
+    </Style>
+    <Style Selector="Border.diff.added > TextBlock">
+      <Setter Property="Foreground" Value="{x:Static hl:DiffBrushes.OnChange}" />
+    </Style>
     <Style Selector="Button.link">
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="BorderThickness" Value="0" />

@@ -177,6 +177,63 @@ public class FixTests
         Assert.Equal("47,XXX", Fixer.ApplyAll("47,XXX", result, SampleContext.Constitutional).Text);
     }
 
+    // --- diff (T-040) ---
+
+    private static string Diff(string input, params TextEdit[] edits) =>
+        string.Concat(FixDiff.Build(input, edits).Select(p => p.Kind switch
+        {
+            DiffKind.Removed => $"[-{p.Text}]",
+            DiffKind.Added => $"[+{p.Text}]",
+            _ => p.Text,
+        }));
+
+    [Fact]
+    public void Diff_InsertDeleteReplace()
+    {
+        Assert.Equal("46[+,]XX", Diff("46XX", new TextEdit(new TextSpan(2, 0), ",")));
+        Assert.Equal("46,XX,del[- ](5)", Diff("46,XX,del (5)", new TextEdit(new TextSpan(9, 1), string.Empty)));
+        Assert.Equal("46,X[-X][+Y]", Diff("46,XX", new TextEdit(new TextSpan(3, 2), "XY")));
+    }
+
+    [Fact]
+    public void Diff_TrimsTheSharedPrefixAndSuffix()
+    {
+        // A reorder replaces the whole span; the diff marks only the part between the shared prefix and suffix.
+        Assert.Equal("t([-5;2][+2;5])", Diff("t(5;2)", new TextEdit(new TextSpan(0, 6), "t(2;5)")));
+        Assert.Equal("ab[+c]", Diff("ab", new TextEdit(new TextSpan(0, 2), "abc")));
+        Assert.Equal("a[-a]", Diff("aa", new TextEdit(new TextSpan(0, 2), "a")));
+    }
+
+    [Fact]
+    public void Diff_MergesAdjacentRunsAndKeepsBothSides()
+    {
+        const string input = "46XX,del (5)";
+        TextEdit[] edits = [new(new TextSpan(2, 0), ","), new(new TextSpan(8, 1), string.Empty), new(new TextSpan(10, 1), "4")];
+        var parts = FixDiff.Build(input, edits);
+
+        Assert.Equal(input, string.Concat(parts.Where(p => p.Kind != DiffKind.Added).Select(p => p.Text)));
+        Assert.Equal(Fixer.Apply(input, edits), string.Concat(parts.Where(p => p.Kind != DiffKind.Removed).Select(p => p.Text)));
+        Assert.All(parts.Zip(parts.Skip(1)), pair => Assert.NotEqual(pair.First.Kind, pair.Second.Kind));
+        Assert.All(parts, p => Assert.NotEmpty(p.Text));
+    }
+
+    [Fact]
+    public void Diff_OverlappingOrOutsideEdits_Throw()
+    {
+        Assert.Throws<ArgumentException>(() => FixDiff.Build("46,XX", [new TextEdit(new TextSpan(0, 3), "47,"), new TextEdit(new TextSpan(2, 2), "XY")]));
+        Assert.Throws<ArgumentException>(() => FixDiff.Build("46,XX", [new TextEdit(new TextSpan(4, 3), "Y")]));
+    }
+
+    [Fact]
+    public void Diff_OfAFix_MatchesItsPreview()
+    {
+        const string input = "46,XY,t(5;2)(q13;p11)";
+        var fix = Validate(input).Diagnostics.SelectMany(d => d.Fixes).First(f => f.IsEdit);
+        var parts = FixDiff.Build(input, fix);
+        Assert.Equal(fix.Preview, string.Concat(parts.Where(p => p.Kind != DiffKind.Removed).Select(p => p.Text)));
+        Assert.Contains(parts, p => p.Kind == DiffKind.Removed);
+    }
+
     // --- serialisation ---
 
     [Fact]

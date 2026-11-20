@@ -30,6 +30,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     private readonly Validator? _validator;
     private EditionPanelViewModel? _observedPanel;
+    private bool _applying;
 
     /// <summary>The view model over <see cref="Validator.Default"/>.</summary>
     public MainWindowViewModel()
@@ -171,6 +172,36 @@ public partial class MainWindowViewModel : ObservableObject
     /// <summary>The last report; <c>null</c> for blank input or without a validator.</summary>
     public ValidationReport? Report { get; private set; }
 
+    /// <summary>What the last Apply did (T-040), e.g. <c>Applied: insert a comma</c>; cleared when the input is typed.</summary>
+    [ObservableProperty]
+    public partial string? LastApplied { get; set; }
+
+    /// <summary>Whether <see cref="LastApplied"/> is set.</summary>
+    public bool HasLastApplied => LastApplied is not null;
+
+    /// <summary>
+    /// Applies a fix (T-040): sets <see cref="Input"/> to <paramref name="newText"/>, which re-validates, and notes what was
+    /// applied. The editor takes the new text as one undoable change.
+    /// </summary>
+    public void ApplyFix(string newText, string description)
+    {
+        ArgumentNullException.ThrowIfNull(newText);
+        ArgumentNullException.ThrowIfNull(description);
+        _applying = true;
+        try
+        {
+            Input = newText;
+        }
+        finally
+        {
+            _applying = false;
+        }
+
+        LastApplied = "Applied: " + description;
+    }
+
+    partial void OnLastAppliedChanged(string? value) => OnPropertyChanged(nameof(HasLastApplied));
+
     /// <summary>Asks the editor to select <paramref name="span"/>.</summary>
     public void SelectSpan(TextSpan span)
     {
@@ -178,7 +209,15 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(SelectedSpan));
     }
 
-    partial void OnInputChanged(string value) => Validate();
+    partial void OnInputChanged(string value)
+    {
+        if (!_applying)
+        {
+            LastApplied = null;
+        }
+
+        Validate();
+    }
 
     partial void OnSelectedEditionChoiceChanged(EditionChoice? value) => Validate();
 
@@ -248,7 +287,7 @@ public partial class MainWindowViewModel : ObservableObject
         Report = report;
         foreach (var result in report.Results)
         {
-            Panels.Add(new EditionPanelViewModel(report, result));
+            Panels.Add(new EditionPanelViewModel(report, result, ApplyFix));
         }
 
         HasResult = true;

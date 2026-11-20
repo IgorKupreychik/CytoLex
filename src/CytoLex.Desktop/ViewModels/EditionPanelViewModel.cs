@@ -12,7 +12,7 @@ namespace CytoLex.Desktop.ViewModels;
 /// </summary>
 public partial class EditionPanelViewModel : ObservableObject
 {
-    public EditionPanelViewModel(ValidationReport report, EditionResult result)
+    public EditionPanelViewModel(ValidationReport report, EditionResult result, ApplyFixHandler? applyFix = null)
     {
         ArgumentNullException.ThrowIfNull(report);
         ArgumentNullException.ThrowIfNull(result);
@@ -29,7 +29,8 @@ public partial class EditionPanelViewModel : ObservableObject
         CountsText = IsNotImplemented ? string.Empty : CountsOf(result.Counts);
 
         Segments = [.. report.Segments.Select(s => SegmentItemViewModel.From(input, s, result.Segments.FirstOrDefault(r => r.Segment.Index == s.Index)))];
-        Diagnostics = [.. result.Diagnostics.Select((d, i) => new DiagnosticItemViewModel(input, d, i, result.Edition))];
+        Diagnostics = [.. result.Diagnostics.Select((d, i) => new DiagnosticItemViewModel(input, d, i, result.Edition, applyFix))];
+        FixAll = FixAllViewModel.From(input, result, report.Context.Effective, applyFix);
         CellLineGroups = CellLineGroupViewModel.From(result);
         Highlights = IsNotImplemented ? [] : HighlightBuilder.Build(input, result, report.Context.Effective);
     }
@@ -66,6 +67,12 @@ public partial class EditionPanelViewModel : ObservableObject
 
     /// <summary>The diagnostics of the edition, in span order.</summary>
     public IReadOnlyList<DiagnosticItemViewModel> Diagnostics { get; }
+
+    /// <summary>"Fix all" (T-040): one previewed round of every applicable level-1 fix; <c>null</c> when fewer than two apply.</summary>
+    public FixAllViewModel? FixAll { get; }
+
+    /// <summary>Whether <see cref="FixAll"/> is offered.</summary>
+    public bool HasFixAll => FixAll is not null;
 
     /// <summary>The abnormalities of the karyotype segments, grouped by cell line (T-069).</summary>
     public IReadOnlyList<CellLineGroupViewModel> CellLineGroups { get; }

@@ -108,8 +108,9 @@ public partial class MainWindow : Window
     {
         if (_viewModel is not null && Input.Text != _viewModel.Input)
         {
-            Input.Text = _viewModel.Input;
-            Input.CaretOffset = Input.Text.Length;
+            // A document replace instead of setting Text keeps the undo stack: Ctrl+Z undoes an applied fix (T-040).
+            Input.Document.Replace(0, Input.Document.TextLength, _viewModel.Input);
+            Input.CaretOffset = Input.Document.TextLength;
         }
     }
 
