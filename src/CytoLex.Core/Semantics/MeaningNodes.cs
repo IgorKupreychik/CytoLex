@@ -155,8 +155,22 @@ public sealed record CellLine : MeaningNode
 
     public CellCount? CellCount { get; init; }
 
+    /// <summary>The earlier clone this line is written relative to (<c>idem</c>, <c>sl</c>, <c>sdl</c>; §11.1.4); <c>null</c> when written in full.</summary>
+    public CloneReference? BasedOn { get; init; }
+
     public override IEnumerable<MeaningNode> Children() => Join([Count, Ploidy, Sex], Items, [CellCount]);
 }
+
+/// <summary>
+/// A cell line's reference to an earlier clone (§11.1.4): <c>idem</c>, <c>sl</c>, <c>sl2</c>, <c>sdl1</c>, <c>idem×2</c>.
+/// Not a separate node: <see cref="Item"/> is the reference item, which stays in <see cref="CellLine.Items"/>.
+/// </summary>
+/// <param name="Symbol"><c>idem</c>, <c>sl</c> or <c>sdl</c>.</param>
+/// <param name="Number">The number after the symbol (<c>sdl1</c>, <c>sl2</c>).</param>
+/// <param name="Multiplier">The <c>×n</c> of a polyploid subclone; 1 without one, <c>null</c> when its number is missing.</param>
+/// <param name="Item">The reference item.</param>
+/// <param name="TargetIndex">The index of the referenced cell line; <c>null</c> when there is none (e.g. on the first line).</param>
+public sealed record CloneReference(string Symbol, int? Number, int? Multiplier, Abnormality Item, int? TargetIndex);
 
 /// <summary>A number or range: chromosome count <c>46</c>, <c>45~48</c>, leading count <c>3</c>, <c>12~20</c>, <c>~14</c>.</summary>
 public sealed record NumberRange : MeaningNode
@@ -209,7 +223,7 @@ public sealed record CellCount : MeaningNode
 {
     public int? Cells { get; init; }
 
-    /// <summary><c>cp</c>: composite karyotype (§11.1.5; not implemented in the pilot).</summary>
+    /// <summary><c>cp</c>: composite karyotype (§11.1.5).</summary>
     public bool IsComposite { get; init; }
 }
 
@@ -232,7 +246,10 @@ public abstract record SuffixedItem : KaryotypeItem
     /// <summary><c>mat</c>, <c>pat</c>, <c>inh</c> or <c>dn</c>.</summary>
     public Inheritance? Inheritance { get; init; }
 
-    private protected IEnumerable<MeaningNode> SuffixNodes => Join([Copies, Constitutional, Inheritance]);
+    /// <summary>The number of cells with this abnormality, after it: <c>del(3)(p12)[2]</c> (§11.1.5 ¶2). Not part of <see cref="MeaningNode.Span"/>.</summary>
+    public CellCount? CellCount { get; init; }
+
+    private protected IEnumerable<MeaningNode> SuffixNodes => Join([Copies, Constitutional, Inheritance, CellCount]);
 }
 
 /// <summary>Copies of an abnormality: <c>×2</c>.</summary>

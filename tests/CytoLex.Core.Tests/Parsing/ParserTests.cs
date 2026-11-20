@@ -114,9 +114,42 @@ public class ParserTests
     }
 
     [Theory]
-    [InlineData("46,XX,t(9;22)(q34;q11.2)[3]/47,idem,+8[17]", ConstructKind.CloneReference, "idem")]
-    [InlineData("46,XX,t(9;22)(q34;q11.2)[3]/47,sl,+8[10]/48,sdl1,+9[7]", ConstructKind.CloneReference, "sl")]
-    [InlineData("47~51,XY,+1~5mar[cp10]", ConstructKind.Composite, "cp")]
+    [InlineData("46,XX,t(9;22)(q34;q11.2)[3]/47,idem,+8[17]")]
+    [InlineData("46,XX,t(9;22)(q34;q11.2)[3]/47,sl,+8[10]/48,sdl1,+9[7]")]
+    [InlineData("47~51,XY,+1~5mar[cp10]")]
+    public void CloneNotation_IsImplemented(string text)
+    {
+        var tree = Parse(text);
+        Assert.Empty(tree.Constructs);
+        Assert.Empty(tree.Diagnostics);
+    }
+
+    [Fact]
+    public void CellCountAfterAbnormality_BelongsToTheItem()
+    {
+        const string text = "45~48,XX,del(3)(p12)[2],–5[4],+8[2],+11[3][cp7]";
+        var tree = Parse(text);
+        Assert.Empty(tree.Diagnostics);
+        var line = Assert.Single(tree.Root.ChildNodes(SyntaxKind.CellLine));
+        var items = line.ChildNodes(SyntaxKind.Item).ToList();
+        Assert.Equal(4, items.Count);
+        Assert.All(items, i => Assert.Single(i.ChildNodes(SyntaxKind.ItemCellCount)));
+        Assert.Equal("[cp7]", Assert.Single(line.ChildNodes(SyntaxKind.CellCount)).ToFullString());
+        Assert.Equal(text, tree.ToFullString());
+    }
+
+    [Fact]
+    public void CommaBeforeMultiplySign_AfterCloneReference_IsPolyploidSubclone()
+    {
+        const string text = "46,XY,t(9;22)(q34;q11.2)[3]/92,idem,×2[5]";
+        var tree = Parse(text);
+        var d = Assert.Single(tree.Diagnostics);
+        Assert.Equal("CLONE.POLYPLOID_SUBCLONE", d.RuleId);
+        Assert.Equal(",", d.Span.Of(text));
+        Assert.Equal(text, tree.ToFullString());
+    }
+
+    [Theory]
     [InlineData("46,XX,der(1̲)t(1;3)(p34.3;q21)", ConstructKind.Underlining, "1̲")]
     [InlineData("46,XX,chr(2)(q21)", ConstructKind.Breakage, "chr")]
     public void NotImplementedConstructs_AreReportedWithTheirSpan(string text, ConstructKind kind, string spanText)

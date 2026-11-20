@@ -87,6 +87,9 @@ public enum SyntaxKind
     /// <summary>A cell count <c>[20]</c> or <c>[cp10]</c>.</summary>
     CellCount,
 
+    /// <summary>The number of cells with one abnormality, after it: <c>del(3)(p12)[2]</c> (§11.1.5 ¶2; inside the <see cref="Item"/>).</summary>
+    ItemCellCount,
+
     /// <summary><c>…</c>: abnormalities left out.</summary>
     Ellipsis,
 

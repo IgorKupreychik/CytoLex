@@ -42,6 +42,7 @@ public enum AbnormalityKind
 /// <param name="IsComposite"><c>[cpN]</c>.</param>
 /// <param name="IsPartial">Built from recovered input.</param>
 /// <param name="AbnormalityCount">The entries of <see cref="EditionResult.Abnormalities"/> in this cell line.</param>
+/// <param name="BasedOn">The index (in <see cref="EditionResult.CellLines"/>) of the clone this line refers to with <c>idem</c>/<c>sl</c>/<c>sdl</c> (T-032).</param>
 public sealed record CellLineSummary(
     int Index,
     int SegmentIndex,
@@ -54,7 +55,8 @@ public sealed record CellLineSummary(
     int? Cells,
     bool IsComposite,
     bool IsPartial,
-    int AbnormalityCount);
+    int AbnormalityCount,
+    int? BasedOn = null);
 
 /// <summary>A breakpoint of an abnormality.</summary>
 /// <param name="Span">The breakpoint in the whole input.</param>

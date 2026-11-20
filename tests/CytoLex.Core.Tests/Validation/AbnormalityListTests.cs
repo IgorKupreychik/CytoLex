@@ -83,6 +83,13 @@ public class AbnormalityListTests
     }
 
     [Fact]
+    public void CloneLines_NameTheLineTheyReferTo()
+    {
+        var result = Result("46,XX,t(9;22)(q34;q11.2)[3]/47,sl,+8[17]/48,sdl,+9[3]");
+        Assert.Equal([null, 0, 1], result.CellLines.Select(l => l.BasedOn));
+    }
+
+    [Fact]
     public void Translocation_ShortFormAndBreakpoints()
     {
         var e = One("46,XY,t(9;22)(q34;q11.2)");

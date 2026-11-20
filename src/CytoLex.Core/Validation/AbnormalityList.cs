@@ -21,6 +21,7 @@ internal sealed class AbnormalityList(string input)
     /// <summary>Adds the cell lines and items of one segment's model, in input order.</summary>
     public void Add(int segmentIndex, KaryotypeModel model)
     {
+        var first = _cellLines.Count;
         foreach (var line in model.CellLines)
         {
             var lineIndex = _cellLines.Count;
@@ -45,7 +46,8 @@ internal sealed class AbnormalityList(string input)
                 line.CellCount?.Cells,
                 line.CellCount?.IsComposite ?? false,
                 line.IsPartial,
-                _entries.Count - before));
+                _entries.Count - before,
+                line.BasedOn?.TargetIndex is { } target ? first + target : null));
         }
     }
 

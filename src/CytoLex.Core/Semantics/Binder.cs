@@ -203,12 +203,30 @@ public sealed class Binder
                 Issues = tree.Diagnostics,
                 IsFragment = root.Kind == SyntaxKind.Fragment,
                 Prefixes = prefixes.ToImmutable(),
-                CellLines = lines.ToImmutable(),
+                CellLines = ResolveCloneReferences(lines.ToImmutable()),
                 Unbound = unbound.ToImmutable(),
                 Relation = relation,
                 IsEndoreduplication = prefixes.Any(p => p.Symbol == "end"),
                 Kb = relation == CellLineRelation.Transplant ? Refs(Rules(TransplantChimera)) : [],
             };
+        }
+
+        /// <summary>Sets <see cref="CellLine.BasedOn"/> for lines written with <c>idem</c>, <c>sl</c> or <c>sdl</c> (<see cref="CloneReferences"/>).</summary>
+        private static ImmutableArray<CellLine> ResolveCloneReferences(ImmutableArray<CellLine> lines)
+        {
+            var refs = lines.Select(CloneReferences.Of).ToList();
+            if (refs.All(r => r is null))
+            {
+                return lines;
+            }
+
+            var targets = CloneReferences.Resolve(refs);
+            return [.. lines.Select((line, i) => CloneReferences.ReferenceItem(line) is { } item
+                ? line with
+                {
+                    BasedOn = new CloneReference(item.Kind!, item.Parts[0].SymbolNumber, item.Copies is null ? 1 : item.Copies.Count, item, targets[i]),
+                }
+                : line)];
         }
 
         private Prefix BindPrefix(SyntaxNode node)
@@ -360,7 +378,10 @@ public sealed class Binder
             var core = (SyntaxNode)item.Children[0];
             if (core.Kind != SyntaxKind.Alternative)
             {
-                return BindCore(core);
+                var bound = BindCore(core);
+                return bound is SuffixedItem suffixed && item.ChildNodes(SyntaxKind.ItemCellCount).FirstOrDefault() is { } cells
+                    ? suffixed with { CellCount = BindCellCount(cells) }
+                    : bound;
             }
 
             var or = core.Children.OfType<SyntaxToken>().Where(t => IsWord(t, "or"));

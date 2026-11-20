@@ -198,10 +198,10 @@ public class ValidatorTests
     [Fact]
     public void NotImplementedConstruct_MakesResultIncomplete()
     {
-        var result = Validate("47,XX,+8[10]/48,idem,+9[5]").Results[0];
+        var result = Validate("46,XX,chr(2)(q21)").Results[0];
 
         Assert.False(result.Validity.IsComplete);
-        Assert.Contains(result.Segments[0].Constructs, c => c.Kind == ConstructKind.CloneReference);
+        Assert.Contains(result.Segments[0].Constructs, c => c.Kind == ConstructKind.Breakage);
     }
 
     [Fact]

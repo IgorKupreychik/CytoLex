@@ -5,12 +5,6 @@ namespace CytoLex.Core.Syntax;
 /// <summary>Constructs inside a karyotype segment that the pilot recognises but does not validate (docs/design/core.md §3.2).</summary>
 public enum ConstructKind
 {
-    /// <summary><c>idem</c>, <c>sl</c>, <c>sdl</c> (§11.1.4; T-032).</summary>
-    CloneReference,
-
-    /// <summary>A composite karyotype <c>cp</c> (§11.1.5; T-032).</summary>
-    Composite,
-
     /// <summary>A chromosome breakage symbol (ch. 10; T-018).</summary>
     Breakage,
 

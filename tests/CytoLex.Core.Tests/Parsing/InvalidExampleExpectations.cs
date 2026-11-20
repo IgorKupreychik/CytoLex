@@ -6,7 +6,7 @@ namespace CytoLex.Core.Tests.Parsing;
 /// counts, context, spacing (kept as trivia), band existence, symbol combinations, group counts. Otherwise each entry
 /// is the KB rule the parser names, the text of the span and its offset (zero-length span = an inserted token).
 /// <see cref="KbInvalidExampleParseTests"/> fails when a KB example is missing here or an entry is no longer in the KB.
-/// Examples the parser can't read yet are in <see cref="KbExamples.PendingExamples"/> instead (T-014).
+/// Examples the parser can't read yet go in <see cref="KbExamples.PendingExamples"/> instead (T-014).
 /// </summary>
 internal static class InvalidExampleExpectations
 {
@@ -160,6 +160,8 @@ internal static class InvalidExampleExpectations
             ["46,XX,t(9;22)(q34;q11.2)[3]/47,idem,+8[17]/48,idem,+9[3]"] = [], // CLONE.SUBCLONE_REFERENCE
             ["45,XY,–7[5]/46,sl,+8[6]/46,XY,t(9;22)(q34;q11.2)[3]/92,sl2×2[5]/93,sdl,+8[2]"] = [], // CLONE.SECOND_STEMLINE
             ["45~48,XX,del(3)(p12),–5,+8,+11[7cp]"] = [], // CP.FORMAT
+            ["45~48,XX,del(3)(p12)[1],–5[4],+8[2][cp6]"] = [], // CLONE.MIN_CELLS
+            ["46,XY,t(9;22)(q34;q11.2)[3]/92,idem,×2[5]"] = [("CLONE.POLYPLOID_SUBCLONE", ",", 35)], // CLONE.POLYPLOID_SUBCLONE
             ["46,XX,t(1;6)(p11;p12)[9]/46,XX,t(3;9)(p13;p13)[14]/46,XX[7]"] = [], // CLONE.ORDER_UNRELATED
             ["46,XX,t(1;6)(p11;p12)[9]/47,XX,+X[9]/46,XX[7]"] = [], // CLONE.ORDER_UNRELATED
             ["46,XY,t(9;22)(q34;q11.2)[6]/46,XY,t(1;3)(p22;p14)[14]"] = [], // CLONE.ORDER_UNRELATED

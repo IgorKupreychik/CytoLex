@@ -300,6 +300,29 @@ internal static class ChromosomeCount
 
     private readonly record struct ItemDelta(ImmutableArray<int> Values, bool Certain);
 
+    /// <summary>
+    /// The possible count changes of a subclone's own items relative to the clone it refers to (§11.1.4 ¶1: signs are
+    /// relative to the stemline, so a lost X/Y counts −1: the subclone has no sex field of its own); <c>null</c> when an
+    /// item's effect is unknown.
+    /// </summary>
+    public static (ImmutableArray<int> Values, bool Certain)? RelativeDelta(IEnumerable<KaryotypeItem> items)
+    {
+        var sum = ImmutableArray.Create(0);
+        var certain = true;
+        foreach (var item in items)
+        {
+            if (Delta(item, hasConstitutionalSex: true) is not { } d)
+            {
+                return null;
+            }
+
+            sum = Combine(sum, d.Values);
+            certain &= d.Certain;
+        }
+
+        return (sum, certain);
+    }
+
     /// <summary>The possible count changes of one item; <c>null</c> when unknown (the line is skipped).</summary>
     private static ItemDelta? Delta(KaryotypeItem item, bool hasConstitutionalSex)
     {

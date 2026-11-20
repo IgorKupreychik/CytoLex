@@ -62,6 +62,7 @@ public sealed class Parser
     internal const string IsoFormat = "ISO.FORMAT";
     internal const string HsrNoAbrSymbol = "HSR.NO_ABR_SYMBOL";
     internal const string MarNoSizeMorphology = "MAR.NO_SIZE_MORPHOLOGY";
+    internal const string PolyploidSubclone = "CLONE.POLYPLOID_SUBCLONE";
 
     /// <summary>
     /// Unlisted words that a symbol rule names (one fault, one finding; T-068), reported by that rule instead of
@@ -81,7 +82,7 @@ public sealed class Parser
         CountSexOrder, AbnormalityOrder, ChromosomeInParentheses, ChromosomeSeparator, BreakpointGroups, GainLossSign,
         NoArmLengthSign, VarLengthSign, ListedOnly, TypedSymbolForms, ArmSymbol, SubbandFormat, ChromIdentifiers,
         CloneSeparator, MosaicChimeraPrefix, Endoreduplication, ParentalOrigin, MultiplySignAfter, PloidyInAngleBrackets,
-        QuestionableItem, DminFormat, UpdFormat, IsoFormat, HsrNoAbrSymbol, MarNoSizeMorphology,
+        QuestionableItem, DminFormat, UpdFormat, IsoFormat, HsrNoAbrSymbol, MarNoSizeMorphology, PolyploidSubclone,
     ];
 
     private static readonly Dictionary<string, Parser> _byEdition = new(StringComparer.Ordinal);
@@ -145,30 +146,15 @@ public sealed class Parser
         var result = ImmutableArray.CreateBuilder<NotImplementedConstruct>();
         foreach (var t in tokens)
         {
-            if (t.Kind == TokenKind.Word)
+            if (t.Kind == TokenKind.Word && _vocab.Find(t.Text) is { Sections.Length: > 0 } entry)
             {
-                switch (t.Text)
+                if (entry.Sections.All(s => s.StartsWith("10.", StringComparison.Ordinal)))
                 {
-                    case "idem" or "sl" or "sdl":
-                        result.Add(new(ConstructKind.CloneReference, t.Span, $"clone reference '{t.Text}' (§11.1.4): not implemented in the pilot"));
-                        break;
-                    case "cp":
-                        result.Add(new(ConstructKind.Composite, t.Span, "composite karyotype 'cp' (§11.1.5): not implemented in the pilot"));
-                        break;
-                    default:
-                        if (_vocab.Find(t.Text) is { Sections.Length: > 0 } entry)
-                        {
-                            if (entry.Sections.All(s => s.StartsWith("10.", StringComparison.Ordinal)))
-                            {
-                                result.Add(new(ConstructKind.Breakage, t.Span, $"breakage symbol '{t.Text}' (ch. 10): not implemented in the pilot"));
-                            }
-                            else if (entry.Sections.All(s => s.StartsWith("12.", StringComparison.Ordinal)))
-                            {
-                                result.Add(new(ConstructKind.Meiotic, t.Span, $"meiotic symbol '{t.Text}' (ch. 12): not implemented in the pilot"));
-                            }
-                        }
-
-                        break;
+                    result.Add(new(ConstructKind.Breakage, t.Span, $"breakage symbol '{t.Text}' (ch. 10): not implemented in the pilot"));
+                }
+                else if (entry.Sections.All(s => s.StartsWith("12.", StringComparison.Ordinal)))
+                {
+                    result.Add(new(ConstructKind.Meiotic, t.Span, $"meiotic symbol '{t.Text}' (ch. 12): not implemented in the pilot"));
                 }
             }
 
@@ -360,10 +346,34 @@ public sealed class Parser
 
             while (true)
             {
+                if (At(TokenKind.Comma) && Peek(1).Kind == TokenKind.Multiply && children.Count > 0
+                    && children[^1] is SyntaxNode { Kind: SyntaxKind.Item } clone && IsCloneReference(clone))
+                {
+                    // "idem,×2": the multiplication sign follows the clone reference directly (§11.1.4 ¶3).
+                    var comma = Eat();
+                    Report(PolyploidSubclone, comma.Span, SyntaxDiagnosticKind.Unexpected, "The multiplication sign follows idem, sl or sdl directly, without a comma.", Delete(comma.Span));
+                    var core = (SyntaxNode)clone.Children[0];
+                    var extended = new List<SyntaxElement>(core.Children) { comma };
+                    ParseSuffixes(extended);
+                    children[^1] = Node(SyntaxKind.Item, [Node(core.Kind, extended), .. clone.Children.Skip(1)]);
+                    continue;
+                }
+
                 if (At(TokenKind.Comma))
                 {
                     children.Add(Eat());
                     children.Add(ParseItem());
+                    continue;
+                }
+
+                if (At(TokenKind.OpenBracket) && Peek(1).Kind == TokenKind.Number && Peek(2).Kind == TokenKind.CloseBracket
+                    && (Peek(3).Kind == TokenKind.OpenBracket
+                        || (Peek(3).Kind == TokenKind.Comma && !(Peek(4).Kind == TokenKind.Number && Peek(5).Kind is TokenKind.Comma or TokenKind.Tilde or TokenKind.OpenAngle)))
+                    && children.Count > 0 && children[^1] is SyntaxNode { Kind: SyntaxKind.Item } counted)
+                {
+                    // "del(3)(p12)[2],": the number of cells with this abnormality (§11.1.5 ¶2, E2).
+                    var count = Node(SyntaxKind.ItemCellCount, Eat(), Eat(), Eat());
+                    children[^1] = Node(SyntaxKind.Item, [.. counted.Children, count]);
                     continue;
                 }
 
@@ -405,6 +415,12 @@ public sealed class Parser
 
             return Node(SyntaxKind.CellLine, children);
         }
+
+        /// <summary>An item whose abnormality is a clone reference: <c>idem</c>, <c>sl</c>, <c>sdl1</c> (§11.1.4).</summary>
+        private static bool IsCloneReference(SyntaxNode item) =>
+            item.Children[0] is SyntaxNode { Kind: SyntaxKind.Abnormality } core
+            && core.ChildNodes(SyntaxKind.AbnormalityPart).FirstOrDefault() is { } part
+            && part.ChildNodes(SyntaxKind.Symbols).SelectMany(s => s.Children.OfType<SyntaxToken>()).LastOrDefault() is { Text: "idem" or "sl" or "sdl" };
 
         /// <summary><c>XX,46</c>: X/Y letters, a comma, then a number.</summary>
         private bool SexThenCount()

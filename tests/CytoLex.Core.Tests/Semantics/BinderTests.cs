@@ -283,6 +283,35 @@ public class BinderTests
         Assert.Null(Assert.Single(item.Groups).Chromosome);
     }
 
+    [Theory]
+    [InlineData("46,XX,t(9;22)(q34;q11.2)[3]/47,sl,+8[17]/48,sdl1,+9[3]/49,sdl2,+11[12]", new[] { -1, 0, 1, 2 })]
+    [InlineData("46,XX,t(9;22)(q34;q11.2)[3]/47,idem,+8[17]/48,idem,+8,+9[3]", new[] { -1, 0, 0 })]
+    [InlineData("46,XY,t(9;22)(q34;q11.2)[3]/47,sl,+8[10]/48,sdl,+der(22)t(9;22)[4]/47,sl,+19[3]", new[] { -1, 0, 1, 0 })]
+    [InlineData("45,XY,–7[5]/46,sl,+8[6]/46,XY,t(9;22)(q34;q11.2)[3]/92,sl2×2[5]/93,sl2×2,+8[2]", new[] { -1, 0, -1, 2, 2 })]
+    [InlineData("47,idem,+8[17]/46,XX,t(9;22)(q34;q11.2)[3]", new[] { -2, -1 })]
+    public void CloneReferences_ResolveToTheirTargetLine(string text, int[] expected)
+    {
+        // -1: written in full; -2: a reference without a target.
+        var lines = BindOne(text).CellLines;
+        Assert.Equal(expected, lines.Select(l => l.BasedOn is null ? -1 : l.BasedOn.TargetIndex ?? -2));
+    }
+
+    [Fact]
+    public void PolyploidSubclone_HasItsMultiplier()
+    {
+        var line = BindOne("26,X,+4,+6,+21[3]/52,idem×2[13]").CellLines[1];
+        Assert.Equal(("idem", 2), (line.BasedOn!.Symbol, line.BasedOn.Multiplier!.Value));
+    }
+
+    [Fact]
+    public void CellCountAfterAbnormality_IsOnTheItem()
+    {
+        var line = Assert.Single(BindOne("45~48,XX,del(3)(p12)[2],–5[4],+8[2],+11[3][cp7]").CellLines);
+        Assert.Equal([2, 4, 2, 3], line.Items.OfType<SuffixedItem>().Select(i => i.CellCount!.Cells!.Value));
+        Assert.True(line.CellCount!.IsComposite);
+        Assert.Equal(7, line.CellCount.Cells);
+    }
+
     [Fact]
     public void KbRef_RoundTrips()
     {
