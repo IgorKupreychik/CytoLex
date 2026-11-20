@@ -43,7 +43,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-031 | done | 1 | T-029, T-065 | Rules: structural rearrangements |
 | T-032 | done | 2 | T-031, T-068, T-014 | Rules: neoplastic (clones, idem/sl/sdl, composite) |
 | T-033 | todo | 3 | T-031, T-016 | Parser + rules: FISH (ish, nuc ish) |
-| T-034 | in_progress | 2 | T-031, T-017 | Parser + rules: microarray (arr) |
+| T-034 | done | 2 | T-031, T-017 | Parser + rules: microarray (arr) |
 | T-035 | done | 1 | T-030, T-031, T-068 | Level 1 deterministic fixes + level 3 explanations |
 | T-036 | done | 2 | T-028 | Desktop: app shell + single-string check with highlighting |
 | T-037 | todo | 2 | T-036 | Desktop: version selector |
@@ -453,13 +453,35 @@ Outcome (2026-11-18): `Segmenter.Split` (top-level `.` followed by a letter sepa
 **Notes:**
 
 ### T-034 — Parser + rules: microarray
-**Status:** in_progress
+**Status:** done
 **Description:** `arr` grammar and rules, including the genome build and coordinate vs. band consistency.
 **Acceptance:** Related KB examples pass.
 **Notes:** From T-017:
 - Checkable ARR rules (errors): `NUCLEOTIDE_FORMAT`, `NORMAL_RESULT`, `ABERRATIONS_ONLY`, `ABERRATION_ORDER`, `REGION_FORMAT`, `PTER_TO_QTER`, `COPY_NUMBER`, `MOSAIC_PROPORTION`, `INHERITANCE_SPACING`, `COMBINED_WITH_OTHER_METHODS` (general), `ZYGOSITY`, `COMPLEX_CX`, `CHROMOTHRIPSIS`; plus `GEN.GENOME_BUILD_REQUIRED`, `SYM.NO_SPACE_AT_PARENTHESIS` (arr example) and `BAND.MUST_EXIST` (§14.2 E27 invalid example). Info only: `SHORT_AND_DETAILED_SYSTEMS`, `RESULT_TABLE`, `STRUCTURE_NOT_SHOWN`, `GENOME_BROWSER_BANDS`.
 - Coordinate vs. band check: §14.2 E23/E24, E34, E40, E44 and E45 print GRCh37 positions under `[GRCh38]` (kept as printed; listed in `ARR.PTER_TO_QTER`'s note). Decide how to treat them before flagging.
 - When arr parses, remove the karyotype-segment filter in `ParseHelper.KbExamples()` and check that the 24 harness skips "arr: not implemented in the pilot" become passes.
+**Outcome (2026-11-20):**
+- `arr` is implemented for ISCN 2016:
+  - grammar in `src/CytoLex.Core/Syntax/Parser.Arr.cs` (permissive: faults stay in the tree for the rules);
+  - model in `Semantics/ArrNodes.cs` + `Binder.Arr.cs` (`SegmentModel` base of `KaryotypeModel`/`ArrModel`);
+  - checks in `Rules/Checks/ArrAnalyses.cs` + `ArrRulesCheck.cs` (`GEN.GENOME_BUILD_REQUIRED` and 12 ARR rules) and `CombinedResultOrderCheck.cs`.
+- General checks run on arr: `BAND.MUST_EXIST`, `CHROM.IDENTIFIERS`, `BAND.DESIGNATION_FORMAT`, and `SYM.NO_SPACE_AT_PARENTHESIS` (new arr branch).
+- `RuleContext` gained `SegmentModel`, `Arr`, `Karyotype`, `Segments` and `ImplementedTypes`.
+- Every arr KB example passes; the 24 "arr: not implemented" skips are gone.
+- Results: `dotnet test` 4188 total, 0 failed, 8 skipped; tools tests 180 passed.
+- Tests:
+  - new `ArrParserTests.cs`, `ArrBinderTests.cs`, `ArrChecksTests.cs`;
+  - `ParseHelper`/`BindHelper` cover arr, and `ParseHelper.KbExamples()` no longer needs a karyotype segment;
+  - 25 `InvalidExampleExpectations` entries added.
+- Deviations from the plan:
+  - §14.2.1 E4/E5 print the non-existent band 21q11.21. Treated like E27 (decided with the user): the printed E4 string is a `BAND.MUST_EXIST` invalid example; the `ARR.ZYGOSITY` examples use 21q11.2.
+  - A karyotype after an arr result (`…dn.47,XY`, not split by the segmenter) is reported by the arr parser as `ARR.COMBINED_WITH_OTHER_METHODS`, with a move fix.
+  - The missing copy number is reported by a check, not the parser.
+  - One check class carries all the ARR bindings.
+- Deferred:
+  - positions vs. bands → T-071 (`discussion`);
+  - arr entries in the abnormality list → T-072.
+- Docs: `docs/decisions.md`, `docs/design/core.md`, `docs/extraction-review-2016.md`, `CLAUDE.md`/`README.md`, the `ARR.PTER_TO_QTER` note.
 
 ### T-035 — Level 1 fixes + level 3 explanations
 **Status:** done
