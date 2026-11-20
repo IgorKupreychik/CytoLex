@@ -2,6 +2,7 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using CytoLex.Core.Text;
 using CytoLex.Desktop.Highlighting;
 using CytoLex.Desktop.ViewModels;
 
@@ -57,7 +58,22 @@ public partial class MainWindow : Window
                 ApplyHighlights();
                 break;
             case nameof(MainWindowViewModel.SelectedDiagnostic):
-                SelectDiagnosticSpan();
+                if (_viewModel?.SelectedDiagnostic is { } item)
+                {
+                    SelectSpan(item.Span);
+                }
+
+                break;
+            case nameof(MainWindowViewModel.SelectedSpan):
+                if (_viewModel?.SelectedSpan is { } span)
+                {
+                    SelectSpan(span);
+                }
+
+                break;
+            case nameof(MainWindowViewModel.HoverSpan):
+                _colorizer.HoverSpan = _viewModel?.HoverSpan;
+                Input.TextArea.TextView.Redraw();
                 break;
             default:
                 break;
@@ -109,16 +125,37 @@ public partial class MainWindow : Window
         Input.TextArea.TextView.Redraw();
     }
 
-    private void SelectDiagnosticSpan()
+    private void SelectSpan(TextSpan span)
     {
-        if (_viewModel?.SelectedDiagnostic is not { } item)
-        {
-            return;
-        }
-
         var length = Input.Text.Length;
-        var start = Math.Clamp(item.Span.Start, 0, length);
-        var end = Math.Clamp(item.Span.End, start, length);
+        var start = Math.Clamp(span.Start, 0, length);
+        var end = Math.Clamp(span.End, start, length);
         Input.Select(start, end - start); // also moves the caret (to the insertion point for an empty span)
+    }
+
+    // Abnormalities panel (T-069): clicking a card or a part selects its span; hovering a card marks it in the editor.
+    private void OnSpanItemTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is Control { DataContext: ISpanItem item })
+        {
+            _viewModel?.SelectSpan(item.Span);
+            e.Handled = true; // a part inside a card selects only the part
+        }
+    }
+
+    private void OnCardPointerEntered(object? sender, PointerEventArgs e)
+    {
+        if (_viewModel is not null && sender is Control { DataContext: AbnormalityItemViewModel item })
+        {
+            _viewModel.HoverSpan = item.Span;
+        }
+    }
+
+    private void OnCardPointerExited(object? sender, PointerEventArgs e)
+    {
+        if (_viewModel is not null && sender is Control { DataContext: AbnormalityItemViewModel item } && _viewModel.HoverSpan == item.Span)
+        {
+            _viewModel.HoverSpan = null;
+        }
     }
 }

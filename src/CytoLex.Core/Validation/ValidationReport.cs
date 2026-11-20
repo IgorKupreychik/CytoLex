@@ -47,6 +47,8 @@ public sealed record SegmentResult(
 /// <param name="Counts">Diagnostic counts.</param>
 /// <param name="Diagnostics">Diagnostics, sorted by span start, then most severe first.</param>
 /// <param name="Segments">One result per segment; empty for a not-implemented edition.</param>
+/// <param name="CellLines">The cell lines of the karyotype segments, in input order (T-069).</param>
+/// <param name="Abnormalities">The abnormalities of the karyotype segments, in input order; each names its cell line (T-069).</param>
 public sealed record EditionResult(
     string Edition,
     EditionStatus Status,
@@ -54,7 +56,9 @@ public sealed record EditionResult(
     Validity Validity,
     SeverityCounts Counts,
     ImmutableArray<Diagnostic> Diagnostics,
-    ImmutableArray<SegmentResult> Segments);
+    ImmutableArray<SegmentResult> Segments,
+    ImmutableArray<CellLineSummary> CellLines,
+    ImmutableArray<AbnormalityEntry> Abnormalities);
 
 /// <summary>The result of <see cref="Validator.Validate"/>: the segments, the context, and one result per edition requested.</summary>
 /// <param name="Input">The input string; every span refers to it.</param>

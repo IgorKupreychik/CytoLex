@@ -52,8 +52,9 @@
       </ItemsControl>
     </StackPanel>
 
+    <Grid ColumnDefinitions="3*,Auto,2*">
     <!-- Diagnostics -->
-    <ListBox x:Name="DiagnosticsList" ItemsSource="{Binding Diagnostics}" SelectedItem="{Binding SelectedDiagnostic}">
+    <ListBox Grid.Column="0" x:Name="DiagnosticsList" ItemsSource="{Binding Diagnostics}" SelectedItem="{Binding SelectedDiagnostic}">
       <ListBox.ItemTemplate>
         <DataTemplate x:DataType="vm:DiagnosticItemViewModel">
           <Grid ColumnDefinitions="Auto,*" Margin="0,2">
@@ -83,6 +84,97 @@
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
+
+    <GridSplitter Grid.Column="1" Width="6" Background="Transparent" ResizeDirection="Columns" />
+
+    <!-- Abnormalities (T-069) -->
+    <DockPanel Grid.Column="2">
+      <TextBlock DockPanel.Dock="Top" Text="Abnormalities" FontWeight="SemiBold" Margin="0,0,0,6" />
+      <TextBlock DockPanel.Dock="Top" Text="No karyotype cell lines." Opacity="0.6"
+                 IsVisible="{Binding !HasCellLines}" />
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <ItemsControl ItemsSource="{Binding CellLineGroups}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:CellLineGroupViewModel">
+              <StackPanel Spacing="4" Margin="0,0,0,10">
+                <TextBlock Text="{Binding Header}" FontWeight="SemiBold" Opacity="0.85" TextWrapping="Wrap" />
+                <ItemsControl ItemsSource="{Binding Items}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:AbnormalityItemViewModel">
+                      <Border Classes="card" Opacity="{Binding Opacity}"
+                              Tapped="OnSpanItemTapped" PointerEntered="OnCardPointerEntered" PointerExited="OnCardPointerExited">
+                        <StackPanel Spacing="4">
+                          <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Border Grid.Column="0" Background="{Binding KindBrush}" CornerRadius="3" Padding="6,1"
+                                    VerticalAlignment="Center" Margin="0,0,8,0">
+                              <TextBlock Text="{Binding KindLabel}" Foreground="White" FontSize="12" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                              <TextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" TextWrapping="Wrap" />
+                              <TextBlock Text="{Binding ShortForm}" IsVisible="{Binding ShowShortForm}" Opacity="0.65"
+                                         FontFamily="Cascadia Mono,Consolas,monospace" />
+                            </StackPanel>
+                            <Ellipse Grid.Column="2" Width="10" Height="10" Fill="{Binding DiagnosticsBrush}"
+                                     IsVisible="{Binding HasDiagnostics}" VerticalAlignment="Center"
+                                     ToolTip.Tip="{Binding DiagnosticsTip}" />
+                          </Grid>
+                          <ItemsControl ItemsSource="{Binding Tags}">
+                            <ItemsControl.ItemsPanel>
+                              <ItemsPanelTemplate>
+                                <WrapPanel />
+                              </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                              <DataTemplate x:DataType="x:String">
+                                <Border Classes="tag">
+                                  <TextBlock Text="{Binding}" FontSize="11" />
+                                </Border>
+                              </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                          </ItemsControl>
+                          <ItemsControl ItemsSource="{Binding Flags}" IsVisible="{Binding HasFlags}">
+                            <ItemsControl.ItemsPanel>
+                              <ItemsPanelTemplate>
+                                <WrapPanel />
+                              </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                              <DataTemplate x:DataType="vm:FlagViewModel">
+                                <Border Classes="flag" ToolTip.Tip="{Binding Tip}">
+                                  <TextBlock Text="{Binding Glyph}" FontSize="11" FontWeight="SemiBold" />
+                                </Border>
+                              </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                          </ItemsControl>
+                          <Expander Header="{Binding PartsHeader}" IsVisible="{Binding HasParts}" Padding="4">
+                            <ItemsControl ItemsSource="{Binding Parts}">
+                              <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:AbnormalityPartViewModel">
+                                  <Border Classes="part" Tapped="OnSpanItemTapped">
+                                    <StackPanel Spacing="2">
+                                      <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" />
+                                        <TextBlock Text="{Binding ShortForm}" Opacity="0.65" FontFamily="Cascadia Mono,Consolas,monospace" />
+                                      </StackPanel>
+                                      <TextBlock Text="{Binding TagsText}" FontSize="11" Opacity="0.7" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                  </Border>
+                                </DataTemplate>
+                              </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                          </Expander>
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </DockPanel>
+    </Grid>
   </DockPanel>
 
   <Window.Styles>
@@ -91,6 +183,39 @@
     </Style>
     <Style Selector="TextBlock.invalid">
       <Setter Property="Foreground" Value="#D13438" />
+    </Style>
+    <Style Selector="Border.card">
+      <Setter Property="BorderBrush" Value="#808080" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Padding" Value="8,6" />
+      <Setter Property="Margin" Value="0,0,0,6" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Border.card:pointerover">
+      <Setter Property="BorderBrush" Value="#0078D4" />
+    </Style>
+    <Style Selector="Border.tag">
+      <Setter Property="Background" Value="#200078D4" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="6,0" />
+      <Setter Property="Margin" Value="0,0,4,2" />
+    </Style>
+    <Style Selector="Border.flag">
+      <Setter Property="BorderBrush" Value="#808080" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="Padding" Value="4,0" />
+      <Setter Property="Margin" Value="0,0,4,0" />
+    </Style>
+    <Style Selector="Border.part">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Padding" Value="4,2" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Border.part:pointerover">
+      <Setter Property="Background" Value="#200078D4" />
     </Style>
   </Window.Styles>
 </Window>

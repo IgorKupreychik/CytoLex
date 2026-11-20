@@ -78,7 +78,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-066 | todo | 2 | T-065 | Band composition from the short system (derivative structure for short-form abnormalities) |
 | T-067 | discussion | 3 | T-045, T-046 | Revisit genome-assembly-only bands per edition (2016 error vs. later-edition valid?) |
 | T-068 | done | 1 | T-031 | Rules: ch. 9 symbol rules (split from T-031) |
-| T-069 | todo | 2 | T-036 | Abnormality list: core API + desktop panel |
+| T-069 | done | 2 | T-036 | Abnormality list: core API + desktop panel |
 
 ---
 
@@ -532,12 +532,12 @@ Outcome (2026-11-18):
 **Notes:**
 
 ### T-069 — Abnormality list: core API + desktop panel
-**Status:** todo
+**Status:** done
 **Description:** Return the abnormalities of each karyotype as a flat list from the core and show them in the desktop app.
 - **Core:** a public list per edition result (e.g. `EditionResult.Abnormalities`), flattened from the semantic model (T-065, which the validator currently discards), in input order. Per entry: the written text and span, kind (gain/loss/structural symbol), symbol, chromosomes, breakpoints (band + arm), a short form (`t(9;22)`, `+8`, `del(5q)`), the parts of a derivative, the cell line it belongs to, flags (partial, questioned `?`, constitutional `c`, inheritance, copies `×n`) and the diagnostics inside its span. Document the API in `docs/design/core.md` (§5/§9). Reusable by batch export (T-038), the web service (T-044) and the translation (T-058).
 - **Desktop:** an "Abnormalities" panel grouped by cell line (header with count, sex, cell count); one card per abnormality with a kind chip, the written form and short form, chromosome/band tags, flag icons and a diagnostics dot; derivatives expand to their parts; hover/click selects the span in the editor; partial items faded.
 **Acceptance:** Every abnormality of the KB karyotype examples appears in the list with the right span, kind, chromosomes and breakpoints; derivatives list their parts; partial items are flagged; the panel groups by cell line and selecting a card selects its span.
-**Notes:** Created 2026-11-20 from T-036 (decided with the user: one task for core + panel, no clinical catalogue matching for now). Only karyotype segments produce entries (ish/arr: T-033/T-034). `idem`/`sl`/`sdl` clones list only their own items until T-032 resolves the stemline.
+**Notes:** Created 2026-11-20 from T-036 (decided with the user: one task for core + panel, no clinical catalogue matching for now). Only karyotype segments produce entries (ish/arr: T-033/T-034). `idem`/`sl`/`sdl` clones list only their own items until T-032 resolves the stemline. **Outcome (2026-11-20):** core: `EditionResult.CellLines` (`CellLineSummary`) and `EditionResult.Abnormalities` (`AbnormalityEntry` with kind, sign, symbol, chromosomes, `BreakpointSummary`s, short form, derivative `Parts`, `or` `Readings`, `AbnormalityFlags`, linked diagnostic indices, `KbRef`s), types in `src/CytoLex.Core/Validation/Abnormalities.cs`, built from the semantic model by `AbnormalityList.cs` in `Validator.Run`; plain DTOs, JSON round-trip tested. Desktop: "Abnormalities" panel right of the diagnostics (grid splitter), grouped by cell line (`CellLineGroupViewModel`: count, sex, cells, mos/chi/recipient/donor), cards (`AbnormalityItemViewModel`: kind chip, written + short form, chromosome/band tags, flag badges, diagnostics dot, faded when partial, expander for derivative parts / `or` readings); click on a card or part selects its span (`MainWindowViewModel.SelectSpan`), hover shades it (`DiagnosticColorizer.HoverSpan`). Tests: `tests/CytoLex.Core.Tests/Validation/AbnormalityListTests.cs` (every KB karyotype example compared item by item with the bound model + spot checks), `tests/CytoLex.Desktop.Tests/AbnormalityPanelTests.cs`. `dotnet test`: 3,190 total, 0 failed, 13 skipped; `dotnet format` clean. Docs: `docs/design/core.md` §5/§9/§14, `CLAUDE.md`/`README.md` status. Deviations from the plan: none of substance (hover shades the span instead of selecting it, as planned; short form keeps `×n`/`c`/inheritance in the flags).
 
 ## External comparison (CytoGPS)
 

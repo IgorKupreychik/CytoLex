@@ -100,6 +100,7 @@ public sealed class Validator
     {
         var diagnostics = new List<Diagnostic>();
         var segmentResults = ImmutableArray.CreateBuilder<SegmentResult>();
+        var abnormalities = new AbnormalityList(input);
         foreach (var segment in segments)
         {
             if (!profile.ImplementedTypes.Contains(segment.Type))
@@ -110,6 +111,7 @@ public sealed class Validator
 
             var tree = profile.Parser.Parse(input, segment, isFragment);
             var model = profile.Binder.Bind(tree);
+            abnormalities.Add(segment.Index, model);
             diagnostics.AddRange(tree.Diagnostics.Select(d => DiagnosticFactory.FromSyntax(profile.Kb, input, d, context.Effective)).OfType<Diagnostic>());
 
             foreach (var (rule, check) in profile.Checks.Where(c => c.Rule.AppliesToType(segment.Type)))
@@ -136,7 +138,8 @@ public sealed class Validator
         ];
         var segs = segmentResults.ToImmutable();
         var complete = segs.All(s => s.Status == EditionStatus.Implemented && s.Constructs.IsEmpty);
-        return new EditionResult(profile.Edition, EditionStatus.Implemented, null, ValidityOf(sorted, context.Effective, complete), CountsOf(sorted), sorted, segs);
+        var (cellLines, entries) = abnormalities.Build(sorted);
+        return new EditionResult(profile.Edition, EditionStatus.Implemented, null, ValidityOf(sorted, context.Effective, complete), CountsOf(sorted), sorted, segs, cellLines, entries);
     }
 
     /// <summary>Validity per §9: known context → no errors; unknown → the contexts without (firm or conditional) errors.</summary>
@@ -167,6 +170,8 @@ public sealed class Validator
         KnownEditions.Contains(edition) ? $"ISCN {edition}: not implemented" : $"ISCN {edition}: unknown edition",
         new Validity(false, [], false),
         SeverityCounts.None,
+        [],
+        [],
         [],
         []);
 }

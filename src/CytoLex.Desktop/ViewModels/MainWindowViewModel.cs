@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CytoLex.Core.Context;
+using CytoLex.Core.Text;
 using CytoLex.Core.Validation;
 using CytoLex.Desktop.Highlighting;
 
@@ -9,7 +10,7 @@ namespace CytoLex.Desktop.ViewModels;
 
 /// <summary>
 /// The single-string check (T-036): validates <see cref="Input"/> in the default edition on every change and exposes the
-/// detected segments, the context, validity, the diagnostics and the editor highlights.
+/// detected segments, the context, validity, the diagnostics, the editor highlights and the abnormalities by cell line (T-069).
 /// </summary>
 public partial class MainWindowViewModel : ObservableObject
 {
@@ -99,8 +100,29 @@ public partial class MainWindowViewModel : ObservableObject
     /// <summary>The diagnostics of the edition, in span order.</summary>
     public ObservableCollection<DiagnosticItemViewModel> Diagnostics { get; } = [];
 
+    /// <summary>The abnormalities of the karyotype segments, grouped by cell line (T-069).</summary>
+    public ObservableCollection<CellLineGroupViewModel> CellLineGroups { get; } = [];
+
+    /// <summary>Whether there are cell lines to show in the abnormalities panel.</summary>
+    [ObservableProperty]
+    public partial bool HasCellLines { get; set; }
+
+    /// <summary>The span the editor should select (a clicked card or part); raised on every <see cref="SelectSpan"/>, even for the same span.</summary>
+    public TextSpan? SelectedSpan { get; private set; }
+
+    /// <summary>The span of the card under the mouse, drawn as a background in the editor.</summary>
+    [ObservableProperty]
+    public partial TextSpan? HoverSpan { get; set; }
+
     /// <summary>The last report; <c>null</c> for blank input or without a validator.</summary>
     public ValidationReport? Report { get; private set; }
+
+    /// <summary>Asks the editor to select <paramref name="span"/>.</summary>
+    public void SelectSpan(TextSpan span)
+    {
+        SelectedSpan = span;
+        OnPropertyChanged(nameof(SelectedSpan));
+    }
 
     partial void OnInputChanged(string value) => Validate();
 
@@ -117,7 +139,10 @@ public partial class MainWindowViewModel : ObservableObject
     {
         Segments.Clear();
         Diagnostics.Clear();
+        CellLineGroups.Clear();
+        HasCellLines = false;
         SelectedDiagnostic = null;
+        HoverSpan = null;
         Report = null;
 
         var input = Input;
@@ -145,6 +170,12 @@ public partial class MainWindowViewModel : ObservableObject
             Diagnostics.Add(new DiagnosticItemViewModel(input, result.Diagnostics[i], i));
         }
 
+        foreach (var group in CellLineGroupViewModel.From(result))
+        {
+            CellLineGroups.Add(group);
+        }
+
+        HasCellLines = CellLineGroups.Count > 0;
         HasResult = true;
         IsValid = result.Status == EditionStatus.Implemented && result.Validity.IsValid;
         ValidityText = VerdictOf(result, report.Context);
