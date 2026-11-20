@@ -45,7 +45,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-033 | todo | 3 | T-031, T-016 | Parser + rules: FISH (ish, nuc ish) |
 | T-034 | todo | 2 | T-031, T-017 | Parser + rules: microarray (arr) |
 | T-035 | done | 1 | T-030, T-031, T-068 | Level 1 deterministic fixes + level 3 explanations |
-| T-036 | todo | 2 | T-028 | Desktop: app shell + single-string check with highlighting |
+| T-036 | done | 2 | T-028 | Desktop: app shell + single-string check with highlighting |
 | T-037 | todo | 2 | T-036 | Desktop: version selector |
 | T-038 | todo | 2 | T-036 | Desktop: batch validation + export |
 | T-039 | todo | 2 | T-036, T-005 | Desktop: rule browser |
@@ -78,6 +78,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-066 | todo | 2 | T-065 | Band composition from the short system (derivative structure for short-form abnormalities) |
 | T-067 | discussion | 3 | T-045, T-046 | Revisit genome-assembly-only bands per edition (2016 error vs. later-edition valid?) |
 | T-068 | done | 1 | T-031 | Rules: ch. 9 symbol rules (split from T-031) |
+| T-069 | todo | 2 | T-036 | Abnormality list: core API + desktop panel |
 
 ---
 
@@ -501,10 +502,10 @@ Outcome (2026-11-18):
 ## Desktop app (pilot)
 
 ### T-036 — App shell + single-string check
-**Status:** todo
+**Status:** done
 **Description:** Input box. Shows detected types, highlighting (underline for wrong ranges, insertion marker with grey expected text for missing parts, strikethrough for extra parts) and a diagnostics list with citations.
 **Acceptance:** Book examples show correctly; highlighting matches diagnostic ranges.
-**Notes:**
+**Notes:** **Outcome (2026-11-20):** the desktop window validates the input on every change in the default edition (2016) and shows the verdict ("valid as constitutional only", "as far as implemented"), counts, the context with its markers, and the segments with their detected types (not-implemented ones marked). Highlighting in `src/CytoLex.Desktop/Highlighting/`: `HighlightBuilder` maps each diagnostic's own level-1 fix (not the "all occurrences" one) to highlights — replace → underline, insert → marker + grey expected text, delete → strikethrough; no edit → underline of the diagnostic span (marker if empty); severity colours (`SeverityBrushes`); drawn by `DiagnosticColorizer` (text decorations) and `InsertionElementGenerator` (zero-length inline element). Diagnostics list (`DiagnosticItemViewModel`): severity, title, column, rule ID, detail, per-context severities, book-ambiguous note, fixes as text (Apply is T-040), citations; selecting one selects its span. Book-example dropdown (§13 worked examples). App icon (G-banded chromosome + check badge): `src/CytoLex.Desktop/Assets/cytolex.ico`/`.png`, set as exe and window icon. New test project `tests/CytoLex.Desktop.Tests/` (embeds `build/kb.json`): highlight cases plus a check over every KB example string that each diagnostic's highlights lie in the input on its own fix edits (or its span); view-model tests. `dotnet test`: 2,568 total, 0 failed, 13 skipped; `dotnet format` clean. Docs: `CLAUDE.md`/`README.md` (status, layout, commands). Deviation from the plan: no debounce (validation is fast enough per keystroke). Follow-up: T-069 (abnormality list + panel).
 
 ### T-037 — Version selector
 **Status:** todo
@@ -529,6 +530,14 @@ Outcome (2026-11-18):
 **Description:** Before/after diff of a fix (additions green, removals red) with an "Apply" button that re-validates.
 **Acceptance:** Applying the fixes for the KB's invalid examples yields valid strings.
 **Notes:**
+
+### T-069 — Abnormality list: core API + desktop panel
+**Status:** todo
+**Description:** Return the abnormalities of each karyotype as a flat list from the core and show them in the desktop app.
+- **Core:** a public list per edition result (e.g. `EditionResult.Abnormalities`), flattened from the semantic model (T-065, which the validator currently discards), in input order. Per entry: the written text and span, kind (gain/loss/structural symbol), symbol, chromosomes, breakpoints (band + arm), a short form (`t(9;22)`, `+8`, `del(5q)`), the parts of a derivative, the cell line it belongs to, flags (partial, questioned `?`, constitutional `c`, inheritance, copies `×n`) and the diagnostics inside its span. Document the API in `docs/design/core.md` (§5/§9). Reusable by batch export (T-038), the web service (T-044) and the translation (T-058).
+- **Desktop:** an "Abnormalities" panel grouped by cell line (header with count, sex, cell count); one card per abnormality with a kind chip, the written form and short form, chromosome/band tags, flag icons and a diagnostics dot; derivatives expand to their parts; hover/click selects the span in the editor; partial items faded.
+**Acceptance:** Every abnormality of the KB karyotype examples appears in the list with the right span, kind, chromosomes and breakpoints; derivatives list their parts; partial items are flagged; the panel groups by cell line and selecting a card selects its span.
+**Notes:** Created 2026-11-20 from T-036 (decided with the user: one task for core + panel, no clinical catalogue matching for now). Only karyotype segments produce entries (ish/arr: T-033/T-034). `idem`/`sl`/`sdl` clones list only their own items until T-032 resolves the stemline.
 
 ## External comparison (CytoGPS)
 

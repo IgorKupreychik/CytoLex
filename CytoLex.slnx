@@ -5,5 +5,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CytoLex.Core.Tests/CytoLex.Core.Tests.csproj" />
+    <Project Path="tests/CytoLex.Desktop.Tests/CytoLex.Desktop.Tests.csproj" />
   </Folder>
 </Solution>

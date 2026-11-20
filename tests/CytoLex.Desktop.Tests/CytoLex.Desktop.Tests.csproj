@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Tests of the desktop app's UI-free parts: highlight mapping and view models (T-036). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <!-- Full KB: every KB example string is checked for consistent highlights. -->
+    <CytoLexKbExamples Condition="'$(CytoLexKbExamples)' == ''">$(RepoRoot)build/kb.json</CytoLexKbExamples>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/CytoLex.Desktop/CytoLex.Desktop.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="$(CytoLexKbExamples)" LogicalName="CytoLex.Tests.kb.json" Visible="false" />
+  </ItemGroup>
+
+  <Target Name="CheckKbExamples" BeforeTargets="BeforeBuild;PrepareResources">
+    <Error Condition="!Exists('$(CytoLexKbExamples)')"
+           Text="KB file not found: $(CytoLexKbExamples). Run 'uv run --directory tools kb build' from the repo root first." />
+  </Target>
+</Project>
