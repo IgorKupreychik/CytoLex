@@ -1,7 +1,7 @@
 # CytoLex — Tasks
 
 Statuses: `todo` · `in_progress` · `blocked` · `done` · `discussion` (a decision to make via interview).
-Priority: 1 = foundation/core · 2 = pilot · 3 = later.
+Priority: 1 = foundation/core · 2 = pilot · 3 = later · 4 = after the ISCN 2016 core and the desktop app are complete (web service).
 Run `/next-task` to pick the next startable task (or `/next-task T-xxx` for a specific one).
 A task is startable when its status is `todo` or `discussion` and every task in **Depends** is `done`.
 Keep the summary table and the task sections in sync (status changes are made in both places).
@@ -53,10 +53,10 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-041 | todo | 3 | T-035 | Level 2 "did you mean" suggestions |
 | T-042 | todo | 3 | T-027 | Handling of underlined homologue notation |
 | T-043 | discussion | 3 | – | Copyright cleanup before any public deployment |
-| T-044 | todo | 3 | T-028 | Web service wrapping the core library |
+| T-044 | todo | 4 | T-028 | Web service wrapping the core library + browser page |
 | T-045 | todo | 3 | T-013 | ISCN 2020 KB + version profile |
 | T-046 | todo | 3 | T-045 | ISCN 2024 KB + version profile |
-| T-047 | todo | 2 | – | Research CytoGPS (API, LGF output, ISCN version, source/licence, local options, terms) |
+| T-047 | done | 2 | – | Research CytoGPS (API, LGF output, ISCN version, source/licence, local options, terms) |
 | T-048 | discussion | 2 | T-047 | Decide CytoGPS integration mode and data policy |
 | T-049 | todo | 2 | T-028, T-048 | `ExternalChecker` interface + CytoGPS adapter |
 | T-050 | todo | 2 | T-031 | LGF computation in the core library |
@@ -85,6 +85,11 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-073 | done | 2 | T-029 | Stray spaces inside a karyotype (`47,XY, +21`, `46,X Y`) are not reported: KB basis and fix |
 | T-074 | done | 2 | T-073, T-035 | Checks for `SYM.NO_OTHER_SPACE` and `SYM.LETTER_CASE` (stray spaces, letter case; level-1 fixes) |
 | T-075 | discussion | 3 | T-047, T-073 | Severity of stray spaces and letter case (`SYM.NO_OTHER_SPACE`, `SYM.LETTER_CASE`) vs. CytoGPS behaviour |
+| T-076 | todo | 3 | T-047 | Ask the CytoGPS authors: licence of the GitHub code, newer parser/server code |
+| T-077 | todo | 2 | T-050, T-038 | Batch statistics per band (loss/gain/fusion share of clones, aggregate LGF table) |
+| T-078 | todo | 3 | T-050, T-069 | Desktop: ideogram view of loss/gain/fusion per band and clone |
+| T-079 | todo | 3 | T-050, T-038 | Export in CytoGPS's JSON result format (RCytoGPS-compatible) |
+| T-080 | discussion | 3 | T-075 | Optional lenient mode (stray spaces, letter case as warnings) |
 
 ---
 
@@ -666,12 +671,12 @@ Related: lower-case `46,xy` gets only `SYM.LISTED_ONLY` (warning, explanation); 
 - what each choice means for the CytoGPS 2×2 comparison and batch results.
 Then decide whether each rule stays `error` or becomes `warning` (book-stated spacing rules such as `SYM.SPACE_BETWEEN_SYMBOLS` stay `error` either way). The book, not CytoGPS, remains the basis; CytoGPS informs the choice.
 **Acceptance:** Decision in `docs/decisions.md`; if a severity changes, the rule's `severity` and review note are updated in the KB (then `kb build`, `dotnet build`).
-**Notes:** Created 2026-11-20 from T-073.
+**Notes:** Created 2026-11-20 from T-073. T-047 findings (`docs/research/cytogps.md` §4, §5.1, §8): CytoGPS strips all whitespace before parsing and matches keywords case-insensitively, so every listed space/case string is accepted silently (`Success`), with no report or normalisation notice.
 
 ## External comparison (CytoGPS)
 
 ### T-047 — Research CytoGPS
-**Status:** todo
+**Status:** done
 **Description:** Find out (web access failed during planning):
 - Available interfaces: web form and API (endpoint, fields).
 - Input/output format (validity, error messages, LGF vectors, JSON).
@@ -681,7 +686,37 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 - Terms of use and privacy.
 - Contact the authors if needed. Sites: `https://cytogps-app.mangograss-a1cf8a6c.westus2.azurecontainerapps.io/karyotype_parser`, cytogps.org, the RCytoGPS package.
 **Acceptance:** Findings with source URLs in `docs/research/cytogps.md`.
-**Notes:**
+**Notes:** **Outcome (2026-11-20):** `docs/research/cytogps.md` — findings with sources: interfaces (hosted `POST /singleKaryotypeAnalysis` returns HTML in JSON, `POST /batchKaryotypeAnalysis` returns a zip; no documented API; `cytogps.org` no longer resolves), JSON/LGF format (5 statuses, 916 ISCN 2016 bands), coverage (ISCN 2016, short-system karyotypes only, ASCII only, whitespace stripped, case-insensitive; no ish/arr/detailed system), licence (no file in the repo; site User Agreement = non-commercial use), privacy (no policy; batch results kept on the server). Beyond the plan (with the user): the local copy at `C:\_\NMDP\ISCN\CytoGPS` was built and run with a portable Temurin 21 JDK in `C:\_\Tests\PortableJDK` plus `javax.json-1.1.4.jar` and a small wrapper (§7); it matches the hosted app on 28 probe strings and a 5-line batch. Both tools were run on the 951 KB example strings → `docs/research/cytogps-comparison.md` (feature table today/planned, accuracy, caveats; for business presentations) and `docs/research/data/cytogps-vs-cytolex-2016.csv`. Docs: `docs/decisions.md` pointer, `README.md`/`CLAUDE.md` (`docs/research/`), notes in T-048/T-075. Follow-ups: T-076 (licence enquiry), T-077–T-080 (batch statistics, ideogram, CytoGPS JSON export, lenient mode); T-066 and T-044 extended (derivative structure in the abnormality list, browser page).
+
+### T-076 — Ask the CytoGPS authors about the licence and newer code
+**Status:** todo
+**Description:** The GitHub repo `i2-wustl/CytoGPS` has no licence file. The hosted site's User Agreement grants non-commercial use of "the computer code provided here". Ask the authors (WashU Institute for Informatics / the RCytoGPS maintainer) whether that agreement covers the repo code, and whether a newer parser or the web app's server code is available. Draft text: `docs/research/cytogps.md` §9. The user sends it; Claude doesn't.
+**Acceptance:** The answer (or "no reply by <date>") recorded in `docs/research/cytogps.md` §6/§9. If redistribution is allowed, add a note to T-043/T-049.
+**Notes:** Created 2026-11-20 from T-047. Needed only before any redistribution or public deployment; private local use is already covered.
+
+### T-077 — Batch statistics per band
+**Status:** todo
+**Description:** CytoGPS reports for each band the share of clones with a loss, gain or fusion there (its APL/APG/APF), plus an aggregate LGF table with one row per clone (`docs/research/cytogps.md` §3, repo `README.txt` "How to use Summary Statistics"). Add the same to batch results: per edition, over the clones of every valid string, from the T-050 LGF. Show it in the desktop "Batch" summary and export it (CSV: one row per band; one row per clone for the aggregate table).
+**Acceptance:** Statistics and both CSVs for the KB sample batch; the numbers for a small hand-checked batch match a hand count; the counting rules (which clones count, which strings are skipped) are documented.
+**Notes:** Created 2026-11-20 from the CytoGPS comparison (T-047, `docs/research/cytogps-comparison.md`).
+
+### T-078 — Desktop: ideogram view
+**Status:** todo
+**Description:** CytoGPS draws the chromosomes at 850 resolution with each band's loss/gain/fusion, clone by clone. Add a desktop panel that draws the ideogram from the KB band data (`kb/bands/<version>/bands.yaml`, already in the runtime bundle) and colours the T-050 LGF of the selected cell line. Link it to the abnormality list (T-069): selecting an abnormality highlights its bands.
+**Acceptance:** The panel shows the LGF of every cell line of a sample of KB examples; band positions are checked against the band data; selection works both ways.
+**Notes:** Created 2026-11-20 from the CytoGPS comparison (T-047). Low priority (user).
+
+### T-079 — Export in CytoGPS's JSON result format
+**Status:** todo
+**Description:** Write batch results in CytoGPS's result format (`producer`, `date`, `iscn2016_bands`, `output[]` with `karyotype`, `status`, `parsing_result[].loss_gain_fusion_computing`; `docs/research/cytogps.md` §3) from the T-050 LGF, so that the RCytoGPS R package (`readLGF`) reads it. Map our verdicts to CytoGPS's five statuses, and mark the producer as CytoLex.
+**Acceptance:** RCytoGPS `readLGF` reads an export of the KB sample batch; for strings both tools accept, the LGF arrays equal the local CytoGPS output, or each difference is explained.
+**Notes:** Created 2026-11-20 from the CytoGPS comparison (T-047). Low priority (user). Also simplifies T-049/T-051: both sides produce the same format.
+
+### T-080 — Optional lenient mode
+**Status:** discussion
+**Description:** CytoGPS silently accepts stray spaces and any letter case (`docs/research/cytogps.md` §4). Decide whether CytoLex gets an optional "lenient" mode (e.g. for old records) that reports `SYM.NO_OTHER_SPACE` and `SYM.LETTER_CASE` as warnings instead of errors, and if so: which rules it covers, where it's switched on (validator option, desktop, batch), and how results show that it was on. The book stays the basis; the default stays strict.
+**Acceptance:** Decision in `docs/decisions.md`; if adopted, a `todo` task for the implementation.
+**Notes:** Created 2026-11-20 from the CytoGPS comparison (T-047). Depends on T-075: if the two rules become warnings anyway, lenient mode may not be needed.
 
 ### T-048 — Decide CytoGPS integration mode and data policy
 **Status:** discussion
@@ -689,7 +724,7 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 - Integration: local build, container, or online with opt-in.
 - What data may be sent online (an organisational policy check is needed if real patient karyotypes may be involved).
 **Acceptance:** Decision in `docs/decisions.md`.
-**Notes:**
+**Notes:** Research done in T-047: `docs/research/cytogps.md` §6–§8 (local build works and matches hosted; hosted has no privacy policy and keeps batch results on the server; recommendation: local default, hosted for synthetic strings only).
 
 ### T-049 — `ExternalChecker` interface + CytoGPS adapter
 **Status:** todo
@@ -737,9 +772,9 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 
 ### T-044 — Web service
 **Status:** todo
-**Description:** A web service exposing single/batch validation from the core library.
-**Acceptance:** Same results as the desktop app for the KB example suite.
-**Notes:**
+**Description:** A web service exposing single/batch validation from the core library, plus a browser page on top of it (no install): single-string check with highlights, diagnostics with citations and fixes, and batch upload with CSV/JSON export, like the desktop app.
+**Acceptance:** Same results as the desktop app for the KB example suite; the browser page checks a string and a batch file end to end.
+**Notes:** 2026-11-20: browser page added from the CytoGPS comparison (T-047, user). 2026-11-20: priority 3 → 4 (user): the ISCN 2016 core and the desktop app come first. Data policy for uploaded strings: follow the T-048 decision (CytoGPS has none, `docs/research/cytogps.md` §6).
 
 ### T-045 — ISCN 2020 KB + version profile
 **Status:** todo
@@ -773,9 +808,9 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 
 ### T-066 — Band composition from the short system
 **Status:** todo
-**Description:** The binder (T-065) keeps `DerivativeStructure` only as written (detailed system); short-form abnormalities have none. Compute the band composition (ordered pieces with orientation, joins) from the short system for every pilot rearrangement type (del, dup, inv, ins, i, idic, r, t, der with several parts, rec, dic, trc, tas, trp, qdp, add, hsr, fis …), so rules can compare both systems and LGF (T-050) and the translation (T-058) can use one shape. Each type's composition must trace to its KB rule (§4.3, §9); missing semantics go into the KB first.
-**Acceptance:** For every KB example pair printed in both systems, the computed composition of the short form equals the bound detailed form; per-type unit tests; types without a defined composition are listed and left `null`.
-**Notes:** Created 2026-11-18 from T-065 (decided with the user: T-065 normalises breakpoints only). Useful for T-031 (short-vs-detailed rules such as `DER.COMPLEX_USE_DETAILED`), T-050 (LGF) and T-058 (translation).
+**Description:** The binder (T-065) keeps `DerivativeStructure` only as written (detailed system); short-form abnormalities have none. Compute the band composition (ordered pieces with orientation, joins) from the short system for every pilot rearrangement type (del, dup, inv, ins, i, idic, r, t, der with several parts, rec, dic, trc, tas, trp, qdp, add, hsr, fis …), so rules can compare both systems and LGF (T-050) and the translation (T-058) can use one shape. Each type's composition must trace to its KB rule (§4.3, §9); missing semantics go into the KB first. Also show the composition in the abnormality list (T-069: `AbnormalityList.cs`, desktop "Abnormalities" panel) as the derivative written out in the detailed system, e.g. `der(9)t(9;22)(q34;q11.2)` → `der(9)(9pter→9q34::22q11.2→22qter)`. CytoGPS shows this (`derivative_chromosome_detailed_systems`, `docs/research/cytogps.md` §3).
+**Acceptance:** For every KB example pair printed in both systems, the computed composition of the short form equals the bound detailed form; per-type unit tests; types without a defined composition are listed and left `null`. The abnormality list shows the detailed-system form for every abnormality with a composition (core API + desktop panel; checked on the KB pairs printed in both systems).
+**Notes:** Created 2026-11-18 from T-065 (decided with the user: T-065 normalises breakpoints only). Useful for T-031 (short-vs-detailed rules such as `DER.COMPLEX_USE_DETAILED`), T-050 (LGF) and T-058 (translation). 2026-11-20: abnormality-list display added from the CytoGPS comparison (T-047, user).
 
 ### T-067 — Revisit genome-assembly-only bands per edition
 **Status:** discussion

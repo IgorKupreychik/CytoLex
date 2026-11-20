@@ -34,7 +34,7 @@ The app stack is C# on .NET 10 LTS: a core library with a hand-written parser, a
 | `kb/source-text/<version>/` | Text extracted from the ISCN PDF (**gitignored**, rebuildable) |
 | `build/` | Generated SQLite (FTS5), full JSON KB (`kb.json`), lean runtime bundle for the core (`kb-runtime.json`), review images, download cache (**gitignored**) |
 | `config/` | `local.example.yaml` template; your `local.yaml` is gitignored |
-| `docs/` | Decision record, design docs (core library: [`docs/design/core.md`](docs/design/core.md)), extraction review |
+| `docs/` | Decision record, design docs (core library: [`docs/design/core.md`](docs/design/core.md)), extraction review, research notes (`docs/research/`: CytoGPS findings — [`docs/research/cytogps.md`](docs/research/cytogps.md); CytoLex vs. CytoGPS comparison for presentations — [`docs/research/cytogps-comparison.md`](docs/research/cytogps-comparison.md), per-string data in `docs/research/data/`) |
 | `TASKS.md` | Task list and status |
 
 ## Getting started (tooling)

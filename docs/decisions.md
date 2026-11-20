@@ -139,7 +139,7 @@ The KB is the single source for all validation decisions.
   - Prefer a local CytoGPS (source code or container).
   - The online adapter is off by default.
   - Data policy to be decided in T-048, after research (T-047).
-  - CytoGPS facts are unverified (web access failed during planning).
+  - CytoGPS facts were researched in T-047 (2026-11-20): [`docs/research/cytogps.md`](research/cytogps.md) (ISCN 2016, short-system karyotypes only, ASCII only, ignores spaces and case; local build runs and matches the hosted app; no licence file in the repo, site User Agreement = non-commercial use; no privacy policy).
 
 ## Copyright
 - Private, personal project for now: verbatim quotes are kept (in separate, removable files) to audit validator decisions.
