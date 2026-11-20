@@ -26,7 +26,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-014 | done | 2 | T-013 | KB: ch. 11 (neoplasia) |
 | T-015 | todo | 3 | T-013 | KB: ch. 13.1–13.2 (metaphase ish) |
 | T-016 | todo | 3 | T-015 | KB: ch. 13.3–13.8 (nuc ish, fib/rev ish, cgh, painting) |
-| T-017 | todo | 2 | T-013 | KB: ch. 14 (microarray) |
+| T-017 | done | 2 | T-013 | KB: ch. 14 (microarray) |
 | T-018 | todo | 3 | T-013 | KB: ch. 10 & 12 (breakage, meiotic) |
 | T-019 | todo | 3 | T-017 | KB: ch. 15 & 16 (RSA, sequence-based) |
 | T-020 | done | 1 | T-013 | Tech stack for core library + desktop app |
@@ -236,10 +236,29 @@ All KB tasks share these steps and criteria:
 **Notes:** Before starting, person sign-off of the **Fibre diagram** (§13.4, p.112): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`. Drawn fibre symbols and nucleus diagrams (§13.3.2, pp.109–112) are not in the text: `needs_review`.
 
 ### T-017 — KB: ch. 14 (microarray)
-**Status:** todo
+**Status:** done
 **Description:** `arr` nomenclature, genome build requirement, SNP-array specifics, complex results.
 **Acceptance:** Shared KB criteria.
-**Notes:**
+**Notes:** **Outcome (2026-11-20):**
+- KB: 17 new `ARR` rules in `kb/rules/2016/ch14/` (§14.1, §14.2, §14.2.1, §14.2.2) with quotes in `kb/source-quotes/2016/ch14/`. All paraphrases were approved by the user. 13 are errors; 4 are info (`SHORT_AND_DETAILED_SYSTEMS`, `RESULT_TABLE`, `STRUCTURE_NOT_SHOWN`, `GENOME_BROWSER_BANDS`). `COMBINED_WITH_OTHER_METHODS` is `applies_to: [general]` and holds the combined karyotype/ish + arr strings.
+- All 73 printed strings are valid examples. The exception is §14.2 E27 (misprinted band 18q22.33): its printed form is an invalid example of `BAND.MUST_EXIST`, and the corrected form is a valid example of `ARR.ABERRATION_ORDER`.
+- Changes to existing rules:
+  - `GEN.GENOME_BUILD_REQUIRED` extended (placement, space, exceptions) and re-approved.
+  - `SYM.NO_SPACE_AT_PARENTHESIS` gained an arr example; `SYM.LISTED_ONLY` gained a ch. 14 note.
+  - `related` links from `KARYO.PARENTAL_ORIGIN`, `UPD.FORMAT` and `UNCERTAIN.OR_ALTERNATIVE`.
+- Printed-form decisions (with the user):
+  - the spaces printed in `) ×n` are normalized;
+  - line wraps are joined;
+  - GRCh37 positions under `[GRCh38]` (E23/E24, E34, E40, E44, E45) are kept as printed and noted for T-034.
+- Tests:
+  - the harness skips a non-valid case whose string has no implemented segment (`ExampleRun.NotImplemented`, `ValidatorAdapter`);
+  - `ParseHelper.KbExamples()` skips strings with no karyotype segment;
+  - one `InvalidExampleExpectations` entry added.
+- Results: `kb build` 177 rules / 288 quotes; `dotnet test` 3797 total, 0 failed, 81 skipped.
+- Docs: `docs/decisions.md`, `docs/extraction-review-2016.md`, `CLAUDE.md`/`README.md` (harness skip), T-034 notes.
+- Deviations from the plan:
+  - combined strings moved under the general rule;
+  - the E27 misprint and GRCh37 findings came from a band-coordinate check during the work.
 
 ### T-018 — KB: ch. 10 & 12 (breakage, meiotic)
 **Status:** todo
@@ -433,7 +452,10 @@ Outcome (2026-11-18): `Segmenter.Split` (top-level `.` followed by a letter sepa
 **Status:** todo
 **Description:** `arr` grammar and rules, including the genome build and coordinate vs. band consistency.
 **Acceptance:** Related KB examples pass.
-**Notes:**
+**Notes:** From T-017:
+- Checkable ARR rules (errors): `NUCLEOTIDE_FORMAT`, `NORMAL_RESULT`, `ABERRATIONS_ONLY`, `ABERRATION_ORDER`, `REGION_FORMAT`, `PTER_TO_QTER`, `COPY_NUMBER`, `MOSAIC_PROPORTION`, `INHERITANCE_SPACING`, `COMBINED_WITH_OTHER_METHODS` (general), `ZYGOSITY`, `COMPLEX_CX`, `CHROMOTHRIPSIS`; plus `GEN.GENOME_BUILD_REQUIRED`, `SYM.NO_SPACE_AT_PARENTHESIS` (arr example) and `BAND.MUST_EXIST` (§14.2 E27 invalid example). Info only: `SHORT_AND_DETAILED_SYSTEMS`, `RESULT_TABLE`, `STRUCTURE_NOT_SHOWN`, `GENOME_BROWSER_BANDS`.
+- Coordinate vs. band check: §14.2 E23/E24, E34, E40, E44 and E45 print GRCh37 positions under `[GRCh38]` (kept as printed; listed in `ARR.PTER_TO_QTER`'s note). Decide how to treat them before flagging.
+- When arr parses, remove the karyotype-segment filter in `ParseHelper.KbExamples()` and check that the 24 harness skips "arr: not implemented in the pilot" become passes.
 
 ### T-035 — Level 1 fixes + level 3 explanations
 **Status:** done

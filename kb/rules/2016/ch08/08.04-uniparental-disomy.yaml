@@ -36,4 +36,4 @@ rules:
         example gives mat or pat, but the text does not say it is required; whether upd(n)
         without a parent of origin is valid stays open: book-ambiguous, so findings are capped at
         warning (T-022/T-056) until a person resolves it.
-    related: [KARYO.PARENTAL_ORIGIN]
+    related: [KARYO.PARENTAL_ORIGIN, ARR.ZYGOSITY]

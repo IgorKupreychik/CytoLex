@@ -1,0 +1,55 @@
+version: "2016"
+section: "14.2.2"
+rules:
+  - id: ARR.COMPLEX_CX
+    title: cx for multiple complex rearrangements across the genome
+    applies_to: [arr]
+    severity: error
+    statement: >-
+      Multiple complex rearrangements across the whole genome are written with cx directly after
+      the chromosomes concerned in parentheses, in place of a copy number (arr(1–22,X)cx). Sex
+      chromosomes that appear normal are left out.
+    cite:
+      - {section: "14.2.2", page: 122, para: "¶1"}
+      - {section: "14.2.2", page: 122, example: E2}
+    examples:
+      valid:
+        - text: "arr(1–22,X)cx"
+          cite: {section: "14.2.2", page: 122, example: E1}
+        - text: "arr(1–22)cx"
+          cite: {section: "14.2.2", page: 122, example: E2}
+        - text: "arr(1–22,X,Y)cx"
+          cite: {section: "14.2.2", page: 122, example: E3}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Format read from E1–E3. No invalid example: a space before cx is
+        SYM.NO_SPACE_AT_PARENTHESIS, and the book gives no other faulty form.
+    related: [ARR.CHROMOTHRIPSIS, ARR.COPY_NUMBER]
+
+  - id: ARR.CHROMOTHRIPSIS
+    title: cth for chromothripsis
+    applies_to: [arr]
+    severity: error
+    statement: >-
+      Chromothripsis, a complex pattern of alternating copy-number states (normal, gain, loss)
+      along a chromosome or segment, is written with cth directly after the chromosome or arm in
+      parentheses ((1p)cth, (1,13)cth). It may be combined with other array results in one
+      string.
+    cite:
+      - {section: "14.2.2", page: 122, para: "¶2"}
+      - {section: "14.2.2", page: 122, example: E6}
+    examples:
+      valid:
+        - text: "arr(1p)cth"
+          cite: {section: "14.2.2", page: 122, example: E4}
+        - text: "arr(1,13)cth"
+          cite: {section: "14.2.2", page: 122, example: E5}
+        - text: "arr[GRCh38] (1)cth,6q25.1q27(149100000_170899992)×1,(13)cth"
+          cite: {section: "14.2.2", page: 122, example: E6}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: Format read from E4–E6. No invalid example (as for ARR.COMPLEX_CX).
+    related: [ARR.COMPLEX_CX, ARR.ABERRATION_ORDER]

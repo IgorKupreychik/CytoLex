@@ -167,5 +167,6 @@ internal static class InvalidExampleExpectations
             ["47,XY,+21c[12]/48,XY,+8,+21c[3]/49,XY,+8,+9,+21c[5]"] = [], // CLONE.NORMAL_LAST
             ["68<3n>,XY,–Y[10]"] = [], // SEX.UNEVEN_PLOIDY_MALE
             ["45,XY,–7[5]/46,idem,+8[6]/46,XY,t(9;22)(q34;q11.2)[3]/92,XXYY,t(9;22)×2[5]/93,XXYY,t(9;22)×2,+8[2]"] = [], // KARYO.ABNORMALITY_ORDER (§11.1.4 E7, printed)
+            ["47,XY,+mar.arr[GRCh38] 1p12p11.2(117596421_121013236)×3 dn.ish r(1)(p13.1q11?)(D1Z1+)"] = [], // ARR.COMBINED_WITH_OTHER_METHODS
         };
 }

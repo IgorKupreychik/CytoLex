@@ -1,0 +1,82 @@
+version: "2016"
+section: "14.1"
+rules:
+  - id: ARR.SHORT_AND_DETAILED_SYSTEMS
+    title: Short and detailed microarray descriptions
+    applies_to: [arr]
+    severity: info
+    statement: >-
+      One nomenclature covers every array type (BAC, copy-number oligonucleotide, SNP or a mix).
+      The number and type of probes or clones are not part of it. Results can be written in two
+      systems. The short description gives only the abnormal nucleotide span. The detailed
+      description also gives the nearest normal nucleotides on either side, each followed by its
+      own copy number, as in 163002425×2,163146681_183022312×1,184322231×2.
+    cite:
+      - {section: "14.1", page: 115, para: "¶2"}
+    examples:
+      valid:
+        - text: "arr[GRCh38] 4q32.2q35.1(163146681_183022312)×1"
+          cite: {section: "14.2", page: 117, example: E10}
+          note: Short description.
+        - text: "arr[GRCh38] 4q32.2q35.1(163002425×2,163146681_183022312×1,184322231×2)"
+          cite: {section: "14.2", page: 117, example: E10}
+          note: Detailed description of the same loss.
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info: the rule describes the two systems; a string can't break it. The format
+        of each system is checked by ARR.NUCLEOTIDE_FORMAT, ARR.REGION_FORMAT and ARR.COPY_NUMBER.
+    related: [ARR.NUCLEOTIDE_FORMAT, ARR.REGION_FORMAT, STRUCT.SHORT_AND_DETAILED_SYSTEMS]
+
+  - id: ARR.NUCLEOTIDE_FORMAT
+    title: Nucleotide positions without commas, span with an underscore
+    applies_to: [arr]
+    severity: error
+    statement: >-
+      Nucleotide positions are written as plain numbers, without thousands separators. A span
+      joins its first and last position with an underscore (_), following the HGVS
+      recommendations. Single positions in one result (as in the detailed description) are
+      separated by commas.
+    cite:
+      - {section: "14.1", page: 115, para: "¶2"}
+      - {section: "14.2", page: 116, para: "¶3"}
+    examples:
+      valid:
+        - text: "arr[GRCh38] Xq25(126228413_126535347)×1"
+          cite: {section: "14.2", page: 117, example: E13}
+        - text: "arr[GRCh38] Xq25(126023321×2,126228413_126535347×1,126556900×2)"
+          cite: {section: "14.2", page: 117, example: E13}
+      invalid:
+        - text: "arr[GRCh38] 4q32.2q35.1(163,146,681_183,022,312)×1"
+          why: The positions contain thousands separators (commas).
+          corrected: "arr[GRCh38] 4q32.2q35.1(163146681_183022312)×1"
+        - text: "arr[GRCh38] 4q32.2q35.1(163146681-183022312)×1"
+          why: The span must be joined with an underscore, not a hyphen.
+          corrected: "arr[GRCh38] 4q32.2q35.1(163146681_183022312)×1"
+    fix: {level: 1, kind: replace, hint: "Write the positions without separators and join a span with an underscore (_)."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: Both invalid examples are inferred from §14.1 ¶2.
+    related: [ARR.SHORT_AND_DETAILED_SYSTEMS, ARR.PTER_TO_QTER]
+
+  - id: ARR.RESULT_TABLE
+    title: Report narrative; complex results may be tabulated
+    applies_to: [arr]
+    severity: info
+    statement: >-
+      The report's narrative or interpretation states the platform, its resolution and whether
+      the array covers the whole genome. For very complex results, often in cancer, the
+      laboratory may give the ISCN results in a table instead of one string, optionally with an
+      estimate of the proportion of cells with each abnormality.
+    cite:
+      - {section: "14.1", page: 115, para: "¶3"}
+      - {section: "14.2", page: 116, para: "¶2"}
+    examples:
+      valid: []
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: Severity info - the rule concerns the report, not the string; a string can't verify it.
+    related: [ARR.MOSAIC_PROPORTION]

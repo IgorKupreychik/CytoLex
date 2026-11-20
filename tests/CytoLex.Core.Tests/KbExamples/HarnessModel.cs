@@ -36,11 +36,14 @@ internal enum Severity
 /// <param name="ValidContexts">Contexts in which the string has no errors.</param>
 /// <param name="Diagnostics">All diagnostics of the edition.</param>
 /// <param name="InferredContext">The context the string's own markers point to (§3.3); <c>null</c> = unknown.</param>
+/// <param name="NotImplemented">Set when no segment of the string is implemented in the pilot (e.g. an arr-only string
+/// before T-034): the reason, as the result states it; no check can run on such a string.</param>
 internal sealed record ExampleRun(
     bool IsValid,
     IReadOnlyList<SampleContext> ValidContexts,
     IReadOnlyList<ExampleDiagnostic> Diagnostics,
-    SampleContext? InferredContext = null);
+    SampleContext? InferredContext = null,
+    string? NotImplemented = null);
 
 /// <param name="RuleId">KB rule ID (or <c>CORE.UNPARSED</c>).</param>
 /// <param name="Severity">Effective severity; for a conditional diagnostic the worst over the contexts.</param>

@@ -43,8 +43,14 @@ internal static class ValidatorAdapter
                     d.Certainty == Certainty.Uncertain,
                     [.. d.Fixes.Select(f => f.Preview).OfType<string>()],
                     d.CannotVerify))],
-                report.Context.Inferred is { } inferred ? Map(inferred) : null);
+                report.Context.Inferred is { } inferred ? Map(inferred) : null,
+                NotImplementedReason(result));
         }
+
+        private static string? NotImplementedReason(EditionResult result) =>
+            !result.Segments.IsEmpty && result.Segments.All(s => s.Status == EditionStatus.NotImplemented)
+                ? string.Join("; ", result.Segments.Select(s => s.Reason).Distinct(StringComparer.Ordinal))
+                : null;
 
         private static SampleContext Map(CoreContext c) => c switch
         {

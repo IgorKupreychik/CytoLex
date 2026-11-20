@@ -145,6 +145,11 @@ Person check (`review.human`): `ok` for Table 1, Table 2, Table 3, Table 4 and S
   sentence continues after an example list.
 - §12.1 p.93: the terminology list (`spm | Spermatogonial metaphase`, …) is labelled as an
   example (E1). Harmless; re-check when writing ch. 12 rules (T-018).
+- Ch. 14 (T-017): several §14.2 examples print a space between `)` and `×n` (E1 second line,
+  E14–E19 and others) and §14.2.1 E9's caption prints `(4– 6)`; KB examples drop these spaces.
+  Long arr strings wrap inside parentheses or after `,` and are joined with no space. §14.2 E27
+  prints the non-existent band 18q22.33 (positions fit 18q21.33), and E23/E24, E34, E40, E44 and
+  E45 give GRCh37 positions under a `[GRCh38]` label (see `docs/decisions.md`, T-017).
 - §1.5 p.5: the date line "May 2012" is labelled as an example (ch. 1 is history, not used for
   rules).
 

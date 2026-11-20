@@ -1,0 +1,445 @@
+version: "2016"
+section: "14.2"
+rules:
+  - id: ARR.NORMAL_RESULT
+    title: Normal array result
+    applies_to: [arr]
+    severity: error
+    statement: >-
+      A normal result from an array with probes on many loci of every chromosome is written arr,
+      the chromosomes in parentheses and the copy number: arr(1–22,X)×2 for a female,
+      arr(1–22)×2,(X,Y)×1 for a male. No space comes between arr and the opening parenthesis. The
+      autosomes come first and the sex chromosomes are kept apart from them; no genome build is
+      needed.
+    cite:
+      - {section: "14.2", page: 116, para: "¶1"}
+      - {section: "14.1", page: 115, para: "¶2"}
+    examples:
+      valid:
+        - text: "arr(1–22,X)×2"
+          cite: {section: "14.2", page: 116, example: E1}
+        - text: "arr(1–22)×2,(X,Y)×1"
+          cite: {section: "14.2", page: 116, example: E1}
+          note: Printed "(X,Y) ×1" with a space; written without it (decided in T-017).
+      invalid:
+        - text: "arr(X,1–22)×2"
+          why: The sex chromosome is listed before the autosomes.
+          corrected: "arr(1–22,X)×2"
+        - text: "arr(X,Y)×1,(1–22)×2"
+          why: The sex chromosomes are listed before the autosomes.
+          corrected: "arr(1–22)×2,(X,Y)×1"
+    fix: {level: 1, kind: reorder, hint: List the autosomes first and the sex chromosomes after them.}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Both invalid examples are inferred. The space between arr and the parenthesis is
+        SYM.NO_SPACE_AT_PARENTHESIS (§14.2 ¶1 cited there).
+    related: [ARR.ABERRATION_ORDER, GEN.GENOME_BUILD_REQUIRED, SYM.NO_SPACE_AT_PARENTHESIS]
+
+  - id: ARR.ABERRATIONS_ONLY
+    title: Abnormal result lists only the aberrations
+    applies_to: [arr]
+    severity: error
+    statement: >-
+      An abnormal result lists only the aberrations; chromosomes with a normal result are not
+      written. Whole-chromosome or whole-arm changes may use the short form without nucleotide
+      positions and without a genome build, as in arr(8)×3,(21)×3.
+    cite:
+      - {section: "14.2", page: 116, para: "¶3"}
+      - {section: "14.1", page: 115, para: "¶2"}
+    examples:
+      valid:
+        - text: "arr(8)×3,(21)×3"
+          cite: {section: "14.2", page: 116, example: E3}
+        - text: "arr(X)×2,(Y)×1"
+          cite: {section: "14.2", page: 116, example: E4}
+          note: A gain of X in a male; the Y is written because the sex chromosomes are read together.
+        - text: "arr(16q)×3"
+          cite: {section: "14.2", page: 116, example: E5}
+        - text: "arr(1–22)×3,(X)×2,(Y)×1"
+          cite: {section: "14.2", page: 116, example: E7}
+          note: Triploidy 69,XXY - every chromosome is abnormal.
+        - text: "arr(1–22,X)×3"
+          cite: {section: "14.2", page: 116, example: E8}
+        - text: "arr(1–19,21,22,X)×3"
+          cite: {section: "14.2", page: 116, example: E9}
+          note: Near-triploid female with two copies of chromosome 20; the normal-looking chromosome 20 is the one left out.
+      invalid:
+        - text: "arr[GRCh38] (1–22,X)×2,6q21q25.1(113900000_149100000)×1"
+          why: The normal chromosomes are listed together with the aberration.
+          corrected: "arr[GRCh38] 6q21q25.1(113900000_149100000)×1"
+    fix: {level: 1, kind: delete, hint: Remove the normal chromosomes; list only the aberrations.}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: The invalid example is inferred from "list only the aberrations" (§14.2 ¶3).
+    related: [ARR.NORMAL_RESULT, ARR.REGION_FORMAT]
+
+  - id: ARR.ABERRATION_ORDER
+    title: Aberrations by chromosome, sex chromosomes last, pter to qter
+    applies_to: [arr]
+    severity: error
+    statement: >-
+      Aberrations are listed from the lowest to the highest chromosome number, whether they are
+      gains or losses; sex chromosome aberrations come last. Several aberrations on one
+      chromosome are listed from pter to qter.
+    cite:
+      - {section: "14.2", page: 116, para: "¶3"}
+      - {section: "14.2", page: 119, example: E27}
+      - {section: "14.2", page: 119, example: E28}
+      - {section: "14.2", page: 119, example: E29}
+      - {section: "14.2", page: 119, example: E33}
+    examples:
+      valid:
+        - text: "arr[GRCh38] 20q13.13q13.33(51001876_62375085)×1,22q13.32q13.33(48533211_49525263)×3"
+          cite: {section: "14.2", page: 118, example: E25}
+        - text: "arr[GRCh38] 9p24.3(1310386_1709409)×1 mat,9p22.3p22.2(16455330_16763471)×1 dn,18q21.33q22.1(62747805_67920791)×1 dn"
+          cite: {section: "14.2", page: 119, example: E27}
+          note: >-
+            Printed 18q22.33q22.1, a band that does not exist (misprint; the printed form is an
+            invalid example of BAND.MUST_EXIST). Written with 18q21.33, which the positions fit.
+        - text: "arr[GRCh38] 14q31.1(82695844_82855387)×1,14q32.33(105643093_106109395)×3"
+          cite: {section: "14.2", page: 119, example: E28}
+        - text: "arr[GRCh38] 9p24.3p13.1(204166_38756057)×1,18q21.33q22.1(63877984_64683663)×1,21q11.2q21.1(13600026_20175986)×3"
+          cite: {section: "14.2", page: 119, example: E29}
+        - text: "arr[GRCh37] 20q13.2q13.33(51840606_62375085)×3,Yq11.23(26887746_27019505)×0"
+          cite: {section: "14.2", page: 119, example: E33}
+      invalid:
+        - text: "arr(21)×3,(8)×3"
+          why: Chromosome 21 is listed before chromosome 8.
+          corrected: "arr(8)×3,(21)×3"
+        - text: "arr[GRCh38] Xp22.31(6923924_7253485)×3,5q14.3(88018766_89063989)×1"
+          why: The sex chromosome aberration must come last.
+          corrected: "arr[GRCh38] 5q14.3(88018766_89063989)×1,Xp22.31(6923924_7253485)×3"
+        - text: "arr[GRCh38] 14q32.33(105643093_106109395)×3,14q31.1(82695844_82855387)×1"
+          why: On one chromosome the aberrations are listed from pter to qter; 14q31.1 is nearer pter.
+          corrected: "arr[GRCh38] 14q31.1(82695844_82855387)×1,14q32.33(105643093_106109395)×3"
+    fix: {level: 1, kind: reorder, hint: "Order the aberrations by chromosome number (sex chromosomes last), then from pter to qter."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The invalid examples are the book's E3, E36 and E28 reordered. E27 is written with the
+        corrected band 18q21.33 (decided with the user in T-017; see BAND.MUST_EXIST).
+    related: [ARR.PTER_TO_QTER, ARR.NORMAL_RESULT, KARYO.ABNORMALITY_ORDER]
+
+  - id: ARR.REGION_FORMAT
+    title: Region of an array aberration
+    applies_to: [arr]
+    severity: error
+    statement: >-
+      A segment is written as the chromosome with the bands of the abnormal segment only: the
+      first and the last band, run together without a separator (6q21q25.1), or one band
+      (Xq25). The nucleotide positions follow in parentheses, then the copy number. A whole
+      chromosome or arm may instead be written in parentheses without positions ((8), (16q));
+      several chromosomes with the same result share one pair of parentheses, with commas and
+      en-dash ranges ((1–19,21,22,X)). pter or qter may end a band range (13q14.2qter). When the
+      result can't tell two homologous regions apart (the pseudoautosomal regions of X and Y),
+      both are given with "or", for the bands and for the positions.
+    cite:
+      - {section: "14.2", page: 116, para: "¶3"}
+      - {section: "14.2", page: 116, example: E2}
+      - {section: "14.2", page: 116, example: E6}
+      - {section: "14.2", page: 120, example: E46}
+      - {section: "14.2", page: 121, example: E49}
+    examples:
+      valid:
+        - text: "arr(X)×1[0.6]"
+          cite: {section: "14.2", page: 116, example: E2}
+        - text: "arr[GRCh38] Xp22.33q28(168546_155233730)×1[0.6]"
+          cite: {section: "14.2", page: 116, example: E2}
+        - text: "arr[GRCh38] 6q21q25.1(113900000_149100000)×1,(21)×3"
+          cite: {section: "14.2", page: 116, example: E6}
+          note: A segment and a whole chromosome in one result.
+        - text: "arr[GRCh38] 18p11.32q23(102328_79093443)×3"
+          cite: {section: "14.2", page: 120, example: E43}
+        - text: "arr[GRCh38] 21q11.2q22.3(13531865_46914745)×3"
+          cite: {section: "14.2", page: 120, example: E44}
+        - text: "arr[GRCh38] Xq28 or Yq12(155790872_156030895 or 56959165_57217415)×1"
+          cite: {section: "14.2", page: 120, example: E46}
+        - text: "arr[GRCh38] (1–7)×1,(9–12)×1,13q12.11q14.2(19438807_48800573)×1,13q14.2(48986461_49176936)×0~1,13q14.2qter(49176999_115095706)×1,(15–20)×1,(22)×1,(X)×1"
+          cite: {section: "14.2", page: 121, example: E49}
+      invalid:
+        - text: "arr[GRCh38] 6q21-q25.1(113900000_149100000)×1"
+          why: The two bands of the segment are run together, without a hyphen.
+          corrected: "arr[GRCh38] 6q21q25.1(113900000_149100000)×1"
+        - text: "arr[GRCh38] 6q21q6q25.1(113900000_149100000)×1"
+          why: The chromosome number is written once, before the first band.
+          corrected: "arr[GRCh38] 6q21q25.1(113900000_149100000)×1"
+    fix: {level: 3, hint: "Write the chromosome once, then the first and last band without a separator, then the positions in parentheses."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The format is read from the printed examples (E2–E49); §14.2 ¶3 states "Only the band
+        designations of the abnormal clones are shown". Both invalid examples are inferred.
+    related: [ARR.SHORT_AND_DETAILED_SYSTEMS, ARR.PTER_TO_QTER, ARR.COPY_NUMBER, UNCERTAIN.OR_ALTERNATIVE]
+
+  - id: ARR.PTER_TO_QTER
+    title: Bands and positions from pter to qter
+    applies_to: [arr]
+    severity: error
+    statement: >-
+      The aberrant nucleotides are listed from pter to qter, as in the current genome builds of
+      the public browsers (UCSC, Ensembl): the first position of a span is the smaller one, and
+      the band range runs in the same direction.
+    cite:
+      - {section: "14.2", page: 116, para: "¶3"}
+    examples:
+      valid:
+        - text: "arr[GRCh38] 11p12(37741458_39209912)×3"
+          cite: {section: "14.2", page: 117, example: E17}
+          note: Printed "(37741458_39209912) ×3" with a space; written without it (decided in T-017).
+        - text: "arr[GRCh38] 11p12(37003221×2,37741458_39209912×3,39752007×2)"
+          cite: {section: "14.2", page: 117, example: E17}
+        - text: "arr[GRCh38] 1p36.33p36.32(827048_3736354)×3,1q41q44(221649655_247175095)×1"
+          cite: {section: "14.2", page: 119, example: E30}
+        - text: "arr[GRCh38] 18p11.32(102328_2326882)×1,18q21.31q23(56296522_76093443)×3"
+          cite: {section: "14.2", page: 119, example: E31}
+        - text: "arr[GRCh38] 18p11.32p11.21(102328_15079388)×1,18q22.3q23(69172132_79093443)×1"
+          cite: {section: "14.2", page: 120, example: E45}
+      invalid:
+        - text: "arr[GRCh38] 4q35.1q32.2(183022312_163146681)×1"
+          why: The bands and positions run from qter to pter.
+          corrected: "arr[GRCh38] 4q32.2q35.1(163146681_183022312)×1"
+    fix: {level: 1, kind: reorder, hint: Swap the bands and the positions so that they run from pter to qter.}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The invalid example is inferred. Several printed examples labelled [GRCh38] carry GRCh37
+        positions (E23, E24, E34, E40, E44, E45; some lie past the chromosome end in GRCh38).
+        Their format is correct and they stay valid as printed (decided with the user in T-017);
+        a position-vs-band or position-vs-build check (T-034) must account for them.
+    related: [ARR.ABERRATION_ORDER, ARR.NUCLEOTIDE_FORMAT, ARR.REGION_FORMAT]
+
+  - id: ARR.COPY_NUMBER
+    title: Copy number after the region
+    applies_to: [arr]
+    severity: error
+    statement: >-
+      Each region is followed by its copy number with the multiplication sign (×0, ×1, ×3, …).
+      A copy number that varies is given as a range with the approximate sign (×2~4, ×0~1). When
+      the number is too high to count reliably, as in a tumour amplification, amp replaces the
+      copy number.
+    cite:
+      - {section: "14.2", page: 117, para: "¶4"}
+      - {section: "14.2", page: 120, example: E42}
+      - {section: "14.2", page: 120, example: E47}
+    examples:
+      valid:
+        - text: "arr[GRCh38] Xp11.22(53215290_53986534)×3"
+          cite: {section: "14.2", page: 117, example: E16}
+          note: Printed "(53215290_53986534) ×3" with a space; written without it (decided in T-017).
+        - text: "arr[GRCh38] 15q11.1q13.2(20366669_30226235)×4"
+          cite: {section: "14.2", page: 120, example: E41}
+        - text: "arr[GRCh38] 12p13.33p11.1(84917_34382567)×2~4"
+          cite: {section: "14.2", page: 120, example: E42}
+        - text: "arr[GRCh38] 7p11.2(54290345_55087100)amp"
+          cite: {section: "14.2", page: 120, example: E47}
+      invalid:
+        - text: "arr[GRCh38] 11p12(37741458_39209912)"
+          why: The copy number (×n) after the region is missing.
+        - text: "arr[GRCh38] 12p13.33p11.1(84917_34382567)×2-4"
+          why: A copy-number range uses the approximate sign (~), not a hyphen.
+          corrected: "arr[GRCh38] 12p13.33p11.1(84917_34382567)×2~4"
+    fix: {level: 3, hint: "Give the copy number after the region as ×n, a range as ×n~m, or amp for an uncountable amplification."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Read from §14.2 ¶4 ("copy number (×1, ×3, etc.)") and the printed examples; E42's
+        caption explains ~, E47's caption amp. Both invalid examples are inferred.
+    related: [ARR.REGION_FORMAT, ARR.MOSAIC_PROPORTION, UNCERTAIN.APPROX_INTERVAL]
+
+  - id: ARR.MOSAIC_PROPORTION
+    title: Proportion of abnormal cells in square brackets
+    applies_to: [arr]
+    severity: error
+    statement: >-
+      For a mixed cell population, the estimated proportion of cells with the abnormality may be
+      given in square brackets right after the copy number, as a fraction (×1[0.6] for about
+      60% of cells).
+    cite:
+      - {section: "14.2", page: 116, para: "¶3"}
+      - {section: "14.2", page: 116, example: E2}
+    examples:
+      valid:
+        - text: "arr(X)×1[0.6]"
+          cite: {section: "14.2", page: 116, example: E2}
+        - text: "arr[GRCh38] 11q22.3q23.2(104669588_113439979)×1[0.3],13q14.13q14.3(46290874_51390298)×1[0.8]"
+          cite: {section: "14.2", page: 120, example: E48}
+      invalid:
+        - text: "arr(X)×1[60%]"
+          why: The proportion is a fraction (0.6), not a percentage.
+          corrected: "arr(X)×1[0.6]"
+        - text: "arr(X)[0.6]×1"
+          why: The proportion follows the copy number.
+          corrected: "arr(X)×1[0.6]"
+    fix: {level: 3, hint: "Write the proportion as a fraction in square brackets right after the copy number (×1[0.6])."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        "Fraction" is read from every printed example (E2, E38, E39, E48: [0.6], [0.4], [0.15],
+        [0.3], [0.8]) and E2's caption ("approximately 60% of cells"). Both invalid examples are
+        inferred.
+    related: [ARR.COPY_NUMBER, ARR.RESULT_TABLE]
+
+  - id: ARR.INHERITANCE_SPACING
+    title: Parental origin after the copy number
+    applies_to: [arr]
+    severity: error
+    statement: >-
+      The parental origin (inh, mat, pat or dn) may follow the copy number. A space separates the
+      copy number and the inheritance symbol, but no space is written when the symbol follows
+      the closing parenthesis of a detailed description. With several aberrations, each carries
+      its own inheritance symbol.
+    cite:
+      - {section: "14.2", page: 117, para: "¶4"}
+      - {section: "14.2", page: 119, example: E27}
+    examples:
+      valid:
+        - text: "arr[GRCh38] 4q32.2q35.1(163146681_183022312)×1 dn"
+          cite: {section: "14.2", page: 117, example: E11}
+        - text: "arr[GRCh38] 4q32.2q35.1(163002425×2,163146681_183022312×1,184322231×2)dn"
+          cite: {section: "14.2", page: 117, example: E11}
+        - text: "arr[GRCh38] Xq25(126228413_126535347)×0 mat"
+          cite: {section: "14.2", page: 117, example: E12}
+        - text: "arr[GRCh38] Xq25(126023321×1,126228413_126535347×0,126556900×1)mat"
+          cite: {section: "14.2", page: 117, example: E12}
+        - text: "arr[GRCh38] Xp22.31(6467202_8091950)×0 mat"
+          cite: {section: "14.2", page: 117, example: E14}
+          note: Printed "(6467202_8091950) ×0 mat" with a space before ×; written without it (decided in T-017).
+        - text: "arr[GRCh38] Xp11.22(53215290_53986534)×2 mat"
+          cite: {section: "14.2", page: 117, example: E15}
+          note: Printed with a space before ×; written without it (decided in T-017).
+        - text: "arr[GRCh38] 17p11.2(16512256_20405113)×3 dn"
+          cite: {section: "14.2", page: 117, example: E18}
+          note: Printed with a space before ×; written without it (decided in T-017).
+        - text: "arr[GRCh38] 4q28.2(128184801_129319376)×3 mat,16p11.2(29581254_30066186)×3 pat"
+          cite: {section: "14.2", page: 118, example: E26}
+      invalid:
+        - text: "arr[GRCh38] 4q32.2q35.1(163146681_183022312)×1dn"
+          why: A space is required between the copy number and dn.
+          corrected: "arr[GRCh38] 4q32.2q35.1(163146681_183022312)×1 dn"
+        - text: "arr[GRCh38] 4q32.2q35.1(163002425×2,163146681_183022312×1,184322231×2) dn"
+          why: No space is written between the closing parenthesis of the detailed description and dn.
+          corrected: "arr[GRCh38] 4q32.2q35.1(163002425×2,163146681_183022312×1,184322231×2)dn"
+    fix: {level: 1, kind: replace, hint: "Write one space between the copy number and the inheritance symbol, and none after a closing parenthesis."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: Both invalid examples are E11 with the spacing reversed (inferred).
+    related: [KARYO.PARENTAL_ORIGIN, ARR.COPY_NUMBER, ARR.ZYGOSITY]
+
+  - id: ARR.STRUCTURE_NOT_SHOWN
+    title: An array shows copy number, not structure
+    applies_to: [arr]
+    severity: info
+    statement: >-
+      An array shows only relative gains and losses of DNA. The structure behind them (deletion,
+      duplication, insertion, unbalanced translocation, ring, marker, isochromosome, trisomy
+      versus translocation) needs FISH or a karyotype to be shown, and is then written in that
+      method's nomenclature, combined with the array result.
+    cite:
+      - {section: "14.2", page: 117, para: "¶4"}
+      - {section: "14.2", page: 118, example: E23}
+      - {section: "14.2", page: 120, example: E44}
+    examples:
+      valid:
+        - text: "arr[GRCh38] 8q23.1q24.3(105171556_146201911)×3,15q26.2q26.3(96062102_100201136)×1"
+          cite: {section: "14.2", page: 118, example: E23}
+          note: The same result after chromosome analysis and FISH is §14.2 E24 (ARR.COMBINED_WITH_OTHER_METHODS).
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: Severity info - it explains how to read an array result; a string can't violate it.
+    related: [ARR.COMBINED_WITH_OTHER_METHODS]
+
+  - id: ARR.COMBINED_WITH_OTHER_METHODS
+    title: Array result combined with karyotype and FISH
+    applies_to: [general]
+    severity: error
+    statement: >-
+      A result combined with banded chromosome analysis is written as arr, the genome build, a
+      space and the region, band or sub-band of the locus; a period (.) separates it from the
+      preceding result. With several techniques, the karyotype comes first, then FISH, then the
+      results of other techniques such as the array.
+    cite:
+      - {section: "14.2", page: 118, para: "¶5"}
+    examples:
+      valid:
+        - text: "47,XY,+mar.arr[GRCh38] 1p12p11.2(117596421_121013236)×3 dn"
+          cite: {section: "14.2", page: 118, example: E19}
+          note: Printed with a space before ×; written without it (decided in T-017).
+        - text: "47,XY,+mar.ish r(1)(p13.1q11?)(D1Z1+).arr[GRCh38] 1p12p11.2(117596421_121013236)×3 dn"
+          cite: {section: "14.2", page: 118, example: E20}
+          note: Printed "r(1) (p13.1q11?)" with a space and wrapped after the underscore; written without them.
+        - text: "47,XY,+mar.arr[GRCh38] 1p12p11.2(117596421_121013236)×3 dn,15q25.1q26.3(78932946_100201136)×3 dn"
+          cite: {section: "14.2", page: 118, example: E21}
+        - text: "46,XX.arr[GRCh38] 3p12.2(80395073_83498191)×3 inh,12p12.1(23543231_23699047)×1 dn"
+          cite: {section: "14.2", page: 118, example: E22}
+        - text: "46,XY,der(15)t(8;15)(q22.3;q26.2)mat.ish der(15)t(8;15)(RP11-1143I12+,RP11-14C10–).arr[GRCh38] 8q23.1q24.3(105171556_146201911)×3,15q26.2q26.3(96062102_100201136)×1"
+          cite: {section: "14.2", page: 118, example: E24}
+          note: Karyotype, FISH and array; §14.2 E23 alone. Shows that the structure needs FISH or a karyotype (ARR.STRUCTURE_NOT_SHOWN).
+        - text: "46,XY,rec(18)dup(18q)inv(18)(p11.32q21)pat.arr[GRCh38] 18p11.32(102328_2326882)×1,18q21.31q23(56296522_76093443)×3"
+          cite: {section: "14.2", page: 119, example: E32}
+        - text: "46,X,der(Y)t(Y;20)(q11.23;q13.2).arr[GRCh38] 20q13.2q13.33(51840606_62375085)×3,Yq11.23(26887746_27019505)×0"
+          cite: {section: "14.2", page: 119, example: E34}
+        - text: "46,XY,der(20)t(Y;20)(q11.23;q13.2).arr[GRCh37] 20q13.2q13.33(51840606_62375085)×1,Yq11.23(26887746_27019505)×2"
+          cite: {section: "14.2", page: 119, example: E35}
+        - text: "46,X,der(Y)t(X;Y)(p22.33;q12).arr[GRCh37] Xp22.33(701_2679502)×3,Xp22.33p22.2(2709521_15955588)×2,Yq11.221q11.23(16139805_27177529)×0"
+          cite: {section: "14.2", page: 119, example: E37}
+        - text: "46,XX.arr[GRCh38] 5q14.3(88018766_89063989)×1,Xp22.31(6923924_7253485)×3"
+          cite: {section: "14.2", page: 119, example: E36}
+          note: Also shows the sex chromosome aberration listed last (ARR.ABERRATION_ORDER).
+        - text: "ish mos del(2)(q11.2q13)(RP11-11P22–)[10/30].arr[GRCh38] 2q11.2q13(100982729_112106760)×1[0.4]"
+          cite: {section: "14.2", page: 120, example: E38}
+          note: FISH and array; the array gives the proportion of cells (ARR.MOSAIC_PROPORTION).
+        - text: "47,XY,+mar.ish der(2)(p11.2q13)(D2Z2+)[5/30].arr[GRCh38] 2p11.2q13(90982729_112106760)×3[0.15]"
+          cite: {section: "14.2", page: 120, example: E39}
+          note: Also shows the proportion of cells (ARR.MOSAIC_PROPORTION).
+        - text: "47,XX,+mar.arr[GRCh38] 21q11.2q21.1(13461349_17308947)×4,21q22.3(46222759_46914885)×3"
+          cite: {section: "14.2", page: 120, example: E40}
+          note: Also shows a two-copy gain (×4, ARR.COPY_NUMBER).
+      invalid:
+        - text: "arr[GRCh38] 1p12p11.2(117596421_121013236)×3 dn.47,XY,+mar"
+          why: The karyotype is listed first, before the array result.
+          corrected: "47,XY,+mar.arr[GRCh38] 1p12p11.2(117596421_121013236)×3 dn"
+        - text: "47,XY,+mar.arr[GRCh38] 1p12p11.2(117596421_121013236)×3 dn.ish r(1)(p13.1q11?)(D1Z1+)"
+          why: The FISH result comes before the array result.
+          corrected: "47,XY,+mar.ish r(1)(p13.1q11?)(D1Z1+).arr[GRCh38] 1p12p11.2(117596421_121013236)×3 dn"
+    fix: {level: 1, kind: reorder, hint: "Order the results karyotype, FISH, then array, separated by periods."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        applies_to general: the rule orders the segments of a combined string. Both invalid
+        examples are E19/E20 reordered (inferred). The space after the genome build is part of
+        GEN.GENOME_BUILD_REQUIRED.
+    related: [GEN.GENOME_BUILD_REQUIRED, ARR.STRUCTURE_NOT_SHOWN]
+
+  - id: ARR.GENOME_BROWSER_BANDS
+    title: Array bands come from the genome browsers
+    applies_to: [arr]
+    severity: info
+    statement: >-
+      Array band assignments are taken from the genome browsers, while conventional ones come
+      from banded chromosomes; the two do not always agree. Arrays usually lack the
+      heterochromatin near the centromeres, so centromeric bands rarely appear in array results
+      for rings and markers, even when the centromere is probably involved (FISH can confirm
+      it).
+    cite:
+      - {section: "14.2", page: 118, para: "¶6"}
+      - {section: "14.2", page: 118, example: E19}
+    examples:
+      valid: []
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info - an explanation. It backs the T-022 decision that genome-assembly-only
+        band names give no note in arr strings (BAND.GENOME_ASSEMBLY_ONLY does not apply to arr).
+    related: [BAND.GENOME_ASSEMBLY_ONLY, BAND.MUST_EXIST]

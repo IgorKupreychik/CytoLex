@@ -26,6 +26,9 @@ internal sealed record ExampleOutcome(string? SkipReason, IReadOnlyList<string> 
 /// rule is implemented or reported by the parser, a fix of the rule's diagnostic previews it exactly (T-035). Level-3
 /// rules have no single fix, so their corrected forms are checked for validity only.</item>
 /// <item>No <c>CORE.UNPARSED</c> on any example.</item>
+/// <item>Invalid and corrected cases whose invalid string has no implemented segment (an arr-only example of a general
+/// rule, before T-034) skip with the segment's "not implemented" reason: no check can run on it (decided in T-017). Its
+/// corrected form is still checked where it is a valid example of its own.</item>
 /// </list>
 /// </summary>
 internal static class ExampleExpectations
@@ -40,10 +43,20 @@ internal static class ExampleExpectations
             return ExampleOutcome.Skip(NoValidator);
         }
 
-        if (c.Kind == ExampleKind.Invalid && !ruleImplemented
-            && !validator.Run(c.Rule.Edition, c.Text, null, c.IsFragment).Diagnostics.Any(d => d.RuleId == c.Rule.Id))
+        if (c.Kind != ExampleKind.Valid)
         {
-            return ExampleOutcome.Skip($"rule {c.Rule.Id} not implemented");
+            var probe = validator.Run(c.Rule.Edition, c.Text, null, c.IsFragment);
+            if (c.Kind == ExampleKind.Invalid && !ruleImplemented && !probe.Diagnostics.Any(d => d.RuleId == c.Rule.Id))
+            {
+                return ExampleOutcome.Skip($"rule {c.Rule.Id} not implemented");
+            }
+
+            // No check runs on a string none of whose segments is implemented (an arr-only example of a general rule
+            // before T-034), so its rule can neither fire nor offer the fix (T-017).
+            if (probe.NotImplemented is { } notImplemented)
+            {
+                return ExampleOutcome.Skip(notImplemented);
+            }
         }
 
         var failures = new List<string>();

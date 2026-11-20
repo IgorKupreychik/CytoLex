@@ -1,0 +1,21 @@
+version: "2016"
+section: "14.2.1"
+quotes:
+  - rule: ARR.ZYGOSITY
+    cite: {section: "14.2.1", page: 121, para: "¶1"}
+    text: >-
+      The use of SNP arrays may uncover regions of homozygosity that have been reduced from
+      previously known heterozygosity. The symbols htz and hmz can be used to define the
+      zygosity of the chromosomal region.
+  - rule: ARR.ZYGOSITY
+    cite: {section: "14.2.1", page: 121, example: E5}
+    text: >-
+      Note the use of the parentheses in the long form with multiple regions of homozygosity
+      being grouped.
+  - rule: ARR.ZYGOSITY
+    cite: {section: "14.2.1", page: 122, example: E9}
+    text: >-
+      Chromosomes 1, 2, 4–6, 8, 9p, 10–12, 18, and 21 show a heterozygous state, which does not
+      need to be emphasized, since this represents the normal situation, whereas the other
+      chromosomes and 9q show homozygosity, which also does not to be emphasized because this is
+      already clear by the ×1 notation.

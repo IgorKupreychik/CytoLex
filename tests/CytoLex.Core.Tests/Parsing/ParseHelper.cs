@@ -26,10 +26,15 @@ internal static class ParseHelper
     public static string Describe(string text, SyntaxDiagnostic d) =>
         string.Create(CultureInfo.InvariantCulture, $"{d.RuleId} '{d.Span.Of(text)}'@{d.Span.Start}");
 
-    /// <summary>The distinct KB karyotype/general examples of edition 2016 (valid, invalid and corrected), with their fragment flag.</summary>
+    /// <summary>
+    /// The distinct KB karyotype/general examples of edition 2016 (valid, invalid and corrected) that have a karyotype
+    /// segment to parse, with their fragment flag. Strings without one (arr-only examples of general rules) have nothing to
+    /// parse until their parser exists (T-034; decided in T-017).
+    /// </summary>
     public static IEnumerable<(string Text, bool Fragment, ExampleKind Kind, string RuleId)> KbExamples() =>
         KbCatalog.Default.Cases
             .Where(c => c.Rule.Edition == "2016" && c.Rule.AppliesTo.Any(a => a is "karyotype" or "general"))
+            .Where(c => Segmenter.Split(c.CheckedText).Any(s => s.Type == NotationType.Karyotype))
             .Select(c => (Text: c.CheckedText, Fragment: KbCatalog.IsFragment(c.CheckedText), c.Kind, RuleId: c.Rule.Id))
             .DistinctBy(x => (x.Text, x.Kind == ExampleKind.Invalid));
 }

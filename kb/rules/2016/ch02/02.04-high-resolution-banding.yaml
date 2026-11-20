@@ -58,8 +58,21 @@ rules:
           why: Chromosome 9 has no band q35; its long arm ends at region 3, band 4.
         - text: "9q34.4"
           why: Band 9q34 has only sub-bands 9q34.1–9q34.3.
+        - text: "arr[GRCh38] 9p24.3(1310386_1709409)×1 mat,9p22.3p22.2(16455330_16763471)×1 dn,18q22.33q22.1(62747805_67920791)×1 dn"
+          cite: {section: "14.2", page: 119, example: E27}
+          why: >-
+            Printed error in the book: band 18q22.33 does not exist (18q22 has sub-bands
+            18q22.1–18q22.3). The positions lie in 18q21.33–18q22.1, the range §14.2 E29 prints
+            for a nearby region.
+          corrected: "arr[GRCh38] 9p24.3(1310386_1709409)×1 mat,9p22.3p22.2(16455330_16763471)×1 dn,18q21.33q22.1(62747805_67920791)×1 dn"
     fix: {level: 3, hint: "Name an existing band; check the idiogram of the chromosome at the resolution level used."}
-    review: {paraphrase_checked: true, needs_review: false}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        §14.2 E27 (T-017, decided with the user): the printed 18q22.33q22.1 is a misprint. The
+        printed string is kept here as an invalid example; ARR.ABERRATION_ORDER holds the
+        corrected form as its valid example.
     related: [BAND.CENTROMERE_10, BAND.RESOLUTION_LEVELS, BAND.GENOME_ASSEMBLY_ONLY]
 
   - id: BAND.GENOME_ASSEMBLY_ONLY

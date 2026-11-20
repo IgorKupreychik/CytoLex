@@ -1,0 +1,69 @@
+version: "2016"
+section: "14.2.1"
+rules:
+  - id: ARR.ZYGOSITY
+    title: htz / hmz for the zygosity of a region (SNP arrays)
+    applies_to: [arr]
+    severity: error
+    statement: >-
+      With SNP arrays, htz (heterozygosity) or hmz (homozygosity) may give the zygosity of a
+      region. The symbol follows the copy number after a space; mos (mosaic) comes before it,
+      and the origin (mat, pat or c) after it, each separated by a space (×2 mos hmz mat). Several
+      regions with the same result may be grouped in parentheses before the shared copy number.
+      The normal heterozygous state, and homozygosity that ×1 already implies, need not be
+      written.
+    cite:
+      - {section: "14.2.1", page: 121, para: "¶1"}
+      - {section: "14.2.1", page: 121, example: E2}
+      - {section: "14.2.1", page: 121, example: E5}
+      - {section: "14.2.1", page: 122, example: E9}
+    examples:
+      valid:
+        - text: "arr[GRCh38] 11p12(37741458_39209912)×2 hmz"
+          cite: {section: "14.2.1", page: 121, example: E1}
+        - text: "arr[GRCh38] 11p12(37741458_39209912)×2 mos hmz mat"
+          cite: {section: "14.2.1", page: 121, example: E2}
+        - text: "upd(16)mat.arr[GRCh38] 16p13.3q23.1(31010_78001824)×2 htz,16q23.1q24.2(78003664_88690776)×2 hmz"
+          cite: {section: "14.2.1", page: 121, example: E3}
+        - text: "arr[GRCh38] 15q11.2q26.3(23123715_101888908)×2 hmz pat,21q11.21q22.3(14595263_48084819)×2 hmz pat"
+          cite: {section: "14.2.1", page: 121, example: E4}
+        - text: "arr(15q,21q)×2 hmz pat"
+          cite: {section: "14.2.1", page: 121, example: E5}
+          note: Short form.
+        - text: "arr[GRCh38] (15q11.2q26.3(23123715_101888908),21q11.21q22.3(14595263_48084819))×2 hmz pat"
+          cite: {section: "14.2.1", page: 121, example: E5}
+          note: Long form; the two regions of homozygosity are grouped in parentheses.
+        - text: "arr(7)×2 htz mat"
+          cite: {section: "14.2.1", page: 121, example: E6}
+        - text: "arr[GRCh38] 11p15.5p15.4(2265338_6275434)×2 hmz c,19q13.33qter(49759500_58586384)×2 hmz"
+          cite: {section: "14.2.1", page: 121, example: E7}
+          note: c marks the inherited (constitutional) region; the other region is acquired.
+        - text: "arr[GRCh38] 11p15.5p15.4(2265338_6275434)×2 hmz,19q13.33qter(49759500_58586384)×2 hmz"
+          cite: {section: "14.2.1", page: 122, example: E8}
+        - text: "arr(3,7,9q,13–17,19,20,22,X)×1"
+          cite: {section: "14.2.1", page: 122, example: E9}
+          note: Near-haploidy; hmz is implied by ×1 and not written.
+        - text: "arr(1,2)×4,(3)×2 hmz,(4–6)×4,(7)×2 hmz,(8,9p)×4,(9q)×2 hmz,(10–12)×4,(13–17)×2 hmz,(18)×4,(19,20)×2 hmz,(21)×4,(22,X)×2 hmz"
+          cite: {section: "14.2.1", page: 122, example: E9}
+          note: >-
+            The doubled form the E9 caption also calls correct; printed "(4– 6)" with a space,
+            written without it (decided in T-017).
+        - text: "arr(1–13)×2 mos hmz,(14)×2~3,(16–20)×2 mos hmz,(21)×2~3,(22)×2 mos hmz,(X)×1~2,(Y)×1~2"
+          cite: {section: "14.2.1", page: 122, example: E10}
+      invalid:
+        - text: "arr[GRCh38] 11p12(37741458_39209912)×2hmz"
+          why: A space is required between the copy number and hmz.
+          corrected: "arr[GRCh38] 11p12(37741458_39209912)×2 hmz"
+        - text: "arr[GRCh38] 11p12(37741458_39209912)×2 mat mos hmz"
+          why: mos and hmz come before the parental origin (×2 mos hmz mat).
+          corrected: "arr[GRCh38] 11p12(37741458_39209912)×2 mos hmz mat"
+    fix: {level: 3, hint: "Write the copy number, then mos, hmz/htz and the origin, separated by spaces (×2 mos hmz mat)."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity error: "can be used" makes htz/hmz optional, but the printed form fixes how they
+        are written (kb/README.md, Severity). The order mos → hmz/htz → origin is read from E2,
+        E4–E7 and E10; both invalid examples are inferred. The "need not be written" part is
+        from the E9 caption and is not checked.
+    related: [ARR.INHERITANCE_SPACING, ARR.COPY_NUMBER, UPD.FORMAT]

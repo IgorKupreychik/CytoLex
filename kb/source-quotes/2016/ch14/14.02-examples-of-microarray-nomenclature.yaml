@@ -1,0 +1,83 @@
+version: "2016"
+section: "14.2"
+quotes:
+  - rule: ARR.NORMAL_RESULT
+    cite: {section: "14.2", page: 116, para: "¶1"}
+    text: >-
+      If the results are normal using any type of array that has probes targeted to multiple
+      loci across all chromosomes, the results are expressed as follows with no space between
+      arr and the opening parenthesis. The sex chromosomes are separated from the autosomes,
+      which are listed first.
+  - rule: ARR.ABERRATIONS_ONLY
+    cite: {section: "14.2", page: 116, para: "¶3"}
+    text: If the results are abnormal, list only the aberrations.
+  - rule: ARR.ABERRATION_ORDER
+    cite: {section: "14.2", page: 116, para: "¶3"}
+    text: >-
+      Regardless of whether it is a copy number gain or loss, the aberrations are listed from
+      lowest to highest chromosome; sex chromosome abnormalities should be listed last.
+  - rule: ARR.ABERRATION_ORDER
+    cite: {section: "14.2", page: 119, example: E28}
+    text: >-
+      Note that the abnormalities are shown from pter to qter, irrespective of whether they are
+      gains or losses.
+  - rule: ARR.REGION_FORMAT
+    cite: {section: "14.2", page: 116, para: "¶3"}
+    text: Only the band designations of the abnormal clones are shown.
+  - rule: ARR.PTER_TO_QTER
+    cite: {section: "14.2", page: 116, para: "¶3"}
+    text: >-
+      The aberrant nucleotides are listed from pter to qter, consistent with the public
+      databases of current genome builds on UCSC or Ensembl Genome Browsers
+      (www.genome.ucsc.edu or www.ensembl.org).
+  - rule: ARR.COPY_NUMBER
+    cite: {section: "14.2", page: 120, example: E42}
+    text: >-
+      The approximate sign is used to indicate that the number of copies of this region varies
+      from 2 to 4.
+  - rule: ARR.COPY_NUMBER
+    cite: {section: "14.2", page: 120, example: E47}
+    text: >-
+      Microarray analysis of a solid tumor shows amplification of a region in 7p11.2. The exact
+      copy number is too high to be enumerated accurately by array.
+  - rule: ARR.MOSAIC_PROPORTION
+    cite: {section: "14.2", page: 116, para: "¶3"}
+    text: >-
+      To indicate a mixed cell population, the proportion of cells with the abnormality can be
+      estimated and included in brackets following the copy number.
+  - rule: ARR.INHERITANCE_SPACING
+    cite: {section: "14.2", page: 117, para: "¶4"}
+    text: >-
+      The parental origin of the abnormality may follow the copy number (×1, ×3, etc.). There is
+      a space between the copy number and the inheritance symbol (dn, mat, pat, inh), but no
+      space if the inheritance symbol follows a parenthesis in the detailed system.
+  - rule: ARR.INHERITANCE_SPACING
+    cite: {section: "14.2", page: 119, example: E27}
+    text: Therefore, the inheritance of each is listed after the specific gain or loss.
+  - rule: ARR.STRUCTURE_NOT_SHOWN
+    cite: {section: "14.2", page: 117, para: "¶4"}
+    text: >-
+      Because microarray analysis can only demonstrate a relative gain or loss of DNA, FISH
+      analysis or karyotype is necessary to definitively demonstrate the structure of
+      deletions, duplications, insertions, unbalanced translocations, etc.
+  - rule: ARR.COMBINED_WITH_OTHER_METHODS
+    cite: {section: "14.2", page: 118, para: "¶5"}
+    text: >-
+      Observations combined with banded chromosome analysis and microarrays can be expressed by
+      using the symbol arr followed by the genome build, a space and the chromosome region, band
+      or sub-band designation of the locus. A period (.) precedes the microarray nomenclature.
+      Where multiple techniques are used, the karyotype is listed first followed by FISH,
+      followed by results obtained with other techniques.
+  - rule: ARR.GENOME_BROWSER_BANDS
+    cite: {section: "14.2", page: 118, para: "¶6"}
+    text: >-
+      Note that the conventional cytogenetic banding assignments are those derived from banded
+      chromosomes, while the array banding assignments are those derived from genome browsers.
+      These are not always concordant with each other.
+  - rule: ARR.GENOME_BROWSER_BANDS
+    cite: {section: "14.2", page: 118, example: E19}
+    text: >-
+      Because most microarrays will not contain the heterochromatin near the centromeres, the
+      centromeric bands are rarely included in the nomenclature of rings and markers after
+      microarray analysis, although the centromere is probably included in the aberration and
+      would need to be confirmed by FISH.

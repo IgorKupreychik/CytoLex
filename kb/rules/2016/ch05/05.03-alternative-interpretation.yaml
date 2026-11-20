@@ -29,4 +29,4 @@ rules:
           corrected: "46,XX,add(19)(p13 or q13)"
     fix: {level: 1, kind: insert, hint: Put a space before and after or.}
     review: {paraphrase_checked: true, needs_review: false}
-    related: [BREAK.ALTERNATIVE_BANDS, UNCERTAIN.APPROX_INTERVAL, SYM.SPACE_BETWEEN_SYMBOLS]
+    related: [BREAK.ALTERNATIVE_BANDS, UNCERTAIN.APPROX_INTERVAL, SYM.SPACE_BETWEEN_SYMBOLS, ARR.REGION_FORMAT]

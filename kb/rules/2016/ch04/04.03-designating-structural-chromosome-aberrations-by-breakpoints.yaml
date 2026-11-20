@@ -26,15 +26,38 @@ rules:
     severity: error
     statement: >-
       When an aberration is given by nucleotide positions (microarray, region-specific assay or
-      sequencing), the genome build or assembly must be stated (sections 14.1, 15.1, 16.2).
+      sequencing), the genome build or assembly must be stated (sections 14.1, 15.1, 16.2). In a
+      microarray result the build is written in square brackets directly after arr, followed by
+      a space (arr[GRCh38] 6q21q25.1(…)). It is not needed for a normal result or for a
+      whole-chromosome or whole-arm change written in the short form without positions
+      (arr(8)×3,(21)×3).
     cite:
       - {section: "4.3", page: 41, para: "¶2"}
+      - {section: "14.1", page: 115, para: "¶2"}
+      - {section: "14.2", page: 118, para: "¶5"}
     examples:
       valid:
         - text: "arr[GRCh38] Xp22.33q28(168546_155233730)×1[0.6]"
           cite: {section: "14.2", page: 116, example: E2}
+        - text: "arr[GRCh37] 20q13.2q13.33(51840606_62375085)×3,Yq11.23(26887746_27019505)×0"
+          cite: {section: "14.2", page: 119, example: E33}
+        - text: "arr(1–22,X)×2"
+          cite: {section: "14.2", page: 116, example: E1}
+          note: Normal result; no build needed.
+        - text: "arr(8)×3,(21)×3"
+          cite: {section: "14.2", page: 116, example: E3}
+          note: Short-form aneuploidy; no build needed.
       invalid:
         - text: "arr Xp22.33q28(168546_155233730)×1[0.6]"
           why: Nucleotide positions are given without the genome build (e.g. [GRCh38]).
-    fix: {level: 3, hint: "Add the genome build in square brackets (e.g. arr[GRCh38])."}
-    review: {paraphrase_checked: true, needs_review: false}
+        - text: "arr[GRCh38]6q21q25.1(113900000_149100000)×1"
+          why: A space is required after the square bracket of the genome build.
+          corrected: "arr[GRCh38] 6q21q25.1(113900000_149100000)×1"
+    fix: {level: 3, hint: "Add the genome build in square brackets (e.g. arr[GRCh38]), followed by a space."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        T-017 extended the statement with the §14.1 ¶2 placement, space and exceptions (re-approved
+        by the user). The second invalid example is inferred from "there is a space after the
+        square bracket".

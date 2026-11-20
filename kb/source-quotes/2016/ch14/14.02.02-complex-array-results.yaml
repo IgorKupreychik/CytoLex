@@ -1,0 +1,16 @@
+version: "2016"
+section: "14.2.2"
+quotes:
+  - rule: ARR.COMPLEX_CX
+    cite: {section: "14.2.2", page: 122, para: "¶1"}
+    text: >-
+      The symbol cx for complex chromosome rearrangement is used for multiple complex
+      rearrangements across the entire genome.
+  - rule: ARR.COMPLEX_CX
+    cite: {section: "14.2.2", page: 122, example: E2}
+    text: The sex chromosomes appear normal and are therefore not shown.
+  - rule: ARR.CHROMOTHRIPSIS
+    cite: {section: "14.2.2", page: 122, para: "¶2"}
+    text: >-
+      Chromothripsis (cth) refers to complex patterns of alternating copy number changes
+      (normal, gain, or loss) along a chromosome or chromosomal segment.

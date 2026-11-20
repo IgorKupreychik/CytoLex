@@ -40,6 +40,8 @@ rules:
         "min" is. Ch. 11 (T-014): every symbol used is listed (idem, sl, sdl, cp, c, mat, ×, [ ],
         ~); the numbered forms sdl1, sdl2 and sl2 are the listed sl/sdl with a number (§11.1.4
         ¶1, E7), and the ploidy terms n±, 2n–, 2n+ (§11.2 ¶2) are report terms, not notation.
+        Ch. 14 (T-017): every symbol used is listed (arr, GRCh, [ ], _, ×, ~, amp, mos, hmz, htz,
+        mat, pat, inh, dn, c, cx, cth, or, qter, upd).
 
   - id: SYM.SPACE_BETWEEN_SYMBOLS
     title: Space between combined symbols
@@ -94,6 +96,7 @@ rules:
       precedes or follows it.
     cite:
       - {section: "3", page: 34, para: "¶1"}
+      - {section: "14.2", page: 116, para: "¶1"}
     examples:
       valid:
         - text: "46,XX,del(5)(q13q33)"
@@ -102,6 +105,9 @@ rules:
         - text: "46,XX,del (5)(q13q33)"
           why: Space between del and the opening parenthesis.
           corrected: "46,XX,del(5)(q13q33)"
+        - text: "arr (1–22,X)×2"
+          why: No space is written between arr and the opening parenthesis (§14.2 ¶1).
+          corrected: "arr(1–22,X)×2"
     fix: {level: 1, kind: delete, hint: Remove the space next to the parenthesis.}
     review: {paraphrase_checked: true, needs_review: false}
 

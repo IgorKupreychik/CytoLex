@@ -1,0 +1,38 @@
+version: "2016"
+section: "14.1"
+quotes:
+  - rule: ARR.SHORT_AND_DETAILED_SYSTEMS
+    cite: {section: "14.1", page: 115, para: "¶2"}
+    text: >-
+      The nomenclature has been refined to encompass either type of array, built out of BACs,
+      oligonucleotides for copy number detection only, or SNPs, so that arrays made out of
+      combinations of oligonucleotides and SNPs may be described with a single nomenclature. In
+      this improved nomenclature, the number and type of clones used as targets (BAC, cosmid,
+      fosmid, oligonucleotide, etc.) are not included. Two systems have been devised; a detailed
+      description that includes the span of the abnormal nucleotides, as well as the bordering
+      normal nucleotides, and a short description that includes only the abnormal nucleotides.
+  - rule: ARR.NUCLEOTIDE_FORMAT
+    cite: {section: "14.1", page: 115, para: "¶2"}
+    text: >-
+      In both the detailed and short descriptions, the nucleotide numbers are given without
+      commas and the span is separated by an underscore (_), in line with the molecular genetic
+      nomenclature outlined by Human Genome Variation Society (HGVS) recommendations
+      (www.HGVS.org/varnomen).
+  - rule: ARR.NUCLEOTIDE_FORMAT
+    cite: {section: "14.2", page: 116, para: "¶3"}
+    text: >-
+      Multiple nucleotides may be listed, separated by commas, or an underscore may be used to
+      indicate that the gain or loss encompasses the segment between the listed clones.
+  - rule: ARR.RESULT_TABLE
+    cite: {section: "14.1", page: 115, para: "¶3"}
+    text: >-
+      In highly complex array results, the laboratory may choose to display results using ISCN
+      nomenclature in a table instead of in a string. This is often the case in cancer. At the
+      discretion of the lab, the information can include an estimate of the proportion of cells
+      with the abnormality.
+  - rule: ARR.RESULT_TABLE
+    cite: {section: "14.2", page: 116, para: "¶2"}
+    text: >-
+      The descriptive narrative, or interpretation, in the report should indicate the platform
+      used, the resolution, and whether the array represents the entire genome of all
+      chromosomes.
