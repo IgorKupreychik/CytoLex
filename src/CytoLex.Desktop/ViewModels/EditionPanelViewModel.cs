@@ -29,7 +29,7 @@ public partial class EditionPanelViewModel : ObservableObject
         CountsText = IsNotImplemented ? string.Empty : CountsOf(result.Counts);
 
         Segments = [.. report.Segments.Select(s => SegmentItemViewModel.From(input, s, result.Segments.FirstOrDefault(r => r.Segment.Index == s.Index)))];
-        Diagnostics = [.. result.Diagnostics.Select((d, i) => new DiagnosticItemViewModel(input, d, i))];
+        Diagnostics = [.. result.Diagnostics.Select((d, i) => new DiagnosticItemViewModel(input, d, i, result.Edition))];
         CellLineGroups = CellLineGroupViewModel.From(result);
         Highlights = IsNotImplemented ? [] : HighlightBuilder.Build(input, result, report.Context.Effective);
     }

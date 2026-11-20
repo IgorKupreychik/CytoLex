@@ -11,7 +11,7 @@ namespace CytoLex.Desktop.ViewModels;
 /// <summary>One row of the diagnostics list: a <see cref="Diagnostic"/> rendered as text.</summary>
 public sealed class DiagnosticItemViewModel
 {
-    public DiagnosticItemViewModel(string input, Diagnostic diagnostic, int index)
+    public DiagnosticItemViewModel(string input, Diagnostic diagnostic, int index, string? edition = null)
     {
         ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(diagnostic);
@@ -22,6 +22,10 @@ public sealed class DiagnosticItemViewModel
         SeverityLabel = Label(diagnostic.Severity);
         SeverityBrush = SeverityBrushes.For(diagnostic.Severity);
         RuleId = diagnostic.RuleId;
+        Edition = edition;
+
+        // KB rules always carry a citation; core codes (CORE.*) have none and no rule to open.
+        HasKbRule = edition is not null && !diagnostic.Citations.IsDefaultOrEmpty;
         Message = diagnostic.Message;
         Detail = diagnostic.Detail;
         Location = LocationOf(input, diagnostic.Span);
@@ -50,6 +54,15 @@ public sealed class DiagnosticItemViewModel
 
     /// <summary>The KB rule ID or core code.</summary>
     public string RuleId { get; }
+
+    /// <summary>The edition of the result the diagnostic belongs to; <c>null</c> if not given.</summary>
+    public string? Edition { get; }
+
+    /// <summary>Whether <see cref="RuleId"/> is a KB rule that the rule browser can open (T-039).</summary>
+    public bool HasKbRule { get; }
+
+    /// <summary>Whether <see cref="RuleId"/> is a core code (shown as plain text).</summary>
+    public bool IsCoreCode => !HasKbRule;
 
     /// <summary>The KB rule title.</summary>
     public string Message { get; }

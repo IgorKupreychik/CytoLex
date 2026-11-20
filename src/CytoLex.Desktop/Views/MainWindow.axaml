@@ -2,12 +2,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ae="using:AvaloniaEdit"
         xmlns:vm="using:CytoLex.Desktop.ViewModels"
+        xmlns:rules="using:CytoLex.Desktop.Rules"
         x:Class="CytoLex.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="CytoLex"
         Icon="/Assets/cytolex.ico"
         Width="1000" Height="680">
-  <!-- Main tabs: single-string check (T-036) and batch validation (T-038) -->
+  <!-- Main tabs: single-string check (T-036), batch validation (T-038) and rule browser (T-039) -->
   <TabControl x:Name="MainTabs" SelectedIndex="{Binding SelectedMainTab}" Margin="8,4,8,8">
   <TabItem Header="Single string">
   <DockPanel Margin="8">
@@ -96,7 +97,11 @@
                         <TextBlock Text="{Binding Message}" FontWeight="SemiBold" TextWrapping="Wrap" />
                         <TextBlock Text="{Binding Location}" FontFamily="Cascadia Mono,Consolas,monospace" Opacity="0.7" />
                       </StackPanel>
-                      <TextBlock Text="{Binding RuleId}" FontFamily="Cascadia Mono,Consolas,monospace" FontSize="12" Opacity="0.7" />
+                      <!-- Rule ID: a link to the rule browser for KB rules (T-039), plain text for core codes -->
+                      <Button Classes="link" Content="{Binding RuleId}" IsVisible="{Binding HasKbRule}" Click="OnOpenRuleClick"
+                              ToolTip.Tip="Open the rule in the rule browser" />
+                      <TextBlock Text="{Binding RuleId}" IsVisible="{Binding IsCoreCode}"
+                                 FontFamily="Cascadia Mono,Consolas,monospace" FontSize="12" Opacity="0.7" />
                       <TextBlock Text="{Binding Detail}" IsVisible="{Binding HasDetail}" TextWrapping="Wrap" />
                       <TextBlock Text="{Binding Condition}" IsVisible="{Binding HasCondition}" TextWrapping="Wrap" FontStyle="Italic" />
                       <TextBlock Text="{Binding Review}" IsVisible="{Binding HasReview}" TextWrapping="Wrap" FontStyle="Italic" Opacity="0.8" />
@@ -321,9 +326,157 @@
       </ListBox>
     </DockPanel>
   </TabItem>
+
+  <TabItem Header="Rules">
+    <DockPanel Margin="8" DataContext="{Binding Rules}" x:DataType="vm:RuleBrowserViewModel">
+      <TextBlock DockPanel.Dock="Top" Text="{Binding ErrorText}" IsVisible="{Binding HasError}" Classes="invalid"
+                 TextWrapping="Wrap" Margin="0,0,0,8" />
+      <!-- Search, edition, section -->
+      <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto,Auto" Margin="0,0,0,8" IsVisible="{Binding IsAvailable}">
+        <TextBox Grid.Column="0" Text="{Binding Query}"
+                 PlaceholderText="Search rules: ID, words, example strings like t(9;22), quotes" />
+        <ComboBox Grid.Column="1" MinWidth="120" Margin="8,0,0,0" ToolTip.Tip="ISCN edition"
+                  ItemsSource="{Binding Editions}" SelectedItem="{Binding SelectedEdition}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="x:String">
+              <TextBlock Text="{Binding StringFormat='ISCN {0}'}" />
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <ComboBox Grid.Column="2" MinWidth="140" Margin="8,0,0,0" ToolTip.Tip="Book section"
+                  ItemsSource="{Binding Sections}" SelectedItem="{Binding SelectedSection}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:SectionChoice">
+              <TextBlock Text="{Binding Label}" />
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBlock Grid.Column="3" Text="{Binding ResultText}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.7" />
+      </Grid>
+
+      <Grid ColumnDefinitions="2*,Auto,3*" IsVisible="{Binding IsAvailable}">
+        <!-- Hits -->
+        <ListBox Grid.Column="0" ItemsSource="{Binding Hits}" SelectedItem="{Binding SelectedHit}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:RuleHitViewModel">
+              <Grid ColumnDefinitions="Auto,*" Margin="0,2">
+                <Border Grid.Column="0" Background="{Binding SeverityBrush}" Width="4" CornerRadius="2" Margin="0,0,8,0" />
+                <StackPanel Grid.Column="1" Spacing="1">
+                  <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding Id}" FontFamily="Cascadia Mono,Consolas,monospace" FontSize="12" Opacity="0.75" />
+                  <TextBlock Text="{Binding Meta}" FontSize="12" Opacity="0.6" />
+                  <TextBlock Text="{Binding Snippet}" IsVisible="{Binding HasSnippet}" FontSize="12" FontStyle="Italic"
+                             Opacity="0.75" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+
+        <GridSplitter Grid.Column="1" Width="6" Background="Transparent" ResizeDirection="Columns" />
+
+        <!-- Detail -->
+        <TextBlock Grid.Column="2" Text="Select a rule, or click a diagnostic's rule ID in the single-string check."
+                   Opacity="0.6" TextWrapping="Wrap" Margin="8,0,0,0" IsVisible="{Binding !HasDetail}" />
+        <ScrollViewer Grid.Column="2" HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding HasDetail}">
+          <StackPanel Margin="8,0,8,8" Spacing="8" DataContext="{Binding Detail}" x:DataType="vm:RuleDetailViewModel">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Border Background="{Binding SeverityBrush}" CornerRadius="3" Padding="6,1" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Severity}" Foreground="White" />
+              </Border>
+              <SelectableTextBlock Text="{Binding Id}" FontFamily="Cascadia Mono,Consolas,monospace" VerticalAlignment="Center" />
+            </StackPanel>
+            <TextBlock Text="{Binding Title}" FontSize="17" FontWeight="SemiBold" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding Header}" Opacity="0.7" TextWrapping="Wrap" />
+            <SelectableTextBlock Text="{Binding Statement}" TextWrapping="Wrap" />
+            <ItemsControl ItemsSource="{Binding Citations}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                  <TextBlock Text="{Binding}" FontSize="12" Opacity="0.75" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Text="{Binding Scope}" TextWrapping="Wrap" Opacity="0.85" />
+            <TextBlock Text="{Binding Fix}" IsVisible="{Binding HasFix}" TextWrapping="Wrap" Opacity="0.85" />
+            <TextBlock Text="{Binding Review}" IsVisible="{Binding HasReview}" TextWrapping="Wrap" FontStyle="Italic" Opacity="0.8" />
+
+            <StackPanel Spacing="2" IsVisible="{Binding HasRelated}">
+              <TextBlock Text="Related rules" FontWeight="SemiBold" />
+              <ItemsControl ItemsSource="{Binding Related}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <WrapPanel />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:RelatedRuleViewModel">
+                    <Button Classes="link" Content="{Binding Id}" Command="{Binding OpenCommand}" Margin="0,0,12,0" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+
+            <StackPanel Spacing="4" IsVisible="{Binding HasValidExamples}">
+              <TextBlock Text="Valid examples" FontWeight="SemiBold" Classes="valid" />
+              <ItemsControl ItemsSource="{Binding ValidExamples}" ItemTemplate="{StaticResource RuleExampleTemplate}" />
+            </StackPanel>
+
+            <StackPanel Spacing="4" IsVisible="{Binding HasInvalidExamples}">
+              <TextBlock Text="Invalid examples" FontWeight="SemiBold" Classes="invalid" />
+              <ItemsControl ItemsSource="{Binding InvalidExamples}" ItemTemplate="{StaticResource RuleExampleTemplate}" />
+            </StackPanel>
+
+            <StackPanel Spacing="4">
+              <TextBlock Text="Source quotes" FontWeight="SemiBold" />
+              <TextBlock Text="{x:Static vm:RuleDetailViewModel.NoQuotesText}" IsVisible="{Binding !HasQuotes}" Opacity="0.6" />
+              <ItemsControl ItemsSource="{Binding Quotes}" IsVisible="{Binding HasQuotes}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="rules:RuleQuote">
+                    <Border BorderBrush="#808080" BorderThickness="2,0,0,0" Padding="8,2" Margin="0,0,0,6">
+                      <StackPanel Spacing="2">
+                        <SelectableTextBlock Text="{Binding Text}" TextWrapping="Wrap" FontStyle="Italic" />
+                        <TextBlock Text="{Binding Citation}" FontSize="12" Opacity="0.7" />
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
+    </DockPanel>
+  </TabItem>
   </TabControl>
 
+  <Window.Resources>
+    <!-- A KB example in the rule browser: the string, why/corrected/citation, and "Check" (T-039) -->
+    <DataTemplate x:Key="RuleExampleTemplate" x:DataType="vm:RuleExampleViewModel">
+      <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+        <StackPanel Grid.Column="0" Spacing="1">
+          <SelectableTextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding Info}" IsVisible="{Binding HasInfo}" FontSize="12" Opacity="0.7" TextWrapping="Wrap" />
+        </StackPanel>
+        <Button Grid.Column="1" Classes="link" Content="Check" Command="{Binding CheckCommand}" VerticalAlignment="Top"
+                Margin="8,0,0,0" ToolTip.Tip="Open in the single-string check" />
+      </Grid>
+    </DataTemplate>
+  </Window.Resources>
+
   <Window.Styles>
+    <Style Selector="Button.link">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Foreground" Value="#0078D4" />
+      <Setter Property="FontFamily" Value="Cascadia Mono,Consolas,monospace" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.link:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="#005A9E" />
+    </Style>
     <Style Selector="TextBlock.valid">
       <Setter Property="Foreground" Value="#107C10" />
     </Style>

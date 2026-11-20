@@ -14,6 +14,7 @@ namespace CytoLex.Desktop.Views;
 /// <see cref="MainWindowViewModel.Input"/>, hands the highlights of the selected edition tab (T-037) to the editor's
 /// renderers, and selects <see cref="MainWindowViewModel.SelectedSpan"/> (a picked diagnostic, card or part) in the editor.
 /// The Batch tab (T-038) uses it only for the file pickers and the row double-click; the work is in <see cref="BatchViewModel"/>.
+/// The Rules tab (T-039) is bound to <see cref="RuleBrowserViewModel"/>; a diagnostic's rule-ID link opens it.
 /// </summary>
 public partial class MainWindow : Window
 {
@@ -153,6 +154,17 @@ public partial class MainWindow : Window
             _viewModel.HoverSpan = null;
         }
     }
+
+    // Diagnostics list (T-039): the rule ID of a KB rule opens it in the rule browser.
+    private void OnOpenRuleClick(object? sender, RoutedEventArgs e)
+    {
+        if (_viewModel is not null && sender is Control { DataContext: DiagnosticItemViewModel item })
+        {
+            _viewModel.OpenRule(item);
+            e.Handled = true;
+        }
+    }
+
     // Batch tab (T-038): file pickers hand local paths to the view model.
     private static readonly FilePickerFileType _batchInput = new("Batch input (*.txt, *.csv, *.tsv)") { Patterns = ["*.txt", "*.csv", "*.tsv"] };
     private static readonly FilePickerFileType _csv = new("CSV summary (*.csv)") { Patterns = ["*.csv"] };

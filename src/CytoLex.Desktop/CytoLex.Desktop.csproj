@@ -7,6 +7,9 @@
     <!-- App icon: a G-banded chromosome with a validation check (T-036). -->
     <ApplicationIcon>Assets/cytolex.ico</ApplicationIcon>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <!-- Rule browser database (T-039; written by `kb build`), copied next to the app as kb/kb.sqlite.
+         Override with -p:CytoLexKbDatabase=<path>. -->
+    <CytoLexKbDatabase Condition="'$(CytoLexKbDatabase)' == ''">$(RepoRoot)build/kb.sqlite</CytoLexKbDatabase>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +19,8 @@
     <PackageReference Include="Avalonia.Fonts.Inter" />
     <PackageReference Include="Avalonia.AvaloniaEdit" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +28,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="$(CytoLexKbDatabase)" Link="kb/kb.sqlite" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../CytoLex.Core/CytoLex.Core.csproj" />
   </ItemGroup>
+
+  <Target Name="CheckKbDatabase" BeforeTargets="BeforeBuild">
+    <Error Condition="!Exists('$(CytoLexKbDatabase)')"
+           Text="KB database not found: $(CytoLexKbDatabase). Run 'uv run --directory tools kb build' from the repo root first." />
+  </Target>
 </Project>

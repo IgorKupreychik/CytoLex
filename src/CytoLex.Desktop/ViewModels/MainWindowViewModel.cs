@@ -6,6 +6,7 @@ using CytoLex.Core.Context;
 using CytoLex.Core.Text;
 using CytoLex.Core.Validation;
 using CytoLex.Desktop.Highlighting;
+using CytoLex.Desktop.Rules;
 
 namespace CytoLex.Desktop.ViewModels;
 
@@ -38,6 +39,12 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// <summary>The view model over <paramref name="validator"/> (<c>null</c> = <see cref="Validator.Default"/>).</summary>
     public MainWindowViewModel(Validator? validator)
+        : this(validator, RuleStore.DefaultPath)
+    {
+    }
+
+    /// <summary>The view model over <paramref name="validator"/> with the rule browser over <paramref name="ruleDatabasePath"/>.</summary>
+    public MainWindowViewModel(Validator? validator, string ruleDatabasePath)
     {
         try
         {
@@ -58,10 +65,11 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         Batch = new BatchViewModel(_validator, EditionChoices, SelectedEditionChoice, OpenInSingleCheck);
+        Rules = new RuleBrowserViewModel(ruleDatabasePath, SelectedEditionChoice?.Edition, CheckExample);
         Validate();
     }
 
-    /// <summary>Index of the main tab: <see cref="SingleTab"/> or <see cref="BatchTab"/>.</summary>
+    /// <summary>Index of the main tab: <see cref="SingleTab"/>, <see cref="BatchTab"/> or <see cref="RulesTab"/>.</summary>
     [ObservableProperty]
     public partial int SelectedMainTab { get; set; }
 
@@ -71,8 +79,33 @@ public partial class MainWindowViewModel : ObservableObject
     /// <summary>The batch tab (T-038).</summary>
     public const int BatchTab = 1;
 
+    /// <summary>The rule browser tab (T-039).</summary>
+    public const int RulesTab = 2;
+
     /// <summary>Batch validation (T-038).</summary>
     public BatchViewModel Batch { get; }
+
+    /// <summary>The rule browser (T-039).</summary>
+    public RuleBrowserViewModel Rules { get; }
+
+    /// <summary>Opens the KB rule of <paramref name="diagnostic"/> in the rule browser (diagnostic → rule link).</summary>
+    /// <returns>Whether the rule was found.</returns>
+    public bool OpenRule(DiagnosticItemViewModel diagnostic)
+    {
+        ArgumentNullException.ThrowIfNull(diagnostic);
+        if (!diagnostic.HasKbRule || diagnostic.Edition is not { } edition)
+        {
+            return false;
+        }
+
+        var found = Rules.OpenRule(edition, diagnostic.RuleId);
+        SelectedMainTab = RulesTab;
+        return found;
+    }
+
+    // A rule browser example → the single-string check, in the rule's edition when it is a choice.
+    private void CheckExample(string input, string edition) =>
+        OpenInSingleCheck(input, EditionChoices.FirstOrDefault(c => c.Edition == edition));
 
     /// <summary>Shows <paramref name="input"/> in the single-string check, in <paramref name="choice"/> when given (from a batch row).</summary>
     public void OpenInSingleCheck(string input, EditionChoice? choice)

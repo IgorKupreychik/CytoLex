@@ -48,7 +48,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-036 | done | 2 | T-028 | Desktop: app shell + single-string check with highlighting |
 | T-037 | done | 2 | T-036 | Desktop: version selector |
 | T-038 | done | 2 | T-036 | Desktop: batch validation + export |
-| T-039 | todo | 2 | T-036, T-005 | Desktop: rule browser |
+| T-039 | done | 2 | T-036, T-005 | Desktop: rule browser |
 | T-040 | todo | 2 | T-036, T-035 | Desktop: fix UI (diff view, Apply → re-validate) |
 | T-041 | todo | 3 | T-035 | Level 2 "did you mean" suggestions |
 | T-042 | todo | 3 | T-027 | Handling of underlined homologue notation |
@@ -352,7 +352,7 @@ Outcome (2026-11-18): Decided that `->`, `-` (and U+2212) and lowercase `x` in m
 **Status:** todo
 **Description:** Show the translation next to the diagnostics: hovering an item highlights its span (and vice versa), KB links open the version-specific entry in the rule browser, a coordinates toggle (off by default) with a GRCh37/38 choice, and the partial-translation banner.
 **Acceptance:** Book examples show their translation; hover ↔ span highlighting and KB links work.
-**Notes:** Created 2026-11-18 from T-054.
+**Notes:** Created 2026-11-18 from T-054. From T-039 (decided with the user, 2026-11-20): the rule browser lists rules only; add the vocab entries (symbols, banding codes: `vocab`/`vocab_tokens` in `build/kb.sqlite`) to it here, so translation links to vocab items have a target (`RuleStore`, `RuleBrowserViewModel`).
 
 ## Core library
 
@@ -592,10 +592,16 @@ Outcome (2026-11-18):
   - JSON items nest `Item {Line, Id, Input}` next to `Report`.
 
 ### T-039 — Rule browser
-**Status:** todo
+**Status:** done
 **Description:** Browse and search rules, paraphrases, quotes and examples (FTS). Clicking a diagnostic opens its rule.
 **Acceptance:** Search works; diagnostic → rule navigation works; works without quote files.
-**Notes:**
+**Notes:** Decided with the user at planning: rules only (vocab entries → T-059), a third main tab "Rules".
+**Outcome (2026-11-20):**
+- **Data:** `src/CytoLex.Desktop/Rules/RuleStore.cs` reads `build/kb.sqlite` read-only via `Microsoft.Data.Sqlite.Core` 10.0.14 + `SQLitePCLRaw.bundle_e_sqlite3` 2.1.13 (FTS5); checks `meta.format_version` = 2. User queries become quoted FTS5 prefix phrases (`t(9;22)` → `"t 9 22"*`), ANDed; `rules_fts` and `quotes_fts` searched together (bm25, exact ID first); section filter; `Rule(edition, id)` with citations, scope, fix, review, related, examples, quotes (optional). The desktop build copies the database as `kb/kb.sqlite` (`CytoLexKbDatabase`; missing → build error).
+- **Desktop:** "Rules" tab (`ViewModels/RuleBrowserViewModel.cs`: edition, section, hits, `RuleDetailViewModel` with related-rule links and "Check" on examples → single-string check). A diagnostic's rule ID is a link (`MainWindowViewModel.OpenRule`, `DiagnosticItemViewModel.HasKbRule`/`Edition`); core codes have none. A missing or stale database disables only this tab.
+- **Tests:** `tests/CytoLex.Desktop.Tests/RuleStoreTests.cs`, `RuleBrowserTests.cs` (every runtime rule listed and opened with matching metadata, search kinds, odd input, no-quotes copy, missing/foreign database, diagnostic → rule, related links, example check). `dotnet test`: 4,277 total, 0 failed, 8 skipped; `dotnet format` clean.
+- **Docs:** `CLAUDE.md`, `README.md`, `docs/design/core.md` §6; note on T-059.
+- **Deviations from the plan:** no search debounce (FTS search is fast enough per keystroke); the browser is created at startup rather than lazily (a missing database still doesn't block the app).
 
 ### T-040 — Fix UI
 **Status:** todo
