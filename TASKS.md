@@ -46,7 +46,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-034 | done | 2 | T-031, T-017 | Parser + rules: microarray (arr) |
 | T-035 | done | 1 | T-030, T-031, T-068 | Level 1 deterministic fixes + level 3 explanations |
 | T-036 | done | 2 | T-028 | Desktop: app shell + single-string check with highlighting |
-| T-037 | todo | 2 | T-036 | Desktop: version selector |
+| T-037 | done | 2 | T-036 | Desktop: version selector |
 | T-038 | todo | 2 | T-036 | Desktop: batch validation + export |
 | T-039 | todo | 2 | T-036, T-005 | Desktop: rule browser |
 | T-040 | todo | 2 | T-036, T-035 | Desktop: fix UI (diff view, Apply → re-validate) |
@@ -557,10 +557,10 @@ Outcome (2026-11-18):
 **Notes:** **Outcome (2026-11-20):** the desktop window validates the input on every change in the default edition (2016) and shows the verdict ("valid as constitutional only", "as far as implemented"), counts, the context with its markers, and the segments with their detected types (not-implemented ones marked). Highlighting in `src/CytoLex.Desktop/Highlighting/`: `HighlightBuilder` maps each diagnostic's own level-1 fix (not the "all occurrences" one) to highlights — replace → underline, insert → marker + grey expected text, delete → strikethrough; no edit → underline of the diagnostic span (marker if empty); severity colours (`SeverityBrushes`); drawn by `DiagnosticColorizer` (text decorations) and `InsertionElementGenerator` (zero-length inline element). Diagnostics list (`DiagnosticItemViewModel`): severity, title, column, rule ID, detail, per-context severities, book-ambiguous note, fixes as text (Apply is T-040), citations; selecting one selects its span. Book-example dropdown (§13 worked examples). App icon (G-banded chromosome + check badge): `src/CytoLex.Desktop/Assets/cytolex.ico`/`.png`, set as exe and window icon. New test project `tests/CytoLex.Desktop.Tests/` (embeds `build/kb.json`): highlight cases plus a check over every KB example string that each diagnostic's highlights lie in the input on its own fix edits (or its span); view-model tests. `dotnet test`: 2,568 total, 0 failed, 13 skipped; `dotnet format` clean. Docs: `CLAUDE.md`/`README.md` (status, layout, commands). Deviation from the plan: no debounce (validation is fast enough per keystroke). Follow-up: T-069 (abnormality list + panel).
 
 ### T-037 — Version selector
-**Status:** todo
+**Status:** done
 **Description:** Switch between a single version and all versions; all-versions shows one panel per version.
 **Acceptance:** Both modes work; unimplemented versions show `not-implemented`.
-**Notes:**
+**Notes:** Done 2026-11-20. Edition selector in the desktop top bar (`MainWindowViewModel.EditionChoices`/`SelectedEditionChoice`: known editions, unimplemented ones labelled, plus "All editions"; default = newest implemented). Results are one tab per `EditionResult` (new `ViewModels/EditionPanelViewModel.cs`: header with status, verdict, counts, segment notes, diagnostics, abnormalities, highlights); the editor draws the selected tab's highlights, and the selected tab is kept while re-typing. Not-implemented editions show their reason in grey with no diagnostics/abnormalities. A diagnostic click is routed through `SelectedSpan`. Layout decided with the user: tabs (not side-by-side columns). Tests: `MainWindowViewModelTests` (7 new), `AbnormalityPanelTests` read through the selected panel. Files: `MainWindowViewModel.cs`, `EditionPanelViewModel.cs`, `Views/MainWindow.axaml(.cs)`, CLAUDE.md/README.md status. Core unchanged.
 
 ### T-038 — Batch validation
 **Status:** todo

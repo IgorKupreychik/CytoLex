@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CytoLex.Core.Context;
 using CytoLex.Core.Text;
@@ -9,8 +10,9 @@ using CytoLex.Desktop.Highlighting;
 namespace CytoLex.Desktop.ViewModels;
 
 /// <summary>
-/// The single-string check (T-036): validates <see cref="Input"/> in the default edition on every change and exposes the
-/// detected segments, the context, validity, the diagnostics, the editor highlights and the abnormalities by cell line (T-069).
+/// The single-string check (T-036): validates <see cref="Input"/> on every change in the edition picked in the selector, or in
+/// every known edition (T-037), and exposes the context plus one <see cref="EditionPanelViewModel"/> per edition (verdict,
+/// segments, diagnostics, abnormalities by cell line (T-069), editor highlights).
 /// </summary>
 public partial class MainWindowViewModel : ObservableObject
 {
@@ -26,6 +28,7 @@ public partial class MainWindowViewModel : ObservableObject
     ];
 
     private readonly Validator? _validator;
+    private EditionPanelViewModel? _observedPanel;
 
     /// <summary>The view model over <see cref="Validator.Default"/>.</summary>
     public MainWindowViewModel()
@@ -39,20 +42,30 @@ public partial class MainWindowViewModel : ObservableObject
         try
         {
             _validator = validator ?? Validator.Default;
-            Edition = _validator.DefaultEdition;
-            Status = $"ISCN {Edition} · implemented editions: {string.Join(", ", _validator.ImplementedEditions)}";
+            var implemented = _validator.ImplementedEditions;
+            EditionChoices =
+            [
+                .. _validator.KnownEditions.Select(e => new EditionChoice(e, implemented.Contains(e) ? $"ISCN {e}" : $"ISCN {e} (not implemented)")),
+                EditionChoice.All,
+            ];
+            SelectedEditionChoice = EditionChoices.First(c => c.Edition == _validator.DefaultEdition);
         }
         catch (Exception ex) when (ex is InvalidOperationException or IOException or System.Text.Json.JsonException)
         {
-            Edition = "?";
+            _validator = null;
+            EditionChoices = [];
             Status = "The knowledge base could not be loaded: " + ex.Message;
         }
 
         Validate();
     }
 
-    /// <summary>The edition validated against (the newest implemented one; the selector is T-037).</summary>
-    public string Edition { get; }
+    /// <summary>The editions to pick from (T-037): every known edition, oldest first, then "All editions".</summary>
+    public IReadOnlyList<EditionChoice> EditionChoices { get; }
+
+    /// <summary>The picked edition or "All editions"; changing it re-validates.</summary>
+    [ObservableProperty]
+    public partial EditionChoice? SelectedEditionChoice { get; set; }
 
     /// <summary>The ISCN string.</summary>
     [ObservableProperty]
@@ -62,52 +75,33 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     public partial string? SelectedExample { get; set; }
 
-    /// <summary>Status line (KB / edition).</summary>
+    /// <summary>Status line (KB / editions).</summary>
     [ObservableProperty]
     public partial string Status { get; set; } = string.Empty;
 
-    /// <summary>The verdict, e.g. <c>Valid in ISCN 2016 as constitutional only</c>.</summary>
-    [ObservableProperty]
-    public partial string ValidityText { get; set; } = string.Empty;
-
-    /// <summary>Whether the input is valid in the edition (for the verdict colour).</summary>
-    [ObservableProperty]
-    public partial bool IsValid { get; set; }
-
-    /// <summary>Whether there is a verdict to show (the input is not blank).</summary>
+    /// <summary>Whether there are results to show (the input is not blank).</summary>
     [ObservableProperty]
     public partial bool HasResult { get; set; }
 
-    /// <summary>The sample context: hint, inferred or unknown, with its markers.</summary>
+    /// <summary>Shown instead of results for blank input (<c>Enter an ISCN string.</c>).</summary>
+    [ObservableProperty]
+    public partial string Placeholder { get; set; } = string.Empty;
+
+    /// <summary>The sample context: hint, inferred or unknown, with its markers (the same in every edition).</summary>
     [ObservableProperty]
     public partial string ContextText { get; set; } = string.Empty;
 
-    /// <summary>Diagnostic counts.</summary>
+    /// <summary>One panel per validated edition (one tab each).</summary>
+    public ObservableCollection<EditionPanelViewModel> Panels { get; } = [];
+
+    /// <summary>The panel (tab) shown; the editor draws its highlights.</summary>
     [ObservableProperty]
-    public partial string CountsText { get; set; } = string.Empty;
+    public partial EditionPanelViewModel? SelectedPanel { get; set; }
 
-    /// <summary>The editor highlights of the current result.</summary>
-    [ObservableProperty]
-    public partial ImmutableArray<Highlight> Highlights { get; set; } = [];
+    /// <summary>The editor highlights of <see cref="SelectedPanel"/>.</summary>
+    public ImmutableArray<Highlight> Highlights => SelectedPanel?.Highlights ?? [];
 
-    /// <summary>The diagnostic selected in the list.</summary>
-    [ObservableProperty]
-    public partial DiagnosticItemViewModel? SelectedDiagnostic { get; set; }
-
-    /// <summary>The detected segments with their notation types.</summary>
-    public ObservableCollection<SegmentItemViewModel> Segments { get; } = [];
-
-    /// <summary>The diagnostics of the edition, in span order.</summary>
-    public ObservableCollection<DiagnosticItemViewModel> Diagnostics { get; } = [];
-
-    /// <summary>The abnormalities of the karyotype segments, grouped by cell line (T-069).</summary>
-    public ObservableCollection<CellLineGroupViewModel> CellLineGroups { get; } = [];
-
-    /// <summary>Whether there are cell lines to show in the abnormalities panel.</summary>
-    [ObservableProperty]
-    public partial bool HasCellLines { get; set; }
-
-    /// <summary>The span the editor should select (a clicked card or part); raised on every <see cref="SelectSpan"/>, even for the same span.</summary>
+    /// <summary>The span the editor should select (a clicked diagnostic, card or part); raised on every <see cref="SelectSpan"/>, even for the same span.</summary>
     public TextSpan? SelectedSpan { get; private set; }
 
     /// <summary>The span of the card under the mouse, drawn as a background in the editor.</summary>
@@ -126,6 +120,8 @@ public partial class MainWindowViewModel : ObservableObject
 
     partial void OnInputChanged(string value) => Validate();
 
+    partial void OnSelectedEditionChoiceChanged(EditionChoice? value) => Validate();
+
     partial void OnSelectedExampleChanged(string? value)
     {
         if (value is not null)
@@ -134,70 +130,73 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    /// <summary>Validates <see cref="Input"/> and refreshes every result property.</summary>
+    partial void OnSelectedPanelChanged(EditionPanelViewModel? value)
+    {
+        if (_observedPanel is not null)
+        {
+            _observedPanel.PropertyChanged -= OnPanelPropertyChanged;
+        }
+
+        _observedPanel = value;
+        if (value is not null)
+        {
+            value.PropertyChanged += OnPanelPropertyChanged;
+        }
+
+        HoverSpan = null;
+        OnPropertyChanged(nameof(Highlights));
+    }
+
+    private void OnPanelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(EditionPanelViewModel.SelectedDiagnostic) && sender is EditionPanelViewModel { SelectedDiagnostic: { } item })
+        {
+            SelectSpan(item.Span);
+        }
+    }
+
+    /// <summary>Validates <see cref="Input"/> in the selected edition(s) and rebuilds the panels.</summary>
     public void Validate()
     {
-        Segments.Clear();
-        Diagnostics.Clear();
-        CellLineGroups.Clear();
-        HasCellLines = false;
-        SelectedDiagnostic = null;
-        HoverSpan = null;
+        // Keep the shown tab across re-validation ("All editions" while typing).
+        var previous = SelectedPanel?.Edition;
+        SelectedPanel = null;
+        Panels.Clear();
         Report = null;
-
-        var input = Input;
-        if (_validator is null || string.IsNullOrWhiteSpace(input))
+        if (_validator is null)
         {
             HasResult = false;
-            IsValid = false;
-            ValidityText = _validator is null ? string.Empty : "Enter an ISCN string.";
-            ContextText = CountsText = string.Empty;
-            Highlights = [];
+            Placeholder = ContextText = string.Empty;
             return;
         }
 
-        var report = _validator.Validate(input);
-        var result = report.Results[0];
+        var choice = SelectedEditionChoice ?? EditionChoice.All;
+        Status = $"Implemented editions: {string.Join(", ", _validator.ImplementedEditions)} · showing: "
+            + (choice.Edition is null ? "all editions" : $"ISCN {choice.Edition}");
+
+        var input = Input;
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            HasResult = false;
+            Placeholder = "Enter an ISCN string.";
+            ContextText = string.Empty;
+            return;
+        }
+
+        var editions = choice.Edition is { } edition ? EditionSelection.One(edition) : EditionSelection.All;
+        var report = _validator.Validate(input, new ValidationOptions { Editions = editions });
         Report = report;
-
-        foreach (var segment in report.Segments)
+        foreach (var result in report.Results)
         {
-            Segments.Add(SegmentItemViewModel.From(input, segment, result.Segments.FirstOrDefault(s => s.Segment.Index == segment.Index)));
+            Panels.Add(new EditionPanelViewModel(report, result));
         }
 
-        for (var i = 0; i < result.Diagnostics.Length; i++)
-        {
-            Diagnostics.Add(new DiagnosticItemViewModel(input, result.Diagnostics[i], i));
-        }
-
-        foreach (var group in CellLineGroupViewModel.From(result))
-        {
-            CellLineGroups.Add(group);
-        }
-
-        HasCellLines = CellLineGroups.Count > 0;
         HasResult = true;
-        IsValid = result.Status == EditionStatus.Implemented && result.Validity.IsValid;
-        ValidityText = VerdictOf(result, report.Context);
+        Placeholder = string.Empty;
         ContextText = ContextOf(input, report.Context);
-        CountsText = CountsOf(result.Counts);
-        Highlights = HighlightBuilder.Build(input, result, report.Context.Effective);
-    }
-
-    internal static string VerdictOf(EditionResult result, ContextInfo context)
-    {
-        if (result.Status == EditionStatus.NotImplemented)
-        {
-            return result.Reason ?? $"ISCN {result.Edition}: not implemented";
-        }
-
-        var v = result.Validity;
-        var all = Enum.GetValues<SampleContext>().Length;
-        var text = !v.IsValid ? $"Not valid in ISCN {result.Edition}"
-            : context.Effective is null && v.ValidContexts.Length < all
-                ? $"Valid in ISCN {result.Edition} as {string.Join(" or ", v.ValidContexts.Select(DiagnosticItemViewModel.Label))} only"
-                : $"Valid in ISCN {result.Edition}";
-        return v.IsComplete ? text : text + " (as far as implemented)";
+        SelectedPanel = Panels.FirstOrDefault(p => p.Edition == previous)
+            ?? Panels.FirstOrDefault(p => p.IsImplemented)
+            ?? Panels.FirstOrDefault();
     }
 
     internal static string ContextOf(string input, ContextInfo context)
@@ -219,10 +218,16 @@ public partial class MainWindowViewModel : ObservableObject
             ? $"Context: unknown, the markers contradict each other{markers}"
             : "Context: unknown (no markers); context-dependent findings are shown per context";
     }
+}
 
-    private static string CountsOf(SeverityCounts c)
-    {
-        var text = $"{c.Errors} error(s), {c.Warnings} warning(s), {c.Infos} info(s)";
-        return c.Conditional > 0 ? text + $", {c.Conditional} context-dependent" : text;
-    }
+/// <summary>An entry of the edition selector (T-037).</summary>
+/// <param name="Edition">The edition, e.g. <c>2016</c>; <c>null</c> = all editions.</param>
+/// <param name="Label">The text shown, e.g. <c>ISCN 2020 (not implemented)</c>.</param>
+public sealed record EditionChoice(string? Edition, string Label)
+{
+    /// <summary>"All editions": one panel per known edition.</summary>
+    public static EditionChoice All { get; } = new(null, "All editions");
+
+    /// <inheritdoc/>
+    public override string ToString() => Label;
 }

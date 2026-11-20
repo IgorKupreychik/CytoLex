@@ -9,9 +9,19 @@
         Width="1000" Height="680">
   <DockPanel Margin="16">
     <!-- Input -->
-    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,8">
       <TextBlock Grid.Column="0" Text="ISCN string" FontWeight="SemiBold" VerticalAlignment="Center" />
-      <ComboBox Grid.Column="1" PlaceholderText="Book examples" MinWidth="240"
+      <!-- Edition selector (T-037): one edition or all editions (one tab each) -->
+      <ComboBox Grid.Column="1" x:Name="EditionSelector" MinWidth="220" Margin="0,0,8,0"
+                ToolTip.Tip="ISCN edition to validate against"
+                ItemsSource="{Binding EditionChoices}" SelectedItem="{Binding SelectedEditionChoice}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:EditionChoice">
+            <TextBlock Text="{Binding Label}" />
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+      <ComboBox Grid.Column="2" PlaceholderText="Book examples" MinWidth="240"
                 ItemsSource="{x:Static vm:MainWindowViewModel.ExampleStrings}"
                 SelectedItem="{Binding SelectedExample}" />
     </Grid>
@@ -24,157 +34,177 @@
     <!-- Status -->
     <TextBlock DockPanel.Dock="Bottom" Text="{Binding Status}" Margin="0,8,0,0" Opacity="0.7" />
 
-    <!-- Summary: verdict, context, counts, segments -->
-    <StackPanel DockPanel.Dock="Top" Margin="0,10,0,10" Spacing="4" IsVisible="{Binding HasResult}">
-      <StackPanel Orientation="Horizontal" Spacing="16">
-        <TextBlock Text="{Binding ValidityText}" FontWeight="SemiBold" FontSize="15"
-                   Classes.valid="{Binding IsValid}" Classes.invalid="{Binding !IsValid}" />
-        <TextBlock Text="{Binding CountsText}" VerticalAlignment="Center" Opacity="0.8" />
-      </StackPanel>
-      <TextBlock Text="{Binding ContextText}" Opacity="0.8" TextWrapping="Wrap" />
-      <ItemsControl ItemsSource="{Binding Segments}">
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <WrapPanel />
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-        <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="vm:SegmentItemViewModel">
-            <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
-              <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="{Binding Type}" FontWeight="SemiBold" />
-                <TextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" />
-                <TextBlock Text="{Binding Note}" IsVisible="{Binding HasNote}" FontStyle="Italic" Opacity="0.7" />
-              </StackPanel>
-            </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-    </StackPanel>
+    <!-- Shared: context (the same in every edition), or the placeholder for blank input -->
+    <TextBlock DockPanel.Dock="Top" Text="{Binding Placeholder}" Margin="0,10,0,0" Opacity="0.7" IsVisible="{Binding !HasResult}" />
+    <TextBlock DockPanel.Dock="Top" Text="{Binding ContextText}" Margin="0,10,0,6" Opacity="0.8" TextWrapping="Wrap"
+               IsVisible="{Binding HasResult}" />
 
-    <Grid ColumnDefinitions="3*,Auto,2*">
-    <!-- Diagnostics -->
-    <ListBox Grid.Column="0" x:Name="DiagnosticsList" ItemsSource="{Binding Diagnostics}" SelectedItem="{Binding SelectedDiagnostic}">
-      <ListBox.ItemTemplate>
-        <DataTemplate x:DataType="vm:DiagnosticItemViewModel">
-          <Grid ColumnDefinitions="Auto,*" Margin="0,2">
-            <Border Grid.Column="0" Background="{Binding SeverityBrush}" CornerRadius="3" Padding="6,1"
-                    VerticalAlignment="Top" Margin="0,0,10,0" MinWidth="64">
-              <TextBlock Text="{Binding SeverityLabel}" Foreground="White" HorizontalAlignment="Center" />
-            </Border>
-            <StackPanel Grid.Column="1" Spacing="2">
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <TextBlock Text="{Binding Message}" FontWeight="SemiBold" TextWrapping="Wrap" />
-                <TextBlock Text="{Binding Location}" FontFamily="Cascadia Mono,Consolas,monospace" Opacity="0.7" />
+    <!-- One tab per edition (T-037) -->
+    <TabControl x:Name="EditionTabs" ItemsSource="{Binding Panels}" SelectedItem="{Binding SelectedPanel}"
+                IsVisible="{Binding HasResult}" Padding="0,6,0,0">
+      <TabControl.ItemTemplate>
+        <DataTemplate x:DataType="vm:EditionPanelViewModel">
+          <TextBlock Text="{Binding Header}" FontSize="14"
+                     Classes.valid="{Binding IsValid}" Classes.invalid="{Binding IsInvalid}" Classes.notimpl="{Binding IsNotImplemented}" />
+        </DataTemplate>
+      </TabControl.ItemTemplate>
+      <TabControl.ContentTemplate>
+        <DataTemplate x:DataType="vm:EditionPanelViewModel">
+          <DockPanel>
+            <!-- Edition summary: verdict, counts, segments -->
+            <StackPanel DockPanel.Dock="Top" Margin="0,4,0,10" Spacing="4">
+              <StackPanel Orientation="Horizontal" Spacing="16">
+                <TextBlock Text="{Binding ValidityText}" FontWeight="SemiBold" FontSize="15"
+                           Classes.valid="{Binding IsValid}" Classes.invalid="{Binding IsInvalid}" Classes.notimpl="{Binding IsNotImplemented}" />
+                <TextBlock Text="{Binding CountsText}" VerticalAlignment="Center" Opacity="0.8" />
               </StackPanel>
-              <TextBlock Text="{Binding RuleId}" FontFamily="Cascadia Mono,Consolas,monospace" FontSize="12" Opacity="0.7" />
-              <TextBlock Text="{Binding Detail}" IsVisible="{Binding HasDetail}" TextWrapping="Wrap" />
-              <TextBlock Text="{Binding Condition}" IsVisible="{Binding HasCondition}" TextWrapping="Wrap" FontStyle="Italic" />
-              <TextBlock Text="{Binding Review}" IsVisible="{Binding HasReview}" TextWrapping="Wrap" FontStyle="Italic" Opacity="0.8" />
-              <ItemsControl ItemsSource="{Binding Fixes}">
+              <ItemsControl ItemsSource="{Binding Segments}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <WrapPanel />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="x:String">
-                    <TextBlock Text="{Binding}" TextWrapping="Wrap" Opacity="0.9" />
+                  <DataTemplate x:DataType="vm:SegmentItemViewModel">
+                    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="{Binding Type}" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" />
+                        <TextBlock Text="{Binding Note}" IsVisible="{Binding HasNote}" FontStyle="Italic" Opacity="0.7" />
+                      </StackPanel>
+                    </Border>
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
-              <TextBlock Text="{Binding Citations}" IsVisible="{Binding HasCitations}" TextWrapping="Wrap" FontSize="12" Opacity="0.7" />
             </StackPanel>
-          </Grid>
-        </DataTemplate>
-      </ListBox.ItemTemplate>
-    </ListBox>
 
-    <GridSplitter Grid.Column="1" Width="6" Background="Transparent" ResizeDirection="Columns" />
+            <Grid ColumnDefinitions="3*,Auto,2*" IsVisible="{Binding IsImplemented}">
+            <!-- Diagnostics -->
+            <ListBox Grid.Column="0" ItemsSource="{Binding Diagnostics}" SelectedItem="{Binding SelectedDiagnostic}">
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:DiagnosticItemViewModel">
+                  <Grid ColumnDefinitions="Auto,*" Margin="0,2">
+                    <Border Grid.Column="0" Background="{Binding SeverityBrush}" CornerRadius="3" Padding="6,1"
+                            VerticalAlignment="Top" Margin="0,0,10,0" MinWidth="64">
+                      <TextBlock Text="{Binding SeverityLabel}" Foreground="White" HorizontalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Spacing="2">
+                      <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="{Binding Message}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Location}" FontFamily="Cascadia Mono,Consolas,monospace" Opacity="0.7" />
+                      </StackPanel>
+                      <TextBlock Text="{Binding RuleId}" FontFamily="Cascadia Mono,Consolas,monospace" FontSize="12" Opacity="0.7" />
+                      <TextBlock Text="{Binding Detail}" IsVisible="{Binding HasDetail}" TextWrapping="Wrap" />
+                      <TextBlock Text="{Binding Condition}" IsVisible="{Binding HasCondition}" TextWrapping="Wrap" FontStyle="Italic" />
+                      <TextBlock Text="{Binding Review}" IsVisible="{Binding HasReview}" TextWrapping="Wrap" FontStyle="Italic" Opacity="0.8" />
+                      <ItemsControl ItemsSource="{Binding Fixes}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="x:String">
+                            <TextBlock Text="{Binding}" TextWrapping="Wrap" Opacity="0.9" />
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                      <TextBlock Text="{Binding Citations}" IsVisible="{Binding HasCitations}" TextWrapping="Wrap" FontSize="12" Opacity="0.7" />
+                    </StackPanel>
+                  </Grid>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
 
-    <!-- Abnormalities (T-069) -->
-    <DockPanel Grid.Column="2">
-      <TextBlock DockPanel.Dock="Top" Text="Abnormalities" FontWeight="SemiBold" Margin="0,0,0,6" />
-      <TextBlock DockPanel.Dock="Top" Text="No karyotype cell lines." Opacity="0.6"
-                 IsVisible="{Binding !HasCellLines}" />
-      <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-        <ItemsControl ItemsSource="{Binding CellLineGroups}">
-          <ItemsControl.ItemTemplate>
-            <DataTemplate x:DataType="vm:CellLineGroupViewModel">
-              <StackPanel Spacing="4" Margin="0,0,0,10">
-                <TextBlock Text="{Binding Header}" FontWeight="SemiBold" Opacity="0.85" TextWrapping="Wrap" />
-                <ItemsControl ItemsSource="{Binding Items}">
+            <GridSplitter Grid.Column="1" Width="6" Background="Transparent" ResizeDirection="Columns" />
+
+            <!-- Abnormalities (T-069) -->
+            <DockPanel Grid.Column="2">
+              <TextBlock DockPanel.Dock="Top" Text="Abnormalities" FontWeight="SemiBold" Margin="0,0,0,6" />
+              <TextBlock DockPanel.Dock="Top" Text="No karyotype cell lines." Opacity="0.6"
+                         IsVisible="{Binding !HasCellLines}" />
+              <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl ItemsSource="{Binding CellLineGroups}">
                   <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:AbnormalityItemViewModel">
-                      <Border Classes="card" Opacity="{Binding Opacity}"
-                              Tapped="OnSpanItemTapped" PointerEntered="OnCardPointerEntered" PointerExited="OnCardPointerExited">
-                        <StackPanel Spacing="4">
-                          <Grid ColumnDefinitions="Auto,*,Auto">
-                            <Border Grid.Column="0" Background="{Binding KindBrush}" CornerRadius="3" Padding="6,1"
-                                    VerticalAlignment="Center" Margin="0,0,8,0">
-                              <TextBlock Text="{Binding KindLabel}" Foreground="White" FontSize="12" />
-                            </Border>
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                              <TextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" TextWrapping="Wrap" />
-                              <TextBlock Text="{Binding ShortForm}" IsVisible="{Binding ShowShortForm}" Opacity="0.65"
-                                         FontFamily="Cascadia Mono,Consolas,monospace" />
-                            </StackPanel>
-                            <Ellipse Grid.Column="2" Width="10" Height="10" Fill="{Binding DiagnosticsBrush}"
-                                     IsVisible="{Binding HasDiagnostics}" VerticalAlignment="Center"
-                                     ToolTip.Tip="{Binding DiagnosticsTip}" />
-                          </Grid>
-                          <ItemsControl ItemsSource="{Binding Tags}">
-                            <ItemsControl.ItemsPanel>
-                              <ItemsPanelTemplate>
-                                <WrapPanel />
-                              </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                              <DataTemplate x:DataType="x:String">
-                                <Border Classes="tag">
-                                  <TextBlock Text="{Binding}" FontSize="11" />
-                                </Border>
-                              </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                          </ItemsControl>
-                          <ItemsControl ItemsSource="{Binding Flags}" IsVisible="{Binding HasFlags}">
-                            <ItemsControl.ItemsPanel>
-                              <ItemsPanelTemplate>
-                                <WrapPanel />
-                              </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                              <DataTemplate x:DataType="vm:FlagViewModel">
-                                <Border Classes="flag" ToolTip.Tip="{Binding Tip}">
-                                  <TextBlock Text="{Binding Glyph}" FontSize="11" FontWeight="SemiBold" />
-                                </Border>
-                              </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                          </ItemsControl>
-                          <Expander Header="{Binding PartsHeader}" IsVisible="{Binding HasParts}" Padding="4">
-                            <ItemsControl ItemsSource="{Binding Parts}">
-                              <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="vm:AbnormalityPartViewModel">
-                                  <Border Classes="part" Tapped="OnSpanItemTapped">
-                                    <StackPanel Spacing="2">
-                                      <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" />
-                                        <TextBlock Text="{Binding ShortForm}" Opacity="0.65" FontFamily="Cascadia Mono,Consolas,monospace" />
-                                      </StackPanel>
-                                      <TextBlock Text="{Binding TagsText}" FontSize="11" Opacity="0.7" TextWrapping="Wrap" />
+                    <DataTemplate x:DataType="vm:CellLineGroupViewModel">
+                      <StackPanel Spacing="4" Margin="0,0,0,10">
+                        <TextBlock Text="{Binding Header}" FontWeight="SemiBold" Opacity="0.85" TextWrapping="Wrap" />
+                        <ItemsControl ItemsSource="{Binding Items}">
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:AbnormalityItemViewModel">
+                              <Border Classes="card" Opacity="{Binding Opacity}"
+                                      Tapped="OnSpanItemTapped" PointerEntered="OnCardPointerEntered" PointerExited="OnCardPointerExited">
+                                <StackPanel Spacing="4">
+                                  <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <Border Grid.Column="0" Background="{Binding KindBrush}" CornerRadius="3" Padding="6,1"
+                                            VerticalAlignment="Center" Margin="0,0,8,0">
+                                      <TextBlock Text="{Binding KindLabel}" Foreground="White" FontSize="12" />
+                                    </Border>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                      <TextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" TextWrapping="Wrap" />
+                                      <TextBlock Text="{Binding ShortForm}" IsVisible="{Binding ShowShortForm}" Opacity="0.65"
+                                                 FontFamily="Cascadia Mono,Consolas,monospace" />
                                     </StackPanel>
-                                  </Border>
-                                </DataTemplate>
-                              </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                          </Expander>
-                        </StackPanel>
-                      </Border>
+                                    <Ellipse Grid.Column="2" Width="10" Height="10" Fill="{Binding DiagnosticsBrush}"
+                                             IsVisible="{Binding HasDiagnostics}" VerticalAlignment="Center"
+                                             ToolTip.Tip="{Binding DiagnosticsTip}" />
+                                  </Grid>
+                                  <ItemsControl ItemsSource="{Binding Tags}">
+                                    <ItemsControl.ItemsPanel>
+                                      <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                      </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                      <DataTemplate x:DataType="x:String">
+                                        <Border Classes="tag">
+                                          <TextBlock Text="{Binding}" FontSize="11" />
+                                        </Border>
+                                      </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                  </ItemsControl>
+                                  <ItemsControl ItemsSource="{Binding Flags}" IsVisible="{Binding HasFlags}">
+                                    <ItemsControl.ItemsPanel>
+                                      <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                      </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                      <DataTemplate x:DataType="vm:FlagViewModel">
+                                        <Border Classes="flag" ToolTip.Tip="{Binding Tip}">
+                                          <TextBlock Text="{Binding Glyph}" FontSize="11" FontWeight="SemiBold" />
+                                        </Border>
+                                      </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                  </ItemsControl>
+                                  <Expander Header="{Binding PartsHeader}" IsVisible="{Binding HasParts}" Padding="4">
+                                    <ItemsControl ItemsSource="{Binding Parts}">
+                                      <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:AbnormalityPartViewModel">
+                                          <Border Classes="part" Tapped="OnSpanItemTapped">
+                                            <StackPanel Spacing="2">
+                                              <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" />
+                                                <TextBlock Text="{Binding ShortForm}" Opacity="0.65" FontFamily="Cascadia Mono,Consolas,monospace" />
+                                              </StackPanel>
+                                              <TextBlock Text="{Binding TagsText}" FontSize="11" Opacity="0.7" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                          </Border>
+                                        </DataTemplate>
+                                      </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                  </Expander>
+                                </StackPanel>
+                              </Border>
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                      </StackPanel>
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>
                 </ItemsControl>
-              </StackPanel>
-            </DataTemplate>
-          </ItemsControl.ItemTemplate>
-        </ItemsControl>
-      </ScrollViewer>
-    </DockPanel>
-    </Grid>
+              </ScrollViewer>
+            </DockPanel>
+            </Grid>
+          </DockPanel>
+        </DataTemplate>
+      </TabControl.ContentTemplate>
+    </TabControl>
   </DockPanel>
 
   <Window.Styles>
@@ -183,6 +213,9 @@
     </Style>
     <Style Selector="TextBlock.invalid">
       <Setter Property="Foreground" Value="#D13438" />
+    </Style>
+    <Style Selector="TextBlock.notimpl">
+      <Setter Property="Foreground" Value="#808080" />
     </Style>
     <Style Selector="Border.card">
       <Setter Property="BorderBrush" Value="#808080" />

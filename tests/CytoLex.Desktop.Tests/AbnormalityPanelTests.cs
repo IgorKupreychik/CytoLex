@@ -8,18 +8,19 @@ namespace CytoLex.Desktop.Tests;
 public class AbnormalityPanelTests
 {
     [Fact]
-    public void Blank_NoGroups()
+    public void NotImplementedEdition_NoGroups()
     {
-        var vm = new MainWindowViewModel();
-        Assert.Empty(vm.CellLineGroups);
-        Assert.False(vm.HasCellLines);
+        var vm = new MainWindowViewModel { Input = "46,XX.ish 5p15.2(D5S23×2)" };
+        vm.SelectedEditionChoice = vm.EditionChoices.Single(c => c.Edition == "2020");
+        Assert.Empty(vm.SelectedPanel!.CellLineGroups);
+        Assert.False(vm.SelectedPanel.HasCellLines);
     }
 
     [Fact]
     public void SingleCellLine_Cards()
     {
         var vm = new MainWindowViewModel { Input = "47,XY,+8,t(9;22)(q34;q11.2)" };
-        var group = Assert.Single(vm.CellLineGroups);
+        var group = Assert.Single(vm.SelectedPanel!.CellLineGroups);
         Assert.Equal("Cell line · 47,XY · 2 abnormalities", group.Header);
         Assert.Equal(["gain", "t"], group.Items.Select(i => i.KindLabel));
         var t = group.Items[1];
@@ -39,22 +40,22 @@ public class AbnormalityPanelTests
         var vm = new MainWindowViewModel { Input = "mos 47,XX,+21[12]/46,XX[8]" };
         Assert.Equal(
             ["Cell line 1 (mos) · 47,XX · [12] · 1 abnormality", "Cell line 2 (mos) · 46,XX · [8] · 0 abnormalities"],
-            vm.CellLineGroups.Select(g => g.Header));
-        Assert.True(vm.CellLineGroups[1].IsEmpty);
+            vm.SelectedPanel!.CellLineGroups.Select(g => g.Header));
+        Assert.True(vm.SelectedPanel!.CellLineGroups[1].IsEmpty);
     }
 
     [Fact]
     public void Transplant_RecipientAndDonor()
     {
         var vm = new MainWindowViewModel { Input = "46,XX[3]//46,XY[17]" };
-        Assert.Equal(["Cell line 1 (recipient) · 46,XX · [3] · 0 abnormalities", "Cell line 2 (donor) · 46,XY · [17] · 0 abnormalities"], vm.CellLineGroups.Select(g => g.Header));
+        Assert.Equal(["Cell line 1 (recipient) · 46,XX · [3] · 0 abnormalities", "Cell line 2 (donor) · 46,XY · [17] · 0 abnormalities"], vm.SelectedPanel!.CellLineGroups.Select(g => g.Header));
     }
 
     [Fact]
     public void Derivative_ExpandsToParts()
     {
         var vm = new MainWindowViewModel { Input = "46,XX,der(1)t(1;3)(p32;q21)t(1;11)(q25;q13)" };
-        var card = Assert.Single(Assert.Single(vm.CellLineGroups).Items);
+        var card = Assert.Single(Assert.Single(vm.SelectedPanel!.CellLineGroups).Items);
         Assert.Equal("der", card.KindLabel);
         Assert.True(card.HasParts);
         Assert.Equal("3 parts", card.PartsHeader);
@@ -66,7 +67,7 @@ public class AbnormalityPanelTests
     public void Flags_Shown()
     {
         var vm = new MainWindowViewModel { Input = "46,XX,?inv(9)(p12q13)c,der(7)t(2;7)(q21;q22)mat" };
-        var items = Assert.Single(vm.CellLineGroups).Items;
+        var items = Assert.Single(vm.SelectedPanel!.CellLineGroups).Items;
         Assert.Equal(["?", "c"], items[0].Flags.Select(f => f.Glyph));
         Assert.Equal(["mat"], items[1].Flags.Select(f => f.Glyph));
         Assert.True(items[0].HasFlags);
@@ -76,7 +77,7 @@ public class AbnormalityPanelTests
     public void Partial_FadedWithDiagnosticsDot()
     {
         var vm = new MainWindowViewModel { Input = "46,XX,del(5)(q13q33" };
-        var card = Assert.Single(Assert.Single(vm.CellLineGroups).Items);
+        var card = Assert.Single(Assert.Single(vm.SelectedPanel!.CellLineGroups).Items);
         Assert.True(card.IsPartial);
         Assert.Equal(0.5, card.Opacity);
         Assert.Contains(card.Flags, f => f.Glyph == "partial");
@@ -89,7 +90,7 @@ public class AbnormalityPanelTests
     public void Alternatives_ReadingsAsParts()
     {
         var vm = new MainWindowViewModel { Input = "46,XX,del(1)(p13) or dup(1)(p13)" };
-        var card = Assert.Single(Assert.Single(vm.CellLineGroups).Items);
+        var card = Assert.Single(Assert.Single(vm.SelectedPanel!.CellLineGroups).Items);
         Assert.Equal("or", card.KindLabel);
         Assert.Equal("2 readings", card.PartsHeader);
         Assert.Equal(["del(1p)", "dup(1p)"], card.Parts.Select(p => p.ShortForm));
@@ -99,7 +100,7 @@ public class AbnormalityPanelTests
     public void SelectSpan_RaisedEveryTime()
     {
         var vm = new MainWindowViewModel { Input = "47,XY,+8" };
-        var card = Assert.Single(Assert.Single(vm.CellLineGroups).Items);
+        var card = Assert.Single(Assert.Single(vm.SelectedPanel!.CellLineGroups).Items);
         var raised = 0;
         vm.PropertyChanged += (_, e) => raised += e.PropertyName == nameof(MainWindowViewModel.SelectedSpan) ? 1 : 0;
 
@@ -123,7 +124,7 @@ public class AbnormalityPanelTests
     public void IshOnly_NoKaryotypeItems()
     {
         var vm = new MainWindowViewModel { Input = "46,XX.ish 5p15.2(D5S23×2)" };
-        var group = Assert.Single(vm.CellLineGroups);
+        var group = Assert.Single(vm.SelectedPanel!.CellLineGroups);
         Assert.True(group.IsEmpty);
     }
 }

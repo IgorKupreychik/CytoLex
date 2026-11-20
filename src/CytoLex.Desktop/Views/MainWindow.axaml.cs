@@ -10,8 +10,8 @@ namespace CytoLex.Desktop.Views;
 
 /// <summary>
 /// The single-string check window (T-036). The AvaloniaEdit text is not bindable, so this code-behind syncs it with
-/// <see cref="MainWindowViewModel.Input"/>, hands the highlights to the editor's renderers, and selects a diagnostic's
-/// span in the editor when it is picked in the list.
+/// <see cref="MainWindowViewModel.Input"/>, hands the highlights of the selected edition tab (T-037) to the editor's
+/// renderers, and selects <see cref="MainWindowViewModel.SelectedSpan"/> (a picked diagnostic, card or part) in the editor.
 /// </summary>
 public partial class MainWindow : Window
 {
@@ -56,13 +56,6 @@ public partial class MainWindow : Window
                 break;
             case nameof(MainWindowViewModel.Highlights):
                 ApplyHighlights();
-                break;
-            case nameof(MainWindowViewModel.SelectedDiagnostic):
-                if (_viewModel?.SelectedDiagnostic is { } item)
-                {
-                    SelectSpan(item.Span);
-                }
-
                 break;
             case nameof(MainWindowViewModel.SelectedSpan):
                 if (_viewModel?.SelectedSpan is { } span)
