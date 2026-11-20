@@ -1,0 +1,157 @@
+version: "2016"
+section: "11.1.4"
+rules:
+  - id: CLONE.SUBCLONE_REFERENCE
+    title: Subclones written with idem, sl or sdl relative to an earlier clone
+    applies_to: [karyotype]
+    context: [neoplastic]
+    severity: error
+    statement: >-
+      The stemline (sl), the most basic clone, is listed first and written in full; every
+      further subclone is a sideline (sdl). A subclone may be written as its chromosome count,
+      then idem, sl or sdl in place of the abnormalities it shares, then its additional changes.
+      idem always refers to the karyotype listed first, so with idem every clonal change beyond
+      that first karyotype is repeated in each subclone, and all plus and minus signs are
+      relative to the stemline. sl refers to the stemline; sdl refers to the sideline listed
+      before, and several sidelines may be numbered sdl1, sdl2 and so on. A stemline
+      abnormality missing from a subclone is written with a minus sign, without repeating its
+      breakpoints.
+    cite:
+      - {section: "11.1.4", page: 86, para: "¶1"}
+      - {section: "11.1.4", page: 86, para: "¶2"}
+      - {section: "11.1.4", page: 87, example: E14}
+    examples:
+      valid:
+        - text: "46,XX,t(9;22)(q34;q11.2)[3]/47,sl,+8[17]/48,sdl1,+9[3]/49,sdl2,+11[12]"
+          cite: {section: "11.1.4", page: 86, example: E1}
+        - text: "46,XX,t(9;22)(q34;q11.2)[3]/47,idem,+8[17]/48,idem,+8,+9[3]/49,idem,+8,+9,+11[12]"
+          cite: {section: "11.1.4", page: 86, example: E1}
+        - text: "46,XX,t(8;21)(q22;q22)[12]/45,sl,–X[19]/46,sdl1,+8[5]/47,sdl2,+9[8]"
+          cite: {section: "11.1.4", page: 86, example: E2}
+        - text: "46,XX,t(8;21)(q22;q22)[12]/45,idem,–X[19]/46,idem,–X,+8[5]/47,idem,–X,+8,+9[8]"
+          cite: {section: "11.1.4", page: 86, example: E2}
+        - text: "48,XX,t(12;16)(q13;p11.1),…[23]/49,sl,+6[8]/50,sdl,+7,–8,+9[4]"
+          cite: {section: "11.1.4", page: 86, example: E3}
+        - text: "48,XX,t(12;16)(q13;p11.1),…[23]/49,idem,+6[8]/50,idem,+6,+7,–8,+9[4]"
+          cite: {section: "11.1.4", page: 86, example: E3}
+        - text: "46,XY,t(9;22)(q34;q11.2)[3]/47,sl,+8[10]/48,sdl,+der(22)t(9;22)[4]/47,sl,+19[3]"
+          cite: {section: "11.1.4", page: 87, example: E6}
+          note: The last subclone refers back to the stemline (sl), not to the sideline before it.
+        - text: "46,XY,t(9;22)(q34;q11.2)[3]/47,idem,+8[10]/48,idem,+8,+der(22)t(9;22)[4]/47,idem,+19[3]"
+          cite: {section: "11.1.4", page: 87, example: E6}
+        - text: "48,XX,t(12;16)(q13;p11.1),t(14;19)(q23;p11),+17,–19,+20,+21[32]/49,sl,+6[17]"
+          cite: {section: "11.1.4", page: 87, example: E11}
+        - text: "48,XX,t(12;16)(q13;p11.1),t(14;19)(q23;p11),+17,–19,+20,+21[32]/49,idem,+6[17]"
+          cite: {section: "11.1.4", page: 87, example: E11}
+        - text: "53,XY,t(14;18)(q32;q21),…[21]/53,sl,del(7)(q21)[9]"
+          cite: {section: "11.1.4", page: 87, example: E12}
+        - text: "53,XY,t(14;18)(q32;q21),…[21]/53,idem,del(7)(q21)[9]"
+          cite: {section: "11.1.4", page: 87, example: E12}
+        - text: "53,XY,t(1;6)(p34;q22),–3,…[13]/57,sl,+3,+del(7)(q11.2),+8,+9[22]"
+          cite: {section: "11.1.4", page: 87, example: E13}
+          note: +3 is relative to the stemline, which lacks one chromosome 3; the subclone has two normal chromosomes 3.
+        - text: "53,XY,t(1;6)(p34;q22),–3,…[13]/57,idem,+3,+del(7)(q11.2),+8,+9[22]"
+          cite: {section: "11.1.4", page: 87, example: E13}
+        - text: "49,XX,inv(6)(p21q25),…[17]/52,sl,–inv(6),+7,+8,+9,+mar[11]"
+          cite: {section: "11.1.4", page: 87, example: E14}
+          note: The stemline's inv(6) is missing from the sideline; its breakpoints are not repeated.
+        - text: "49,XX,inv(6)(p21q25),…[17]/52,idem,–inv(6),+7,+8,+9,+mar[11]"
+          cite: {section: "11.1.4", page: 87, example: E14}
+      invalid:
+        - text: "47,idem,+8[17]/46,XX,t(9;22)(q34;q11.2)[3]"
+          why: The first clone can't use idem; idem refers to a karyotype listed before it, written in full.
+          corrected: "46,XX,t(9;22)(q34;q11.2)[3]/47,idem,+8[17]"
+        - text: "46,XX,t(9;22)(q34;q11.2)[3]/47,idem,+8[17]/48,idem,+9[3]"
+          why: >-
+            idem refers to the stemline, so the +8 of the previous subclone must be repeated
+            (48 chromosomes = stemline + 2 gains).
+          corrected: "46,XX,t(9;22)(q34;q11.2)[3]/47,idem,+8[17]/48,idem,+8,+9[3]"
+    fix: {level: 3, hint: "Write the stemline first and in full; with idem, repeat every change beyond the first karyotype in each subclone."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Both invalid examples are inferred. The second fault shows up as a chromosome count that
+        does not match the changes relative to the stemline; a check should report it under this
+        rule rather than NUM.COUNT_MATCHES_CHANGES (one fault, one finding).
+    related: [CLONE.IDEM_SL_NOT_MIXED, CLONE.SECOND_STEMLINE, CLONE.POLYPLOID_SUBCLONE, CLONE.ORDER_RELATED]
+
+  - id: CLONE.SECOND_STEMLINE
+    title: Second stemline as sl2; sdl avoided, idem preferred
+    applies_to: [karyotype]
+    context: [neoplastic]
+    severity: warning
+    statement: >-
+      When unrelated clones each show clonal evolution, a tumour has two or more stemlines. The
+      second stemline is referred to as sl2, and sdl is not used for its sidelines, to avoid
+      confusing them with the sidelines of the first. Because sdl1, sdl2 … could then occur
+      more than once, idem is preferred in such cases.
+    cite:
+      - {section: "11.1.4", page: 86, para: "¶2"}
+      - {section: "11.1.4", page: 87, example: E7}
+    examples:
+      valid:
+        - text: "45,XY,–7[5]/46,sl,+8[6]/46,XY,t(9;22)(q34;q11.2)[3]/92,sl2×2[5]/93,sl2×2,+8[2]"
+          cite: {section: "11.1.4", page: 87, example: E7}
+          note: >-
+            The printed idem form of E7 writes the second stemline's subclones in full (idem can
+            only refer to the first karyotype); it prints t(9;22)×2 before +8, against §6, so it is
+            an invalid example of KARYO.ABNORMALITY_ORDER.
+      invalid:
+        - text: "45,XY,–7[5]/46,sl,+8[6]/46,XY,t(9;22)(q34;q11.2)[3]/92,sl2×2[5]/93,sdl,+8[2]"
+          why: Warning - sdl after a second stemline is ambiguous (sideline of sl or of sl2); the book avoids it.
+          corrected: "45,XY,–7[5]/46,sl,+8[6]/46,XY,t(9;22)(q34;q11.2)[3]/92,sl2×2[5]/93,sl2×2,+8[2]"
+    fix: {level: 3, hint: "Refer to the second stemline as sl2 and avoid sdl for its sidelines, or use idem."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity warning: "idem is preferred" and the E7 caption "the use of the term sdl is
+        avoided" state a preference. The invalid example is inferred from E7. E7's idem form is
+        held by KARYO.ABNORMALITY_ORDER as a printed inconsistency (T-014, with the user).
+    related: [CLONE.SUBCLONE_REFERENCE, CLONE.ORDER_UNRELATED]
+
+  - id: CLONE.POLYPLOID_SUBCLONE
+    title: Doubled clones as sl×2, sdl×2 or idem×2
+    applies_to: [karyotype]
+    context: [neoplastic]
+    severity: error
+    statement: >-
+      An aberrant polyploid clone may be written as sl, sdl or idem times a number (×2, ×3 …),
+      with the multiplication sign directly after the term. Further abnormalities of the
+      polyploid clone follow in the usual notation (sections 8.1 and 9.1).
+    cite:
+      - {section: "11.1.4", page: 86, para: "¶3"}
+    examples:
+      valid:
+        - text: "26,X,+4,+6,+21[3]/52,idem×2[13]"
+          cite: {section: "11.1.4", page: 86, example: E4}
+        - text: "46,XY,t(9;22)(q34;q11.2)[3]/92,sl×2[5]/93,sdl,+8[2]"
+          cite: {section: "11.1.4", page: 86, example: E5}
+        - text: "46,XY,t(9;22)(q34;q11.2)[3]/92,idem×2[5]/93,idem×2,+8[2]"
+          cite: {section: "11.1.4", page: 86, example: E5}
+        - text: "48,XX,t(12;16)(q13;p11.1),…[31]/96,sl×2[6]"
+          cite: {section: "11.1.4", page: 87, example: E8}
+        - text: "48,XX,t(12;16)(q13;p11.1),…[31]/96,idem×2[6]"
+          cite: {section: "11.1.4", page: 87, example: E8}
+        - text: "48,XX,t(12;16)(q13;p11.1),…[27]/97,sl×2,+8[3]"
+          cite: {section: "11.1.4", page: 87, example: E9}
+        - text: "48,XY,t(12;16)(q13;p11.1),…[27]/97,idem×2,+8[3]"
+          cite: {section: "11.1.4", page: 87, example: E9}
+          note: Printed with XY, while the sl form of the same example has XX; kept as printed.
+        - text: "48,XX,t(12;16)(q13;p11.1),…[7]/96,sl×2,inv(3)(q21q27),t(3;6)(p25;q21)[19]"
+          cite: {section: "11.1.4", page: 87, example: E10}
+        - text: "48,XX,t(12;16)(q13;p11.1),…[7]/96,idem×2,inv(3)(q21q27),t(3;6)(p25;q21)[19]"
+          cite: {section: "11.1.4", page: 87, example: E10}
+      invalid:
+        - text: "46,XY,t(9;22)(q34;q11.2)[3]/92,idem,×2[5]"
+          why: The multiplication sign belongs directly after idem, not after a comma.
+          corrected: "46,XY,t(9;22)(q34;q11.2)[3]/92,idem×2[5]"
+    fix: {level: 1, kind: delete, hint: Remove the comma between idem/sl/sdl and the multiplication sign.}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity error (T-056 reasoning): writing a doubled clone this way is optional ("may be
+        used"), but the printed form is fixed. The invalid example is inferred.
+    related: [CLONE.SUBCLONE_REFERENCE, KARYO.MULTIPLY_SIGN_AFTER_ABNORMALITY]

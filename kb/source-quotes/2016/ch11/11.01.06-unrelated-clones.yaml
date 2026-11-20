@@ -1,0 +1,29 @@
+version: "2016"
+section: "11.1.6"
+quotes:
+  - rule: CLONE.ORDER_UNRELATED
+    cite: {section: "11.1.6", page: 89, para: "¶1"}
+    text: >-
+      Clones with completely unrelated karyotypic anomalies are presented according to their
+      size; the largest first, then the second largest, etc. If there are two equal sized clones,
+      they are listed as follows: clones with abnormalities of the sex chromosomes first and then
+      those with the smallest to largest numbered autosomes.
+  - rule: CLONE.ORDER_UNRELATED
+    cite: {section: "11.1.6", page: 89, para: "¶2"}
+    text: >-
+      If a tumor contains both related and unrelated clones, the former are presented first in
+      order of increasing complexity (see Section 11.1.4), followed by the unrelated clones in
+      order of decreasing frequency.
+  - rule: CLONE.ORDER_UNRELATED
+    cite: {section: "11.1.6", page: 90, para: "¶3"}
+    text: >-
+      However, if a previously identified abnormality is found among other unrelated clones, it
+      should be listed first, regardless of the number of cells it is identified in.
+  - rule: CLONE.NORMAL_LAST
+    cite: {section: "11.1.6", page: 89, para: "¶1"}
+    text: A normal diploid clone, when present, is always listed last.
+  - rule: CLONE.NORMAL_LAST
+    cite: {section: "11.3", page: 91, para: "¶2"}
+    text: >-
+      A clone with only a constitutional anomaly is, as the normal diploid clone, always listed
+      last.

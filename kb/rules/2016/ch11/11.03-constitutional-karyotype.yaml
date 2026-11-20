@@ -1,0 +1,38 @@
+version: "2016"
+section: "11.3"
+rules:
+  - id: KARYO.CONSTITUTIONAL_ALWAYS_GIVEN
+    title: Constitutional anomaly always given in a tumour karyotype
+    applies_to: [karyotype]
+    context: [neoplastic]
+    severity: info
+    statement: >-
+      When an acquired abnormality affects a chromosome pair that has a constitutional anomaly,
+      the constitutional aberration is always written, even if no tumour cell still has it, so
+      that the acquired change is expressed relative to the constitutional karyotype. A
+      chromosome involved in both a constitutional and an acquired aberration is written as a
+      derivative chromosome.
+    cite:
+      - {section: "11.3", page: 91, para: "¶3"}
+      - {section: "11.3", page: 91, example: E10}
+    examples:
+      valid:
+        - text: "46,XX,+21c,–21[20]"
+          cite: {section: "11.3", page: 91, example: E8}
+          note: Constitutional trisomy 21 with an acquired loss of one chromosome 21.
+        - text: "45,Xc,t(X;18)(p11.1;q11.1)[20]"
+          cite: {section: "11.3", page: 91, example: E9}
+          note: Turner syndrome; the only X is involved in the acquired translocation.
+        - text: "46,XX,der(9)t(9;11)(p22;q23)t(11;12)(p13;q22)c,der(11)t(9;11)t(11;12)c,der(12)t(11;12)c[20]"
+          cite: {section: "11.3", page: 91, example: E10}
+          note: A constitutional t(11;12) with an acquired t(9;11); every aberrant chromosome is written as a derivative.
+      invalid: []
+    fix: {level: 3, hint: Give the constitutional anomaly and state the acquired changes relative to it.}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info: "must always be given" is mandatory, but a string can't show an omitted
+        constitutional anomaly. A check reports cannotVerify only when a constitutional (c)
+        anomaly is present.
+    related: [KARYO.CONSTITUTIONAL_C, CLONE.NORMAL_LAST]

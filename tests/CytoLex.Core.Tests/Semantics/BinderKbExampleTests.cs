@@ -26,6 +26,7 @@ public class BinderKbExampleTests
     {
         var models = BindHelper.Bind(text, fragment);
         Assert.NotEmpty(models);
+        PendingExamples.SkipOrFailIfFixed(text, models.All(m => !m.DescendantsAndSelf().Any(n => n.IsPartial)));
         foreach (var model in models)
         {
             var nodes = model.DescendantsAndSelf().ToList();

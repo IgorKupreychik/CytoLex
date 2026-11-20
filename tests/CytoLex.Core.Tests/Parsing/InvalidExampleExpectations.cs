@@ -6,6 +6,7 @@ namespace CytoLex.Core.Tests.Parsing;
 /// counts, context, spacing (kept as trivia), band existence, symbol combinations, group counts. Otherwise each entry
 /// is the KB rule the parser names, the text of the span and its offset (zero-length span = an inserted token).
 /// <see cref="KbInvalidExampleParseTests"/> fails when a KB example is missing here or an entry is no longer in the KB.
+/// Examples the parser can't read yet are in <see cref="KbExamples.PendingExamples"/> instead (T-014).
 /// </summary>
 internal static class InvalidExampleExpectations
 {
@@ -151,5 +152,20 @@ internal static class InvalidExampleExpectations
             ["46,XX,2del(6)(q13q23)"] = [], // KARYO.MULTIPLY_SIGN_AFTER_ABNORMALITY
             ["46,XX,del(6)×2(q13q23)"] = [("KARYO.MULTIPLY_SIGN_AFTER_ABNORMALITY", "×2", 12)], // KARYO.MULTIPLY_SIGN_AFTER_ABNORMALITY
             ["47,XX,del(6)(q13q23)×3"] = [], // KARYO.MULTIPLY_SIGN_AFTER_ABNORMALITY
+            ["46,XX,t(8;21)(q22;q22)[12]/47,idem,+8[6]/45,XX,–7[2]"] = [], // CLONE.MIN_CELLS
+            ["46,XY,t(8;21)(q22;q22)[26]/47,idem,+21"] = [], // CLONE.CELL_COUNT_REQUIRED
+            ["47,XY,t(8;21)(q22;q22),+21[7]/46,XY,t(8;21)(q22;q22)[26]"] = [], // CLONE.ORDER_RELATED
+            ["46,XX,t(9;22)(q34;q11.2)[3]/47,sl,+8[17]/48,idem,+8,+9[3]"] = [], // CLONE.IDEM_SL_NOT_MIXED
+            ["47,idem,+8[17]/46,XX,t(9;22)(q34;q11.2)[3]"] = [], // CLONE.SUBCLONE_REFERENCE
+            ["46,XX,t(9;22)(q34;q11.2)[3]/47,idem,+8[17]/48,idem,+9[3]"] = [], // CLONE.SUBCLONE_REFERENCE
+            ["45,XY,–7[5]/46,sl,+8[6]/46,XY,t(9;22)(q34;q11.2)[3]/92,sl2×2[5]/93,sdl,+8[2]"] = [], // CLONE.SECOND_STEMLINE
+            ["45~48,XX,del(3)(p12),–5,+8,+11[7cp]"] = [], // CP.FORMAT
+            ["46,XX,t(1;6)(p11;p12)[9]/46,XX,t(3;9)(p13;p13)[14]/46,XX[7]"] = [], // CLONE.ORDER_UNRELATED
+            ["46,XX,t(1;6)(p11;p12)[9]/47,XX,+X[9]/46,XX[7]"] = [], // CLONE.ORDER_UNRELATED
+            ["46,XY,t(9;22)(q34;q11.2)[6]/46,XY,t(1;3)(p22;p14)[14]"] = [], // CLONE.ORDER_UNRELATED
+            ["46,XX[7]/46,XX,t(3;9)(p13;p13)[14]/48,XX,+3,+9[11]"] = [], // CLONE.NORMAL_LAST
+            ["47,XY,+21c[12]/48,XY,+8,+21c[3]/49,XY,+8,+9,+21c[5]"] = [], // CLONE.NORMAL_LAST
+            ["68<3n>,XY,–Y[10]"] = [], // SEX.UNEVEN_PLOIDY_MALE
+            ["45,XY,–7[5]/46,idem,+8[6]/46,XY,t(9;22)(q34;q11.2)[3]/92,XXYY,t(9;22)×2[5]/93,XXYY,t(9;22)×2,+8[2]"] = [], // KARYO.ABNORMALITY_ORDER (§11.1.4 E7, printed)
         };
 }

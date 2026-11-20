@@ -1,0 +1,15 @@
+version: "2016"
+section: "11.3"
+quotes:
+  - rule: KARYO.CONSTITUTIONAL_ALWAYS_GIVEN
+    cite: {section: "11.3", page: 91, para: "¶3"}
+    text: >-
+      To appropriately express acquired abnormalities affecting one of the chromosomes of a pair
+      that is involved in a constitutional anomaly, the constitutional aberration must always be
+      given, even if none of the tumor cells have this particular aberration. Thus, an acquired
+      abnormality is always presented in relation to the constitutional karyotype.
+  - rule: KARYO.CONSTITUTIONAL_ALWAYS_GIVEN
+    cite: {section: "11.3", page: 91, example: E10}
+    text: >-
+      The resulting karyotype, with both constitutional and acquired aberrations, should list each
+      aberrant chromosome as a derivative chromosome.

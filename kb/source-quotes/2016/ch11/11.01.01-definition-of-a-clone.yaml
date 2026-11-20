@@ -1,0 +1,42 @@
+version: "2016"
+section: "11.1.1"
+quotes:
+  - rule: CLONE.MIN_CELLS
+    cite: {section: "11.1.1", page: 84, para: "¶1"}
+    text: >-
+      A clone must have at least two cells with the same aberration if the aberration is a
+      chromosome gain or a structural rearrangement. If the abnormality is loss of a chromosome,
+      the same loss must be present in at least three cells to be accepted as clonal. The term may
+      need to be operationally defined by the author because the criteria for acceptance will
+      depend on, e.g., the number of cells examined, the nature of the aberration involved, the
+      type of culture, and the time cells spend in vitro prior to harvest.
+  - rule: CLONE.MIN_CELLS
+    cite: {section: "11.1.1", page: 84, para: "¶1"}
+    text: >-
+      However, two cells with identical losses of one or more chromosomes and the same chromosome
+      gain or structural aberration(s) may be considered clonal and included in the nomenclature.
+  - rule: CLONE.MIN_CELLS
+    cite: {section: "11.3", page: 90, para: "¶1"}
+    text: >-
+      The same clonality criteria (see Section 11.1.1) apply to cells containing the
+      constitutional karyotype as to cells containing acquired chromosome abnormalities.
+  - rule: CLONE.SINGLE_CELL_REPORTING
+    cite: {section: "11.1.1", page: 84, para: "¶3"}
+    text: >-
+      The general rule in tumor cytogenetics is that only the clonal chromosomal abnormalities
+      found in a tumor should be reported. If, for special reasons, nonclonal aberrations are
+      presented, then these must be clearly separated from the clonal abnormalities and should not
+      be part of the description of the tumor karyotype. When the same abnormal clone has been
+      found in an initial and follow-up study, even in a single cell, it should be reported in the
+      karyotype.
+  - rule: CLONE.SINGLE_CELL_REPORTING
+    cite: {section: "11.1.1", page: 85, para: "¶4"}
+    text: >-
+      Similarly, when a single abnormal cell is confirmed by a different method (e.g., FISH), and
+      thus shown to be clonal, it should be reported in the karyotype
+  - rule: CLONE.SINGLE_CELL_REPORTING
+    cite: {section: "11.1.1", page: 85, para: "¶5"}
+    text: >-
+      When additional abnormalities are seen in a single cell, but not proven to be present with
+      another method, they should not be listed in the nomenclature but should be discussed in the
+      interpretation.

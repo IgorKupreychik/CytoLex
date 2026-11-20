@@ -1,0 +1,76 @@
+version: "2016"
+section: "11.1.1"
+rules:
+  - id: CLONE.MIN_CELLS
+    title: Minimum cell numbers for a clone
+    applies_to: [karyotype]
+    context: [neoplastic]
+    severity: warning
+    statement: >-
+      A clone needs at least two cells with the same chromosome gain or structural
+      rearrangement, and at least three cells with the same chromosome loss. Two cells that
+      share the same loss(es) together with the same gain or structural aberration may still be
+      accepted as clonal. For in situ preparations, the cells must come from different primary
+      cultures, or from well-separated areas or different colonies of one slide. The same
+      criteria apply to cells with a constitutional karyotype (section 11.3), and, in a
+      composite karyotype, to the cell count given after an abnormality (section 11.1.5).
+    cite:
+      - {section: "11.1.1", page: 84, para: "¶1"}
+      - {section: "11.3", page: 90, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XY,del(5)(q13q33),–7,+8[2]/46,XY[18]"
+          cite: {section: "11.1.1", page: 84, example: E1}
+          note: The loss of chromosome 7 is in two cells only, but together with the same structural change and gain, so it is accepted.
+        - text: "46,XX,t(6;11)(q27;q23)[16]/45,X,–X,t(6;11)(q27;q23)[2]/46,XX[1]"
+          cite: {section: "11.1.1", page: 84, example: E1}
+      invalid:
+        - text: "46,XX,t(8;21)(q22;q22)[12]/47,idem,+8[6]/45,XX,–7[2]"
+          why: A clone with only a chromosome loss needs at least three cells; –7 is seen in two.
+        - text: "45~48,XX,del(3)(p12)[1],–5[4],+8[2][cp6]"
+          why: In a composite karyotype each listed abnormality must itself be clonal; del(3)(p12) is seen in one cell.
+    fix: {level: 3, hint: "List only abnormalities that meet the clone criteria (≥2 cells for a gain or structural change, ≥3 for a loss), or state the laboratory's own criteria."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity warning (T-014, with the user): the book says "must", but adds that the term "may
+        need to be operationally defined by the author" (number of cells examined, type of
+        culture, time in vitro), so a smaller clone may be acceptable by the author's criteria.
+        Both invalid examples are inferred; the composite case follows the §11.1.5 E1 caption
+        ("Each of the abnormalities … has been seen in at least two cells").
+    related: [CLONE.SINGLE_CELL_REPORTING, CP.FORMAT]
+
+  - id: CLONE.SINGLE_CELL_REPORTING
+    title: Only clonal abnormalities reported; single cells only when confirmed
+    applies_to: [karyotype]
+    context: [neoplastic]
+    severity: info
+    statement: >-
+      Only clonal abnormalities belong in a tumour karyotype; nonclonal aberrations, if given at
+      all, are kept clearly apart from it. A clone seen in a single cell is reported only when
+      the same abnormal clone was found in an earlier or follow-up study, or when another method
+      (e.g. FISH) has shown it to be clonal. Further abnormalities seen in a single cell and not
+      confirmed otherwise are not written in the nomenclature but discussed in the
+      interpretation.
+    cite:
+      - {section: "11.1.1", page: 84, para: "¶3"}
+      - {section: "11.1.1", page: 85, para: "¶4"}
+      - {section: "11.1.1", page: 85, para: "¶5"}
+    examples:
+      valid:
+        - text: "46,XX,t(9;22)(q34;q11.2)[1]/46,XX[19]"
+          cite: {section: "11.1.1", page: 84, example: E2}
+          note: Valid if the same clone was found in an initial or follow-up study; the string can't show this.
+        - text: "46,XX,del(20)(q11.2q13.3)[1]/46,XX[19].nuc ish(D20S108×1)[40/200]"
+          cite: {section: "11.1.1", page: 85, example: E3}
+          note: The single abnormal cell is confirmed by the nuc ish segment.
+      invalid: []
+    fix: {level: 3, hint: "Report a single-cell clone only if it was seen in an earlier study or confirmed by another method; otherwise discuss it in the interpretation."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info: whether a single cell is confirmed (earlier study, FISH) can't be verified
+        from the string. A check reports it as cannotVerify only on an abnormal clone with [1].
+    related: [CLONE.MIN_CELLS]

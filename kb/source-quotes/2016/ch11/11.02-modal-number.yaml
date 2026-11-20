@@ -1,0 +1,26 @@
+version: "2016"
+section: "11.2"
+quotes:
+  - rule: PLOIDY.MODAL_NUMBER
+    cite: {section: "11.2", page: 90, para: "¶1"}
+    text: >-
+      The modal number is the most common chromosome number in a tumor cell population. The modal
+      number may be expressed as a range between two chromosome numbers.
+  - rule: PLOIDY.MODAL_NUMBER
+    cite: {section: "11.2", page: 90, para: "¶3"}
+    text: >-
+      Pseudodiploid, pseudotriploid, etc., are used to describe a karyotype, which has the number
+      of chromosomes equal to a multiple of the haploid number (euploid) but is abnormal because
+      of the presence of acquired numerical and/or structural aberrations. All chromosome numbers
+      deviating from euploidy are aneuploid.
+  - rule: PLOIDY.LEVELS
+    cite: {section: "11.2", page: 90, para: "¶2"}
+    text: >-
+      Each range is determined as n±n/2, with n/2 defined operationally as 11 chromosomes.
+      Suggested examples of ploidy levels, including ranges of chromosome numbers constituting
+      each level, are given above.
+  - rule: SEX.UNEVEN_PLOIDY_MALE
+    cite: {section: "11.2", page: 90, para: "¶4"}
+    text: >-
+      By convention, in males all sex chromosome deviations should be expressed in relation to X
+      in haploid tumors, to XXY in triploid tumors, to XXXYY in pentaploid tumors, and so on

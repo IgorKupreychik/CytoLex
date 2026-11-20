@@ -96,7 +96,7 @@ bar positions. These are the places where ISCN 2016 differs from 2013 — useful
 ### Tables
 
 All configured tables: text layer and image agree cell for cell (`review.image: ok`).
-Person check (`review.human`): `ok` for Table 1, Table 2, Table 3, Table 4 and Symbols (Table 3 on 2026-11-16; Table 2 and Symbols on 2026-11-17, T-008; Table 4 on 2026-11-17, T-009; Table 1 on 2026-11-17, T-010); pending for the rest.
+Person check (`review.human`): `ok` for Table 1, Table 2, Table 3, Table 4 and Symbols (Table 3 on 2026-11-16; Table 2 and Symbols on 2026-11-17, T-008; Table 4 on 2026-11-17, T-009; Table 1 on 2026-11-17, T-010; Ploidy table on 2026-11-20, T-014); pending for the rest.
 
 | Table | § (chunk) | Page | Shape | Notes |
 |---|---|---|---|---|
@@ -158,7 +158,7 @@ checked):
 | 4.3.2, 4.3.2.2, 4.4 | 43–45 | the Fig. 8/9 diagrams the text depends on (Table 4, p.44: signed off 2026-11-17). **Checked in T-009 (2026-11-17):** the printed figures add no rule content beyond the text, so the ch. 4 rules say so in `review.note` and keep `needs_review: false` |
 | 7.2, 9.2.3, 9.2.17.1, 16.3.7 | 53, 61–65, 75–76, 129 | underlined homologues (U+0332 in the source text; validator behaviour is T-042). §7.2: `FRA.HOMOLOGUE_UNDERLINING` (T-010) and §9.2.3: `DER.HOMOLOGUE_UNDERLINING` (T-012) carry `needs_review`; the other §9.2.3 rules cite no underlined block. §9.2.17.1: `TRANSLOC.HOMOLOGUE_UNDERLINING` (T-013) holds E8/E10 and carries `needs_review`; `TRANSLOC.FORMAT`, `STRUCT.CHROMOSOME_ORDER` and `STRUCT.MULTI_CHROMOSOME_ORDER` cite ¶1, whose underlining only demonstrates the words "single underlining", and use no underlined example |
 | 10.3 | 83 | small table — until `review.human: ok` |
-| 11.1.6 / 11.2 (Ploidy table) | 90 | table; indentation and bold lost |
+| 11.1.6 / 11.2 (Ploidy table) | 90 | table; indentation and bold lost. **Signed off 2026-11-20 (T-014):** all 48 cells match; the lost hierarchy is carried by the names (Near-/Hypo-/Hyper-), so rules that encode it from the names need no `needs_review` for this. Encoded in `PLOIDY.LEVELS` (T-014, `needs_review: false`) |
 | 13.3.2, 13.3.2.4 | 109–112 | signal positions shown only in drawings |
 | 13.4 | 112 | fibre diagram symbols lost |
 | 16.2 | 125–126 | alignment figure: shading, bold and italic carry meaning |

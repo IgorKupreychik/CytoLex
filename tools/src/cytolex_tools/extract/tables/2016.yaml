@@ -88,7 +88,7 @@ tables:
   # of p.90, inside §11.1.6. Indentation (sub-levels) and bold (near-x levels) are not kept.
   - id: Ploidy table
     kind: float
-    review: {image: ok, human: pending, fallback: none}
+    review: {image: ok, human: ok, fallback: none}
     regions:
       - book_page: 90
         top: 66

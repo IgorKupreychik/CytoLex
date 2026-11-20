@@ -1,0 +1,10 @@
+version: "2016"
+section: "11.1.3"
+quotes:
+  - rule: CLONE.MAINLINE
+    cite: {section: "11.1.3", page: 85, para: "¶1"}
+    text: >-
+      The mainline is the most frequent chromosome constitution of a tumor cell population. It is
+      a purely quantitative term to describe the largest clone, and does not necessarily indicate
+      the most basic one in terms of progression. In some situations, when two or more clones are
+      of exactly the same size, a tumor may have more than one mainline.

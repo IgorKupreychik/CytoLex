@@ -1,0 +1,36 @@
+version: "2016"
+section: "11.1.5"
+quotes:
+  - rule: CP.FORMAT
+    cite: {section: "11.1.5", page: 88, para: "¶1"}
+    text: >-
+      The composite karyotype contains all clonally occurring abnormalities and should also give
+      the range of chromosome numbers in the metaphase cells containing the clonal abnormalities.
+      The total number of cells in which the clonal changes were observed is given in square
+      brackets after the karyotype, preceded by the symbol cp.
+  - rule: CP.FORMAT
+    cite: {section: "11.1.5", page: 88, para: "¶2"}
+    text: >-
+      This information may be expressed by providing the number of cells in square brackets after
+      each abnormality.
+  - rule: CP.NOT_FOR_RANDOM_LOSS
+    cite: {section: "11.1.5", page: 88, para: "¶1"}
+    text: The term cp should not be used to describe random loss.
+  - rule: CP.NOT_FOR_RANDOM_LOSS
+    cite: {section: "11.1.5", page: 89, example: E7}
+    text: >-
+      Note that the cell with 42 chromosomes is not included because the abnormalities seen are
+      due to random loss and are not part of the clone.
+  - rule: CP.COUNT_AND_PARADOX
+    cite: {section: "11.1.5", page: 88, para: "¶2"}
+    text: It is not apparent from a composite karyotype how many cells have each abnormality.
+  - rule: CP.COUNT_AND_PARADOX
+    cite: {section: "11.1.5", page: 88, para: "¶3"}
+    text: >-
+      It should be noted that in a composite karyotype the sum of the aberrations listed may
+      indicate a higher or lower chromosome number than that actually seen.
+  - rule: CP.COUNT_AND_PARADOX
+    cite: {section: "11.1.5", page: 88, para: "¶5"}
+    text: >-
+      Note also that a composite karyotype may contain such seemingly paradoxical abnormalities as
+      loss and gain of the same chromosome.

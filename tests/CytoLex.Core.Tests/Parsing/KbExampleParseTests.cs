@@ -1,3 +1,4 @@
+using CytoLex.Core.Syntax;
 using CytoLex.Core.Tests.KbExamples;
 
 namespace CytoLex.Core.Tests.Parsing;
@@ -20,6 +21,7 @@ public class KbValidExampleParseTests
         var trees = ParseHelper.Parse(text, fragment);
         Assert.NotEmpty(trees);
         Assert.All(trees, t => Assert.Equal(t.Segment.Span.Of(text), t.ToFullString()));
+        PendingExamples.SkipOrFailIfFixed(text, trees.All(t => t.Diagnostics.IsEmpty));
         Assert.Empty(trees.SelectMany(t => t.Diagnostics).Select(d => ParseHelper.Describe(text, d)));
     }
 }
@@ -39,6 +41,10 @@ public class KbInvalidExampleParseTests
     [MemberData(nameof(Cases))]
     public void ReportsTheExpectedSyntaxErrors(string text, bool fragment)
     {
+        // A pending invalid example passes once the parser no longer leaves part of it unparsed.
+        PendingExamples.SkipOrFailIfFixed(
+            text, ParseHelper.Parse(text, fragment).SelectMany(t => t.Diagnostics).All(d => d.RuleId != CoreCodes.Unparsed));
+
         Assert.True(InvalidExampleExpectations.Table.TryGetValue(text, out var expected),
             $"'{text}' is not in InvalidExampleExpectations: classify it (syntax errors with rule and span, or [] when a rule finds it).");
 
@@ -54,6 +60,13 @@ public class KbInvalidExampleParseTests
     {
         var invalid = ParseHelper.KbExamples().Where(x => x.Kind == ExampleKind.Invalid).Select(x => x.Text).ToHashSet(StringComparer.Ordinal);
         Assert.DoesNotContain(InvalidExampleExpectations.Table.Keys, k => !invalid.Contains(k));
+    }
+
+    [Fact]
+    public void EveryPendingEntry_IsAKbExample()
+    {
+        var texts = ParseHelper.KbExamples().Select(x => x.Text).ToHashSet(StringComparer.Ordinal);
+        Assert.DoesNotContain(PendingExamples.Table.Keys, k => !texts.Contains(k));
     }
 
     [Fact]

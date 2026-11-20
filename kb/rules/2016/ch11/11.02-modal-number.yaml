@@ -1,0 +1,93 @@
+version: "2016"
+section: "11.2"
+rules:
+  - id: PLOIDY.MODAL_NUMBER
+    title: Modal number; pseudo- and aneuploid
+    applies_to: [karyotype]
+    context: [neoplastic]
+    severity: info
+    statement: >-
+      The modal number is the most common chromosome number in a tumour cell population; it may
+      be given as a range between two chromosome numbers. Pseudodiploid, pseudotriploid and so
+      on describe a karyotype with a chromosome number equal to a multiple of the haploid number
+      (euploid) that is abnormal because of acquired numerical and/or structural aberrations.
+      Every chromosome number that deviates from euploidy is aneuploid.
+    cite:
+      - {section: "11.2", page: 90, para: "¶1"}
+      - {section: "11.2", page: 90, para: "¶3"}
+    examples:
+      valid: []
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: Severity info - definitions of terms used in reports, not in the notation string; nothing to check.
+    related: [PLOIDY.LEVELS]
+
+  - id: PLOIDY.LEVELS
+    title: Ploidy levels and their chromosome number ranges
+    applies_to: [karyotype]
+    severity: info
+    statement: >-
+      Modal numbers near a multiple of the haploid number may be described by ploidy level:
+      near-haploid (n±), hypohaploid (n–), hyperhaploid (n+), near-diploid (2n±), hypodiploid
+      (2n–), hyperdiploid (2n+), and so on up to octaploid. Each near-level spans n ± n/2 around
+      its multiple, with n/2 set to 11 chromosomes: near-haploid up to 34, near-diploid 35–57,
+      near-triploid 58–80, near-tetraploid 81–103, near-pentaploid 104–126, near-hexaploid
+      127–149, near-heptaploid 150–172 and near-octaploid 173–195. Within each near-level, the
+      hypo-level lies below the exact multiple and the hyper-level above it; the exact multiple
+      itself belongs only to the near-level.
+    cite:
+      - {section: "11.2", page: 90, para: "¶2"}
+      - {section: "11.1.6", page: 90, float: "Ploidy table"}
+    examples:
+      valid: []
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info - terminology for reports (and the level a count falls in); no string
+        violates it. The Ploidy table (p.90, printed inside §11.1.6 without a caption; §11.2 ¶2
+        refers to it as "given above") was signed off on 2026-11-20 (T-014). Its rows, near-level
+        (exact multiple): range; hypo; hyper -
+        haploid (23): ≤34; <23; 24–34 ·
+        diploid (46): 35–57; 35–45; 47–57 ·
+        triploid (69): 58–80; 58–68; 70–80 ·
+        tetraploid (92): 81–103; 81–91; 93–103 ·
+        pentaploid (115): 104–126; 104–114; 116–126 ·
+        hexaploid (138): 127–149; 127–137; 139–149 ·
+        heptaploid (161): 150–172; 150–160; 162–172 ·
+        octaploid (184): 173–195; 173–183; 185–195.
+        Bold (near-levels) and indentation (hypo/hyper) are lost in the text layer; the names
+        carry the hierarchy. NUM.PLOIDY_REFERENCE's level formula (a count c lies on level 1 up
+        to 34, else on ⌊(c + 11) / 23⌋) matches every near-level range of the table (checked
+        2026-11-20). The table stops at 195; the formula extends it.
+    related: [NUM.PLOIDY_REFERENCE, NUM.PLOIDY_IN_ANGLE_BRACKETS, PLOIDY.MODAL_NUMBER]
+
+  - id: SEX.UNEVEN_PLOIDY_MALE
+    title: Male tumours with uneven ploidy - sex chromosomes relative to X, XXY, XXXYY
+    applies_to: [karyotype]
+    context: [neoplastic]
+    severity: error
+    statement: >-
+      In male tumours with an uneven ploidy level, the expected sex chromosome constitution
+      can't be deduced. By convention, sex chromosome deviations are then stated relative to X
+      in haploid tumours, to XXY in triploid tumours, to XXXYY in pentaploid tumours, and so on.
+    cite:
+      - {section: "11.2", page: 90, para: "¶4"}
+    examples:
+      valid:
+        - text: "68<3n>,XY,–X[10]"
+          cite: {section: "11.2", page: 90, example: E1}
+          note: Triploid male tumour with loss of a sex chromosome; XY is XXY minus one X.
+      invalid:
+        - text: "68<3n>,XY,–Y[10]"
+          why: In a triploid male tumour the reference is XXY, so XY is a loss of X, not of Y.
+          corrected: "68<3n>,XY,–X[10]"
+    fix: {level: 1, kind: replace, hint: "State the sex chromosome change relative to X, XXY, XXXYY … (haploid, triploid, pentaploid …)."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity error: "by convention … should be expressed" fixes the reference. The invalid
+        example is inferred.
+    related: [NUM.PLOIDY_REFERENCE, SEX.ACQUIRED_GAIN_LOSS]

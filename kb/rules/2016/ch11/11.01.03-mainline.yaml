@@ -1,0 +1,37 @@
+version: "2016"
+section: "11.1.3"
+rules:
+  - id: CLONE.MAINLINE
+    title: Mainline is the largest clone
+    applies_to: [karyotype]
+    context: [neoplastic]
+    severity: info
+    statement: >-
+      The mainline is the most frequent chromosome constitution in a tumour cell population, a
+      purely quantitative term for the largest clone; it need not be the most basic clone in
+      terms of progression. When two or more clones have exactly the same size, a tumour may
+      have more than one mainline.
+    cite:
+      - {section: "11.1.3", page: 85, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,t(9;22)(q34;q11.2)[3]/47,XX,+8,t(9;22)(q34;q11.2)[17]"
+          cite: {section: "11.1.3", page: 85, example: E1}
+          note: The second clone (17 cells) is the mainline, though it most probably evolved from the first.
+        - text: "46,XX,t(9;22)(q34;q11.2)[3]/47,sl,+8[17]"
+          cite: {section: "11.1.3", page: 85, example: E1}
+        - text: "46,XX,t(9;22)(q34;q11.2)[3]/47,idem,+8[17]"
+          cite: {section: "11.1.3", page: 85, example: E1}
+        - text: "46,XX,der(2)t(2;5)(p23;q35)[10]/47,XX,+2,der(2)t(2;5)[16]"
+          cite: {section: "11.1.3", page: 85, example: E2}
+          note: Printed with the der(2) repeated without its breakpoints (an abbreviated repeat, see KARYO.ABBREVIATED_FORM).
+        - text: "46,XX,der(2)t(2;5)(p23;q35)[10]/47,sl,+2[16]"
+          cite: {section: "11.1.3", page: 85, example: E2}
+        - text: "46,XX,der(2)t(2;5)(p23;q35)[10]/47,idem,+2[16]"
+          cite: {section: "11.1.3", page: 85, example: E2}
+      invalid: []
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: Severity info - a definition; no string can violate it.
+    related: [CLONE.ORDER_RELATED]

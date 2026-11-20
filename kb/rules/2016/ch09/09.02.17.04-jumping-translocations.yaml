@@ -24,5 +24,9 @@ rules:
     review:
       paraphrase_checked: true
       needs_review: false
-      note: The general clone-order rule for unrelated clones is §11.1.6 (T-014); link it there.
-    related: [TRANSLOC.FORMAT, KARYO.CLONE_SEPARATOR]
+      note: >-
+        The general order of unrelated clones is CLONE.ORDER_UNRELATED (§11.1.6, T-014). That rule
+        is a warning because §11.1.6 ¶3 lets a previously identified abnormality come first; for
+        jumping translocations §9.2.17.4 states the decreasing-frequency order without that
+        exception, so this rule stays an error.
+    related: [TRANSLOC.FORMAT, KARYO.CLONE_SEPARATOR, CLONE.ORDER_UNRELATED]

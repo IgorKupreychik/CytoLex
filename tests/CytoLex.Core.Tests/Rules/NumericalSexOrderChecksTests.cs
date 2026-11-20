@@ -77,6 +77,7 @@ public class NumericalSexOrderChecksTests
     [InlineData("45,XY,upd der(13;13)(q10;q10)pat")]
     [InlineData("46,XXYc,–X")] // a constitutional field keeps the lost X
     [InlineData("44,Xc,–X")]
+    [InlineData("45,Xc,t(X;18)(p11.1;q11.1)[20]")] // §11.3 E9: the constitutional field holds the translocated X
     [InlineData("48,XY,+21c,+21")]
     [InlineData("48,XXY,+mar c")]
     [InlineData("47,XXX?c")]

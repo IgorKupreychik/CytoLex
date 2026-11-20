@@ -23,7 +23,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-011 | done | 1 | T-008 | KB: ch. 8 (numerical abnormalities) |
 | T-012 | done | 1 | T-008 | KB: ch. 9.1–9.2.10 (structural, part 1) |
 | T-013 | done | 1 | T-008 | KB: ch. 9.2.11–9.3 (structural, part 2 incl. translocations) |
-| T-014 | todo | 2 | T-013 | KB: ch. 11 (neoplasia) |
+| T-014 | done | 2 | T-013 | KB: ch. 11 (neoplasia) |
 | T-015 | todo | 3 | T-013 | KB: ch. 13.1–13.2 (metaphase ish) |
 | T-016 | todo | 3 | T-015 | KB: ch. 13.3–13.8 (nuc ish, fib/rev ish, cgh, painting) |
 | T-017 | todo | 2 | T-013 | KB: ch. 14 (microarray) |
@@ -217,10 +217,11 @@ All KB tasks share these steps and criteria:
 **Outcome (2026-11-17):** No sign-off needed. 24 new rules + quotes in `kb/rules/2016/ch09/` and `kb/source-quotes/2016/ch09/` (13 section files, §9.2.11–9.3; none for the §9.2.17 heading), new prefixes `ISO`, `MAR`, `DMIN`, `ACE`, `NEO`, `QDP`, `RING`, `TAS`, `TRANSLOC`, `ROB`, `TRC`, `TRP`, plus `DER.WHOLE_ARM_TWO_CHROMOSOMES` and `KARYO.MULTIPLY_SIGN_AFTER_ABNORMALITY`; all paraphrases approved by the user. All 69 example blocks are valid examples (script-checked); `kb build` passes (140 rules, 220 quotes). Translocation chromosome order stays in `STRUCT.CHROMOSOME_ORDER`/`STRUCT.MULTI_CHROMOSOME_ORDER` (§9.2.17.1 cites added); T-013 notes done (`DER.ISODERIVATIVE` ↔ `ISO.FORMAT`, `SEX.ABNORMAL_SEX_CHROMOSOME_IN_LIST` now cites the explicit §9.2.17.1 E3 statement, `DIC.FORMAT` linked to the whole-arm/rob rules, `KARYO.REPLACED_NORMAL_NOT_MISSING` gained §9.2.11–9.3 examples). Re-approved statement changes: `STRUCT.PROXIMAL_BREAKPOINT_FIRST` and `STRUCT.SHORT_ARM_BREAKPOINT_FIRST` (band order free where it shows orientation: trp, complex t, rings, tas, trc). `needs_review`: `TRANSLOC.HOMOLOGUE_UNDERLINING` (T-042) and `TRP.FORMAT` (§9.2.19 ¶1 vs E2). Inferred invalid examples are noted per rule. Notes added to T-014, T-022, T-031, T-042; `docs/decisions.md` and `docs/extraction-review-2016.md` updated. No deviations from the plan.
 
 ### T-014 — KB: ch. 11 (neoplasia)
-**Status:** todo
+**Status:** done
 **Description:** Clone definition and size, mainline, stemline/sideline, idem vs. sl/sdl, composite karyotype, unrelated clones, modal number, constitutional karyotype in neoplasia.
 **Acceptance:** Shared KB criteria.
 **Notes:** Before starting, person sign-off of the **Ploidy table** (p.90; its ranges become numeric limits — check every number): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`. Indentation/bold of the printed table are lost (`docs/extraction-review-2016.md`). From T-013: `TRANSLOC.JUMPING` (§9.2.17.4) points to §11.1.6 for the order of unrelated clones (decreasing frequency); link it to the clone-order rule written here.
+**Outcome (2026-11-20):** Ploidy table (p.90, 48 cells) signed off before planning. 18 new rules + quotes in `kb/rules/2016/ch11/` and `kb/source-quotes/2016/ch11/` (8 section files, §11.1.1–11.3), new prefixes `CLONE` (11), `CP` (3), `PLOIDY` (2), plus `SEX.UNEVEN_PLOIDY_MALE` and `KARYO.CONSTITUTIONAL_ALWAYS_GIVEN`; all paraphrases approved by the user. `kb build` passes (160 rules, 262 quotes); `dotnet test` 3633 total, 0 failed. Decided with the user: Ploidy table as the info rule `PLOIDY.LEVELS`; `CLONE.MIN_CELLS` and `CLONE.ORDER_UNRELATED` are warnings (§11.1.6 E3 kept as an invalid warning form). Existing rules extended: `KARYO.CLONE_SEPARATOR`, `KARYO.CONSTITUTIONAL_C`, `MAR.CONSTITUTIONAL_C_SPACE`, `KARYO.ABNORMALITY_ORDER`, `NUM.PLOIDY_REFERENCE`, `KARYO.CLONE_ORDER_CONSTITUTIONAL`, `SYM.LISTED_ONLY`; `TRANSLOC.JUMPING` linked to `CLONE.ORDER_UNRELATED`. Deviations (decided with the user during the work): the §11.1.4 E7 idem form is an invalid example of `KARYO.ABNORMALITY_ORDER` (printed out of order); `SEX.ABNORMAL_SEX_CHROMOSOME_IN_LIST` gained a cited c-field exception (§11.3 E9, re-approved) with a one-line fix in `ChromosomeCount.cs` and a unit test; new test-side `KbExamples/PendingExamples.cs` skips 3 examples the parser can't read yet (handed to T-032); invalid examples classified in `InvalidExampleExpectations.cs`. Notes added to T-032; `docs/decisions.md`, `docs/extraction-review-2016.md`, `CLAUDE.md`, `README.md` updated.
 
 ### T-015 — KB: ch. 13.1–13.2 (metaphase ish)
 **Status:** todo
@@ -420,7 +421,7 @@ Outcome (2026-11-18): `Segmenter.Split` (top-level `.` followed by a letter sepa
 **Status:** todo
 **Description:** Clones, cell counts `[n]`, idem/sl/sdl, composite karyotypes, `/` and `//`.
 **Acceptance:** Related KB examples pass.
-**Notes:**
+**Notes:** From T-014: the KB rules are `CLONE.*` (11), `CP.*` (3), `PLOIDY.*` (2, info), `SEX.UNEVEN_PLOIDY_MALE`, `KARYO.CONSTITUTIONAL_ALWAYS_GIVEN` (`kb/rules/2016/ch11/`). Parser work: cell counts after an abnormality (`del(3)(p12)[2]`, §11.1.5 E2) and `idem,×2` (should be reported as `CLONE.POLYPLOID_SUBCLONE` with a delete fix); these examples are in `tests/CytoLex.Core.Tests/KbExamples/PendingExamples.cs` and must be removed from it. One fault, one finding: a missing repeat with idem shows up as a count mismatch (`…/48,idem,+9`) and belongs to `CLONE.SUBCLONE_REFERENCE`, not `NUM.COUNT_MATCHES_CHANGES`; a normal clone listed first belongs to `CLONE.NORMAL_LAST` when acquired and `KARYO.CLONE_ORDER_CONSTITUTIONAL` when constitutional. `CLONE.ORDER_UNRELATED` is a warning (§11.1.6 ¶3). The info rules `CLONE.SINGLE_CELL_REPORTING` (abnormal `[1]` clone), `CP.NOT_FOR_RANDOM_LOSS` (`[cp…]`) and `KARYO.CONSTITUTIONAL_ALWAYS_GIVEN` (`c` present) report cannotVerify only when their notation is present.
 
 ### T-033 — Parser + rules: FISH
 **Status:** todo

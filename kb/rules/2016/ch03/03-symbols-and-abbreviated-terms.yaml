@@ -37,7 +37,9 @@ rules:
         karyotypes (DER.NO_PH_SYMBOL). Ch. 9.2.11–9.3 (T-013): every symbol used is listed (i,
         idic, mar, dmin, ace, neo, qdp, r, dic r, trc r, tas, t, rob, trc, trp, ×); jt is not used.
         "acro" (in "acro mar", which the book discourages, MAR.NO_SIZE_MORPHOLOGY) is not listed;
-        "min" is.
+        "min" is. Ch. 11 (T-014): every symbol used is listed (idem, sl, sdl, cp, c, mat, ×, [ ],
+        ~); the numbered forms sdl1, sdl2 and sl2 are the listed sl/sdl with a number (§11.1.4
+        ¶1, E7), and the ploidy terms n±, 2n–, 2n+ (§11.2 ¶2) are report terms, not notation.
 
   - id: SYM.SPACE_BETWEEN_SYMBOLS
     title: Space between combined symbols

@@ -1,0 +1,29 @@
+version: "2016"
+section: "11.1.2"
+quotes:
+  - rule: CLONE.CELL_COUNT_REQUIRED
+    cite: {section: "11.1.2", page: 85, para: "¶1"}
+    text: >-
+      The number of cells that constitute a clone is given in square brackets [ ] after the
+      karyotype. When all cells are normal, the number of cells is still specified.
+  - rule: CLONE.ORDER_RELATED
+    cite: {section: "11.1.2", page: 85, para: "¶1"}
+    text: >-
+      In cancer cytogenetics, the clones are written in order of increasing complexity,
+      irrespective of the size of the clone.
+  - rule: CLONE.ORDER_RELATED
+    cite: {section: "11.1.4", page: 86, para: "¶1"}
+    text: >-
+      Cytogenetically related clones (subclones) are presented, as far as possible, in order of
+      increasing complexity, irrespective of the size of the clone.
+  - rule: CLONE.ORDER_RELATED
+    cite: {section: "11.1.6", page: 89, para: "¶2"}
+    text: >-
+      If a tumor contains both related and unrelated clones, the former are presented first in
+      order of increasing complexity (see Section 11.1.4), followed by the unrelated clones in
+      order of decreasing frequency.
+  - rule: CLONE.IDEM_SL_NOT_MIXED
+    cite: {section: "11.1.2", page: 85, example: E3}
+    text: >-
+      however, the terms idem and sl must never be intermixed when describing a single tumor
+      sample.

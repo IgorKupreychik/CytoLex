@@ -13,6 +13,7 @@ rules:
     cite:
       - {section: "8.1", page: 54, para: "¶2"}
       - {section: "11.2", page: 90, para: "¶2"}
+      - {section: "11.1.6", page: 90, float: "Ploidy table"}
     examples:
       valid:
         - text: "26,X,+4,+6,+21"
@@ -35,7 +36,7 @@ rules:
         The levels beyond near-tetraploid follow §11.2 ¶2 (each range is n ± n/2, n/2 = 11
         chromosomes) and the Ploidy table on p.90: a count c lies on level 1 up to 34, else on
         level ⌊(c + 11) / 23⌋ (T-030).
-    related: [KARYO.PLOIDY_RELATIVE, NUM.PLOIDY_IN_ANGLE_BRACKETS, NUM.COUNT_MATCHES_CHANGES]
+    related: [KARYO.PLOIDY_RELATIVE, NUM.PLOIDY_IN_ANGLE_BRACKETS, NUM.COUNT_MATCHES_CHANGES, PLOIDY.LEVELS]
 
   - id: NUM.PLOIDY_IN_ANGLE_BRACKETS
     title: A chosen reference ploidy goes in angle brackets after the count

@@ -126,6 +126,8 @@ rules:
       valid:
         - text: "48,XXY,+mar c"
           cite: {section: "8.2", page: 56, example: E20}
+        - text: "47,XX,del(5)(q15),+mar c[20]"
+          cite: {section: "11.3", page: 91, example: E5}
       invalid:
         - text: "48,XXY,+marc"
           why: A space is required between mar and c.

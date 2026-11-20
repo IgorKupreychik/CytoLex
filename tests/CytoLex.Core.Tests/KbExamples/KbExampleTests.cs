@@ -3,6 +3,7 @@ namespace CytoLex.Core.Tests.KbExamples;
 /// <summary>
 /// One test per KB example (T-025): valid, invalid, and corrected forms from <c>build/kb.json</c>.
 /// Invalid cases skip with a reason while their rule is not implemented (T-029+); corrected cases check fix previews (T-035).
+/// Examples in <see cref="PendingExamples"/> skip with their reason until they pass (T-014).
 /// </summary>
 public class KbExampleTests
 {
@@ -24,6 +25,7 @@ public class KbExampleTests
             Assert.Skip(reason);
         }
 
+        PendingExamples.SkipOrFailIfFixed(c.Text, outcome.Failures.Count == 0);
         Assert.True(outcome.Failures.Count == 0, $"{c.DisplayName}\n  - {string.Join("\n  - ", outcome.Failures)}");
     }
 }

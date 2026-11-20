@@ -9,10 +9,13 @@ rules:
       The sex chromosome field after the count lists only the structurally normal sex
       chromosomes. A structurally abnormal X or Y is not written there; it appears only as an
       abnormality in the list that follows (46,Y,t(X;8)(p22.3;q24.1) in a male; 46,X,fra(X)(q27.3)
-      in a female).
+      in a female). Exception: in a tumour karyotype, a sex chromosome field marked c gives the
+      constitutional complement, which may include the rearranged X or Y (45,Xc,t(X;18)(p11.1;q11.1)
+      in a patient with Turner syndrome, section 11.3).
     cite:
       - {section: "9.1", page: 59, example: E8}
       - {section: "9.2.17.1", page: 75, example: E3}
+      - {section: "11.3", page: 91, example: E9}
     examples:
       valid:
         - text: "46,Y,t(X;8)(p22.3;q24.1)"
@@ -51,6 +54,9 @@ rules:
           cite: {section: "9.2.17.1", page: 76, example: E7}
         - text: "46,Y,tas(X;12;3)(q28;p13q24.3;q29)"
           cite: {section: "9.2.16", page: 74, example: E2}
+        - text: "45,Xc,t(X;18)(p11.1;q11.1)[20]"
+          cite: {section: "11.3", page: 91, example: E9}
+          note: The c-marked field gives the constitutional 45,X; its only X is in the acquired translocation.
       invalid:
         - text: "46,XY,t(X;8)(p22.3;q24.1)"
           why: The X is involved in the translocation, so it is not a normal sex chromosome and must not be written in the sex field.

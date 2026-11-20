@@ -235,7 +235,9 @@ internal static class ChromosomeCount
 
         if (!rearranged.IsEmpty && SexFieldHolds(line.Sex, rearranged) && Fits(Shift(expected, -rearranged.Length), count))
         {
-            return Result(CountVerdict.RearrangedSexInField, true);
+            // A c-marked field gives the constitutional complement, which may hold the rearranged X/Y (§11.3 E9:
+            // 45,Xc,t(X;18)(p11.1;q11.1) - the only X is translocated).
+            return Result(hasConstitutionalSex ? CountVerdict.Fits : CountVerdict.RearrangedSexInField, true);
         }
 
         for (var dropped = 1; dropped <= replaced.Length; dropped++)

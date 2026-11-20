@@ -1,0 +1,42 @@
+version: "2016"
+section: "11.1.4"
+quotes:
+  - rule: CLONE.SUBCLONE_REFERENCE
+    cite: {section: "11.1.4", page: 86, para: "¶1"}
+    text: >-
+      The stemline (sl) is the most basic clone of a tumor cell population and is listed first.
+      All additional deviating subclones are termed sidelines (sdl). To describe the stemlines or
+      sidelines, these symbols, or the term idem [‘idem] (Latin = same), can be used. If more than
+      one sideline is present, these may be referred to as sdl1, sdl2, and so on.
+  - rule: CLONE.SUBCLONE_REFERENCE
+    cite: {section: "11.1.4", page: 86, para: "¶2"}
+    text: >-
+      In tumors with subclones the term idem can be used, followed by the additional changes in
+      relation to the stemline, which is listed first. Note that idem always refers to the
+      karyotype listed first. This means that in tumors with multiple subclones each clonal change
+      in addition to the first karyotype will have to be repeated. It also means that all plus and
+      minus signs only refer to changes in relation to the stemline karyotype.
+  - rule: CLONE.SUBCLONE_REFERENCE
+    cite: {section: "11.1.4", page: 87, example: E14}
+    text: >-
+      The inv(6) present in the stemline has not been found in the sideline with 52 chromosomes.
+      The breakpoints in the inv(6) need not be repeated.
+  - rule: CLONE.SECOND_STEMLINE
+    cite: {section: "11.1.4", page: 86, para: "¶2"}
+    text: >-
+      Note that when two or more stemlines are present, there may also exist two or more sdl1,
+      sdl2 and so on, which will reduce clarity. In such instances idem is preferred.
+  - rule: CLONE.SECOND_STEMLINE
+    cite: {section: "11.1.4", page: 87, example: E7}
+    text: >-
+      The second stemline shows t(9;22) and is designated sl2 in the subclone showing
+      tetraploidy. Further clonal evolution is found in a sideline showing gain of chromosome 8,
+      but to avoid confusion between sidelines of sl1 and sl2, the use of the term sdl is avoided
+      when referring to a second stemline.
+  - rule: CLONE.POLYPLOID_SUBCLONE
+    cite: {section: "11.1.4", page: 86, para: "¶3"}
+    text: >-
+      The term sl or sdl times a number (×2, ×3, etc.) may be used to designate aberrant polyploid
+      clones. Alternatively, the term idem times a number (×2, ×3, etc.) may be used to designate
+      aberrant polyploid clones. Additional abnormalities in the polyploid clone may then be
+      indicated using conventional terminology (see Sections 8.1 and 9.1).
