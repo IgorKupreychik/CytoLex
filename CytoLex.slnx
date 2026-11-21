@@ -2,9 +2,11 @@
   <Folder Name="/src/">
     <Project Path="src/CytoLex.Core/CytoLex.Core.csproj" />
     <Project Path="src/CytoLex.Desktop/CytoLex.Desktop.csproj" />
+    <Project Path="src/CytoLex.External/CytoLex.External.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CytoLex.Core.Tests/CytoLex.Core.Tests.csproj" />
     <Project Path="tests/CytoLex.Desktop.Tests/CytoLex.Desktop.Tests.csproj" />
+    <Project Path="tests/CytoLex.External.Tests/CytoLex.External.Tests.csproj" />
   </Folder>
 </Solution>

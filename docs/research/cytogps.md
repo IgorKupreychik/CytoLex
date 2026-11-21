@@ -157,6 +157,7 @@ java  -cp classes;antlr-4.7-complete.jar;javax.json-1.1.4.jar  CytoGpsCli input.
 ```
 
 - Input: UTF-8 text, one karyotype per line. The output matches the hosted app (§5.1).
+- **Since T-049 the adapter does this itself:** `src/CytoLex.External/CytoGps/` compiles the CytoGPS sources plus this wrapper (JSON output only) into `build/cache/cytogps/` on demand and runs one JVM per batch; setup in `config/local.yaml` → `cytogps` (see README → "CytoGPS (optional)"). The javax.json jar is checked against Maven Central's SHA-1 `943f240a509d3c70b448a55c6735591ecbd37c88`. A scan of the CytoGPS sources (2026-11-21) found no `java.net`/socket use.
 
 ## 8. Implications
 

@@ -74,7 +74,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
 | Aggregate statistics over a batch | ✅ (per-band loss/gain/fusion share, aggregate LGF table) | ◐ (summary per edition and rule) | 🗓 per-band statistics and aggregate LGF table (T-077) |
 | Ideogram view | ✅ | ❌ | 🗓 desktop panel linked to the abnormality list (T-078, low priority) |
 | R package | ✅ (RCytoGPS) | ❌ | 🗓 export in CytoGPS's JSON format, readable by RCytoGPS (T-079, low priority) |
-| Comparison with CytoGPS built in | – | ❌ | 🗓 T-049, T-051, T-052 |
+| Comparison with CytoGPS built in | – | ◐ (adapter: runs the local CytoGPS build on a batch and normalizes its results, T-049) | 🗓 comparison engine + report (T-051), desktop batch view (T-052), CytoGPS panel in the single-string check (T-081) |
 | **Batch** | | | |
 | Batch input | ✅ `.txt` only | ✅ text, CSV, TSV (with IDs) | |
 | Batch export | zip (JSON, CSV, XLS) | CSV summary + full JSON report (both read back) | |

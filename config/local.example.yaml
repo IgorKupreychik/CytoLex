@@ -3,3 +3,12 @@ iscn_pdf:
   "2016": "C:/path/to/ISCN_2016.pdf"
   # "2020": "C:/path/to/ISCN_2020.pdf"
   # "2024": "C:/path/to/ISCN_2024.pdf"
+
+# Optional: local CytoGPS build for comparisons (T-049; local only, synthetic/book strings only, decision T-048).
+# Each key can be overridden by an environment variable CYTOLEX_CYTOGPS_<KEY>, e.g. CYTOLEX_CYTOGPS_JAVA_HOME.
+# cytogps:
+#   source_dir: "C:/path/to/CytoGPS"                  # unpacked github.com/i2-wustl/CytoGPS (src/, target/, resource/)
+#   java_home: "C:/path/to/jdk-21"                    # a JDK: bin/java and bin/javac
+#   javax_json_jar: "C:/path/to/javax.json-1.1.4.jar" # Maven Central org.glassfish:javax.json:1.1.4 (SHA-1 checked)
+#   disk_cache: false                                 # true: also cache results in build/cache/cytogps/results/
+#   timeout_seconds: 600                              # limit for one CytoGPS run

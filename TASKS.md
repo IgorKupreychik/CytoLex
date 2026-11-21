@@ -58,7 +58,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-046 | todo | 3 | T-045 | ISCN 2024 KB + version profile |
 | T-047 | done | 2 | – | Research CytoGPS (API, LGF output, ISCN version, source/licence, local options, terms) |
 | T-048 | done | 2 | T-047 | Decide CytoGPS integration mode and data policy |
-| T-049 | todo | 2 | T-028, T-048 | `ExternalChecker` interface + CytoGPS adapter |
+| T-049 | done | 2 | T-028, T-048 | `ExternalChecker` interface + CytoGPS adapter |
 | T-050 | todo | 2 | T-031 | LGF computation in the core library |
 | T-051 | todo | 2 | T-049, T-050 | Comparison engine + CLI report |
 | T-052 | todo | 3 | T-051, T-038 | Desktop: comparison view |
@@ -90,6 +90,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-078 | todo | 3 | T-050, T-069 | Desktop: ideogram view of loss/gain/fusion per band and clone |
 | T-079 | todo | 3 | T-050, T-038 | Export in CytoGPS's JSON result format (RCytoGPS-compatible) |
 | T-080 | discussion | 3 | T-075 | Optional lenient mode (stray spaces, letter case as warnings) |
+| T-081 | todo | 2 | T-049, T-036 | Desktop: CytoGPS panel in the single-string check (optional, never blocks CytoLex) |
 
 ---
 
@@ -721,6 +722,17 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 **Acceptance:** Decision in `docs/decisions.md`; if adopted, a `todo` task for the implementation.
 **Notes:** Created 2026-11-20 from the CytoGPS comparison (T-047). Depends on T-075: if the two rules become warnings anyway, lenient mode may not be needed.
 
+### T-081 — Desktop: CytoGPS panel in the single-string check
+**Status:** todo
+**Description:** Show CytoGPS's result next to CytoLex's in the single-string check, using the T-049 adapter: a "CytoGPS" tab beside the edition tabs with its verdict, raw status, messages, repaired string, the string as sent (ASCII typed forms) and an agreement badge against the CytoLex 2016 verdict. Notation CytoGPS doesn't cover (ish, arr, detailed system; `docs/research/cytogps.md` §4) is shown as "not supported by CytoGPS", not as a disagreement. CytoGPS runs on demand ("Check with CytoGPS" button, optionally automatic after a typing pause), not on every keystroke (one JVM per run).
+**CytoGPS is optional and must never block CytoLex:**
+- CytoLex validation, highlights, fixes and every other tab work exactly as without CytoGPS, whether CytoGPS is configured or not.
+- Not configured → the tab shows the "CytoGPS not configured: …" reason and a pointer to README → "CytoGPS (optional)"; no process is started.
+- CytoGPS runs in the background (async, cancellable); the UI stays responsive, a new input cancels the running check, and a stale result is never shown for a changed input.
+- A failure (compile error, crash, timeout, unreadable output) shows the adapter's message in the tab only; nothing throws into the app.
+**Acceptance:** View-model tests with a fake checker: not configured, success (valid/invalid), failure, timeout/cancel, input changed while running, unsupported notation; CytoLex results are identical with and without a checker. Checked by hand against the local CytoGPS build on book strings.
+**Notes:** Created 2026-11-21 (user request during T-049). Can be built before T-051; the agreement badge here is a plain verdict comparison, and T-051's comparison engine can replace it later.
+
 ### T-048 — Decide CytoGPS integration mode and data policy
 **Status:** done
 **Description:**
@@ -731,10 +743,24 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 **Outcome (2026-11-20):** Decided with the user (interview): CytoGPS runs as a local build only (no hosted adapter, no online path in code or CI, CytoGPS code never vendored); test, sample and comparison data are synthetic or ISCN-book strings only, real patient karyotypes are never committed, cached in the repo or sent out, and real-data use needs an organisational policy check; the hosted app may be used by hand with synthetic/book strings only. Recorded in `docs/decisions.md` (External comparison section + log entry) and a data-policy line in `CLAUDE.md`. Follow-ups: T-049 description/acceptance changed to the local adapter (opt-in guard and throttling dropped); T-044 notes carry the in-memory-only rule for uploads. No deviations from the plan.
 
 ### T-049 — `ExternalChecker` interface + CytoGPS adapter
-**Status:** todo
+**Status:** done
 **Description:** A pluggable interface for external checkers, plus a CytoGPS adapter around a **locally compiled** CytoGPS (batch file → JSON, one JVM per batch; config keys in `config/local.yaml`, build in `build/cache/cytogps/`) with a response cache. No online path (T-048).
 **Acceptance:** The adapter returns normalized results for a sample batch; it makes no network access; a missing local build gives a clear "CytoGPS not configured" result.
 **Notes:** 2026-11-20: description and acceptance follow the T-048 decision (local build only, no hosted adapter; synthetic/book strings only); the earlier hosted opt-in guard and throttling are dropped. Setup and wrapper: `docs/research/cytogps.md` §7–§8.
+**Outcome (2026-11-21):** New library `src/CytoLex.External/` (in `CytoLex.slnx`; YamlDotNet 18.1.0 pinned):
+- `IExternalChecker` → `ExternalBatchResult`: one normalized item per input (verdict Valid/Invalid/NotConfigured/Failed, CytoGPS status, messages, repaired string, clones with LGF counts aligned with the 916 bands); it never throws for setup or tool problems.
+- `TypedSymbolForms`: printed → ASCII typed forms from the KB vocabulary.
+- `CytoGps/`: `CytoGpsConfig` (`config/local.yaml` → `cytogps`, env `CYTOLEX_CYTOGPS_<KEY>`); `CytoGpsBuild` (javac on demand into `build/cache/cytogps/`, fingerprint, javax.json SHA-1 pinned); `CytoGpsCli.java` (our wrapper, embedded); `CytoGpsJson`; `CytoGpsChecker` (one JVM per batch, temp input outside the repo, in-memory cache, disk cache only with `disk_cache: true`).
+
+Tests: `tests/CytoLex.External.Tests/` (25 unit tests with a fake runner + an integration test that skips when not configured). The integration test passed against the local build on `tests/data/batch/2016/karyotype.txt` (597 strings + 3 spot checks, ~46 s; the build was reused on the second run).
+
+Docs: `CLAUDE.md`, `README.md` ("CytoGPS (optional)"), `config/local.example.yaml`, `docs/decisions.md` (T-049 entry), `docs/research/cytogps.md` §7, `docs/research/cytogps-comparison.md`.
+
+Deviations from the plan: `ExternalClone` also carries `DetailedSystems`; there is a test seam for the expected jar SHA-1.
+
+Known limitation: CytoGPS writes its result file only at the end of a batch, so a crash on one string fails the whole batch (not seen on the sample).
+
+Follow-ups: T-081 (desktop CytoGPS panel, never blocks CytoLex) added; T-052 notes extended.
 
 ### T-050 — LGF computation in the core library
 **Status:** todo
@@ -752,7 +778,7 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 **Status:** todo
 **Description:** Batch table with per-row agreement status, filters (e.g. disagreements only), side-by-side detail, LGF difference view and triage.
 **Acceptance:** Works on a sample batch, using the comparison engine.
-**Notes:**
+**Notes:** 2026-11-21: like T-081, CytoGPS must never block CytoLex: when it is not configured, fails or is slow, the Batch tab and its CytoLex results work as before, and the comparison view shows why CytoGPS results are missing.
 
 ## Later
 

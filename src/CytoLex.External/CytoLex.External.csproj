@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- External checkers (T-049): a pluggable interface and the adapter around a locally compiled CytoGPS
+       (decision T-048: local build only, no network). Kept out of CytoLex.Core: it starts processes and
+       reads config/local.yaml. -->
+  <PropertyGroup>
+    <RootNamespace>CytoLex.External</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="YamlDotNet" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../CytoLex.Core/CytoLex.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Our own wrapper around CytoGPS's batch JSON writer, compiled together with the CytoGPS sources. -->
+    <EmbeddedResource Include="CytoGps/CytoGpsCli.java" LogicalName="CytoLex.External.CytoGpsCli.java" />
+    <InternalsVisibleTo Include="CytoLex.External.Tests" />
+  </ItemGroup>
+</Project>
