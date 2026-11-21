@@ -125,6 +125,7 @@ def cmd_check(args: argparse.Namespace) -> int:
         REPO_ROOT / "kb" / "rules",
         REPO_ROOT / "kb" / "source-quotes",
         REPO_ROOT / "kb" / "vocab",
+        REPO_ROOT / "kb" / "translation",
     ]
     missing = [p for p in paths if not p.exists() and args.paths]
     for p in missing:

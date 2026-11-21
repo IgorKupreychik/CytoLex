@@ -65,7 +65,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
 | Automatic corrections | ◐ (brackets/slants: revised string) | ✅ one-click fixes with preview, "Fix all", explanation when no single fix exists | 🗓 "did you mean" suggestions (T-041) |
 | Severity levels (error / warning / info) | ❌ | ✅ | |
 | Constitutional vs. acquired context | ❌ | ✅ | |
-| Plain-language translation of a string | ❌ | ❌ | 🗓 T-057, T-058, T-059 |
+| Plain-language translation of a string | ❌ | ❌ (data ready: English templates + a 398-string expected-output set, T-057) | 🗓 T-058 (renderer), T-059 (desktop view) |
 | Rule browser (search the rules, examples) | ❌ | ✅ | |
 | Abnormality list per cell line | ◐ (clone list with cell counts) | ✅ | |
 | Derivative written out in the detailed system | ✅ | ◐ (only when the input is already in the detailed system) | 🗓 computed from the short form, shown in the abnormality list (T-066) |

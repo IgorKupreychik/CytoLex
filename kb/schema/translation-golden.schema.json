@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cytolex.local/schema/translation-golden.schema.json",
+  "title": "CytoLex KB — literal translation golden file",
+  "description": "Expected literal translations for one edition: kb/translation/<version>/golden.yaml (T-057). Test data of the renderer (T-058): string → summary and one sentence per item, with spans and KB references. Book entries paraphrase the printed explanation of the cited example (never quoted). Conventions: kb/README.md → Translation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "golden"],
+  "properties": {
+    "version": { "$ref": "common.schema.json#/$defs/version" },
+    "golden": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["input", "context", "summary", "items", "review"],
+        "oneOf": [
+          { "required": ["cite"], "not": { "required": ["origin"] } },
+          { "required": ["origin"], "not": { "required": ["cite"] } }
+        ],
+        "properties": {
+          "input": { "description": "The string as written (book form: →, –, ×).", "$ref": "common.schema.json#/$defs/text" },
+          "cite": { "description": "The book example the entry is taken from.", "$ref": "common.schema.json#/$defs/cite" },
+          "origin": { "description": "Non-book entries: synthetic (written for the test set).", "enum": ["synthetic"] },
+          "note": { "$ref": "common.schema.json#/$defs/text" },
+          "fragment": { "description": "A book fragment, parsed with the fragment entry (count and sex chromosomes optional).", "type": "boolean" },
+          "context": { "description": "The context hint the translation is given for; unknown = neutral wording plus readings where the meaning differs.", "enum": ["unknown", "constitutional", "neoplastic"] },
+          "summary": { "description": "The summary line.", "$ref": "common.schema.json#/$defs/text" },
+          "items": {
+            "description": "One sentence per item, in input order: prefixes, each cell line's header, each karyotype item.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["span", "sentence", "kb"],
+              "properties": {
+                "span": {
+                  "description": "Where the item is in input: start (0-based UTF-16 offset, as in the core) and the text there.",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["start", "text"],
+                  "properties": {
+                    "start": { "type": "integer", "minimum": 0 },
+                    "text": { "$ref": "common.schema.json#/$defs/text" }
+                  }
+                },
+                "sentence": { "$ref": "common.schema.json#/$defs/text" },
+                "readings": {
+                  "description": "Only where the context changes the meaning.",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "minProperties": 1,
+                  "properties": {
+                    "constitutional": { "$ref": "common.schema.json#/$defs/text" },
+                    "neoplastic": { "$ref": "common.schema.json#/$defs/text" }
+                  }
+                },
+                "kb": {
+                  "description": "KB entries the item links to (rule:…, vocab:…, band:…).",
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^(rule:[A-Z][A-Z0-9_]*(\\.[A-Z][A-Z0-9_]*)+|vocab:[a-z][a-z0-9_]*/.+|band:[0-9XY]+[pq][0-9]+(\\.[0-9]+)?)$",
+                    "x-expected": "a KB reference (rule:ID, vocab:vocabulary/label or band:name)"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            }
+          },
+          "review": { "$ref": "translation-templates.schema.json#/$defs/review" }
+        }
+      }
+    }
+  }
+}

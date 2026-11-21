@@ -15,9 +15,14 @@ Checks (errors fail the build; nothing is written then):
      cells of the `source` tables, and each entry's label is in its own cited block
   9. (T-060) `kb/bands/<version>/bands.yaml`: `version` = edition, every band has the keys the
      runtime bundle carries, unique band names
+ 10. (T-057) `kb/translation/<version>/`: `templates.<language>.yaml` (keys are existing rules or
+     vocab items, unique keys and constructs, every construct covered, placeholders are declared
+     slots, variant names unique and required with several forms) and `golden.yaml` (unique
+     inputs, spans match the input, KB references exist, cites match the chunks)
 Warnings: chunks missing (6-7 skipped); a valid example's text not found in its cited E block
 (whitespace ignored; typed forms of `equivalent_forms` vocab entries count as printed, T-053);
-no `bands.yaml` for an edition (its runtime bundle then has `bands: null`).
+no `bands.yaml` for an edition (its runtime bundle then has `bands: null`); a template slot no
+form uses.
 
 Outputs: `kb.sqlite` (rule browser), `kb.json` (full KB, also read by the KB-example tests),
 `kb-runtime.json` (lean runtime bundle embedded in `CytoLex.Core`, T-060) and
@@ -34,7 +39,7 @@ from pathlib import Path
 
 from .chunks import Section, load_sections, normalise, squash
 from .cite import render_cite
-from .schema import Problem, iter_yaml_files, load_yaml, validate_file
+from .schema import SCHEMA_DIR, Problem, iter_yaml_files, load_yaml, validate_file
 
 FORMAT_VERSION = 2  # 2: `vocab` (T-008)
 RUNTIME_FORMAT_VERSION = 1  # kb-runtime.json (T-060); independent of FORMAT_VERSION
@@ -45,6 +50,10 @@ SEPARATOR_RE = re.compile(r"^\|(\s*:?-+:?\s*\|)+$")
 PIPE_RE = re.compile(r"(?<!\\)\|")
 ANCHORS = ("para", "example", "float")
 KIND_DIRS = {"rules": "rules", "quotes": "source-quotes", "entries": "vocab"}
+TRANSLATION_DIR = "translation"  # templates.<language>.yaml + golden.yaml (T-057)
+TEMPLATES_FILE_RE = re.compile(r"^templates\.([a-z]{2})\.ya?ml$")
+PLACEHOLDER_RE = re.compile(r"\{([^{}]*)\}")
+SLOT_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 
 
 @dataclass
@@ -60,8 +69,11 @@ class Edition:
     rule_files: list[KbFile] = field(default_factory=list)
     quote_files: list[KbFile] = field(default_factory=list)
     vocab_files: list[KbFile] = field(default_factory=list)
+    template_files: list[KbFile] = field(default_factory=list)  # T-057
+    golden_file: KbFile | None = None  # T-057
     bands: dict | None = None  # parsed kb/bands/<version>/bands.yaml
     chunks_checked: bool = False
+    sections: dict[str, Section] = field(default_factory=dict)  # the chunks, when present
 
 
 @dataclass
@@ -110,7 +122,7 @@ class BuildReport:
 
 def find_editions(kb_dir: Path) -> list[str]:
     found = set()
-    for sub in KIND_DIRS.values():
+    for sub in (*KIND_DIRS.values(), TRANSLATION_DIR):
         d = kb_dir / sub
         if d.is_dir():
             found |= {p.name for p in d.iterdir() if p.is_dir() and EDITION_RE.match(p.name)}
@@ -133,6 +145,26 @@ def _load_dir(directory: Path, kind: str, errors: list[Problem]) -> list[KbFile]
             continue
         out.append(KbFile(path, path.relative_to(directory).as_posix(), data))
     return out
+
+
+def _load_translation(directory: Path, ed: Edition, errors: list[Problem]) -> None:
+    """Template and golden files of one edition (T-057), schema-checked."""
+    if not directory.is_dir():
+        return
+    for path in iter_yaml_files([directory]):
+        problems = validate_file(path)
+        if problems:
+            errors.extend(problems)
+            continue
+        data = load_yaml(path)
+        f = KbFile(path, path.relative_to(directory).as_posix(), data)
+        if "templates" in data:
+            ed.template_files.append(f)
+        elif "golden" in data:
+            ed.golden_file = f
+        else:
+            other = next(k for k in data if k != "version")
+            errors.append(Problem(path, "", f"a '{other}' file in the {TRANSLATION_DIR} directory"))
 
 
 def _file_section(path: Path) -> str | None:
@@ -424,6 +456,7 @@ def _check_edition(ed: Edition, source_dir: Path, report: BuildReport) -> None:
 
     # 6-7. against the chunks
     sections = load_sections(source_dir) if source_dir.is_dir() else {}
+    ed.sections = sections
     _check_vocab_files(ed, sections, errors)
     if not sections:
         report.warnings.append(
@@ -464,6 +497,170 @@ def _check_edition(ed: Edition, source_dir: Path, report: BuildReport) -> None:
                         f"{f.path}:rules[{i}].examples.valid[{j}]: {ex['text']!r} "
                         f"not found in §{sec.section} {label}"
                     )
+
+
+# --- translation (T-057) -----------------------------------------------------------------
+
+
+def template_constructs() -> list[str]:
+    """The constructs every template set must cover (the schema's `construct` enum)."""
+    schema = json.loads(
+        (SCHEMA_DIR / "translation-templates.schema.json").read_text(encoding="utf-8")
+    )
+    return list(schema["$defs"]["construct"]["enum"])
+
+
+def _kb_refs(ed: Edition) -> tuple[set[str], set[str]]:
+    """The edition's rule and vocab references (`rule:ID`, `vocab:key/label`), and its bands."""
+    refs = {f"rule:{r['id']}" for f in ed.rule_files for r in f.data["rules"]}
+    for f in ed.vocab_files:
+        refs |= {f"vocab:{f.data['vocabulary']}/{e['label']}" for e in f.data["entries"]}
+    bands = {f"band:{b['name']}" for b in (ed.bands or {}).get("bands", [])}
+    return refs, bands
+
+
+def _check_version(f: KbFile, version: str, errors: list[Problem]) -> None:
+    if f.data["version"] != version:
+        errors.append(
+            Problem(f.path, "version", f"{f.data['version']!r} != edition directory {version!r}")
+        )
+
+
+def _check_placeholders(
+    f: KbFile, where: str, text: str, slots: set[str], used: set[str], errors: list[Problem]
+) -> None:
+    for name in PLACEHOLDER_RE.findall(text):
+        used.add(name)
+        if not SLOT_RE.match(name) or name not in slots:
+            errors.append(Problem(f.path, where, f"placeholder {{{name}}} is not a declared slot"))
+    rest = PLACEHOLDER_RE.sub("", text)
+    if "{" in rest or "}" in rest:
+        errors.append(Problem(f.path, where, "unbalanced { or }"))
+
+
+def _check_template(
+    f: KbFile, i: int, t: dict, refs: set[str], report: BuildReport, version: str
+) -> None:
+    errors = report.errors
+    here = f"templates[{i}]"
+    if t["key"] not in refs:
+        errors.append(
+            Problem(f.path, f"{here}.key", f"unknown KB entry {t['key']} in ISCN {version}")
+        )
+    slots = set(t.get("slots") or [])
+    used: set[str] = set()
+    whens: set[str] = set()
+    for j, form in enumerate(t["forms"]):
+        at = f"{here}.forms[{j}]"
+        if "when" in form:
+            if form["when"] in whens:
+                errors.append(Problem(f.path, f"{at}.when", f"duplicate when {form['when']}"))
+            whens.add(form["when"])
+        elif len(t["forms"]) > 1:
+            errors.append(Problem(f.path, at, "'when' is required with several forms"))
+        _check_placeholders(f, f"{at}.text", form["text"], slots, used, errors)
+        for ctx, text in (form.get("readings") or {}).items():
+            _check_placeholders(f, f"{at}.readings.{ctx}", text, slots, used, errors)
+    for name in sorted(slots - used):
+        report.warnings.append(f"{f.path}:{here}: slot {name} is not used by any form")
+
+
+def _check_templates(ed: Edition, refs: set[str], report: BuildReport) -> None:
+    errors = report.errors
+    for f in ed.template_files:
+        _check_version(f, ed.version, errors)
+        m = TEMPLATES_FILE_RE.match(f.path.name)
+        if m is None:
+            errors.append(Problem(f.path, "", "file must be named templates.<language>.yaml"))
+        elif m[1] != f.data["language"]:
+            errors.append(
+                Problem(
+                    f.path, "language", f"{f.data['language']!r} != file name language {m[1]!r}"
+                )
+            )
+        first: dict[tuple[str, str], int] = {}
+        for i, t in enumerate(f.data["templates"]):
+            for name in ("key", "construct"):
+                seen = first.setdefault((name, t[name]), i)
+                if seen != i:
+                    errors.append(
+                        Problem(
+                            f.path,
+                            f"templates[{i}].{name}",
+                            f"duplicate {name} {t[name]} (first at templates[{seen}])",
+                        )
+                    )
+            _check_template(f, i, t, refs, report, ed.version)
+        covered = {t["construct"] for t in f.data["templates"]}
+        missing = [c for c in template_constructs() if c not in covered]
+        if missing:
+            errors.append(
+                Problem(f.path, "templates", f"no template for construct(s): {', '.join(missing)}")
+            )
+
+
+def _utf16_slice(text: str, start: int, length: int) -> str:
+    """`length` UTF-16 code units of `text` from `start` (the core's offsets)."""
+    units = text.encode("utf-16-le")
+    return units[2 * start : 2 * (start + length)].decode("utf-16-le", errors="replace")
+
+
+def _check_golden(ed: Edition, refs: set[str], bands: set[str], report: BuildReport) -> None:
+    f = ed.golden_file
+    if f is None:
+        return
+    errors = report.errors
+    _check_version(f, ed.version, errors)
+    if f.path.stem != "golden":
+        errors.append(Problem(f.path, "", "file must be named golden.yaml"))
+    first: dict[str, int] = {}
+    for i, entry in enumerate(f.data["golden"]):
+        here = f"golden[{i}]"
+        text = entry["input"]
+        seen = first.setdefault(text, i)
+        if seen != i:
+            errors.append(
+                Problem(f.path, f"{here}.input", f"duplicate input (first at golden[{seen}])")
+            )
+        if "cite" in entry and ed.sections:
+            _check_cite(f, f"{here}.cite", entry["cite"], ed.sections, errors)
+        for j, item in enumerate(entry["items"]):
+            start, expected = item["span"]["start"], item["span"]["text"]
+            length = len(expected.encode("utf-16-le")) // 2
+            if _utf16_slice(text, start, length) != expected:
+                errors.append(
+                    Problem(
+                        f.path,
+                        f"{here}.items[{j}].span",
+                        f"{expected!r} is not at offset {start} of {text!r}",
+                    )
+                )
+            for k, ref in enumerate(item["kb"]):
+                if ref not in (bands if ref.startswith("band:") else refs):
+                    errors.append(
+                        Problem(
+                            f.path,
+                            f"{here}.items[{j}].kb[{k}]",
+                            f"unknown KB entry {ref} in ISCN {ed.version}",
+                        )
+                    )
+
+
+def _check_translation(ed: Edition, report: BuildReport) -> None:
+    refs, bands = _kb_refs(ed)
+    _check_templates(ed, refs, report)
+    _check_golden(ed, refs, bands, report)
+
+
+def _translation(ed: Edition, golden: bool) -> dict | None:
+    """`translation` of an edition in the bundles: templates per language (+ the golden file)."""
+    if not ed.template_files and ed.golden_file is None:
+        return None
+    files = sorted(ed.template_files, key=lambda f: f.data["language"])
+    out: dict = {"templates": {f.data["language"]: f.data["templates"] for f in files}}
+    if golden:
+        out["golden"] = ed.golden_file.data["golden"] if ed.golden_file else []
+    return out
 
 
 # --- outputs -----------------------------------------------------------------------------
@@ -657,6 +854,9 @@ def bundle(report: BuildReport) -> dict:
             "quotes": quotes,
             "vocab": vocab,
         }
+        translation = _translation(ed, golden=True)
+        if translation is not None:
+            editions[ed.version]["translation"] = translation
     return {"format_version": FORMAT_VERSION, "editions": editions}
 
 
@@ -708,6 +908,9 @@ def runtime_bundle(report: BuildReport) -> dict:
                 "bands": [{k: b[k] for k in BAND_KEYS} for b in ed.bands["bands"]],
             }
         editions[v] = {"rules": rules, "vocab": vocab, "bands": bands}
+        translation = _translation(ed, golden=False)
+        if translation is not None:
+            editions[v]["translation"] = translation
     return {"format_version": RUNTIME_FORMAT_VERSION, "editions": editions}
 
 
@@ -740,6 +943,13 @@ def review_markdown(report: BuildReport) -> str:
                     state += f"; needs review: {rv['note']}"
                 n = len(f.data["entries"])
                 lines.append(f"- `{f.data['vocabulary']}` ({f.rel}, {n} entries): {state}")
+        translation = [*ed.template_files, *([ed.golden_file] if ed.golden_file else [])]
+        if translation:
+            lines += ["", "### Translation (T-057)", ""]
+            for f in translation:
+                items = f.data.get("templates") or f.data.get("golden") or []
+                todo = sum(not x["review"]["checked"] for x in items)
+                lines.append(f"- `{f.rel}`: {len(items)} entries, {todo} not reviewed")
         lines.append("")
     return "\n".join(lines)
 
@@ -770,12 +980,14 @@ def run(
         ed.rule_files = _load_dir(kb_dir / "rules" / v, "rules", report.errors)
         ed.quote_files = _load_dir(kb_dir / "source-quotes" / v, "quotes", report.errors)
         ed.vocab_files = _load_dir(kb_dir / "vocab" / v, "entries", report.errors)
+        _load_translation(kb_dir / TRANSLATION_DIR / v, ed, report.errors)
         report.editions.append(ed)
     if report.errors:  # cross-file checks need schema-valid files
         return report
     for ed in report.editions:
         _check_edition(ed, source_text_root / ed.version, report)
         _load_bands(ed, kb_dir / "bands", report)
+        _check_translation(ed, report)
     if report.errors:
         return report
 

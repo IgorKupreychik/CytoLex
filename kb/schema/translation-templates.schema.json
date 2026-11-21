@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cytolex.local/schema/translation-templates.schema.json",
+  "title": "CytoLex KB — literal translation templates",
+  "description": "Phrase templates of the literal translation (T-054, T-057) for one edition and language: kb/translation/<version>/templates.<language>.yaml. Each template is keyed by a KB entry and renders one construct of the core's semantic model. kb build checks that every key exists, every construct is covered and every placeholder is a declared slot. Conventions: kb/README.md → Translation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "language", "templates"],
+  "properties": {
+    "version": { "$ref": "common.schema.json#/$defs/version" },
+    "language": {
+      "description": "Language of the texts (ISO 639-1); must match the file name templates.<language>.yaml.",
+      "type": "string",
+      "pattern": "^[a-z]{2}$",
+      "x-expected": "a two-letter language code, e.g. en"
+    },
+    "templates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["construct", "key", "forms", "review"],
+        "properties": {
+          "construct": { "$ref": "#/$defs/construct" },
+          "key": {
+            "description": "The KB entry the phrase renders, as a KbRef: rule:<rule ID> or vocab:<vocabulary>/<entry label>. Symbols use their vocab item; constructs without a symbol use their rule.",
+            "type": "string",
+            "pattern": "^(rule:[A-Z][A-Z0-9_]*(\\.[A-Z][A-Z0-9_]*)+|vocab:[a-z][a-z0-9_]*/.+)$",
+            "x-expected": "a KB reference (rule:ID or vocab:vocabulary/label)"
+          },
+          "slots": {
+            "description": "Placeholders the renderer fills ({name} in the texts).",
+            "type": "array",
+            "items": { "$ref": "#/$defs/slot" },
+            "uniqueItems": true
+          },
+          "forms": {
+            "description": "The phrase, or one phrase per variant the renderer picks (when).",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["text"],
+              "properties": {
+                "when": {
+                  "description": "Variant name (e.g. terminal, interstitial); required when a template has several forms.",
+                  "$ref": "#/$defs/slot"
+                },
+                "text": { "description": "Neutral wording, used when the context is unknown and the readings don't differ.", "$ref": "common.schema.json#/$defs/text" },
+                "readings": {
+                  "description": "Only where the context changes the meaning: one text per context. With the context unknown the renderer gives both.",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "minProperties": 1,
+                  "properties": {
+                    "constitutional": { "$ref": "common.schema.json#/$defs/text" },
+                    "neoplastic": { "$ref": "common.schema.json#/$defs/text" }
+                  }
+                }
+              }
+            }
+          },
+          "note": { "description": "Remarks for renderer authors.", "$ref": "common.schema.json#/$defs/text" },
+          "review": { "$ref": "#/$defs/review" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "slot": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-expected": "a lower_snake name"
+    },
+    "review": {
+      "description": "checked = a person approved the wording (T-082). Unchecked texts are drafts: usable, shown with a draft note.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["checked"],
+      "properties": {
+        "checked": { "type": "boolean" },
+        "note": { "$ref": "common.schema.json#/$defs/text" }
+      }
+    },
+    "construct": {
+      "description": "A karyotype construct (ch. 2–9) of the core's semantic model (docs/design/core.md §5). kb build requires a template for each. List and meaning: kb/README.md → Translation.",
+      "enum": [
+        "summary", "chromosome_count", "ploidy", "sex_chromosomes", "cell_count", "cell_line_separator",
+        "mosaic", "chimera", "transplant_chimera", "endoreduplication",
+        "gain_loss", "copies", "constitutional_c", "uncertain_constitutional",
+        "inherited", "maternal", "paternal", "de_novo", "uniparental_disomy",
+        "additional_material", "deletion", "derivative", "isoderivative", "dicentric", "isodicentric", "pseudodicentric",
+        "double_minutes", "duplication", "fission", "fragile_site", "hsr", "insertion", "inversion", "isochromosome",
+        "marker", "neocentromere", "quadruplication", "ring", "recombinant", "robertsonian", "telomeric_association",
+        "translocation", "tricentric", "triplication", "incomplete",
+        "questionable_item", "unknown_designation", "approximate_interval", "alternative",
+        "band", "region_only", "centromere_band", "short_arm", "long_arm", "short_arm_end", "long_arm_end", "arm_end", "centromere",
+        "band_composition", "break_reunion", "break", "segment",
+        "heterochromatin", "satellite", "stalk", "short_arm_satellite", "long_arm_satellite", "variant_region", "length_change"
+      ]
+    }
+  }
+}

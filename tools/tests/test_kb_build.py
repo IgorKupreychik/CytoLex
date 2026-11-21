@@ -507,3 +507,183 @@ def test_bands_duplicate_name(kb):
 def test_bands_missing_key(kb):
     edit(bands_file(kb), ", book: false}", "}")
     assert_fails(build(kb), kb, "bands[3]", "missing key(s) book")
+
+
+# --- translation (T-057) -----------------------------------------------------------------
+
+TEMPLATES = """\
+version: "2016"
+language: en
+templates:
+  - construct: deletion
+    key: "vocab:symbols/del"
+    slots: [chromosome, from, to]
+    forms:
+      - when: terminal
+        text: "terminal deletion of chromosome {chromosome} at {from}"
+      - when: interstitial
+        text: "interstitial deletion of chromosome {chromosome} between {from} and {to}"
+    review: {checked: false}
+  - construct: translocation
+    key: "rule:TRANSLOC.CHROMOSOME_ORDER"
+    slots: [chromosomes]
+    forms:
+      - text: "translocation between chromosomes {chromosomes}"
+        readings: {neoplastic: "acquired translocation between chromosomes {chromosomes}"}
+    review: {checked: true}
+"""
+
+GOLDEN = """\
+version: "2016"
+golden:
+  - input: "46,XY,t(2;5)(q21;q31)"
+    cite: {section: "9.2.17.1", page: 75, example: "E1"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XY; 1 abnormality."
+    items:
+      - span: {start: 6, text: "t(2;5)(q21;q31)"}
+        sentence: "Translocation between chromosomes 2 and 5."
+        kb: ["rule:TRANSLOC.CHROMOSOME_ORDER", "band:1p36.3"]
+    review: {checked: false}
+  - input: "47,XY,+21"
+    origin: synthetic
+    context: unknown
+    summary: "47 chromosomes; sex chromosomes XY; 1 abnormality."
+    items:
+      - span: {start: 6, text: "+21"}
+        sentence: "Gain of chromosome 21."
+        readings: {constitutional: "An extra chromosome 21.", neoplastic: "Gain of chromosome 21."}
+        kb: ["vocab:symbols/minus sign (–)"]
+    review: {checked: false}
+"""
+
+
+@pytest.fixture
+def tkb(kb, monkeypatch):
+    """The sample KB plus translation files; the construct list cut to the two templated ones."""
+    monkeypatch.setattr(
+        "cytolex_tools.kb.build.template_constructs", lambda: ["deletion", "translocation"]
+    )
+    d = kb[0] / "translation" / "2016"
+    d.mkdir(parents=True)
+    (d / "templates.en.yaml").write_text(TEMPLATES, encoding="utf-8")
+    (d / "golden.yaml").write_text(GOLDEN, encoding="utf-8")
+    return kb
+
+
+def templates_file(kb) -> Path:
+    return kb[0] / "translation" / "2016" / "templates.en.yaml"
+
+
+def golden_file(kb) -> Path:
+    return kb[0] / "translation" / "2016" / "golden.yaml"
+
+
+def test_translation_ok(tkb):
+    report = build(tkb)
+    assert report.errors == [] and report.warnings == []
+    full = json.loads((tkb[2] / "kb.json").read_text(encoding="utf-8"))["editions"]["2016"]
+    assert [t["construct"] for t in full["translation"]["templates"]["en"]] == [
+        "deletion",
+        "translocation",
+    ]
+    assert [g["input"] for g in full["translation"]["golden"]] == [
+        "46,XY,t(2;5)(q21;q31)",
+        "47,XY,+21",
+    ]
+    rt = runtime(tkb)["editions"]["2016"]["translation"]
+    assert set(rt) == {"templates"}  # no golden file in the runtime bundle
+    assert rt["templates"]["en"][1]["forms"][0]["readings"]["neoplastic"].startswith("acquired")
+    review = (tkb[2] / "review" / "kb-review.md").read_text(encoding="utf-8")
+    assert "- `templates.en.yaml`: 2 entries, 1 not reviewed" in review
+    assert "- `golden.yaml`: 2 entries, 2 not reviewed" in review
+
+
+def test_without_translation_no_bundle_key(kb):
+    assert build(kb).errors == []
+    assert "translation" not in runtime(kb)["editions"]["2016"]
+
+
+def test_template_unknown_key(tkb):
+    edit(templates_file(tkb), "vocab:symbols/del", "vocab:symbols/dl")
+    assert_fails(build(tkb), tkb, "templates[0].key", "unknown KB entry vocab:symbols/dl")
+
+
+def test_template_missing_construct(tkb, monkeypatch):
+    monkeypatch.setattr(
+        "cytolex_tools.kb.build.template_constructs",
+        lambda: ["deletion", "translocation", "ring"],
+    )
+    assert_fails(build(tkb), tkb, "templates", "no template for construct(s): ring")
+
+
+def test_template_duplicate_construct(tkb):
+    edit(templates_file(tkb), "construct: translocation", "construct: deletion")
+    assert_fails(build(tkb), tkb, "templates[1].construct", "duplicate construct deletion")
+
+
+def test_template_undeclared_placeholder(tkb):
+    edit(templates_file(tkb), "at {from}", "at {band}")
+    assert_fails(build(tkb), tkb, "templates[0].forms[0].text", "{band} is not a declared slot")
+
+
+def test_template_placeholder_in_reading(tkb):
+    edit(templates_file(tkb), "acquired translocation between chromosomes {chromosomes}", "{x}")
+    assert_fails(
+        build(tkb), tkb, "templates[1].forms[0].readings.neoplastic", "{x} is not a declared slot"
+    )
+
+
+def test_template_unbalanced_brace(tkb):
+    edit(templates_file(tkb), "at {from}", "at {from")
+    report = build(tkb)
+    assert any("unbalanced" in e.message for e in report.errors), report.errors
+
+
+def test_template_several_forms_need_when(tkb):
+    edit(templates_file(tkb), "      - when: interstitial\n        text:", "      - text:")
+    assert_fails(build(tkb), tkb, "templates[0].forms[1]", "'when' is required")
+
+
+def test_template_duplicate_when(tkb):
+    edit(templates_file(tkb), "when: interstitial", "when: terminal")
+    assert_fails(build(tkb), tkb, "templates[0].forms[1].when", "duplicate when terminal")
+
+
+def test_template_unused_slot_warns(tkb):
+    edit(templates_file(tkb), "slots: [chromosomes]", "slots: [chromosomes, extra]")
+    report = build(tkb)
+    assert report.errors == []
+    assert any("slot extra is not used" in w for w in report.warnings)
+
+
+def test_template_language_must_match_file_name(tkb):
+    edit(templates_file(tkb), "language: en", "language: de")
+    assert_fails(build(tkb), tkb, "language", "'de' != file name language 'en'")
+
+
+def test_golden_span_must_match_input(tkb):
+    edit(golden_file(tkb), 'start: 6, text: "t(2;5)', 'start: 5, text: "t(2;5)')
+    assert_fails(build(tkb), tkb, "golden[0].items[0].span", "is not at offset 5")
+
+
+def test_golden_unknown_band(tkb):
+    edit(golden_file(tkb), "band:1p36.3", "band:1p37")
+    assert_fails(build(tkb), tkb, "golden[0].items[0].kb[1]", "unknown KB entry band:1p37")
+
+
+def test_golden_duplicate_input(tkb):
+    edit(golden_file(tkb), '"47,XY,+21"', '"46,XY,t(2;5)(q21;q31)"')
+    assert_fails(build(tkb), tkb, "golden[1].input", "duplicate input")
+
+
+def test_golden_cite_checked_against_chunks(tkb):
+    edit(golden_file(tkb), "page: 75", "page: 76")
+    report = build(tkb)
+    assert any(e.where == "golden[0].cite" for e in report.errors), report.errors
+
+
+def test_golden_needs_cite_or_origin(tkb):
+    edit(golden_file(tkb), "    origin: synthetic\n", "")
+    report = build(tkb)
+    assert any(e.where == "golden[1]" for e in report.errors), report.errors

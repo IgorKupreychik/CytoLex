@@ -3,7 +3,7 @@
 The KB is the single source for every validation decision. Rules are YAML, checked against the JSON Schemas (draft 2020-12) in [`schema/`](schema/). Check files with:
 
 ```sh
-uv run --directory tools kb check                 # all of kb/rules/, kb/source-quotes/ and kb/vocab/
+uv run --directory tools kb check                 # all of kb/rules/, kb/source-quotes/, kb/vocab/ and kb/translation/
 uv run --directory tools kb check kb/rules/2016/ch09/09.02.17.01-reciprocal-translocations.yaml
 ```
 
@@ -23,8 +23,11 @@ uv run --directory tools kb check kb/rules/2016/ch09/09.02.17.01-reciprocal-tran
 | No chunks for the edition (`kb extract` not run): the chunk checks above are skipped | warning |
 | Bands (`kb/bands/<version>/bands.yaml`, T-060): `version` = edition, every band has `name`, `chrom`, `arm`, `parent`, `levels`, `derived`, `book`, `grch37`, `grch38`, names unique | error |
 | No `bands.yaml` for the edition (`kb bands` not run): the runtime bundle has `bands: null` | warning |
+| Translation templates (T-057): file named `templates.<language>.yaml` with that `language`; `key` is an existing rule ID or vocab item of the edition, unique; `construct` unique, and every construct of the schema's list has a template; every `{placeholder}` is a declared slot, braces balanced; `when` unique, required when a template has several forms | error |
+| A declared template slot that no form uses | warning |
+| Golden file (T-057): named `golden.yaml`; inputs unique; each item `span` matches the input at `start` (UTF-16 offsets); every `kb` reference exists (rule, vocab item, band of `bands.yaml`); *with chunks:* `cite` as for rules | error |
 
-Any error → exit 1 and nothing written. Otherwise it writes `build/kb.sqlite` (tables `rules`, `citations`, `examples`, `quotes`, `rule_applies_to`, `rule_context`, `rule_related`, `vocab`, `vocab_tokens`, `meta`; FTS5 `rules_fts`, `quotes_fts`), `build/kb.json` (`{format_version: 2, editions: {"2016": {chunks_checked, rules, quotes, vocab}}}`, each cite with a `rendered` string; the full KB, also read by the KB-example tests), `build/kb-runtime.json` and `build/review/kb-review.md`.
+Any error → exit 1 and nothing written. Otherwise it writes `build/kb.sqlite` (tables `rules`, `citations`, `examples`, `quotes`, `rule_applies_to`, `rule_context`, `rule_related`, `vocab`, `vocab_tokens`, `meta`; FTS5 `rules_fts`, `quotes_fts`), `build/kb.json` (`{format_version: 2, editions: {"2016": {chunks_checked, rules, quotes, vocab, translation?: {templates: {<language>: […]}, golden: […]}}}}`, each cite with a `rendered` string; the full KB, also read by the KB-example tests), `build/kb-runtime.json` and `build/review/kb-review.md`.
 
 `build/kb-runtime.json` is the **lean runtime bundle** that `CytoLex.Core` embeds (T-060, `docs/design/core.md` §6). It is compact JSON with its own `format_version` (1, independent of `kb.json`'s) and is byte-identical across runs:
 ```
@@ -32,9 +35,10 @@ Any error → exit 1 and nothing written. Otherwise it writes `build/kb.sqlite` 
   rules: [{id, section, title, severity, statement, applies_to, context?, related?, fix?,
            review: {needs_review, note?}, cite: [{section, page, para?|example?|float?, rendered}]}],
   vocab: {<vocabulary>: {shared_tokens?, entries: [{label, kind, tokens, pair?, equivalent_forms?, meanings, cite: "<rendered>"}]}},
-  bands: {levels_available, bands: [{name, chrom, arm, parent, levels, derived, book, grch37, grch38}]} | null}}}
+  bands: {levels_available, bands: [{name, chrom, arm, parent, levels, derived, book, grch37, grch38}]} | null,
+  translation?: {templates: {<language>: [<template as in the YAML file>]}}}}}
 ```
-Left out: quotes, examples, `paraphrase_checked`, file paths, vocab `source`/`review`/`note`, band `stain`/sources/counts. Bump `RUNTIME_FORMAT_VERSION` in `tools/src/cytolex_tools/kb/build.py` on any incompatible change; the core checks it at load (T-028).
+`translation` (T-057) is present only when the edition has `kb/translation/<version>/`; it was added without a format bump because readers ignore unknown keys. Left out: the golden file, quotes, examples, `paraphrase_checked`, file paths, vocab `source`/`review`/`note`, band `stain`/sources/counts. Bump `RUNTIME_FORMAT_VERSION` in `tools/src/cytolex_tools/kb/build.py` on any incompatible change; the core checks it at load (T-028).
 
 ## Layout
 | Path | Content |
@@ -51,6 +55,9 @@ Left out: quotes, examples, `paraphrase_checked`, file paths, vocab `source`/`re
 | `bands/<version>/bands.yaml` | Generated band data (`kb bands`; committed, don't edit by hand) |
 | `bands/<version>/ideograms.yaml` | Band labels of the book's idiograms (`kb ideograms`; committed, don't edit by hand) |
 | `bands/<version>/exceptions.yaml` | Cited decisions on every book-vs-NCBI band difference (hand-written; `kb check`) |
+| `schema/translation-templates.schema.json`, `schema/translation-golden.schema.json` | Translation templates and golden file (T-057) |
+| `translation/<version>/templates.<language>.yaml` | Literal translation phrase templates, keyed by KB entry (English: `templates.en.yaml`) |
+| `translation/<version>/golden.yaml` | Expected translations (string → summary, items with spans and KB refs): the renderer's test set |
 
 - **One file per numbered section**, named like its chunk with `.yaml` instead of `.md`: chunk `source-text/2016/ch09/09.02.17.01-reciprocal-translocations.md` → `rules/2016/ch09/09.02.17.01-reciprocal-translocations.yaml`. A rule that draws on several sections lives in the file of its main section and cites the others.
 - **One directory per edition.** "A block per version" means the same rule ID appears in `rules/2016/…` and later in `rules/2020/…`, each with that edition's statement, citations and examples. The file's `version` must match its directory.
@@ -212,3 +219,56 @@ entries:
 - `resolution`: `book` (book names gain the level, NCBI-only names lose it; a name then shown at no level and not kept is dropped) or `ncbi` (NCBI level kept, book-only names ignored);
 - `keep` (optional, with `book`): NCBI-only names that stay valid with their NCBI levels and `book: false`;
 - `cite` (`{section: '2.5', page: 23, float: 'Fig. 5'}`) and `note`.
+
+## Translation (`translation/<version>/`)
+Data of the literal translation (decision T-054 in `docs/decisions.md`; renderer T-058, desktop view T-059). **All entries are drafts** (`review.checked: false`) until a person reviews them (T-082). Drafts are used as they are: the renderer is tested against every golden entry, and the desktop app marks text from unreviewed templates as draft wording.
+
+### Templates (`templates.<language>.yaml`, schema `schema/translation-templates.schema.json`)
+```yaml
+version: "2016"
+language: en
+templates:
+  - construct: deletion                 # one of the constructs below; each needs exactly one template
+    key: "vocab:symbols/del"            # the KB entry the phrase renders (KbRef text form): rule:ID or vocab:<vocabulary>/<label>
+    slots: [chromosome, arm, from, to]  # placeholders the renderer fills
+    forms:                              # one phrase, or one per variant (when), picked by the renderer
+      - when: terminal
+        text: "Terminal deletion of chromosome {chromosome}: break at {from}; …"
+      - when: interstitial
+        text: "Interstitial deletion of chromosome {chromosome}: the segment between {from} and {to} is lost."
+        # readings: {constitutional: …, neoplastic: …}   only where the context changes the meaning
+    note: …                             # optional, for renderer authors
+    review: {checked: false}            # note optional
+```
+- **Keys:** a symbol's construct is keyed by its vocab item (`vocab:symbols/inv`); a construct without a symbol by its rule (`rule:KARYO.TRANSPLANT_CHIMERA`, `rule:UNCERTAIN.APPROX_INTERVAL`). The renderer links each phrase to that entry; the rule browser shows its citation (no citations in the translation itself).
+- **Readings:** the neutral `text` is used when the context is unknown and the meaning does not depend on it. `readings` give one text per context where it does (whole-chromosome gain/loss, an abnormal sex chromosome complement); with the context unknown the renderer shows both, with a known context only that one.
+- **Constructs** (the schema's `construct` list: karyotype ch. 2–9 of the core model, `docs/design/core.md` §5):
+  - header: `summary`, `chromosome_count`, `ploidy`, `sex_chromosomes`, `cell_count`, `cell_line_separator`;
+  - relations: `mosaic`, `chimera`, `transplant_chimera`, `endoreduplication`;
+  - numerical changes and suffixes: `gain_loss`, `copies`, `constitutional_c`, `uncertain_constitutional`, `inherited`, `maternal`, `paternal`, `de_novo`, `uniparental_disomy`;
+  - ch. 9 symbols: `additional_material`, `deletion`, `derivative`, `isoderivative`, `dicentric`, `isodicentric`, `pseudodicentric`, `double_minutes`, `duplication`, `fission`, `fragile_site`, `hsr`, `insertion`, `inversion`, `isochromosome`, `marker`, `neocentromere`, `quadruplication`, `ring`, `recombinant`, `robertsonian`, `telomeric_association`, `translocation`, `tricentric`, `triplication`, `incomplete`;
+  - uncertainty (ch. 5): `questionable_item`, `unknown_designation`, `approximate_interval`, `alternative`;
+  - breakpoints and bands: `band`, `region_only`, `centromere_band`, `short_arm`, `long_arm`, `short_arm_end`, `long_arm_end`, `arm_end`, `centromere`;
+  - detailed system: `band_composition`, `break_reunion`, `break`, `segment`;
+  - variants (ch. 7): `heterochromatin`, `satellite`, `stalk`, `short_arm_satellite`, `long_arm_satellite`, `variant_region`, `length_change`.
+  - Not covered yet: the clone references `idem`/`sl`/`sdl` and `cp` (ch. 11), omitted items `…` (book fragments only; no KB entry), other notation types. Adding a construct = a schema enum value + a template in every language file.
+
+### Golden file (`golden.yaml`, schema `schema/translation-golden.schema.json`)
+```yaml
+version: "2016"
+golden:
+  - input: "46,XX,del(5)(q13q33)"
+    cite: {section: "9.2.2", page: 60, example: "E2"}   # book example; or origin: synthetic (+ note)
+    fragment: true                                      # optional: parsed with the fragment entry
+    context: unknown                                    # unknown · constitutional · neoplastic (the hint)
+    summary: "46 chromosomes; sex chromosomes XX; 1 abnormality."
+    items:
+      - span: {start: 6, text: "del(5)(q13q33)"}         # UTF-16 offset in input + the text there
+        sentence: "Interstitial deletion of chromosome 5: the segment between 5q13 and 5q33 is lost."
+        readings: {constitutional: …, neoplastic: …}     # optional, as in the templates
+        kb: ["vocab:symbols/del", "rule:DEL.FORMAT", …]
+    review: {checked: false}
+```
+- **Items** are exactly the translated parts of the model, in input order: with two or more cell lines, each line's header (count, ploidy, sex chromosomes; its cell count goes into the sentence) followed by its items; with one cell line, only its items (the header is in the summary). Prefixes (`mos`, `chi`, `end`) go into the summary. `GoldenFileTests` (C#) checks the spans and KB refs against the binder, and that synthetic entries are valid ISCN.
+- **Book entries** cover every cited valid example of ch. 4, 8 and 9 that is a karyotype (372; the 4 `arr` strings of ch. 4 are left out); the sentence paraphrases the book's printed explanation (cite, never quote). **Synthetic entries** (26) cover what the book lacks: both readings with the context unknown, `mos`/`chi`/`//`, `~`, `?`.
+- **Skeleton for new entries:** `CYTOLEX_GOLDEN_DRAFT=1` (and optionally `CYTOLEX_GOLDEN_DRAFT_INPUTS=<file>`, one non-book string per line) with `dotnet test --project tests/CytoLex.Core.Tests --filter-class "CytoLex.Core.Tests.Translation.GoldenDraftTests"` writes `build/review/translation/golden-draft-2016.yaml`: the inputs not yet in the golden file, with their spans and KB refs from the binder and empty sentences to fill in.

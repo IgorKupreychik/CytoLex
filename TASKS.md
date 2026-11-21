@@ -66,7 +66,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-054 | done | 2 | T-021 | Literal translation of ISCN strings into plain language: scope, style, architecture |
 | T-055 | done | 2 | T-007 | Tooling: LF line endings for committed generated files (CRLF checkout breaks the ideograms test) |
 | T-056 | done | 1 | T-022 | KB: apply the strictness & severity policy to the 2016 rules |
-| T-057 | todo | 2 | T-023 | Translation templates + schema; reviewed golden file (ISCN 2016) |
+| T-057 | done | 2 | T-023 | Translation templates + schema; golden file (ISCN 2016; drafts, review in T-082) |
 | T-058 | todo | 2 | T-030, T-031, T-057 | Literal translation renderer in the core library |
 | T-059 | todo | 2 | T-058, T-036, T-039 | Desktop: translation view |
 | T-060 | done | 1 | T-023 | `kb build`: lean runtime bundle (rules metadata, vocab, bands) for the core |
@@ -91,6 +91,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-079 | todo | 3 | T-050, T-038 | Export in CytoGPS's JSON result format (RCytoGPS-compatible) |
 | T-080 | discussion | 3 | T-075 | Optional lenient mode (stray spaces, letter case as warnings) |
 | T-081 | todo | 2 | T-049, T-036 | Desktop: CytoGPS panel in the single-string check (optional, never blocks CytoLex) |
+| T-082 | todo | 3 | T-057 | Review the translation templates and golden file (ISCN 2016) |
 
 ---
 
@@ -342,26 +343,27 @@ Outcome (2026-11-18): Decided that `->`, `-` (and U+2212) and lowercase `x` in m
 **Notes:** Raised 2026-11-17 (user). Should be decided before T-023 (core design), so the data model supports it. From T-021: the pilot translation scope is karyotype (ch. 2–9). Use neutral wording when the context is unknown ("three X chromosomes", not a syndrome), or give both readings where context changes the meaning.
 **Outcome (2026-11-18):** Decided: designed now, built after the pilot rules (karyotype ch. 2–9 first); strings with errors get a partial translation with the bad parts marked; summary line + one sentence per item with spans; the translation links to KB entries (rule or vocab item, version-specific, via the rule browser) instead of book citations, while diagnostics keep theirs; neutral wording with both readings where context changes the meaning; optional GRCh37/38 coordinates (off by default); English templates in data files per edition; a person-reviewed golden file for tests. Recorded in `docs/decisions.md` (new "Literal translation (T-054)" section + log entry); T-023 requirements added to its Notes; note on T-038; new tasks T-057 (templates, schema, golden file), T-058 (renderer), T-059 (desktop view). Deviation: the interview added the KB-link-instead-of-citation rule (user's proposal).
 
-### T-057 — Translation templates + schema; reviewed golden file
-**Status:** todo
+### T-057 — Translation templates + schema; golden file (drafts)
+**Status:** done
 **Description:** Data side of the literal translation (T-054, `docs/decisions.md` → "Literal translation"):
 - Phrase templates per ISCN edition, keyed by KB entry (rule ID or vocab item), English for the pilot; proposed location `kb/translation/<version>/`.
 - A JSON Schema for them in `kb/schema/`; `kb check` validates them, `kb build` checks that every key is an existing KB entry and puts them into the bundle.
 - A golden file for ISCN 2016: string → expected summary, items (with spans) and KB IDs. Seeded from book examples by comparing with the printed explanation (cited, not quoted) plus non-book strings; each entry carries a person-review flag and counts only once reviewed.
-**Acceptance:** Templates cover every karyotype ch. 2–9 construct of the T-023 model; `kb build` passes with them; golden file has reviewed entries for the book examples of ch. 4, 8 and 9 plus at least 20 non-book strings; `CLAUDE.md`/`README.md` updated for the new folder.
-**Notes:** Created 2026-11-18 from T-054.
+**Acceptance:** Templates cover every karyotype ch. 2–9 construct of the T-023 model; `kb build` passes with them; golden file has entries for the book examples of ch. 4, 8 and 9 plus at least 20 non-book strings (drafts: the person review moved to T-082, decided with the user 2026-11-21); `CLAUDE.md`/`README.md` updated for the new folder.
+**Notes:** Created 2026-11-18 from T-054. 2026-11-21 (user): no review in this task; every entry is a draft (`review.checked: false`), usable by T-058/T-059 as it is; the review is T-082.
+**Outcome (2026-11-21):** `kb/translation/2016/templates.en.yaml` (69 templates, one per karyotype construct of ch. 2–9, keyed by vocab item or rule, forms per variant, `readings` only where the context changes the meaning) and `kb/translation/2016/golden.yaml` (398 entries: 372 book examples of ch. 4, 8, 9 paraphrasing the printed explanations + 26 synthetic strings; all `review.checked: false`); schemas `kb/schema/translation-templates.schema.json` and `translation-golden.schema.json`. `kb check`/`kb build` (`tools/src/cytolex_tools/kb/schema.py`, `build.py`) check keys, construct coverage, placeholders, `when`, spans (UTF-16), KB refs and cites; templates go into `kb-runtime.json` and `kb.json`, the golden file into `kb.json` only (additive, no format bump); review report counts unreviewed entries. C#: `tests/CytoLex.Core.Tests/Translation/` (`GoldenFile.cs` item list, `GoldenFileTests` = spans/refs match the binder + synthetic entries valid, opt-in `GoldenDraftTests` skeleton writer with `CYTOLEX_GOLDEN_DRAFT[_INPUTS]`). pytest: 28 new tests. Docs: `kb/README.md` → Translation, `docs/decisions.md` (T-057 log entry), `docs/design/core.md` §6, `CLAUDE.md`, `README.md`, comparison doc. Deviations: review deferred to T-082 (user); golden top-level key `golden` (not `entries`, which marks vocab files); the 4 `arr` examples of ch. 4 left out (karyotype only); some template wordings aligned to the golden sentences.
 
 ### T-058 — Literal translation renderer
 **Status:** todo
 **Description:** Renderer in the core library working on the T-023 model: summary line + one sentence per item, each with its span and KB entry links (title shown, ID on hover; no book citation); partial translation of strings with errors (bad parts marked "not translated, see diagnostic"); neutral wording when the context is unknown, both readings where context changes the meaning, a single reading with a hint; optional approximate GRCh37/38 coordinates and sizes from `kb/bands` ("no coordinates" for book-only bands). Per edition.
-**Acceptance:** All reviewed golden-file entries (T-057) pass in the normal test command; strings with errors give a partial translation.
-**Notes:** Created 2026-11-18 from T-054. LGF link (T-050) is a later addition.
+**Acceptance:** All golden-file entries (T-057, `kb/translation/2016/golden.yaml`; drafts count too) pass in the normal test command; strings with errors give a partial translation.
+**Notes:** Created 2026-11-18 from T-054. LGF link (T-050) is a later addition. From T-057 (2026-11-21): read the templates from the runtime bundle (`editions[v].translation.templates.en`, format in `kb/README.md` → Translation) and the golden file from the embedded `kb.json`; reuse `tests/CytoLex.Core.Tests/Translation/GoldenFile.cs` (item list = `GoldenFile.Items`). Pass each phrase's template `review.checked` through, so T-059 can mark draft wording. The clone references `idem`/`sl`/`sdl`/`cp` (ch. 11) and `…` have no construct yet: add schema enum values + templates when the renderer covers them. Where a golden sentence and its template differ in wording, the golden file wins (adjust the template).
 
 ### T-059 — Desktop: translation view
 **Status:** todo
 **Description:** Show the translation next to the diagnostics: hovering an item highlights its span (and vice versa), KB links open the version-specific entry in the rule browser, a coordinates toggle (off by default) with a GRCh37/38 choice, and the partial-translation banner.
 **Acceptance:** Book examples show their translation; hover ↔ span highlighting and KB links work.
-**Notes:** Created 2026-11-18 from T-054. From T-039 (decided with the user, 2026-11-20): the rule browser lists rules only; add the vocab entries (symbols, banding codes: `vocab`/`vocab_tokens` in `build/kb.sqlite`) to it here, so translation links to vocab items have a target (`RuleStore`, `RuleBrowserViewModel`).
+**Notes:** Created 2026-11-18 from T-054. From T-039 (decided with the user, 2026-11-20): the rule browser lists rules only; add the vocab entries (symbols, banding codes: `vocab`/`vocab_tokens` in `build/kb.sqlite`) to it here, so translation links to vocab items have a target (`RuleStore`, `RuleBrowserViewModel`). From T-057 (decided with the user, 2026-11-21): show a small "draft wording" note on translations built from templates with `review.checked: false` (all of them until T-082).
 
 ## Core library
 
@@ -732,6 +734,12 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 - A failure (compile error, crash, timeout, unreadable output) shows the adapter's message in the tab only; nothing throws into the app.
 **Acceptance:** View-model tests with a fake checker: not configured, success (valid/invalid), failure, timeout/cancel, input changed while running, unsupported notation; CytoLex results are identical with and without a checker. Checked by hand against the local CytoGPS build on book strings.
 **Notes:** Created 2026-11-21 (user request during T-049). Can be built before T-051; the agreement badge here is a plain verdict comparison, and T-051's comparison engine can replace it later. 2026-11-21 (T-051): use `CytoGpsCoverage.Unsupported` for "not supported by CytoGPS" (`src/CytoLex.External/Comparison/`).
+
+### T-082 — Review the translation templates and golden file (ISCN 2016)
+**Status:** todo
+**Description:** Person review of the T-057 drafts in `kb/translation/2016/`: each template's wording (`templates.en.yaml`, 69 constructs) and each golden entry (`golden.yaml`: 372 book examples of ch. 4, 8, 9, checked against the book's printed explanation of the cited example, plus 26 synthetic strings). Set `review.checked: true` per entry; corrections go into the files (golden sentence and matching template together). A generated review sheet per book section (`build/review/translation/`) may help.
+**Acceptance:** Every template and golden entry has `review.checked: true`, or a `review.note` saying why not; `kb build` and `dotnet test` pass; the desktop draft note (T-059) disappears for reviewed templates.
+**Notes:** Created 2026-11-21 from T-057 (user: no review for the pilot; drafts stay usable meanwhile). Best done after T-058, so the renderer's output can be reviewed alongside.
 
 ### T-048 — Decide CytoGPS integration mode and data policy
 **Status:** done

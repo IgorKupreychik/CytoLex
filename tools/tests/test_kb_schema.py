@@ -154,3 +154,71 @@ def test_vocab_typographic_may_have_no_tokens():
 def test_vocab_schema_rejects(entry, where):
     problems = validate_data(_vocab(**entry), Path("v.yaml"))
     assert [p.where for p in problems] == [where], problems
+
+
+# --- translation files (T-057) -----------------------------------------------------------
+
+
+@pytest.mark.parametrize("name", ["translation-templates", "translation-golden"])
+def test_translation_schemas_are_valid_draft_2020_12(name):
+    schema = json.loads((SCHEMA_DIR / f"{name}.schema.json").read_text(encoding="utf-8"))
+    Draft202012Validator.check_schema(schema)
+
+
+def _template(**over) -> dict:
+    t = {
+        "construct": "deletion",
+        "key": "vocab:symbols/del",
+        "slots": ["chromosome"],
+        "forms": [{"text": "deletion of chromosome {chromosome}"}],
+        "review": {"checked": False},
+    }
+    return {"version": "2016", "language": "en", "templates": [t | over]}
+
+
+def _golden(**over) -> dict:
+    e = {
+        "input": "47,XY,+21",
+        "origin": "synthetic",
+        "context": "unknown",
+        "summary": "s",
+        "items": [{"span": {"start": 6, "text": "+21"}, "sentence": "x", "kb": ["band:21q22.3"]}],
+        "review": {"checked": False},
+    }
+    return {"version": "2016", "golden": [{k: v for k, v in (e | over).items() if v is not None}]}
+
+
+def test_translation_samples_validate():
+    assert validate_data(_template(), Path("templates.en.yaml")) == []
+    assert validate_data(_golden(), Path("golden.yaml")) == []
+
+
+@pytest.mark.parametrize(
+    ("data", "where"),
+    [
+        (_template(construct="unknown_thing"), "templates[0].construct"),
+        (_template(key="DEL.FORMAT"), "templates[0].key"),
+        (_template(forms=[]), "templates[0].forms"),
+        (_template(review={"checked": "no"}), "templates[0].review.checked"),
+        (_golden(context="acquired"), "golden[0].context"),
+        (_golden(origin=None), "golden[0]"),
+        (_golden(cite={"section": "4.1", "page": 37, "example": "E1"}), "golden[0]"),
+        (
+            _golden(items=[{"span": {"start": 6, "text": "+21"}, "sentence": "x", "kb": ["21q"]}]),
+            "golden[0].items[0].kb[0]",
+        ),
+    ],
+    ids=[
+        "construct",
+        "key",
+        "no-forms",
+        "review",
+        "context",
+        "no-cite-or-origin",
+        "cite-and-origin",
+        "kb-ref",
+    ],
+)
+def test_translation_schema_rejects(data, where):
+    problems = validate_data(data, Path("x.yaml"))
+    assert [p.where for p in problems] == [where], problems

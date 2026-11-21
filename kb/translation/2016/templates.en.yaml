@@ -1,0 +1,513 @@
+# Literal translation templates, ISCN 2016, English (T-057). Format: kb/README.md → Translation.
+# Drafts: every template is review.checked: false until T-082. The renderer (T-058) fills the
+# {slots}; a phrase for a band, arm end or breakpoint is itself rendered by its own template.
+version: "2016"
+language: en
+templates:
+  # ── Header ─────────────────────────────────────────────────────────────────────────────────
+  - construct: summary
+    key: "rule:KARYO.COUNT_SEX_ORDER"
+    slots: [count, sex, changes, cell_lines, relation]
+    forms:
+      - when: no_change
+        text: "{count}; {sex}; no abnormality."
+      - when: changes
+        text: "{count}; {sex}; {changes}."
+      - when: sex_in_abnormality
+        text: "{count}; the sex chromosomes are given only in the abnormalities; {changes}."
+      - when: fragment
+        text: "Fragment: no chromosome count or sex chromosomes given; {changes}."
+      - when: cell_lines
+        text: "{relation} with {cell_lines} cell lines."
+    note: >-
+      changes = "1 abnormality" / "N abnormalities"; relation = the mosaic, chimera or
+      transplant phrase, or "Karyotype" without one. A one-line karyotype has no header item.
+    review: {checked: false}
+  - construct: chromosome_count
+    key: "rule:NUM.COUNT_MATCHES_CHANGES"
+    slots: [count, from, to]
+    forms:
+      - when: single
+        text: "{count} chromosomes"
+      - when: range
+        text: "{from} to {to} chromosomes"
+    review: {checked: false}
+  - construct: ploidy
+    key: "rule:NUM.PLOIDY_IN_ANGLE_BRACKETS"
+    slots: [level]
+    forms:
+      - text: "changes given relative to the {level} ploidy level"
+    note: "level = near-haploid … near-octaploid wording from the number before n (2n → diploid)."
+    review: {checked: false}
+  - construct: sex_chromosomes
+    key: "rule:SEX.CONSTITUTIONAL_COMPLEMENT"
+    slots: [sex]
+    forms:
+      - when: normal
+        text: "sex chromosomes {sex}"
+      - when: single
+        text: "sex chromosome {sex}"
+      - when: none
+        text: "no sex chromosome given"
+      - when: abnormal
+        text: "sex chromosomes {sex}"
+        readings:
+          constitutional: "constitutional sex chromosome complement {sex}"
+          neoplastic: "sex chromosomes {sex}; in an acquired karyotype a sex chromosome change is written with + or –, so this is read as the constitutional complement"
+    review: {checked: false}
+  - construct: cell_count
+    key: "vocab:symbols/brackets, square ([ ])"
+    slots: [cells]
+    forms:
+      - when: count
+        text: "{cells} cells"
+      - when: one
+        text: "1 cell"
+    review: {checked: false}
+  - construct: cell_line_separator
+    key: "rule:KARYO.CLONE_SEPARATOR"
+    slots: [index, header, cells, role]
+    forms:
+      - when: with_cells
+        text: "Cell line {index} ({cells}): {header}."
+      - when: without_cells
+        text: "Cell line {index}: {header}."
+      - when: transplant
+        text: "Cell line {index}, {role} ({cells}): {header}."
+    note: "role = recipient (before //) or donor (after //)."
+    review: {checked: false}
+
+  # ── Cell line relations ────────────────────────────────────────────────────────────────────
+  - construct: mosaic
+    key: "vocab:symbols/mos"
+    forms:
+      - text: "Mosaic"
+    review: {checked: false}
+  - construct: chimera
+    key: "vocab:symbols/chi"
+    forms:
+      - text: "Chimera"
+    review: {checked: false}
+  - construct: transplant_chimera
+    key: "rule:KARYO.TRANSPLANT_CHIMERA"
+    slots: [recipient, donor]
+    forms:
+      - text: "Chimera after transplantation: recipient {recipient}, donor {donor}"
+    review: {checked: false}
+  - construct: endoreduplication
+    key: "vocab:symbols/end"
+    forms:
+      - text: "Endoreduplication"
+    review: {checked: false}
+
+  # ── Numerical changes and suffixes ─────────────────────────────────────────────────────────
+  - construct: gain_loss
+    key: "rule:KARYO.GAIN_LOSS_SIGN"
+    slots: [chromosome, item]
+    forms:
+      - when: gain_rearranged
+        text: "An additional {item}"
+      - when: gain
+        text: "Gain of chromosome {chromosome}."
+        readings:
+          constitutional: "An extra chromosome {chromosome} (constitutional)."
+          neoplastic: "Gain of chromosome {chromosome} (acquired)."
+      - when: loss
+        text: "Loss of chromosome {chromosome}."
+        readings:
+          constitutional: "One chromosome {chromosome} is missing (constitutional)."
+          neoplastic: "Loss of chromosome {chromosome} (acquired)."
+    review: {checked: false}
+  - construct: copies
+    key: "vocab:symbols/multiplication sign (×)"
+    slots: [copies]
+    forms:
+      - text: "{copies} copies of this chromosome"
+    review: {checked: false}
+  - construct: constitutional_c
+    key: "vocab:symbols/c"
+    forms:
+      - text: "constitutional"
+    review: {checked: false}
+  - construct: uncertain_constitutional
+    key: "rule:KARYO.UNCERTAIN_CONSTITUTIONAL"
+    forms:
+      - text: "possibly constitutional"
+    review: {checked: false}
+  - construct: inherited
+    key: "vocab:symbols/inh"
+    forms:
+      - text: "inherited"
+    review: {checked: false}
+  - construct: maternal
+    key: "vocab:symbols/mat"
+    forms:
+      - text: "inherited from the mother"
+    review: {checked: false}
+  - construct: paternal
+    key: "vocab:symbols/pat"
+    forms:
+      - text: "inherited from the father"
+    review: {checked: false}
+  - construct: de_novo
+    key: "vocab:symbols/dn"
+    forms:
+      - text: "de novo (not inherited)"
+    review: {checked: false}
+  - construct: uniparental_disomy
+    key: "vocab:symbols/upd"
+    slots: [chromosome, origin]
+    forms:
+      - text: "Uniparental disomy of chromosome {chromosome}: both copies {origin}."
+    note: "origin = 'from the mother' (mat) or 'from the father' (pat)."
+    review: {checked: false}
+
+  # ── Structural rearrangements (ch. 9) ──────────────────────────────────────────────────────
+  - construct: additional_material
+    key: "vocab:symbols/add"
+    slots: [chromosome, band]
+    forms:
+      - text: "Additional material of unknown origin attached to chromosome {chromosome} at {band}."
+    review: {checked: false}
+  - construct: deletion
+    key: "vocab:symbols/del"
+    slots: [chromosome, arm, from, to]
+    forms:
+      - when: terminal
+        text: "Terminal deletion of chromosome {chromosome}: break at {from}; the segment from there to the end of the {arm} is lost."
+      - when: interstitial
+        text: "Interstitial deletion of chromosome {chromosome}: the segment between {from} and {to} is lost."
+      - when: within_band
+        text: "Interstitial deletion of a small segment within {from}."
+      - when: unknown
+        text: "Deletion in the {arm} of chromosome {chromosome}; breakpoints unknown."
+    review: {checked: false}
+  - construct: derivative
+    key: "vocab:symbols/der"
+    slots: [chromosome, changes]
+    forms:
+      - when: known
+        text: "Derivative chromosome {chromosome}, resulting from {changes}."
+      - when: unknown_centromere
+        text: "Derivative chromosome of unknown centromere origin, resulting from {changes}."
+      - when: two_centromeres
+        text: "Derivative chromosome with the centromeres of chromosomes {chromosome}, resulting from {changes}."
+    review: {checked: false}
+  - construct: isoderivative
+    key: "vocab:symbols/ider"
+    slots: [chromosome, arm, changes]
+    forms:
+      - text: "Isochromosome of the {arm} of a derivative chromosome {chromosome} that results from {changes}."
+    review: {checked: false}
+  - construct: dicentric
+    key: "vocab:symbols/dic"
+    slots: [chromosomes, breakpoints]
+    forms:
+      - text: "Dicentric chromosome formed from chromosomes {chromosomes}, with breaks at {breakpoints}."
+    review: {checked: false}
+  - construct: isodicentric
+    key: "vocab:symbols/idic"
+    slots: [chromosome, band]
+    forms:
+      - text: "Isodicentric chromosome {chromosome}: two copies of chromosome {chromosome} joined at {band}, mirror images of each other, with two centromeres."
+    review: {checked: false}
+  - construct: pseudodicentric
+    key: "vocab:symbols/psu"
+    slots: [chromosome]
+    forms:
+      - text: "pseudodicentric: two centromeres, of which only the one of chromosome {chromosome} is active"
+    review: {checked: false}
+  - construct: double_minutes
+    key: "vocab:symbols/dmin"
+    slots: [count]
+    forms:
+      - when: counted
+        text: "{count} double minutes (small acentric fragments, not counted in the chromosome number)."
+      - when: uncounted
+        text: "Double minutes (small acentric fragments, not counted in the chromosome number)."
+    review: {checked: false}
+  - construct: duplication
+    key: "vocab:symbols/dup"
+    slots: [chromosome, from, to]
+    forms:
+      - when: direct
+        text: "Direct duplication of chromosome {chromosome}: the segment from {from} to {to} is present twice, in the same orientation."
+      - when: inverted
+        text: "Inverted duplication of chromosome {chromosome}: the segment between {from} and {to} is present twice, the extra copy in reverse orientation."
+    review: {checked: false}
+  - construct: fission
+    key: "vocab:symbols/fis"
+    slots: [chromosome]
+    forms:
+      - text: "Centric fission of chromosome {chromosome}: the arms have separated into two chromosomes, each with part of the centromere."
+    review: {checked: false}
+  - construct: fragile_site
+    key: "vocab:symbols/fra"
+    slots: [chromosome, band]
+    forms:
+      - text: "Fragile site on chromosome {chromosome} at {band}."
+    review: {checked: false}
+  - construct: hsr
+    key: "vocab:symbols/hsr"
+    slots: [chromosome, band]
+    forms:
+      - text: "Homogeneously staining region on chromosome {chromosome} at {band}."
+    review: {checked: false}
+  - construct: insertion
+    key: "vocab:symbols/ins"
+    slots: [receiver, donor, site, from, to]
+    forms:
+      - when: direct
+        text: "Direct insertion of the segment {from} to {to} of chromosome {donor} into chromosome {receiver} at {site}."
+      - when: inverted
+        text: "Inverted insertion of the segment {from} to {to} of chromosome {donor} into chromosome {receiver} at {site}; the inserted segment is reversed."
+    review: {checked: false}
+  - construct: inversion
+    key: "vocab:symbols/inv"
+    slots: [chromosome, from, to]
+    forms:
+      - when: paracentric
+        text: "Paracentric inversion of chromosome {chromosome}: the segment between {from} and {to}, within one arm, is reversed."
+      - when: pericentric
+        text: "Pericentric inversion of chromosome {chromosome}: the segment between {from} and {to}, which includes the centromere, is reversed."
+    review: {checked: false}
+  - construct: isochromosome
+    key: "vocab:symbols/i"
+    slots: [chromosome, arm]
+    forms:
+      - text: "Isochromosome of the {arm} of chromosome {chromosome}: both arms are copies of that arm."
+    review: {checked: false}
+  - construct: marker
+    key: "vocab:symbols/mar"
+    slots: [count, number]
+    forms:
+      - when: one
+        text: "A marker chromosome (structurally abnormal, origin unknown)."
+      - when: counted
+        text: "{count} marker chromosomes (structurally abnormal, origin unknown)."
+      - when: numbered
+        text: "Marker chromosome {number} (structurally abnormal, origin unknown)."
+    review: {checked: false}
+  - construct: neocentromere
+    key: "vocab:symbols/neo"
+    slots: [band]
+    forms:
+      - text: "a new centromere (neocentromere) at {band}"
+    review: {checked: false}
+  - construct: quadruplication
+    key: "vocab:symbols/qdp"
+    slots: [chromosome, from, to]
+    forms:
+      - text: "Quadruplication of chromosome {chromosome}: the segment between {from} and {to} is present four times."
+    review: {checked: false}
+  - construct: ring
+    key: "vocab:symbols/r"
+    slots: [chromosome, from, to, number]
+    forms:
+      - when: one_chromosome
+        text: "Ring chromosome {chromosome}: breaks at {from} and {to}, the ends joined to form a ring."
+      - when: unknown_origin
+        text: "A ring chromosome of unknown origin."
+      - when: numbered
+        text: "Ring chromosome {number} of unknown origin."
+    review: {checked: false}
+  - construct: recombinant
+    key: "vocab:symbols/rec"
+    slots: [chromosome, changes]
+    forms:
+      - text: "Recombinant chromosome {chromosome}, resulting from {changes} in a parent."
+    review: {checked: false}
+  - construct: robertsonian
+    key: "vocab:symbols/rob"
+    slots: [chromosomes]
+    forms:
+      - text: "Robertsonian translocation of chromosomes {chromosomes}: their long arms are joined at the centromere."
+    review: {checked: false}
+  - construct: telomeric_association
+    key: "vocab:symbols/tas"
+    slots: [chromosomes, ends]
+    forms:
+      - text: "Telomeric association of chromosomes {chromosomes} at {ends}."
+    review: {checked: false}
+  - construct: translocation
+    key: "vocab:symbols/t"
+    slots: [chromosomes, breakpoints, moves]
+    forms:
+      - when: two_way
+        text: "Translocation between chromosomes {chromosomes}, with breaks at {breakpoints}; the segments distal to the breaks are exchanged."
+      - when: complex
+        text: "Translocation between chromosomes {chromosomes}, with breaks at {breakpoints}: {moves}."
+      - when: whole_arm
+        text: "Whole-arm translocation between chromosomes {chromosomes}, with breaks at the centromeres ({breakpoints})."
+    review: {checked: false}
+  - construct: tricentric
+    key: "vocab:symbols/trc"
+    slots: [chromosomes, breakpoints]
+    forms:
+      - text: "Tricentric chromosome formed from chromosomes {chromosomes}, with breaks at {breakpoints}."
+    review: {checked: false}
+  - construct: triplication
+    key: "vocab:symbols/trp"
+    slots: [chromosome, from, to]
+    forms:
+      - text: "Triplication of chromosome {chromosome}: the segment between {from} and {to} is present three times."
+    review: {checked: false}
+  - construct: incomplete
+    key: "vocab:symbols/inc"
+    forms:
+      - text: "Incomplete karyotype: further abnormalities were present but not fully identified."
+    review: {checked: false}
+
+  # ── Uncertainty (ch. 5) ────────────────────────────────────────────────────────────────────
+  - construct: questionable_item
+    key: "rule:UNCERTAIN.QUESTIONABLE_ITEM"
+    slots: [item]
+    forms:
+      - text: "questionable: {item}"
+    review: {checked: false}
+  - construct: unknown_designation
+    key: "rule:UNCERTAIN.QUESTION_MARK_DESIGNATION"
+    forms:
+      - when: chromosome
+        text: "an unidentified chromosome"
+      - when: band
+        text: "an unknown band"
+    review: {checked: false}
+  - construct: approximate_interval
+    key: "rule:UNCERTAIN.APPROX_INTERVAL"
+    slots: [from, to]
+    forms:
+      - text: "somewhere from {from} to {to}"
+    review: {checked: false}
+  - construct: alternative
+    key: "rule:UNCERTAIN.OR_ALTERNATIVE"
+    slots: [first, second]
+    forms:
+      - text: "either {first} or {second}"
+    review: {checked: false}
+
+  # ── Breakpoints and bands (ch. 2, 4) ───────────────────────────────────────────────────────
+  - construct: band
+    key: "rule:BAND.DESIGNATION_FORMAT"
+    slots: [band]
+    forms:
+      - text: "band {band}"
+    review: {checked: false}
+  - construct: region_only
+    key: "rule:BREAK.REGION_ONLY"
+    slots: [region]
+    forms:
+      - text: "region {region}"
+    review: {checked: false}
+  - construct: centromere_band
+    key: "rule:BAND.CENTROMERE_10"
+    slots: [chromosome, arm]
+    forms:
+      - text: "the centromere ({arm} side of chromosome {chromosome})"
+    review: {checked: false}
+  - construct: short_arm
+    key: "vocab:symbols/p"
+    forms:
+      - text: "short arm"
+    review: {checked: false}
+  - construct: long_arm
+    key: "vocab:symbols/q"
+    forms:
+      - text: "long arm"
+    review: {checked: false}
+  - construct: short_arm_end
+    key: "vocab:symbols/pter"
+    slots: [chromosome]
+    forms:
+      - text: "the end of the short arm of chromosome {chromosome}"
+    review: {checked: false}
+  - construct: long_arm_end
+    key: "vocab:symbols/qter"
+    slots: [chromosome]
+    forms:
+      - text: "the end of the long arm of chromosome {chromosome}"
+    review: {checked: false}
+  - construct: arm_end
+    key: "vocab:symbols/ter"
+    slots: [chromosome]
+    forms:
+      - text: "the end of an arm of chromosome {chromosome}"
+    review: {checked: false}
+  - construct: centromere
+    key: "vocab:symbols/cen"
+    slots: [chromosome]
+    forms:
+      - text: "the centromere of chromosome {chromosome}"
+    review: {checked: false}
+
+  # ── Detailed system (ch. 4.3.2) ────────────────────────────────────────────────────────────
+  - construct: band_composition
+    key: "rule:STRUCT.DETAILED_SYSTEM"
+    slots: [segments]
+    forms:
+      - text: "made up of {segments}"
+    review: {checked: false}
+  - construct: break_reunion
+    key: "vocab:symbols/colon, double (::)"
+    forms:
+      - text: "joined to"
+    review: {checked: false}
+  - construct: break
+    key: "vocab:symbols/colon, single (:)"
+    slots: [band]
+    forms:
+      - text: "break at {band}"
+    review: {checked: false}
+  - construct: segment
+    key: "vocab:symbols/arrow (→ or ->)"
+    slots: [from, to]
+    forms:
+      - text: "the segment from {from} to {to}"
+    review: {checked: false}
+
+  # ── Normal variants (ch. 7) ────────────────────────────────────────────────────────────────
+  - construct: heterochromatin
+    key: "vocab:symbols/h"
+    slots: [where]
+    forms:
+      - text: "the heterochromatin of {where}"
+    review: {checked: false}
+  - construct: satellite
+    key: "vocab:symbols/s"
+    slots: [where]
+    forms:
+      - text: "the satellite of {where}"
+    review: {checked: false}
+  - construct: stalk
+    key: "vocab:symbols/stk"
+    slots: [where]
+    forms:
+      - text: "the stalk of {where}"
+    review: {checked: false}
+  - construct: short_arm_satellite
+    key: "vocab:symbols/ps"
+    slots: [chromosome]
+    forms:
+      - text: "satellites on the short arm of chromosome {chromosome}"
+    review: {checked: false}
+  - construct: long_arm_satellite
+    key: "vocab:symbols/qs"
+    slots: [chromosome]
+    forms:
+      - text: "satellites on the long arm of chromosome {chromosome}"
+    review: {checked: false}
+  - construct: variant_region
+    key: "vocab:symbols/var"
+    slots: [where]
+    forms:
+      - text: "a variable region of {where}"
+    review: {checked: false}
+  - construct: length_change
+    key: "rule:VAR.LENGTH_SIGN"
+    slots: [feature]
+    forms:
+      - when: increase
+        text: "Variation in length: {feature} is longer than usual."
+      - when: decrease
+        text: "Variation in length: {feature} is shorter than usual."
+    review: {checked: false}
