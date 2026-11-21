@@ -62,6 +62,23 @@ The JSON has the same schema locally and hosted (repo `README.txt`; **[obs]** bo
   - **Messages carry no rule IDs, citations or character positions** **[obs]**.
 - RCytoGPS (CRAN, v1.2.14, 2026-09-25, Apache-2.0) only *reads* these JSON files (`readLGF` → `source`, `raw`, `frequency`, `size`, `CL`). It doesn't call the service: https://cran.r-project.org/web/packages/RCytoGPS/index.html
 
+### 3.1 LGF algorithm (from the source) [src, read 2026-11-21 for T-050]
+- **Per event, not copy number** (`business/ParseEvent.getEventOutcome`, `getKaryotypeOutcome`). The sex field and the chromosome count are ignored. `+n`/`−n` add 1 to loss/gain on every band of the chromosome. An event with `×n` is applied n times. There is no baseline, and losses and gains don't cancel (the cancel-out code is commented out).
+- **Per kind** (`ParseEvent`):
+  - `del`: interstitial → loss from the first to the last breakpoint band, plus one fusion per breakpoint; terminal → loss to the arm end, no fusion.
+  - `add`, `dic`, `r`, `trc` → loss from each breakpoint to its arm end, plus fusion at each breakpoint.
+  - `dup`/`trp`/`qdp` → gain ×1/×2/×3 between the breakpoints, plus fusions.
+  - `t` → each breakpoint marked as fusion twice; a p10/q10 breakpoint also marks the opposite arm's centromere entry.
+  - `inv`, `hsr` → fusion twice at the breakpoints. `ins` → fusion, extra marks for one-band inserts. `tas` → fusion.
+  - `i` → gain from the centromere to the arm end, loss of the other arm, fusion ×2 at p10/q10.
+  - `idic` → loss beyond the breakpoint, gain from the centromere to the breakpoint and of the other arm, fusion ×2.
+  - `rob` → loss of the opposite arms, plus fusion at the centromere entries.
+  - `der`/`ider` → the derivative is built from marked segments of the normal chromosome and compared with it: missing bands of the derivative's chromosome are lost, bands of other chromosomes and extra copies are gained, and the joins are fusions (`validation/DerivativeValidation.getDerKaryotypeLGF`, `IderValidation`, `DicDerivativeValidation*` for two-centromere derivatives).
+- **Uncertain events** (`?`, `~`, `or`, `-` in the breakpoints; missing breakpoints that an earlier clone can't fill) get no LGF and go to `uncertain_events`. For an uncertain `+der(…)`/`−der(…)`, only the `+`/`−` is applied (`markDerEventWithIncompleteInfo`). A ring without breakpoints gets pter and qter.
+- **Clones:** `idem`, `sl`, `sdl` (×n) copy the events of the referenced clone, and a minus sign cancels a copied event (`compiler/KaryotypeLoader`).
+- **Band lookup:** a breakpoint band that isn't on the list expands to every list entry that starts with its name (`getAllKeys`, a prefix match), for both loss/gain ranges and fusions.
+- **Band list** (`toolkit/ISCN2016.java`): 916 entries, arm by arm, pter→qter = 868 bands at the 850 level + p10/q10 for each of the 48 arms. Compared with our KB's 850 level, CytoGPS keeps `6p24` and `9q34.1` whole, where we have `6p24.1–3` and `9q34.11–13` (the assembly-only bands, T-067).
+
 ## 4. ISCN edition and notation coverage
 
 - **ISCN 2016**: the band list is named `iscn2016_bands` (916 bands at the 850 level), and the class `toolkit/ISCN2016.java` holds it (repo `README.txt`, source). The edition matches our pilot profile. Later editions (2020, 2024) are not supported.
@@ -168,7 +185,7 @@ java  -cp classes;antlr-4.7-complete.jar;javax.json-1.1.4.jar  CytoGpsCli input.
 - **T-051 (comparison):** compare `karyotype` segments only, and mark ish/arr/detailed-system strings as "not supported by CytoGPS" so they stay out of the 2×2 matrix.
   - Expect many "CytoLex error / CytoGPS valid" cells. Their cause is CytoGPS not checking order, count, chromosome order, sex conventions, spaces or case (§5.2), not our bugs.
   - Triage by rule family will be quick.
-- **T-050/T-051 (LGF):** 916 bands at 850 resolution, a breakpoint band expanded to its sub-bands, and counts per clone. Our LGF must use the same band set and expansion to be comparable.
+- **T-050/T-051 (LGF):** 916 bands at 850 resolution, a breakpoint band expanded to its sub-bands, and counts per clone. Our LGF must use the same band set and expansion to be comparable. The algorithm is in §3.1. **Deferred (2026-11-21):** T-050 is priority 3 and T-051 compares verdicts only (`docs/decisions.md`).
 - **T-075 (severity of spaces and case):** CytoGPS silently accepts stray spaces and any letter case. It doesn't normalise or report them, and has no warning level. Keeping them as `error` adds 2×2 disagreements of a known, harmless kind. That's a point for `warning` or for a separate "format only" category in the comparison, but the book stays the basis.
 
 ## 9. Open questions

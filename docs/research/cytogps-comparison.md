@@ -20,7 +20,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
   CytoGPS gives a short English message and, for bracket/slant typos, a suggested revised string.
 - **Speed and privacy.** CytoLex checks 951 strings in **0.4 s**. CytoGPS (local build) takes **66 s**, and the hosted site takes about 1 s per string. CytoLex runs entirely on the user's machine. The hosted CytoGPS has no privacy policy and keeps uploaded batch results on its server.
 - **Where CytoGPS is ahead today:**
-  - Loss–Gain–Fusion (LGF) band data for research analysis, with batch statistics per band (CytoLex: T-050, T-077);
+  - Loss–Gain–Fusion (LGF) band data for research analysis, with batch statistics per band (CytoLex: T-050, T-077; deferred to priority 3, 2026-11-21);
   - an ideogram view (CytoLex: T-078);
   - no installation (web site; CytoLex: web service + browser page, T-044);
   - an R package ecosystem (CytoLex: T-079, an export that RCytoGPS can read);
@@ -70,7 +70,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
 | Abnormality list per cell line | ◐ (clone list with cell counts) | ✅ | |
 | Derivative written out in the detailed system | ✅ | ◐ (only when the input is already in the detailed system) | 🗓 computed from the short form, shown in the abnormality list (T-066) |
 | **Analysis output** | | | |
-| Loss–Gain–Fusion per band | ✅ (916 bands, JSON/CSV) | ❌ | 🗓 T-050 |
+| Loss–Gain–Fusion per band | ✅ (916 bands, JSON/CSV) | ❌ | 🗓 T-050 (deferred, priority 3) |
 | Aggregate statistics over a batch | ✅ (per-band loss/gain/fusion share, aggregate LGF table) | ◐ (summary per edition and rule) | 🗓 per-band statistics and aggregate LGF table (T-077) |
 | Ideogram view | ✅ | ❌ | 🗓 desktop panel linked to the abnormality list (T-078, low priority) |
 | R package | ✅ (RCytoGPS) | ❌ | 🗓 export in CytoGPS's JSON format, readable by RCytoGPS (T-079, low priority) |
@@ -149,7 +149,7 @@ The 5 invalid karyotypes CytoLex doesn't flag are context- or form-dependent rul
 
 - **Home advantage.** The test set is CytoLex's own regression suite. CytoLex is built to pass it, so its 100 % on valid examples is expected and doesn't measure performance on unseen strings. The CytoGPS numbers on the same set are a fair measure of CytoGPS. For a neutral figure, compare both tools on an independent corpus: the planned review-flagged test corpus (T-062) or anonymised real-world strings run through the local CytoGPS only.
 - **Reference edition.** Both tools target ISCN 2016. Some CytoGPS acceptances (spaces, case) are deliberate leniency, not bugs. Whether these should be errors or warnings in CytoLex is still being decided (T-075).
-- **Different goals.** CytoGPS was built to extract LGF data for research, with validation as a filter. CytoLex is built to validate and correct notation against the book. On LGF output CytoGPS is ahead until T-050, and on research tooling until T-077–T-079.
+- **Different goals.** CytoGPS was built to extract LGF data for research, with validation as a filter. CytoLex is built to validate and correct notation against the book. On LGF output CytoGPS is ahead until T-050, and on research tooling until T-077–T-079 (all deferred to priority 3 on 2026-11-21: CytoLex focuses on validation).
 - **CytoGPS version.** The local build is the 2021 GitHub snapshot. The hosted site gave identical results on all 28 strings probed and on a 5-line batch ([`cytogps.md`](cytogps.md) §5.1).
 
 ## 5. Reproducing

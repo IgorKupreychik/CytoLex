@@ -131,7 +131,7 @@ The KB is the single source for all validation decisions.
 ## External comparison (CytoGPS)
 - Compare our results with CytoGPS for single strings and batches:
   - Validity agreement (2×2 matrix, disagreements highlighted).
-  - Interpretation agreement (Loss–Gain–Fusion per band).
+  - Interpretation agreement (Loss–Gain–Fusion per band) — deferred (T-050, 2026-11-21): the comparison covers verdicts only for now.
   - Triage of each disagreement (our bug / CytoGPS limitation / version difference). Confirmed cases become KB examples.
 - A dev/QA tool first, exposed in the desktop app later.
 - Pluggable `ExternalChecker` interface; cache; compare against CytoGPS's ISCN version only.
@@ -446,3 +446,8 @@ _(entries added by `discussion` tasks: date — task — decision — rationale)
   - **Setup:** paths in `config/local.yaml` → `cytogps` (`source_dir`, `java_home`, `javax_json_jar`, `disk_cache`, `timeout_seconds`), each overridable by `CYTOLEX_CYTOGPS_<KEY>`. The adapter compiles CytoGPS + our wrapper (`CytoGpsCli.java`) with `javac` into `build/cache/cytogps/classes/` and recompiles only when the fingerprint (sources, wrapper, jars, JDK) changes. The javax.json jar is downloaded by hand once and checked against its pinned Maven Central SHA-1. No code path uses the network (a test checks the assembly references no networking assemblies).
   - **Cache and data policy:** results are cached in memory per adapter instance; a disk cache under `build/cache/cytogps/results/` only with `disk_cache: true` (meant for synthetic/book corpora, T-048). Inputs go to a temp directory outside the repo that is deleted after each run.
   - **Rejected:** adapter inside the core (process spawning and config reading in the UI-free library); a separate setup command that downloads the jar (a network step for little gain); an always-on disk cache (would store real strings in the repo folder if someone checked real data).
+
+- **2026-11-21 — T-050 — LGF computation deferred.**
+  - **Decision:** T-050 (Loss–Gain–Fusion per band) goes from priority 2 to 3, and so does T-077, which builds on it. T-051 compares validity verdicts only and no longer depends on T-050. LGF differences in T-051/T-052 come only once T-050 is done.
+  - **Rationale:** LGF is CytoGPS's research data model. ISCN doesn't define it, so it can't trace to KB rules, and it improves neither validation nor fixes, which are CytoLex's purpose. The verdict comparison already finds most disagreements with CytoGPS (`docs/research/cytogps.md` §5.2). Full coverage would also need T-066 (short-system band compositions) for `der`.
+  - **Kept for later:** how CytoGPS computes LGF, read from its source (`docs/research/cytogps.md` §3.1), and the open design questions in T-050's notes (event model vs. copy-number model, T-066 as a dependency, band axis).

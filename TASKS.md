@@ -59,8 +59,8 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-047 | done | 2 | – | Research CytoGPS (API, LGF output, ISCN version, source/licence, local options, terms) |
 | T-048 | done | 2 | T-047 | Decide CytoGPS integration mode and data policy |
 | T-049 | done | 2 | T-028, T-048 | `ExternalChecker` interface + CytoGPS adapter |
-| T-050 | todo | 2 | T-031 | LGF computation in the core library |
-| T-051 | todo | 2 | T-049, T-050 | Comparison engine + CLI report |
+| T-050 | todo | 3 | T-031 | LGF computation in the core library |
+| T-051 | todo | 2 | T-049 | Comparison engine + CLI report |
 | T-052 | todo | 3 | T-051, T-038 | Desktop: comparison view |
 | T-053 | done | 1 | T-003 | Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`? |
 | T-054 | done | 2 | T-021 | Literal translation of ISCN strings into plain language: scope, style, architecture |
@@ -86,7 +86,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-074 | done | 2 | T-073, T-035 | Checks for `SYM.NO_OTHER_SPACE` and `SYM.LETTER_CASE` (stray spaces, letter case; level-1 fixes) |
 | T-075 | discussion | 3 | T-047, T-073 | Severity of stray spaces and letter case (`SYM.NO_OTHER_SPACE`, `SYM.LETTER_CASE`) vs. CytoGPS behaviour |
 | T-076 | todo | 3 | T-047 | Ask the CytoGPS authors: licence of the GitHub code, newer parser/server code |
-| T-077 | todo | 2 | T-050, T-038 | Batch statistics per band (loss/gain/fusion share of clones, aggregate LGF table) |
+| T-077 | todo | 3 | T-050, T-038 | Batch statistics per band (loss/gain/fusion share of clones, aggregate LGF table) |
 | T-078 | todo | 3 | T-050, T-069 | Desktop: ideogram view of loss/gain/fusion per band and clone |
 | T-079 | todo | 3 | T-050, T-038 | Export in CytoGPS's JSON result format (RCytoGPS-compatible) |
 | T-080 | discussion | 3 | T-075 | Optional lenient mode (stray spaces, letter case as warnings) |
@@ -702,7 +702,7 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 **Status:** todo
 **Description:** CytoGPS reports for each band the share of clones with a loss, gain or fusion there (its APL/APG/APF), plus an aggregate LGF table with one row per clone (`docs/research/cytogps.md` §3, repo `README.txt` "How to use Summary Statistics"). Add the same to batch results: per edition, over the clones of every valid string, from the T-050 LGF. Show it in the desktop "Batch" summary and export it (CSV: one row per band; one row per clone for the aggregate table).
 **Acceptance:** Statistics and both CSVs for the KB sample batch; the numbers for a small hand-checked batch match a hand count; the counting rules (which clones count, which strings are skipped) are documented.
-**Notes:** Created 2026-11-20 from the CytoGPS comparison (T-047, `docs/research/cytogps-comparison.md`).
+**Notes:** Created 2026-11-20 from the CytoGPS comparison (T-047, `docs/research/cytogps-comparison.md`). 2026-11-21: priority 2 → 3 with T-050 (user).
 
 ### T-078 — Desktop: ideogram view
 **Status:** todo
@@ -767,16 +767,17 @@ Follow-ups: T-081 (desktop CytoGPS panel, never blocks CytoLex) added; T-052 not
 **Description:** Compute Loss–Gain–Fusion per band from a parsed karyotype, in a form comparable with CytoGPS output.
 **Acceptance:** Matches hand-checked LGF for a sample set of karyotypes.
 **Notes:** From T-065: the semantic model gives breakpoints for both systems but band compositions only for the detailed system; T-066 computes them for the short system (proposed as a dependency).
+**Deferred (2026-11-21, user):** priority 2 → 3. LGF is research output (CytoGPS's data model, not defined by ISCN) and doesn't improve validation or fixes; T-051 now compares verdicts only and no longer depends on T-050. How CytoGPS computes LGF (read from its source): `docs/research/cytogps.md` §3.1. Open design questions for when it resumes: (1) a CytoGPS-compatible event model (per-event counts, sex field and count ignored, `×n` repeats) or a copy-number model against the baseline; (2) short-system `der`/`rec`/`ider` need band compositions, so T-066 is a likely dependency; (3) the band axis: our 850 level + p10/q10 per arm with a mapping onto CytoGPS's 916 entries (it keeps `6p24` and `9q34.1` whole), or CytoGPS's list itself.
 
 ### T-051 — Comparison engine + CLI report
 **Status:** todo
-**Description:** Run a batch through our validator and CytoGPS. Report a 2×2 agreement matrix, disagreements, and LGF differences where both accept. Triage labels (our bug / CytoGPS limitation / version difference); confirmed cases can be exported as KB examples. Compare only against CytoGPS's ISCN version.
-**Acceptance:** The CLI produces the report for a sample batch; triage export works.
-**Notes:**
+**Description:** Run a batch through our validator and CytoGPS. Report a 2×2 agreement matrix and the disagreements (verdicts). LGF differences where both accept are optional and come only once T-050 is done. Triage labels (our bug / CytoGPS limitation / version difference); confirmed cases can be exported as KB examples. Compare only against CytoGPS's ISCN version.
+**Acceptance:** The CLI produces the report (verdicts) for a sample batch; triage export works.
+**Notes:** 2026-11-21: T-050 removed from Depends (user; LGF deferred, see T-050).
 
 ### T-052 — Desktop: comparison view
 **Status:** todo
-**Description:** Batch table with per-row agreement status, filters (e.g. disagreements only), side-by-side detail, LGF difference view and triage.
+**Description:** Batch table with per-row agreement status, filters (e.g. disagreements only), side-by-side detail and triage; an LGF difference view only once T-050 exists.
 **Acceptance:** Works on a sample batch, using the comparison engine.
 **Notes:** 2026-11-21: like T-081, CytoGPS must never block CytoLex: when it is not configured, fails or is slow, the Batch tab and its CytoLex results work as before, and the comparison view shows why CytoGPS results are missing.
 
