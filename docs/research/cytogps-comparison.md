@@ -74,7 +74,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
 | Aggregate statistics over a batch | ✅ (per-band loss/gain/fusion share, aggregate LGF table) | ◐ (summary per edition and rule) | 🗓 per-band statistics and aggregate LGF table (T-077) |
 | Ideogram view | ✅ | ❌ | 🗓 desktop panel linked to the abnormality list (T-078, low priority) |
 | R package | ✅ (RCytoGPS) | ❌ | 🗓 export in CytoGPS's JSON format, readable by RCytoGPS (T-079, low priority) |
-| Comparison with CytoGPS built in | – | ◐ (adapter: runs the local CytoGPS build on a batch and normalizes its results, T-049) | 🗓 comparison engine + report (T-051), desktop batch view (T-052), CytoGPS panel in the single-string check (T-081) |
+| Comparison with CytoGPS built in | – | ◐ (adapter: runs the local CytoGPS build on a batch, T-049; comparison engine: 2×2 verdict matrix, not-supported notation kept out, triage labels, KB-example drafts, report in `build/review/comparison/`, T-051) | 🗓 desktop batch view (T-052), CytoGPS panel in the single-string check (T-081) |
 | **Batch** | | | |
 | Batch input | ✅ `.txt` only | ✅ text, CSV, TSV (with IDs) | |
 | Batch export | zip (JSON, CSV, XLS) | CSV summary + full JSON report (both read back) | |
@@ -160,4 +160,4 @@ The 5 invalid karyotypes CytoLex doesn't flag are context- or form-dependent rul
   - `cytogps_status`, `cytogps_valid` (CytoGPS was run on the ASCII form).
 - **CytoLex:** run `BatchRunner.Run(Validator.Default, …)` on `tests/data/batch/2016/all.csv` and write it with `BatchExport.WriteCsv` (the same as the desktop "Batch" tab followed by the CSV export). Use the ISCN 2016 rows.
 - **CytoGPS:** run the local build ([`cytogps.md`](cytogps.md) §7) on the `iscn` column after the ASCII conversion, then join the results by line.
-- The automated version of this comparison is T-051.
+- The automated version of this comparison is T-051: run `dotnet test --project tests/CytoLex.External.Tests --filter-class "CytoLex.External.Tests.CytoGpsComparisonReportTests"` with CytoGPS set up (README → "CytoGPS (optional)"). It writes `build/review/comparison/cytogps-2016.md` and `.csv` for every distinct string of `all.csv`, keeping notation CytoGPS can't read out of the 2×2 matrix, with the triage labels of `tests/data/comparison/cytogps-2016-triage.yaml`.

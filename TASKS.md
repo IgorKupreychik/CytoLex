@@ -60,7 +60,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-048 | done | 2 | T-047 | Decide CytoGPS integration mode and data policy |
 | T-049 | done | 2 | T-028, T-048 | `ExternalChecker` interface + CytoGPS adapter |
 | T-050 | todo | 3 | T-031 | LGF computation in the core library |
-| T-051 | todo | 2 | T-049 | Comparison engine + CLI report |
+| T-051 | done | 2 | T-049 | Comparison engine + report (no CLI) |
 | T-052 | todo | 3 | T-051, T-038 | Desktop: comparison view |
 | T-053 | done | 1 | T-003 | Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`? |
 | T-054 | done | 2 | T-021 | Literal translation of ISCN strings into plain language: scope, style, architecture |
@@ -731,7 +731,7 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 - CytoGPS runs in the background (async, cancellable); the UI stays responsive, a new input cancels the running check, and a stale result is never shown for a changed input.
 - A failure (compile error, crash, timeout, unreadable output) shows the adapter's message in the tab only; nothing throws into the app.
 **Acceptance:** View-model tests with a fake checker: not configured, success (valid/invalid), failure, timeout/cancel, input changed while running, unsupported notation; CytoLex results are identical with and without a checker. Checked by hand against the local CytoGPS build on book strings.
-**Notes:** Created 2026-11-21 (user request during T-049). Can be built before T-051; the agreement badge here is a plain verdict comparison, and T-051's comparison engine can replace it later.
+**Notes:** Created 2026-11-21 (user request during T-049). Can be built before T-051; the agreement badge here is a plain verdict comparison, and T-051's comparison engine can replace it later. 2026-11-21 (T-051): use `CytoGpsCoverage.Unsupported` for "not supported by CytoGPS" (`src/CytoLex.External/Comparison/`).
 
 ### T-048 — Decide CytoGPS integration mode and data policy
 **Status:** done
@@ -769,17 +769,28 @@ Follow-ups: T-081 (desktop CytoGPS panel, never blocks CytoLex) added; T-052 not
 **Notes:** From T-065: the semantic model gives breakpoints for both systems but band compositions only for the detailed system; T-066 computes them for the short system (proposed as a dependency).
 **Deferred (2026-11-21, user):** priority 2 → 3. LGF is research output (CytoGPS's data model, not defined by ISCN) and doesn't improve validation or fixes; T-051 now compares verdicts only and no longer depends on T-050. How CytoGPS computes LGF (read from its source): `docs/research/cytogps.md` §3.1. Open design questions for when it resumes: (1) a CytoGPS-compatible event model (per-event counts, sex field and count ignored, `×n` repeats) or a copy-number model against the baseline; (2) short-system `der`/`rec`/`ider` need band compositions, so T-066 is a likely dependency; (3) the band axis: our 850 level + p10/q10 per arm with a mapping onto CytoGPS's 916 entries (it keeps `6p24` and `9q34.1` whole), or CytoGPS's list itself.
 
-### T-051 — Comparison engine + CLI report
-**Status:** todo
-**Description:** Run a batch through our validator and CytoGPS. Report a 2×2 agreement matrix and the disagreements (verdicts). LGF differences where both accept are optional and come only once T-050 is done. Triage labels (our bug / CytoGPS limitation / version difference); confirmed cases can be exported as KB examples. Compare only against CytoGPS's ISCN version.
-**Acceptance:** The CLI produces the report (verdicts) for a sample batch; triage export works.
-**Notes:** 2026-11-21: T-050 removed from Depends (user; LGF deferred, see T-050).
+### T-051 — Comparison engine + report (no CLI)
+**Status:** done
+**Description:** Run a batch through our validator and CytoGPS. Report a 2×2 agreement matrix and the disagreements (verdicts), written by an opt-in test (no CLI). LGF differences where both accept are optional and come only once T-050 is done. Triage labels (our bug / CytoGPS limitation / version difference); confirmed cases can be exported as KB examples. Compare only against CytoGPS's ISCN version.
+**Acceptance:** The comparison report (verdicts) is generated for a sample batch; triage export works.
+**Notes:** 2026-11-21: T-050 removed from Depends (user; LGF deferred, see T-050). 2026-11-21: CLI dropped (user): the engine goes into `CytoLex.External` for the desktop (T-052, T-081), and an opt-in test writes the report to `build/review/comparison/`; acceptance reworded from "The CLI produces the report".
+**Outcome (2026-11-21):** Comparison engine in `src/CytoLex.External/Comparison/`:
+- `ComparisonEngine.CompareAsync`: CytoLex in the checker's edition + one checker batch → per-string `Agreement` (both valid/invalid, only CytoLex/checker invalid, not supported, not compared) and the 2×2 `AgreementMatrix`; CytoLex errors and warnings/infos per string; suggested labels.
+- `CytoGpsCoverage` (`IExternalCoverage`): strings outside CytoGPS's grammar (non-karyotype segments, detailed system, `fra`/`upd`/`rec`/`fis`/`tas`/`neo`, `//`, per-abnormality cell counts) stay out of the matrix; rule families CytoGPS doesn't check (for the `checker-limitation` suggestion).
+- `TriageFile`: committed YAML `tests/data/comparison/cytogps-2016-triage.yaml` (labels `our-bug`/`checker-limitation`/`version-difference`/`severity-policy`, `confirmed`, `note`, optional `expected` + `kb_rule`; line-numbered load errors; stale entries). Format and workflow: `tests/data/comparison/README.md`.
+- `ComparisonReport`: Markdown, CSV, triage draft and KB-example draft (`cite: TODO`; nothing edits `kb/`), written to `build/review/comparison/` by the opt-in `CytoGpsComparisonReportTests`.
+
+First run (699 distinct strings of `all.csv`): 240 not supported, 459 compared, 84.3 % agreement (348 both valid, 39 both invalid, 64 only CytoLex invalid, 8 only CytoGPS invalid). All 72 disagreements triaged with the user: 67 `checker-limitation` (64 book-invalid examples CytoGPS accepts, 3 book-valid examples it can't read), 5 `severity-policy` (book-invalid examples CytoLex reports only as warning/info). No CytoLex bug found.
+
+Tests: 31 new unit tests (fake checker + real validator) in `tests/CytoLex.External.Tests/Comparison/` + the report test; `dotnet test` 4,652 total, 0 failed. Docs: `CLAUDE.md`, `README.md`, `docs/decisions.md` (T-051 entry), `docs/research/cytogps-comparison.md`; T-052/T-081 notes. Local `config/local.yaml` got the `cytogps` section (javax.json jar copied to `C:/_/NMDP/ISCN/CytoGPS-lib/`, not in the repo).
+
+Deviations from the plan: no CLI (user); new label `severity-policy` and CytoLex warnings/infos in the report, added after the first run (user); the triage file was filled from the first run's results.
 
 ### T-052 — Desktop: comparison view
 **Status:** todo
 **Description:** Batch table with per-row agreement status, filters (e.g. disagreements only), side-by-side detail and triage; an LGF difference view only once T-050 exists.
 **Acceptance:** Works on a sample batch, using the comparison engine.
-**Notes:** 2026-11-21: like T-081, CytoGPS must never block CytoLex: when it is not configured, fails or is slow, the Batch tab and its CytoLex results work as before, and the comparison view shows why CytoGPS results are missing.
+**Notes:** 2026-11-21: like T-081, CytoGPS must never block CytoLex: when it is not configured, fails or is slow, the Batch tab and its CytoLex results work as before, and the comparison view shows why CytoGPS results are missing. 2026-11-21 (T-051): build on `ComparisonEngine.CompareAsync` (per-string `Agreement`, `AgreementMatrix`, reasons for not supported/not compared), `TriageFile` (labels, stale entries) and `ComparisonReport` (CSV/Markdown/draft exports) in `src/CytoLex.External/Comparison/`.
 
 ## Later
 
