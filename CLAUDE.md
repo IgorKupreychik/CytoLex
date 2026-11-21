@@ -17,6 +17,7 @@ Planned architecture: a UI-free core library, a desktop app (pilot UI), and late
 - Use `/next-task` (or `/next-task T-xxx`) to work on tasks. It does any pending table sign-off first, then plans in plan mode, marks `done` only after user confirmation, and never commits (`.claude/skills/next-task/SKILL.md`).
 - **Every status change goes in both places** in `TASKS.md`: the summary table and the task's section.
 - New open questions become `discussion` tasks; decisions are logged in `docs/decisions.md`.
+- **Data policy (T-048):** never commit real patient karyotypes; test, sample and comparison data are synthetic or ISCN-book strings only, and no code sends strings to an external service. CytoGPS runs as a local build only (no hosted adapter); the hosted CytoGPS app may be used by hand with synthetic/book strings only.
 
 ## Commands
 Repo tooling is a **self-contained Python 3.14 project in `tools/`**, managed by **uv** (decision T-001). It's kept apart from the app code (see **App (.NET)** below).

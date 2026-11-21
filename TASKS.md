@@ -57,7 +57,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-045 | todo | 3 | T-013 | ISCN 2020 KB + version profile |
 | T-046 | todo | 3 | T-045 | ISCN 2024 KB + version profile |
 | T-047 | done | 2 | – | Research CytoGPS (API, LGF output, ISCN version, source/licence, local options, terms) |
-| T-048 | discussion | 2 | T-047 | Decide CytoGPS integration mode and data policy |
+| T-048 | done | 2 | T-047 | Decide CytoGPS integration mode and data policy |
 | T-049 | todo | 2 | T-028, T-048 | `ExternalChecker` interface + CytoGPS adapter |
 | T-050 | todo | 2 | T-031 | LGF computation in the core library |
 | T-051 | todo | 2 | T-049, T-050 | Comparison engine + CLI report |
@@ -79,7 +79,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-067 | discussion | 3 | T-045, T-046 | Revisit genome-assembly-only bands per edition (2016 error vs. later-edition valid?) |
 | T-068 | done | 1 | T-031 | Rules: ch. 9 symbol rules (split from T-031) |
 | T-069 | done | 2 | T-036 | Abnormality list: core API + desktop panel |
-| T-070 | todo | 3 | T-032, T-069 | Abnormality list: inherited changes of idem/sl/sdl clones |
+| T-070 | todo | 3 | T-032, T-069 | Abnormality list: inherited changes of idem/sl/sdl clones (expandable reference, full form) |
 | T-071 | discussion | 2 | T-034 | Arr: nucleotide positions vs. bands of the stated build (KB rule, GRCh37-under-[GRCh38] book examples) |
 | T-072 | todo | 3 | T-034, T-069 | Abnormality list: arr aberrations (core API + desktop panel) |
 | T-073 | done | 2 | T-029 | Stray spaces inside a karyotype (`47,XY, +21`, `46,X Y`) are not reported: KB basis and fix |
@@ -625,11 +625,14 @@ Outcome (2026-11-18):
 **Acceptance:** Every abnormality of the KB karyotype examples appears in the list with the right span, kind, chromosomes and breakpoints; derivatives list their parts; partial items are flagged; the panel groups by cell line and selecting a card selects its span.
 **Notes:** Created 2026-11-20 from T-036 (decided with the user: one task for core + panel, no clinical catalogue matching for now). Only karyotype segments produce entries (ish/arr: T-033/T-034). `idem`/`sl`/`sdl` clones list only their own items until T-032 resolves the stemline. **Outcome (2026-11-20):** core: `EditionResult.CellLines` (`CellLineSummary`) and `EditionResult.Abnormalities` (`AbnormalityEntry` with kind, sign, symbol, chromosomes, `BreakpointSummary`s, short form, derivative `Parts`, `or` `Readings`, `AbnormalityFlags`, linked diagnostic indices, `KbRef`s), types in `src/CytoLex.Core/Validation/Abnormalities.cs`, built from the semantic model by `AbnormalityList.cs` in `Validator.Run`; plain DTOs, JSON round-trip tested. Desktop: "Abnormalities" panel right of the diagnostics (grid splitter), grouped by cell line (`CellLineGroupViewModel`: count, sex, cells, mos/chi/recipient/donor), cards (`AbnormalityItemViewModel`: kind chip, written + short form, chromosome/band tags, flag badges, diagnostics dot, faded when partial, expander for derivative parts / `or` readings); click on a card or part selects its span (`MainWindowViewModel.SelectSpan`), hover shades it (`DiagnosticColorizer.HoverSpan`). Tests: `tests/CytoLex.Core.Tests/Validation/AbnormalityListTests.cs` (every KB karyotype example compared item by item with the bound model + spot checks), `tests/CytoLex.Desktop.Tests/AbnormalityPanelTests.cs`. `dotnet test`: 3,190 total, 0 failed, 13 skipped; `dotnet format` clean. Docs: `docs/design/core.md` §5/§9/§14, `CLAUDE.md`/`README.md` status. Deviations from the plan: none of substance (hover shades the span instead of selecting it, as planned; short form keeps `×n`/`c`/inheritance in the flags).
 
-### T-070 — Abnormality list: inherited changes of idem/sl/sdl clones
+### T-070 — Abnormality list: inherited changes of idem/sl/sdl clones (expandable reference, full form)
 **Status:** todo
-**Description:** A cell line written with `idem`/`sl`/`sdl` lists only its own items in `EditionResult.Abnormalities`. Show the changes it inherits from the clone it refers to (`CellLineSummary.BasedOn`, T-032), e.g. as entries marked inherited, in the core list and the desktop panel.
-**Acceptance:** For every KB example with idem/sl/sdl, each subclone lists the referenced clone's changes (× the `×n` of a polyploid subclone) plus its own; minus-signed stemline abnormalities (`–inv(6)`) remove the inherited one.
-**Notes:** Created 2026-11-20 from T-032 (out of its scope, decided with the user at plan approval).
+**Description:** A cell line written with `idem`/`sl`/`sdl` lists only its own items in `EditionResult.Abnormalities`, and the reference itself is one opaque `CloneReference` entry. Show what the reference means for the given string, e.g. `46,XX,t(9;22)(q34;q11.2)[7]/43,sl,-7,-9,-15[11]` → line 2 = `43,XX,t(9;22)(q34;q11.2),-7,-9,-15[11]`:
+- **Core — inherited entries:** each subclone lists the changes it inherits from the clone it refers to (`CellLineSummary.BasedOn`, T-032) as entries marked inherited, with the source cell line and the source span; reuse the reference expansion of the clone checks (`CloneLine.Changes`, `src/CytoLex.Core/Rules/Checks/Clones.cs`).
+- **Core — full form:** each cell line written with a reference gets its written-out form (count, sex chromosomes, inherited + own abnormalities, cell count), e.g. `43,XX,t(9;22)(q34;q11.2),-7,-9,-15[11]`.
+- **Desktop:** the `idem`/`sl`/`sdl` row in the Abnormalities panel can be expanded: it names the reference (`sl` = stemline → line 1, with that line's text) and shows the inherited entries under it, greyed and tagged "from line N"; clicking one selects its source span in the editor. The cell-line header shows the full form with a copy button.
+**Acceptance:** For every KB example with idem/sl/sdl, each subclone lists the referenced clone's changes (× the `×n` of a polyploid subclone) plus its own; minus-signed stemline abnormalities (`–inv(6)`) remove the inherited one; chained references (`sdl`, `sdlN`, `slN`) and both sides of `//` resolve correctly; the full form of each subclone is reviewed against hand-written expansions for a sample set (incl. the stakeholder example above); the desktop panel expands the reference row, shows inherited entries and the full form, and the click-to-span works (desktop view-model tests).
+**Notes:** Created 2026-11-20 from T-032 (out of its scope, decided with the user at plan approval). 2026-11-21: scope extended from stakeholder feedback (user): expandable reference row, inherited entries with source links, full form per clone (options A+B+C). A plain-language explanation of the reference (option D) belongs to the translation (T-057/T-058); a clone tree view (option E) was not chosen. Open for planning: whether the inherited entries also go into the batch export (T-038 JSON/CSV).
 
 ### T-071 — Arr: nucleotide positions vs. bands of the stated build
 **Status:** discussion
@@ -719,18 +722,19 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 **Notes:** Created 2026-11-20 from the CytoGPS comparison (T-047). Depends on T-075: if the two rules become warnings anyway, lenient mode may not be needed.
 
 ### T-048 — Decide CytoGPS integration mode and data policy
-**Status:** discussion
+**Status:** done
 **Description:**
 - Integration: local build, container, or online with opt-in.
 - What data may be sent online (an organisational policy check is needed if real patient karyotypes may be involved).
 **Acceptance:** Decision in `docs/decisions.md`.
 **Notes:** Research done in T-047: `docs/research/cytogps.md` §6–§8 (local build works and matches hosted; hosted has no privacy policy and keeps batch results on the server; recommendation: local default, hosted for synthetic strings only).
+**Outcome (2026-11-20):** Decided with the user (interview): CytoGPS runs as a local build only (no hosted adapter, no online path in code or CI, CytoGPS code never vendored); test, sample and comparison data are synthetic or ISCN-book strings only, real patient karyotypes are never committed, cached in the repo or sent out, and real-data use needs an organisational policy check; the hosted app may be used by hand with synthetic/book strings only. Recorded in `docs/decisions.md` (External comparison section + log entry) and a data-policy line in `CLAUDE.md`. Follow-ups: T-049 description/acceptance changed to the local adapter (opt-in guard and throttling dropped); T-044 notes carry the in-memory-only rule for uploads. No deviations from the plan.
 
 ### T-049 — `ExternalChecker` interface + CytoGPS adapter
 **Status:** todo
-**Description:** A pluggable interface for external checkers, plus a CytoGPS adapter with a response cache, throttling, and an opt-in guard for online use (off by default, with a third-party warning).
-**Acceptance:** The adapter returns normalized results for a sample batch; online use can't happen without the opt-in.
-**Notes:**
+**Description:** A pluggable interface for external checkers, plus a CytoGPS adapter around a **locally compiled** CytoGPS (batch file → JSON, one JVM per batch; config keys in `config/local.yaml`, build in `build/cache/cytogps/`) with a response cache. No online path (T-048).
+**Acceptance:** The adapter returns normalized results for a sample batch; it makes no network access; a missing local build gives a clear "CytoGPS not configured" result.
+**Notes:** 2026-11-20: description and acceptance follow the T-048 decision (local build only, no hosted adapter; synthetic/book strings only); the earlier hosted opt-in guard and throttling are dropped. Setup and wrapper: `docs/research/cytogps.md` §7–§8.
 
 ### T-050 — LGF computation in the core library
 **Status:** todo
@@ -774,7 +778,7 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 **Status:** todo
 **Description:** A web service exposing single/batch validation from the core library, plus a browser page on top of it (no install): single-string check with highlights, diagnostics with citations and fixes, and batch upload with CSV/JSON export, like the desktop app.
 **Acceptance:** Same results as the desktop app for the KB example suite; the browser page checks a string and a batch file end to end.
-**Notes:** 2026-11-20: browser page added from the CytoGPS comparison (T-047, user). 2026-11-20: priority 3 → 4 (user): the ISCN 2016 core and the desktop app come first. Data policy for uploaded strings: follow the T-048 decision (CytoGPS has none, `docs/research/cytogps.md` §6).
+**Notes:** 2026-11-20: browser page added from the CytoGPS comparison (T-047, user). 2026-11-20: priority 3 → 4 (user): the ISCN 2016 core and the desktop app come first. Data policy for uploaded strings (T-048): keep them in memory only — no storage and no logging of strings — unless a later decision changes it (CytoGPS has no policy, `docs/research/cytogps.md` §6).
 
 ### T-045 — ISCN 2020 KB + version profile
 **Status:** todo
