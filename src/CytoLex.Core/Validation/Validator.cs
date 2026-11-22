@@ -8,6 +8,7 @@ using CytoLex.Core.Rules;
 using CytoLex.Core.Segmentation;
 using CytoLex.Core.Semantics;
 using CytoLex.Core.Syntax;
+using CytoLex.Core.Translation;
 
 namespace CytoLex.Core.Validation;
 
@@ -90,15 +91,17 @@ public sealed class Validator
 
         var results = editions
             .Select(e => _profiles.TryGetValue(e, out var profile)
-                ? Run(profile, input, segments, context, options.IsFragment)
+                ? Run(profile, input, segments, context, options)
                 : NotImplemented(e))
             .ToImmutableArray();
         return new ValidationReport(input, segments, context, results);
     }
 
-    private static EditionResult Run(EditionProfile profile, string input, ImmutableArray<Segment> segments, ContextInfo context, bool isFragment)
+    private static EditionResult Run(EditionProfile profile, string input, ImmutableArray<Segment> segments, ContextInfo context, ValidationOptions options)
     {
+        var isFragment = options.IsFragment;
         var diagnostics = new List<Diagnostic>();
+        var models = new List<(Segment Segment, SegmentModel? Model)>();
         var segmentResults = ImmutableArray.CreateBuilder<SegmentResult>();
         var abnormalities = new AbnormalityList(input);
         foreach (var segment in segments)
@@ -106,11 +109,13 @@ public sealed class Validator
             if (!profile.ImplementedTypes.Contains(segment.Type))
             {
                 segmentResults.Add(new SegmentResult(segment, EditionStatus.NotImplemented, $"{segment.Type.ToKbName()}: not implemented in the pilot", []));
+                models.Add((segment, null));
                 continue;
             }
 
             var tree = profile.Parser.Parse(input, segment, isFragment);
             SegmentModel model = segment.Type == NotationType.Arr ? profile.Binder.BindArr(tree) : profile.Binder.Bind(tree);
+            models.Add((segment, model));
             if (model is KaryotypeModel karyotype)
             {
                 abnormalities.Add(segment.Index, karyotype); // arr entries: T-072
@@ -143,7 +148,11 @@ public sealed class Validator
         var segs = segmentResults.ToImmutable();
         var complete = segs.All(s => s.Status == EditionStatus.Implemented && s.Constructs.IsEmpty);
         var (cellLines, entries) = abnormalities.Build(sorted);
-        return new EditionResult(profile.Edition, EditionStatus.Implemented, null, ValidityOf(sorted, context.Effective, complete), CountsOf(sorted), sorted, segs, cellLines, entries);
+        var validity = ValidityOf(sorted, context.Effective, complete);
+        var translation = options.IncludeTranslation
+            ? TranslationBuilder.Build(profile.Kb, input, models, sorted, context, validity.IsValid, options.IncludeCoordinates)
+            : null;
+        return new EditionResult(profile.Edition, EditionStatus.Implemented, null, validity, CountsOf(sorted), sorted, segs, cellLines, entries, translation);
     }
 
     /// <summary>Validity per §9: known context → no errors; unknown → the contexts without (firm or conditional) errors.</summary>

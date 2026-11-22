@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using CytoLex.Core.Context;
 using CytoLex.Core.Segmentation;
 using CytoLex.Core.Syntax;
+using CytoLex.Core.Translation;
 
 namespace CytoLex.Core.Validation;
 
@@ -49,6 +50,7 @@ public sealed record SegmentResult(
 /// <param name="Segments">One result per segment; empty for a not-implemented edition.</param>
 /// <param name="CellLines">The cell lines of the karyotype segments, in input order (T-069).</param>
 /// <param name="Abnormalities">The abnormalities of the karyotype segments, in input order; each names its cell line (T-069).</param>
+/// <param name="Translation">The literal translation (T-058); <c>null</c> unless <see cref="ValidationOptions.IncludeTranslation"/>.</param>
 public sealed record EditionResult(
     string Edition,
     EditionStatus Status,
@@ -58,7 +60,8 @@ public sealed record EditionResult(
     ImmutableArray<Diagnostic> Diagnostics,
     ImmutableArray<SegmentResult> Segments,
     ImmutableArray<CellLineSummary> CellLines,
-    ImmutableArray<AbnormalityEntry> Abnormalities);
+    ImmutableArray<AbnormalityEntry> Abnormalities,
+    TranslationResult? Translation = null);
 
 /// <summary>The result of <see cref="Validator.Validate"/>: the segments, the context, and one result per edition requested.</summary>
 /// <param name="Input">The input string; every span refers to it.</param>

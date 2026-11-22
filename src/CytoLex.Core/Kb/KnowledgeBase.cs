@@ -33,6 +33,9 @@ public interface IEditionKb
 
     /// <summary>The band names; <c>null</c> when the bundle was built without <c>bands.yaml</c>.</summary>
     BandSet? Bands { get; }
+
+    /// <summary>The literal-translation templates by language (T-057/T-058); empty when the bundle has none.</summary>
+    IReadOnlyDictionary<string, TemplateSet> Translation { get; }
 }
 
 /// <summary>Loads the runtime KB bundle (<c>build/kb-runtime.json</c>, format in kb/README.md).</summary>
@@ -71,7 +74,10 @@ public static class KnowledgeBase
         {
             var rules = ed.Value.GetProperty("rules").EnumerateArray().Select(r => ReadRule(ed.Name, r)).ToImmutableArray();
             var bands = ed.Value.TryGetProperty("bands", out var b) ? BandSet.FromBundle(b) : null;
-            editions.Add(new EditionKb(ed.Name, rules, Vocabulary.FromBundle(root, ed.Name), bands));
+            var translation = ed.Value.TryGetProperty("translation", out var t)
+                ? TemplateSet.FromBundle(t)
+                : ImmutableDictionary<string, TemplateSet>.Empty;
+            editions.Add(new EditionKb(ed.Name, rules, Vocabulary.FromBundle(root, ed.Name), bands, translation));
         }
 
         editions.Sort((a, b) => string.CompareOrdinal(a.Edition, b.Edition));
@@ -134,7 +140,12 @@ public static class KnowledgeBase
         public IEditionKb? ForEdition(string edition) => _byEdition.GetValueOrDefault(edition);
     }
 
-    private sealed class EditionKb(string edition, ImmutableArray<KbRule> rules, Vocabulary vocab, BandSet? bands) : IEditionKb
+    private sealed class EditionKb(
+        string edition,
+        ImmutableArray<KbRule> rules,
+        Vocabulary vocab,
+        BandSet? bands,
+        ImmutableDictionary<string, TemplateSet> translation) : IEditionKb
     {
         private readonly FrozenDictionary<string, KbRule> _byId = rules.ToFrozenDictionary(r => r.Id, StringComparer.Ordinal);
 
@@ -145,6 +156,8 @@ public static class KnowledgeBase
         public Vocabulary Vocab => vocab;
 
         public BandSet? Bands => bands;
+
+        public IReadOnlyDictionary<string, TemplateSet> Translation => translation;
 
         public KbRule? Rule(string id) => _byId.GetValueOrDefault(id);
     }

@@ -49,4 +49,10 @@ public sealed record ValidationOptions
     /// chromosomes optional). Used by the KB-example harness and the rule browser.
     /// </summary>
     public bool IsFragment { get; init; }
+
+    /// <summary>Also render the literal translation of each implemented edition (T-058; <see cref="EditionResult.Translation"/>).</summary>
+    public bool IncludeTranslation { get; init; }
+
+    /// <summary>With <see cref="IncludeTranslation"/>: add approximate GRCh37/38 band coordinates and segment sizes (off by default, T-054).</summary>
+    public bool IncludeCoordinates { get; init; }
 }

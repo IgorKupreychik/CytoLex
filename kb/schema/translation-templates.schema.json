@@ -87,7 +87,7 @@
     "construct": {
       "description": "A karyotype construct (ch. 2–9) of the core's semantic model (docs/design/core.md §5). kb build requires a template for each. List and meaning: kb/README.md → Translation.",
       "enum": [
-        "summary", "chromosome_count", "ploidy", "sex_chromosomes", "cell_count", "cell_line_separator",
+        "summary", "chromosome_count", "ploidy", "sex_chromosomes", "cell_count", "composite", "cell_line_separator", "clone_reference",
         "mosaic", "chimera", "transplant_chimera", "endoreduplication",
         "gain_loss", "copies", "constitutional_c", "uncertain_constitutional",
         "inherited", "maternal", "paternal", "de_novo", "uniparental_disomy",

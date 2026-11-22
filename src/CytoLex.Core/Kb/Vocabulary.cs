@@ -25,6 +25,12 @@ public sealed record VocabEntry(
     /// <summary>The entry as a <c>KbRef</c> string (docs/design/core.md §5), e.g. <c>vocab:symbols/del</c>.</summary>
     public string KbRef => $"vocab:{Vocabulary}/{Label}";
 
+    /// <summary>The printed meanings of the entry (e.g. <c>Deletion</c>), in bundle order.</summary>
+    public ImmutableArray<string> Meanings { get; init; } = [];
+
+    /// <summary>A display title: the first meaning (without a final full stop), else the label (T-058 KB links).</summary>
+    public string Title => Meanings.IsEmpty ? Label : Meanings[0].TrimEnd('.');
+
     /// <summary>Whether <paramref name="token"/> is a typed (not printed) form of this entry.</summary>
     public bool IsTypedForm(string token) =>
         HasEquivalentForms && Tokens.Length > 0 && !string.Equals(Tokens[0], token, StringComparison.Ordinal);
@@ -40,6 +46,7 @@ public sealed class Vocabulary
     public const int SupportedFormatVersion = 1;
 
     private readonly FrozenDictionary<string, ImmutableArray<VocabEntry>> _byToken;
+    private readonly FrozenDictionary<string, VocabEntry> _byRef;
 
     private Vocabulary(string edition, ImmutableArray<VocabEntry> entries)
     {
@@ -49,7 +56,13 @@ public sealed class Vocabulary
             .SelectMany(e => e.Tokens.Select(t => (Token: t, Entry: e)))
             .GroupBy(x => x.Token, StringComparer.Ordinal)
             .ToFrozenDictionary(g => g.Key, g => g.Select(x => x.Entry).ToImmutableArray(), StringComparer.Ordinal);
+        _byRef = entries
+            .GroupBy(e => $"{e.Vocabulary}/{e.Label}", StringComparer.Ordinal)
+            .ToFrozenDictionary(g => g.Key, g => g.First(), StringComparer.Ordinal);
     }
+
+    /// <summary>The entry with the vocab KbRef ID <paramref name="id"/> (<c>symbols/del</c>); <c>null</c> if none.</summary>
+    public VocabEntry? ByRefId(string id) => _byRef.GetValueOrDefault(id);
 
     /// <summary>The ISCN edition, e.g. <c>2016</c>.</summary>
     public string Edition { get; }
@@ -118,7 +131,12 @@ public sealed class Vocabulary
                     [.. e.GetProperty("tokens").EnumerateArray().Select(t => t.GetString()!)],
                     e.TryGetProperty("equivalent_forms", out var eq) && eq.GetBoolean(),
                     [.. e.GetProperty("meanings").EnumerateArray()
-                        .SelectMany(m => m.TryGetProperty("sections", out var s) ? s.EnumerateArray().Select(x => x.GetString()!) : [])]));
+                        .SelectMany(m => m.TryGetProperty("sections", out var s) ? s.EnumerateArray().Select(x => x.GetString()!) : [])])
+                {
+                    Meanings = [.. e.GetProperty("meanings").EnumerateArray()
+                        .Select(m => m.TryGetProperty("text", out var t) ? t.GetString() : null)
+                        .OfType<string>()],
+                });
             }
         }
 

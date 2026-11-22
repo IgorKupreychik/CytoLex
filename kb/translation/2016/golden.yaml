@@ -426,9 +426,9 @@ golden:
     summary: "45 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "dic(13;15)(q22;q24)"}
-        sentence: "Dicentric chromosome formed from chromosomes 13 and 15, with breaks at 13q22 and 15q24; it replaces the two normal chromosomes."
+        sentence: "Dicentric chromosome formed from chromosomes 13 and 15, with breaks at 13q22 and 15q24."
         kb: ["vocab:symbols/dic", "rule:DIC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:13q22", "band:15q24"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Dicentric chromosome formed from chromosomes 13 and 15, with breaks at 13q22 and 15q24; it replaces the two normal chromosomes."}
   - input: "46,XY,der(1)t(1;3)(p22;q13.1)"
     cite: {section: "9.1", page: 59, example: "E9"}
     context: unknown
@@ -489,18 +489,18 @@ golden:
           neoplastic: "Gain of chromosome 13 (acquired)."
         kb: ["vocab:symbols/plus sign, single (+)", "rule:KARYO.GAIN_LOSS_SIGN"]
       - span: {start: 10, text: "dic(13;15)(q22;q24)"}
-        sentence: "Dicentric chromosome formed from chromosomes 13 and 15, with breaks at 13q22 and 15q24; it replaces one chromosome 13 and one chromosome 15."
+        sentence: "Dicentric chromosome formed from chromosomes 13 and 15, with breaks at 13q22 and 15q24."
         kb: ["vocab:symbols/dic", "rule:DIC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:13q22", "band:15q24"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Dicentric chromosome formed from chromosomes 13 and 15, with breaks at 13q22 and 15q24; it replaces one chromosome 13 and one chromosome 15."}
   - input: "45,XY,dic(14;21)(p11.2;p11.2)"
     cite: {section: "9.2.4", page: 66, example: "E4"}
     context: unknown
     summary: "45 chromosomes; sex chromosomes XY; 1 abnormality."
     items:
       - span: {start: 6, text: "dic(14;21)(p11.2;p11.2)"}
-        sentence: "Dicentric chromosome formed from chromosomes 14 and 21, with breaks at 14p11.2 and 21p11.2; it replaces one chromosome 14 and one chromosome 21."
+        sentence: "Dicentric chromosome formed from chromosomes 14 and 21, with breaks at 14p11.2 and 21p11.2."
         kb: ["vocab:symbols/dic", "rule:DIC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:14p11.2", "band:21p11.2"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Dicentric chromosome formed from chromosomes 14 and 21, with breaks at 14p11.2 and 21p11.2; it replaces one chromosome 14 and one chromosome 21."}
   - input: "46,XX,i(21)(q10)"
     cite: {section: "9.2.11", page: 70, example: "E5"}
     context: unknown
@@ -549,21 +549,21 @@ golden:
     summary: "46 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "del(6)(q13q23)×2"}
-        sentence: "Interstitial deletion of chromosome 6: the segment between 6q13 and 6q23 is lost; 2 copies of this chromosome."
+        sentence: "Interstitial deletion of chromosome 6: the segment between 6q13 and 6q23 is lost; 2 copies."
         kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:6q13", "band:6q23", "vocab:symbols/multiplication sign (×)", "rule:KARYO.MULTIPLY_SIGN_REARRANGED_ONLY"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Interstitial deletion of chromosome 6: the segment between 6q13 and 6q23 is lost; 2 copies of this chromosome."}
   - input: "47,XX,del(6)(q13q23)×2,+del(6)(q13q23)"
     cite: {section: "9.3", page: 80, example: "E3"}
     context: unknown
     summary: "47 chromosomes; sex chromosomes XX; 2 abnormalities."
     items:
       - span: {start: 6, text: "del(6)(q13q23)×2"}
-        sentence: "Interstitial deletion of chromosome 6: the segment between 6q13 and 6q23 is lost; 2 copies of this chromosome."
+        sentence: "Interstitial deletion of chromosome 6: the segment between 6q13 and 6q23 is lost; 2 copies."
         kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:6q13", "band:6q23", "vocab:symbols/multiplication sign (×)", "rule:KARYO.MULTIPLY_SIGN_REARRANGED_ONLY"]
       - span: {start: 23, text: "+del(6)(q13q23)"}
-        sentence: "An additional chromosome 6 with the same interstitial deletion between 6q13 and 6q23."
+        sentence: "An additional chromosome 6 with an interstitial deletion: the segment between 6q13 and 6q23 is lost."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:6q13", "band:6q23"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Interstitial deletion of chromosome 6: the segment between 6q13 and 6q23 is lost; 2 copies of this chromosome. | An additional chromosome 6 with the same interstitial deletion between 6q13 and 6q23."}
   - input: "mos 45,X[15]/47,XXX[10]/46,XX[23]"
     cite: {section: "4.1", page: 38, para: "¶9"}
     context: unknown
@@ -1123,9 +1123,9 @@ golden:
         sentence: "An additional derivative chromosome 1, resulting from a translocation between chromosomes 1 and 16 with breaks at 1p13 and 16q13."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:1p13", "vocab:symbols/q", "band:16q13"]
       - span: {start: 33, text: "t(1;16)"}
-        sentence: "Translocation between chromosomes 1 and 16, with the breakpoints given earlier in the string (1p13 and 16q13)."
+        sentence: "Translocation between chromosomes 1 and 16; breakpoints as given at its first mention."
         kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Translocation between chromosomes 1 and 16, with the breakpoints given earlier in the string (1p13 and 16q13)."}
   - input: "46,XX,der(2)t(2;5)(q21;q31)mat,+der(2)t(2;5),–5"
     cite: {section: "4.3.2.2", page: 44, float: "Table 4"}
     context: unknown
@@ -1183,12 +1183,12 @@ golden:
         sentence: "Derivative chromosome 1, resulting from a translocation between chromosomes 1 and 3 with breaks at 1p32 and 3q21, a pericentric inversion of chromosome 1 with breaks at 1p22 and 1q21, and a translocation between chromosomes 1 and 11 with breaks at 1q25 and 11q13."
         kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:1p32", "vocab:symbols/q", "band:3q21", "vocab:symbols/inv", "rule:INV.FORMAT", "band:1p22", "band:1q21", "band:1q25", "band:11q13"]
       - span: {start: 58, text: "der(3)t(1;3)"}
-        sentence: "Derivative chromosome 3 from the same translocation between chromosomes 1 and 3; breakpoints as given before."
+        sentence: "Derivative chromosome 3 from the same translocation between chromosomes 1 and 3; breakpoints as given at its first mention."
         kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT"]
       - span: {start: 71, text: "der(11)t(1;11)"}
-        sentence: "Derivative chromosome 11 from the same translocation between chromosomes 1 and 11; breakpoints as given before."
+        sentence: "Derivative chromosome 11 from the same translocation between chromosomes 1 and 11; breakpoints as given at its first mention."
         kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Derivative chromosome 3 from the same translocation between chromosomes 1 and 3; breakpoints as given before. | Derivative chromosome 11 from the same translocation between chromosomes 1 and 11; breakpoints as given before."}
   - input: "46,XX,inv(2)(p21q31)"
     cite: {section: "4.3.1.1", page: 41, example: "E1"}
     context: unknown
@@ -1249,9 +1249,9 @@ golden:
     summary: "44 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "trc(4;12;9)(q31.2;q22p13;q34)"}
-        sentence: "Tricentric chromosome formed from chromosomes 4, 12 and 9, with breaks at 4q31.2, at 12q22 and 12p13, and at 9q34."
+        sentence: "Tricentric chromosome formed from chromosomes 4, 12 and 9, with breaks at 4q31.2, 12q22 and 12p13, and 9q34."
         kb: ["vocab:symbols/trc", "rule:TRC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:4q31.2", "band:12q22", "vocab:symbols/p", "band:12p13", "band:9q34"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Tricentric chromosome formed from chromosomes 4, 12 and 9, with breaks at 4q31.2, at 12q22 and 12p13, and at 9q34."}
   - input: "46,XX,inv(2)(p13p23)"
     cite: {section: "4.3.1.1", page: 41, example: "E2"}
     context: unknown
@@ -1312,9 +1312,9 @@ golden:
     summary: "46 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "der(1)r(1;3)(p36.1q23;q27q21)"}
-        sentence: "Derivative chromosome 1: a ring formed from chromosomes 1 and 3, with breaks at 1p36.1 and 1q23, and at 3q27 and 3q21 (the chromosome 3 segment in reverse orientation)."
+        sentence: "Derivative chromosome 1: a ring formed from chromosomes 1 and 3, with breaks at 1p36.1 and 1q23, and 3q27 and 3q21."
         kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/r", "rule:RING.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:1p36.1", "vocab:symbols/q", "band:1q23", "band:3q27", "band:3q21"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Derivative chromosome 1: a ring formed from chromosomes 1 and 3, with breaks at 1p36.1 and 1q23, and at 3q27 and 3q21 (the chromosome 3 segment in reverse orientation)."}
   - input: "46,XX,qdp(1)(q23q32)"
     cite: {section: "9.2.14", page: 72, example: "E1"}
     context: unknown
@@ -1412,9 +1412,9 @@ golden:
     summary: "46 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "ins(2)(q13p23p13)"}
-        sentence: "Inverted insertion of the short-arm segment 2p13 to 2p23 of chromosome 2 into its long arm at 2q13; the inserted segment is reversed, so 2p23 is now proximal and 2p13 distal."
+        sentence: "Inverted insertion of the short-arm segment 2p13 to 2p23 of chromosome 2 into its long arm at 2q13; the inserted segment is reversed."
         kb: ["vocab:symbols/ins", "rule:INS.ORIENTATION", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:2q13", "vocab:symbols/p", "band:2p23", "band:2p13"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Inverted insertion of the short-arm segment 2p13 to 2p23 of chromosome 2 into its long arm at 2q13; the inserted segment is reversed, so 2p23 is now proximal and 2p13 distal."}
   - input: "46,XX,ins(2)(p13q21q31)"
     cite: {section: "9.2.9", page: 69, example: "E1"}
     context: unknown
@@ -1668,9 +1668,9 @@ golden:
     summary: "46 chromosomes; sex chromosomes XY; 1 abnormality."
     items:
       - span: {start: 6, text: "der(1)t(1;3)(p32;q21)dup(1)(q25q42)"}
-        sentence: "Derivative chromosome 1, resulting from a translocation between chromosomes 1 and 3 with breaks at 1p32 and 3q21, and a duplication of the segment from 1q25 to 1q42."
+        sentence: "Derivative chromosome 1, resulting from a translocation between chromosomes 1 and 3 with breaks at 1p32 and 3q21, and a direct duplication of chromosome 1 between 1q25 and 1q42."
         kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:1p32", "vocab:symbols/q", "band:3q21", "vocab:symbols/dup", "rule:DUP.FORMAT", "band:1q25", "band:1q42"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Derivative chromosome 1, resulting from a translocation between chromosomes 1 and 3 with breaks at 1p32 and 3q21, and a duplication of the segment from 1q25 to 1q42."}
   - input: "46,XY,der(1)(3qter→3q21::1p32→1q42::1q25→1qter)"
     cite: {section: "9.2.3", page: 62, example: "E14"}
     context: unknown
@@ -1776,9 +1776,9 @@ golden:
     summary: "46 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "rec(21)del(21)ins(21)(p13q22.2q22.3)pat"}
-        sentence: "Recombinant chromosome 21 with a deletion, resulting from an insertion within chromosome 21 (the segment 21q22.2 to 21q22.3 inserted at 21p13) in a parent; inherited from the father."
+        sentence: "Recombinant chromosome 21 with a deletion, resulting from an insertion of the long-arm segment 21q22.2 to 21q22.3 of chromosome 21 into its short arm at 21p13 in a parent; inherited from the father."
         kb: ["vocab:symbols/rec", "rule:REC.FORMAT", "vocab:symbols/del", "rule:DEL.FORMAT", "vocab:symbols/ins", "rule:INS.ORIENTATION", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:21p13", "vocab:symbols/q", "band:21q22.2", "band:21q22.3", "vocab:symbols/pat", "rule:KARYO.PARENTAL_ORIGIN"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Recombinant chromosome 21 with a deletion, resulting from an insertion within chromosome 21 (the segment 21q22.2 to 21q22.3 inserted at 21p13) in a parent; inherited from the father."}
   - input: "46,XY,rec(1)dup(5q)ins(1;5)(q32;q11.2q22)inh,rec(5)del(1q)ins(1;5)inh"
     cite: {section: "9.2.3", page: 61, example: "E4"}
     context: unknown
@@ -2062,9 +2062,9 @@ golden:
     summary: "45 chromosomes; sex chromosomes XY; 1 abnormality."
     items:
       - span: {start: 6, text: "upd der(13;13)(q10;q10)pat"}
-        sentence: "Uniparental disomy of chromosome 13: a derivative chromosome formed from two chromosomes 13 joined at the centromere (breaks at 13q10 and 13q10), inherited from the father."
+        sentence: "Uniparental disomy of chromosome 13: both copies inherited from the father, as a derivative chromosome formed from the long arms of two chromosomes 13, joined at the centromere (13q10 and 13q10)."
         kb: ["vocab:symbols/upd", "rule:UPD.FORMAT", "vocab:symbols/der", "rule:DER.DEFINITION", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "vocab:symbols/pat", "rule:KARYO.PARENTAL_ORIGIN"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Uniparental disomy of chromosome 13: a derivative chromosome formed from two chromosomes 13 joined at the centromere (breaks at 13q10 and 13q10), inherited from the father."}
   - input: "46,Y,t(X;8)(p22.3;q24.1)"
     cite: {section: "9.1", page: 59, example: "E8"}
     context: unknown
@@ -2161,18 +2161,18 @@ golden:
     summary: "46 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "add(19)(p13.3)"}
-        sentence: "Additional material of unknown origin attached to chromosome 19 at 19p13.3."
+        sentence: "Additional material of unknown origin attached to chromosome 19 at 19p13.3, replacing the segment from 19p13.3 to the end of the short arm."
         kb: ["vocab:symbols/add", "rule:ADD.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:19p13.3"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Additional material of unknown origin attached to chromosome 19 at 19p13.3."}
   - input: "46,XX,add(19)(?::p13.3→qter)"
     cite: {section: "9.2.1", page: 59, example: "E1"}
     context: unknown
     summary: "46 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "add(19)(?::p13.3→qter)"}
-        sentence: "Chromosome 19 with additional material of unknown origin: unknown material joined to the segment from 19p13.3 to the end of the long arm."
+        sentence: "Chromosome 19 with additional material of unknown origin: unknown material, joined to the segment from 19p13.3 to the end of the long arm."
         kb: ["rule:STRUCT.DETAILED_SYSTEM", "vocab:symbols/add", "rule:ADD.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/question mark (?)", "vocab:symbols/p", "band:19p13.3", "vocab:symbols/qter"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Chromosome 19 with additional material of unknown origin: unknown material joined to the segment from 19p13.3 to the end of the long arm."}
   - input: "46,XY,add(12)(q13)"
     cite: {section: "9.2.1", page: 59, example: "E2"}
     context: unknown
@@ -2323,9 +2323,9 @@ golden:
     summary: "46 chromosomes; sex chromosomes XY; 1 abnormality."
     items:
       - span: {start: 6, text: "der(1)del(1)(p21p33)hsr(1)(p21)"}
-        sentence: "Derivative chromosome 1, resulting from an interstitial deletion of chromosome 1 between 1p21 and 1p33, and a homogeneously staining region at 1p21 in place of the deleted segment."
+        sentence: "Derivative chromosome 1, resulting from an interstitial deletion of chromosome 1 between 1p21 and 1p33, and a homogeneously staining region at 1p21."
         kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:1p21", "band:1p33", "vocab:symbols/hsr", "rule:HSR.FORMAT"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Derivative chromosome 1, resulting from an interstitial deletion of chromosome 1 between 1p21 and 1p33, and a homogeneously staining region at 1p21 in place of the deleted segment."}
   - input: "46,XY,der(1)(pter→p33::hsr::p21→qter)"
     cite: {section: "9.2.8", page: 68, example: "E3"}
     context: unknown
@@ -2532,18 +2532,18 @@ golden:
     summary: "45 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "der(8;8)(q10;q10)del(8)(q22)t(8;9)(q24.1;q12)"}
-        sentence: "Derivative chromosome made of the long arms of two chromosomes 8 joined at the centromere (8q10), with a terminal deletion of chromosome 8 with a break at 8q22, and a translocation between chromosomes 8 and 9 with breaks at 8q24.1 and 9q12."
+        sentence: "Derivative chromosome formed from the long arms of two chromosomes 8, joined at the centromere (8q10 and 8q10), resulting from a terminal deletion of chromosome 8 with a break at 8q22, and a translocation between chromosomes 8 and 9 with breaks at 8q24.1 and 9q12."
         kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "vocab:symbols/del", "rule:DEL.FORMAT", "band:8q22", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "band:8q24.1", "band:9q12"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Derivative chromosome made of the long arms of two chromosomes 8 joined at the centromere (8q10), with a terminal deletion of chromosome 8 with a break at 8q22, and a translocation between chromosomes 8 and 9 with breaks at 8q24.1 and 9q12."}
   - input: "45,XX,der(8;8)(:8q22→8q10::8q10→8q24.1::9q12→9qter)"
     cite: {section: "9.2.3", page: 64, example: "E26"}
     context: unknown
     summary: "45 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "der(8;8)(:8q22→8q10::8q10→8q24.1::9q12→9qter)"}
-        sentence: "Derivative chromosome of two chromosomes 8 made up of the segment from a break at 8q22 to 8q10, joined to the segment from 8q10 to 8q24.1, joined to the segment from 9q12 to the end of the long arm of chromosome 9."
+        sentence: "Derivative chromosome with the centromeres of two chromosomes 8, made up of the segment from a break at 8q22 to 8q10, joined to the segment from 8q10 to 8q24.1, joined to the segment from 9q12 to the end of the long arm of chromosome 9."
         kb: ["rule:STRUCT.DETAILED_SYSTEM", "vocab:symbols/der", "rule:DER.DEFINITION", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:8q22", "band:8q24.1", "band:9q12", "vocab:symbols/qter"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Derivative chromosome of two chromosomes 8 made up of the segment from a break at 8q22 to 8q10, joined to the segment from 8q10 to 8q24.1, joined to the segment from 9q12 to the end of the long arm of chromosome 9."}
   - input: "47,XY,+der(?)t(?;9)(?;q22)"
     cite: {section: "9.2.3", page: 64, example: "E27"}
     context: unknown
@@ -2568,9 +2568,9 @@ golden:
     summary: "47 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "+der(?)t(?;9)(?;p13)ins(?;7)(?;q11.2q32)"}
-        sentence: "An additional derivative chromosome of unknown centromere origin, resulting from a translocation between an unidentified chromosome and chromosome 9 with a break at 9p13, and an insertion of the segment 7q11.2 to 7q32 of chromosome 7 into it."
+        sentence: "An additional derivative chromosome of unknown centromere origin, resulting from a translocation between an unidentified chromosome and chromosome 9 with a break at 9p13 (the other break unknown), and an insertion of the segment 7q11.2 to 7q32 of chromosome 7 into an unidentified chromosome."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/question mark (?)", "vocab:symbols/p", "band:9p13", "vocab:symbols/ins", "rule:INS.ORIENTATION", "vocab:symbols/q", "band:7q11.2", "band:7q32"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: An additional derivative chromosome of unknown centromere origin, resulting from a translocation between an unidentified chromosome and chromosome 9 with a break at 9p13, and an insertion of the segment 7q11.2 to 7q32 of chromosome 7 into it."}
   - input: "47,XX,+der(?)(9pter→9p13::?→cen→?::7q11.2→7q32::?)"
     cite: {section: "9.2.3", page: 64, example: "E28"}
     context: unknown
@@ -2586,9 +2586,9 @@ golden:
     summary: "47 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "+der(?)t(?;9)(?;p13)hsr(?)"}
-        sentence: "An additional derivative chromosome of unknown centromere origin, resulting from a translocation between an unidentified chromosome and chromosome 9 with a break at 9p13, and a homogeneously staining region at an unknown position."
+        sentence: "An additional derivative chromosome of unknown centromere origin, resulting from a translocation between an unidentified chromosome and chromosome 9 with a break at 9p13 (the other break unknown), and a homogeneously staining region at an unknown position."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/question mark (?)", "vocab:symbols/p", "band:9p13", "vocab:symbols/hsr", "rule:HSR.FORMAT"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: An additional derivative chromosome of unknown centromere origin, resulting from a translocation between an unidentified chromosome and chromosome 9 with a break at 9p13, and a homogeneously staining region at an unknown position."}
   - input: "47,XX,+der(?)(9pter→9p13::?→cen→?::hsr→?)"
     cite: {section: "9.2.3", page: 64, example: "E29"}
     context: unknown
@@ -2604,9 +2604,9 @@ golden:
     summary: "47 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "+der(?)r(?;3;5)(?;q21q26.2;q13q33)"}
-        sentence: "An additional derivative chromosome of unknown centromere origin: a ring formed from an unidentified chromosome and chromosomes 3 and 5, with breaks at 3q21 and 3q26.2, and at 5q13 and 5q33."
+        sentence: "An additional derivative chromosome of unknown centromere origin: a ring formed from an unidentified chromosome and chromosomes 3 and 5, with breaks at 3q21 and 3q26.2, and 5q13 and 5q33 (other breaks unknown)."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/r", "rule:RING.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/question mark (?)", "vocab:symbols/q", "band:3q21", "band:3q26.2", "band:5q13", "band:5q33"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: An additional derivative chromosome of unknown centromere origin: a ring formed from an unidentified chromosome and chromosomes 3 and 5, with breaks at 3q21 and 3q26.2, and at 5q13 and 5q33."}
   - input: "46,XX,der(9)del(9)(p12)t(9;22)(q34;q11.2),der(9)t(9;12)(p13;q22)inv(9)(q13q22)"
     cite: {section: "9.2.3", page: 64, example: "E31"}
     context: unknown
@@ -2628,9 +2628,9 @@ golden:
         sentence: "Derivative chromosome 1, resulting from a translocation between chromosomes 1 and 3 with breaks at 1p34.3 and 3q21."
         kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:1p34.3", "vocab:symbols/q", "band:3q21"]
       - span: {start: 30, text: "der(1̲)t(1̲;3)(p34.3;q21)"}
-        sentence: "Derivative chromosome 1 of the other (underlined) homologue, resulting from a translocation between that chromosome 1 and chromosome 3 with breaks at 1p34.3 and 3q21."
+        sentence: "Derivative chromosome 1 of the underlined homologue, resulting from a translocation between chromosomes 1 and 3 with breaks at 1p34.3 and 3q21."
         kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:1p34.3", "vocab:symbols/q", "band:3q21"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Derivative chromosome 1 of the other (underlined) homologue, resulting from a translocation between that chromosome 1 and chromosome 3 with breaks at 1p34.3 and 3q21."}
   - input: "46,XX,der(1)t(1;3)(p34.3;q21)[20]/46,XX,der(1̲)t(1̲;3)(p34.3;q21)[10]"
     cite: {section: "9.2.3", page: 64, example: "E33"}
     context: unknown
@@ -2646,45 +2646,45 @@ golden:
         sentence: "Cell line 2 (10 cells): 46 chromosomes; sex chromosomes XX."
         kb: ["rule:KARYO.COUNT_SEX_ORDER"]
       - span: {start: 40, text: "der(1̲)t(1̲;3)(p34.3;q21)"}
-        sentence: "Derivative chromosome 1 of the other (underlined) homologue, resulting from a translocation between that chromosome 1 and chromosome 3 with breaks at 1p34.3 and 3q21."
+        sentence: "Derivative chromosome 1 of the underlined homologue, resulting from a translocation between chromosomes 1 and 3 with breaks at 1p34.3 and 3q21."
         kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:1p34.3", "vocab:symbols/q", "band:3q21"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Derivative chromosome 1 of the other (underlined) homologue, resulting from a translocation between that chromosome 1 and chromosome 3 with breaks at 1p34.3 and 3q21."}
   - input: "46,XX,der(1̲)t(1;1̲)(p31;q32)"
     cite: {section: "9.2.3", page: 65, example: "E34"}
     context: unknown
     summary: "46 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "der(1̲)t(1;1̲)(p31;q32)"}
-        sentence: "Derivative chromosome 1 of the underlined homologue, resulting from a translocation between the two chromosomes 1 with breaks at 1p31 and at 1q32 of the underlined homologue."
+        sentence: "Derivative chromosome 1 of the underlined homologue, resulting from a translocation between two chromosomes 1 with breaks at 1p31 and 1q32 of the underlined homologue."
         kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:1p31", "vocab:symbols/q", "band:1q32"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Derivative chromosome 1 of the underlined homologue, resulting from a translocation between the two chromosomes 1 with breaks at 1p31 and at 1q32 of the underlined homologue."}
   - input: "46,XX,der(1)t(1;1̲)(p31;q32)"
     cite: {section: "9.2.3", page: 65, example: "E34"}
     context: unknown
     summary: "46 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "der(1)t(1;1̲)(p31;q32)"}
-        sentence: "Derivative chromosome 1 of the first homologue, resulting from a translocation between the two chromosomes 1 with breaks at 1p31 and at 1q32 of the underlined homologue."
+        sentence: "Derivative chromosome 1 of the first homologue, resulting from a translocation between two chromosomes 1 with breaks at 1p31 and 1q32 of the underlined homologue."
         kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:1p31", "vocab:symbols/q", "band:1q32"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Derivative chromosome 1 of the first homologue, resulting from a translocation between the two chromosomes 1 with breaks at 1p31 and at 1q32 of the underlined homologue."}
   - input: "45,XX,dic(13;13)(q14;q32)"
     cite: {section: "9.2.4", page: 65, example: "E1"}
     context: unknown
     summary: "45 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "dic(13;13)(q14;q32)"}
-        sentence: "Dicentric chromosome formed from the two chromosomes 13, with breaks at 13q14 and 13q32."
+        sentence: "Dicentric chromosome formed from two chromosomes 13, with breaks at 13q14 and 13q32."
         kb: ["vocab:symbols/dic", "rule:DIC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:13q14", "band:13q32"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Dicentric chromosome formed from the two chromosomes 13, with breaks at 13q14 and 13q32."}
   - input: "45,XX,dic(13;13)(13pter→13q14::13q32→13pter)"
     cite: {section: "9.2.4", page: 65, example: "E1"}
     context: unknown
     summary: "45 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "dic(13;13)(13pter→13q14::13q32→13pter)"}
-        sentence: "Dicentric chromosome formed from the two chromosomes 13, made up of the segment from the end of the short arm to 13q14, joined to the segment from 13q32 back to the end of the short arm."
+        sentence: "Dicentric chromosome formed from two chromosomes 13, made up of the segment from the end of the short arm of chromosome 13 to 13q14, joined to the segment from 13q32 to the end of the short arm of chromosome 13."
         kb: ["rule:STRUCT.DETAILED_SYSTEM", "vocab:symbols/dic", "rule:DIC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/pter", "vocab:symbols/q", "band:13q14", "band:13q32"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Dicentric chromosome formed from the two chromosomes 13, made up of the segment from the end of the short arm to 13q14, joined to the segment from 13q32 back to the end of the short arm."}
   - input: "dic(13)(q14q32)"
     cite: {section: "9.2.4", page: 65, example: "E1"}
     fragment: true
@@ -2719,18 +2719,18 @@ golden:
     summary: "47 chromosomes; sex chromosomes XY; 1 abnormality."
     items:
       - span: {start: 6, text: "+dic(17;?)(q22;?)"}
-        sentence: "An additional dicentric chromosome formed from chromosome 17, with a break at 17q22, and an unidentified chromosome."
+        sentence: "An additional dicentric chromosome formed from chromosome 17 and an unidentified chromosome, with a break at 17q22 (the other break unknown)."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/dic", "rule:DIC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:17q22", "vocab:symbols/question mark (?)"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: An additional dicentric chromosome formed from chromosome 17, with a break at 17q22, and an unidentified chromosome."}
   - input: "47,XY,+dic(17;?)(17pter→17q22::?)"
     cite: {section: "9.2.4", page: 66, example: "E5"}
     context: unknown
     summary: "47 chromosomes; sex chromosomes XY; 1 abnormality."
     items:
       - span: {start: 6, text: "+dic(17;?)(17pter→17q22::?)"}
-        sentence: "An additional dicentric chromosome made up of the segment from the end of the short arm of chromosome 17 to 17q22, joined to an unidentified chromosome."
+        sentence: "An additional dicentric chromosome formed from chromosome 17 and an unidentified chromosome, made up of the segment from the end of the short arm of chromosome 17 to 17q22, joined to unknown material."
         kb: ["vocab:symbols/plus sign, single (+)", "rule:STRUCT.DETAILED_SYSTEM", "vocab:symbols/dic", "rule:DIC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/pter", "vocab:symbols/q", "band:17q22", "vocab:symbols/question mark (?)"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: An additional dicentric chromosome made up of the segment from the end of the short arm of chromosome 17 to 17q22, joined to an unidentified chromosome."}
   - input: "46,X,idic(Y)(pter→q12::q12→pter)"
     cite: {section: "9.2.4", page: 66, example: "E6"}
     context: unknown
@@ -2809,9 +2809,9 @@ golden:
     summary: "45 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "psu dic(15;13)(q12;q12)"}
-        sentence: "Pseudodicentric chromosome formed from chromosomes 15 and 13, with breaks at 15q12 and 13q12; of its two centromeres only the one of chromosome 15 is active."
+        sentence: "Pseudodicentric chromosome formed from chromosomes 15 and 13, with breaks at 15q12 and 13q12; only the centromere of chromosome 15 is active."
         kb: ["vocab:symbols/psu", "rule:DIC.PSEUDODICENTRIC_ORDER", "vocab:symbols/dic", "rule:DIC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:15q12", "band:13q12"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Pseudodicentric chromosome formed from chromosomes 15 and 13, with breaks at 15q12 and 13q12; of its two centromeres only the one of chromosome 15 is active."}
   - input: "45,XX,psu dic(15;13)(15pter→15q12::13q12→13pter)"
     cite: {section: "9.2.4", page: 66, example: "E10"}
     context: unknown
@@ -2836,9 +2836,9 @@ golden:
     summary: "46 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "psu idic(20)(pter→q11.2::q11.2→pter)"}
-        sentence: "Pseudo-isodicentric chromosome 20 made up of the segment from the end of the short arm to 20q11.2, joined to the segment from 20q11.2 back to the end of the short arm; only one centromere is active."
+        sentence: "Pseudo-isodicentric chromosome 20 made up of the segment from the end of the short arm to 20q11.2, joined to the segment from 20q11.2 back to the end of the short arm; only one of its two centromeres is active."
         kb: ["rule:STRUCT.DETAILED_SYSTEM", "vocab:symbols/psu", "rule:DIC.PSEUDODICENTRIC_ORDER", "vocab:symbols/idic", "rule:DIC.FORMAT", "rule:ISO.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/pter", "vocab:symbols/q", "band:20q11.2"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Pseudo-isodicentric chromosome 20 made up of the segment from the end of the short arm to 20q11.2, joined to the segment from 20q11.2 back to the end of the short arm; only one centromere is active."}
   - input: "46,XX,dup(1)(q22q25)"
     cite: {section: "9.2.5", page: 67, example: "E1"}
     context: unknown
@@ -3152,7 +3152,7 @@ golden:
         sentence: "Isochromosome of the long arm of chromosome 17: both arms are copies of the long arm."
         kb: ["vocab:symbols/i", "rule:ISO.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q"]
       - span: {start: 50, text: "+mar1×3"}
-        sentence: "Marker chromosome 1 (structurally abnormal, origin unknown), 3 copies."
+        sentence: "Marker chromosome 1 (structurally abnormal, origin unknown); 3 copies."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/mar", "rule:MAR.PLUS_SIGN", "vocab:symbols/multiplication sign (×)", "rule:KARYO.MULTIPLY_SIGN_REARRANGED_ONLY"]
       - span: {start: 58, text: "+mar2"}
         sentence: "Marker chromosome 2 (structurally abnormal, origin unknown)."
@@ -3160,12 +3160,12 @@ golden:
       - span: {start: 64, text: "+mar3"}
         sentence: "Marker chromosome 3 (structurally abnormal, origin unknown)."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/mar", "rule:MAR.PLUS_SIGN"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Marker chromosome 1 (structurally abnormal, origin unknown), 3 copies."}
   - input: "49,XX,…,+3mar,1dmin"
     cite: {section: "9.2.12", page: 71, example: "E7"}
     fragment: true
     context: unknown
-    summary: "49 chromosomes; sex chromosomes XX; further abnormalities left out, plus 3 markers and double minutes."
+    summary: "49 chromosomes; sex chromosomes XX; further abnormalities left out, plus 2 abnormalities."
     items:
       - span: {start: 6, text: "…"}
         sentence: "Further abnormalities are left out here."
@@ -3176,12 +3176,12 @@ golden:
       - span: {start: 14, text: "1dmin"}
         sentence: "1 double minute (small acentric fragment, not counted in the chromosome number)."
         kb: ["vocab:symbols/dmin", "rule:DMIN.FORMAT"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: 49 chromosomes; sex chromosomes XX; further abnormalities left out, plus 3 markers and double minutes."}
   - input: "49,XY,…,+3mar,~14dmin"
     cite: {section: "9.2.12", page: 71, example: "E8"}
     fragment: true
     context: unknown
-    summary: "49 chromosomes; sex chromosomes XY; further abnormalities left out, plus 3 markers and double minutes."
+    summary: "49 chromosomes; sex chromosomes XY; further abnormalities left out, plus 2 abnormalities."
     items:
       - span: {start: 6, text: "…"}
         sentence: "Further abnormalities are left out here."
@@ -3192,12 +3192,12 @@ golden:
       - span: {start: 14, text: "~14dmin"}
         sentence: "About 14 double minutes (small acentric fragments, not counted in the chromosome number)."
         kb: ["rule:UNCERTAIN.APPROX_INTERVAL", "vocab:symbols/dmin", "rule:DMIN.FORMAT"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: 49 chromosomes; sex chromosomes XY; further abnormalities left out, plus 3 markers and double minutes."}
   - input: "49,XX,…,+3mar,9~34dmin"
     cite: {section: "9.2.12", page: 72, example: "E9"}
     fragment: true
     context: unknown
-    summary: "49 chromosomes; sex chromosomes XX; further abnormalities left out, plus 3 markers and double minutes."
+    summary: "49 chromosomes; sex chromosomes XX; further abnormalities left out, plus 2 abnormalities."
     items:
       - span: {start: 6, text: "…"}
         sentence: "Further abnormalities are left out here."
@@ -3208,7 +3208,7 @@ golden:
       - span: {start: 14, text: "9~34dmin"}
         sentence: "9 to 34 double minutes (small acentric fragments, not counted in the chromosome number)."
         kb: ["rule:UNCERTAIN.APPROX_INTERVAL", "vocab:symbols/dmin", "rule:DMIN.FORMAT"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: 49 chromosomes; sex chromosomes XX; further abnormalities left out, plus 3 markers and double minutes."}
   - input: "47,XX,+der(3)(qter→q28:)"
     cite: {section: "9.2.13", page: 72, example: "E1"}
     context: unknown
@@ -3272,9 +3272,9 @@ golden:
     summary: "46 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "qdp(1)(pter→q32::q23→q32::q23→q32::q23→qter)"}
-        sentence: "Quadruplication of chromosome 1 made up of the segment from the end of the short arm to 1q32, joined three times to the segment from 1q23 to 1q32, the last copy continuing to the end of the long arm."
+        sentence: "Quadruplication of chromosome 1 made up of the segment from the end of the short arm to 1q32, joined to the segment from 1q23 to 1q32, joined to the segment from 1q23 to 1q32, joined to the segment from 1q23 to the end of the long arm."
         kb: ["rule:STRUCT.DETAILED_SYSTEM", "vocab:symbols/qdp", "rule:QDP.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/pter", "vocab:symbols/q", "band:1q32", "band:1q23", "vocab:symbols/qter"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Quadruplication of chromosome 1 made up of the segment from the end of the short arm to 1q32, joined three times to the segment from 1q23 to 1q32, the last copy continuing to the end of the long arm."}
   - input: "46,XX,r(7)(::p22→q36::)"
     cite: {section: "9.2.15", page: 73, example: "E1"}
     context: unknown
@@ -3290,9 +3290,9 @@ golden:
     summary: "46 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "der(1)r(1;3)(p36.1q23;q21q27)"}
-        sentence: "Derivative chromosome 1: a ring formed from chromosomes 1 and 3, with breaks at 1p36.1 and 1q23, and at 3q21 and 3q27."
+        sentence: "Derivative chromosome 1: a ring formed from chromosomes 1 and 3, with breaks at 1p36.1 and 1q23, and 3q21 and 3q27."
         kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/r", "rule:RING.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:1p36.1", "vocab:symbols/q", "band:1q23", "band:3q21", "band:3q27"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Derivative chromosome 1: a ring formed from chromosomes 1 and 3, with breaks at 1p36.1 and 1q23, and at 3q21 and 3q27."}
   - input: "46,XX,der(1)(::1p36.1→1q23::3q21→3q27::)"
     cite: {section: "9.2.15", page: 73, example: "E2"}
     context: unknown
@@ -3317,9 +3317,9 @@ golden:
     summary: "46 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "der(1)r(1;?)(p36.1q23;?)"}
-        sentence: "Derivative chromosome 1: a ring formed from chromosome 1, with breaks at 1p36.1 and 1q23, and material of unknown origin."
+        sentence: "Derivative chromosome 1: a ring formed from chromosome 1 and an unidentified chromosome, with breaks at 1p36.1 and 1q23 (other breaks unknown)."
         kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/r", "rule:RING.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:1p36.1", "vocab:symbols/q", "band:1q23", "vocab:symbols/question mark (?)"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Derivative chromosome 1: a ring formed from chromosome 1, with breaks at 1p36.1 and 1q23, and material of unknown origin."}
   - input: "46,XX,der(1)(::1p36.1→1q23::?::)"
     cite: {section: "9.2.15", page: 73, example: "E4"}
     context: unknown
@@ -3344,27 +3344,27 @@ golden:
     summary: "47 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "+dic r(1;3)(p36.1q32;p24q26.2)"}
-        sentence: "An additional dicentric ring chromosome formed from chromosomes 1 and 3, with breaks at 1p36.1 and 1q32, and at 3p24 and 3q26.2."
+        sentence: "An additional dicentric ring chromosome formed from chromosomes 1 and 3, with breaks at 1p36.1 and 1q32, and 3p24 and 3q26.2."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/dic", "rule:DIC.FORMAT", "vocab:symbols/r", "rule:RING.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:1p36.1", "vocab:symbols/q", "band:1q32", "band:3p24", "band:3q26.2"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: An additional dicentric ring chromosome formed from chromosomes 1 and 3, with breaks at 1p36.1 and 1q32, and at 3p24 and 3q26.2."}
   - input: "47,XX,+dic r(1;3)(::1p36.1→1q32::3p24→3q26.2::)"
     cite: {section: "9.2.15", page: 73, example: "E6"}
     context: unknown
     summary: "47 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "+dic r(1;3)(::1p36.1→1q32::3p24→3q26.2::)"}
-        sentence: "An additional dicentric ring chromosome made up of the segment from 1p36.1 to 1q32, joined to the segment from 3p24 to 3q26.2, joined back to the start."
+        sentence: "An additional dicentric ring chromosome formed from chromosomes 1 and 3, made up of the segment from 1p36.1 to 1q32, joined to the segment from 3p24 to 3q26.2, joined back to the start."
         kb: ["vocab:symbols/plus sign, single (+)", "rule:STRUCT.DETAILED_SYSTEM", "vocab:symbols/dic", "rule:DIC.FORMAT", "vocab:symbols/r", "rule:RING.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:1p36.1", "vocab:symbols/q", "band:1q32", "band:3p24", "band:3q26.2"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: An additional dicentric ring chromosome made up of the segment from 1p36.1 to 1q32, joined to the segment from 3p24 to 3q26.2, joined back to the start."}
   - input: "47,XX,+trc r(1;3;12)(::1p36.1→1q32::3q26.3→3p24::12p12→12q23::)"
     cite: {section: "9.2.15", page: 74, example: "E7"}
     context: unknown
     summary: "47 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "+trc r(1;3;12)(::1p36.1→1q32::3q26.3→3p24::12p12→12q23::)"}
-        sentence: "An additional tricentric ring chromosome made up of the segment from 1p36.1 to 1q32, joined to the segment from 3q26.3 to 3p24, joined to the segment from 12p12 to 12q23, joined back to the start."
+        sentence: "An additional tricentric ring chromosome formed from chromosomes 1, 3 and 12, made up of the segment from 1p36.1 to 1q32, joined to the segment from 3q26.3 to 3p24, joined to the segment from 12p12 to 12q23, joined back to the start."
         kb: ["vocab:symbols/plus sign, single (+)", "rule:STRUCT.DETAILED_SYSTEM", "vocab:symbols/trc", "rule:TRC.FORMAT", "vocab:symbols/r", "rule:RING.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:1p36.1", "vocab:symbols/q", "band:1q32", "band:3q26.3", "band:3p24", "band:12p12", "band:12q23"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: An additional tricentric ring chromosome made up of the segment from 1p36.1 to 1q32, joined to the segment from 3q26.3 to 3p24, joined to the segment from 12p12 to 12q23, joined back to the start."}
   - input: "50,XX,+1,+3,+8,+r"
     cite: {section: "9.2.15", page: 74, example: "E9"}
     context: unknown
@@ -3426,23 +3426,23 @@ golden:
     cite: {section: "9.2.15", page: 74, example: "E10"}
     fragment: true
     context: unknown
-    summary: "53 chromosomes; sex chromosomes XX; further abnormalities left out, plus 2 rings of unknown origin."
+    summary: "53 chromosomes; sex chromosomes XX; further abnormalities left out, plus 2 abnormalities."
     items:
       - span: {start: 6, text: "…"}
         sentence: "Further abnormalities are left out here."
         kb: []
       - span: {start: 8, text: "+r1"}
-        sentence: "Ring chromosome 1 of unknown origin."
+        sentence: "An additional ring chromosome 1 of unknown origin."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/r", "rule:RING.FORMAT"]
       - span: {start: 12, text: "+r2"}
-        sentence: "Ring chromosome 2 of unknown origin."
+        sentence: "An additional ring chromosome 2 of unknown origin."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/r", "rule:RING.FORMAT"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: 53 chromosomes; sex chromosomes XX; further abnormalities left out, plus 2 rings of unknown origin. | Ring chromosome 1 of unknown origin. | Ring chromosome 2 of unknown origin."}
   - input: "53,XY,…,+5r"
     cite: {section: "9.2.15", page: 74, example: "E11"}
     fragment: true
     context: unknown
-    summary: "53 chromosomes; sex chromosomes XY; further abnormalities left out, plus 5 rings of unknown origin."
+    summary: "53 chromosomes; sex chromosomes XY; further abnormalities left out, plus 1 abnormality."
     items:
       - span: {start: 6, text: "…"}
         sentence: "Further abnormalities are left out here."
@@ -3450,7 +3450,7 @@ golden:
       - span: {start: 8, text: "+5r"}
         sentence: "5 additional ring chromosomes of unknown origin."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/r", "rule:RING.FORMAT"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: 53 chromosomes; sex chromosomes XY; further abnormalities left out, plus 5 rings of unknown origin."}
   - input: "46,XX,tas(12;13)(q24.3;q34)"
     cite: {section: "9.2.16", page: 74, example: "E1"}
     context: unknown
@@ -3475,18 +3475,18 @@ golden:
     summary: "46 chromosomes; sex chromosome Y; 1 abnormality."
     items:
       - span: {start: 5, text: "tas(X;12;3)(Xpter→Xqter→12pter→12qter→3qter→3pter)"}
-        sentence: "Telomeric association of chromosomes X, 12 and 3: chromosome X from end to end, joined to chromosome 12 from end to end, joined to chromosome 3 from the end of the long arm to the end of the short arm."
+        sentence: "Telomeric association of chromosomes X, 12 and 3: chromosome X from the end of the short arm to the end of the long arm, joined to chromosome 12 from the end of the short arm to the end of the long arm, joined to chromosome 3 from the end of the long arm to the end of the short arm."
         kb: ["rule:STRUCT.DETAILED_SYSTEM", "vocab:symbols/tas", "rule:TAS.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/pter", "vocab:symbols/qter"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Telomeric association of chromosomes X, 12 and 3: chromosome X from end to end, joined to chromosome 12 from end to end, joined to chromosome 3 from the end of the long arm to the end of the short arm."}
   - input: "46,X,tas(1;X;12;7)(1qter→1pter→Xqter→Xpter→12pter→12qter→7pter→7qter)"
     cite: {section: "9.2.16", page: 75, example: "E3"}
     context: unknown
     summary: "46 chromosomes; sex chromosome X; 1 abnormality."
     items:
       - span: {start: 5, text: "tas(1;X;12;7)(1qter→1pter→Xqter→Xpter→12pter→12qter→7pter→7qter)"}
-        sentence: "Telomeric association of chromosomes 1, X, 12 and 7: chromosome 1 from the end of the long arm to the end of the short arm, joined to chromosome X from the end of the long arm to the end of the short arm, joined to chromosome 12 from end to end, joined to chromosome 7 from end to end."
+        sentence: "Telomeric association of chromosomes 1, X, 12 and 7: chromosome 1 from the end of the long arm to the end of the short arm, joined to chromosome X from the end of the long arm to the end of the short arm, joined to chromosome 12 from the end of the short arm to the end of the long arm, joined to chromosome 7 from the end of the short arm to the end of the long arm."
         kb: ["rule:STRUCT.DETAILED_SYSTEM", "vocab:symbols/tas", "rule:TAS.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/qter", "vocab:symbols/pter"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Telomeric association of chromosomes 1, X, 12 and 7: chromosome 1 from the end of the long arm to the end of the short arm, joined to chromosome X from the end of the long arm to the end of the short arm, joined to chromosome 12 from end to end, joined to chromosome 7 from end to end."}
   - input: "46,XY,t(2;5)(2pter→2q21::5q31→5qter;5pter→5q31::2q21→2qter)"
     cite: {section: "9.2.17.1", page: 75, example: "E1"}
     context: unknown
@@ -3604,9 +3604,9 @@ golden:
     summary: "46 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "t(3;9;9̲;22)(p13;q22;q34;q11.2)"}
-        sentence: "Translocation between chromosome 3, both chromosomes 9 (the second one underlined) and chromosome 22, with breaks at 3p13, 9q22, 9q34 of the underlined homologue and 22q11.2: the segment of chromosome 3 distal to 3p13 moves to the first chromosome 9, the segment of that chromosome 9 distal to 9q22 moves to the underlined chromosome 9, the segment of the underlined chromosome 9 distal to 9q34 moves to chromosome 22, and the segment of chromosome 22 distal to 22q11.2 moves to chromosome 3."
+        sentence: "Translocation between chromosome 3, both chromosomes 9 (the second one underlined) and chromosome 22, with breaks at 3p13, 9q22, 9q34 of the underlined homologue and 22q11.2: the segment of chromosome 3 distal to 3p13 moves to the first chromosome 9, the segment of the first chromosome 9 distal to 9q22 moves to the underlined chromosome 9, the segment of the underlined chromosome 9 distal to 9q34 moves to chromosome 22, and the segment of chromosome 22 distal to 22q11.2 moves to chromosome 3."
         kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:3p13", "vocab:symbols/q", "band:9q22", "band:9q34", "band:22q11.2"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Translocation between chromosome 3, both chromosomes 9 (the second one underlined) and chromosome 22, with breaks at 3p13, 9q22, 9q34 of the underlined homologue and 22q11.2: the segment of chromosome 3 distal to 3p13 moves to the first chromosome 9, the segment of that chromosome 9 distal to 9q22 moves to the underlined chromosome 9, the segment of the underlined chromosome 9 distal to 9q34 moves to chromosome 22, and the segment of chromosome 22 distal to 22q11.2 moves to chromosome 3."}
   - input: "46,XX,t(3;9;9̲;22)(22qter→22q11.2::3p13→3qter;9pter→9q22::3p13→3pter;9̲pter→9̲q34::9q22→9qter;22pter→22q11.2::9̲q34→9̲qter)"
     cite: {section: "9.2.17.1", page: 76, example: "E10"}
     context: unknown
@@ -3631,9 +3631,9 @@ golden:
     summary: "46 chromosomes; sex chromosomes XY; 1 abnormality."
     items:
       - span: {start: 6, text: "t(1;3)(1pter→1p10::3q10→3qter;3pter→3p10::1q10→1qter)"}
-        sentence: "Whole-arm translocation between chromosomes 1 and 3: one chromosome is made up of the short arm of chromosome 1 (end to 1p10) joined to the long arm of chromosome 3 (3q10 to end), the other of the short arm of chromosome 3 (end to 3p10) joined to the long arm of chromosome 1 (1q10 to end)."
+        sentence: "Whole-arm translocation between chromosomes 1 and 3: chromosome 1 is made up of the segment from the end of its short arm to 1p10, joined to the segment from 3q10 to the end of the long arm of chromosome 3; chromosome 3 is made up of the segment from the end of its short arm to 3p10, joined to the segment from 1q10 to the end of the long arm of chromosome 1."
         kb: ["rule:STRUCT.DETAILED_SYSTEM", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/pter", "vocab:symbols/p", "vocab:symbols/q", "vocab:symbols/qter"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Whole-arm translocation between chromosomes 1 and 3: one chromosome is made up of the short arm of chromosome 1 (end to 1p10) joined to the long arm of chromosome 3 (3q10 to end), the other of the short arm of chromosome 3 (end to 3p10) joined to the long arm of chromosome 1 (1q10 to end)."}
   - input: "46,XY,t(1;3)(p10;p10)"
     cite: {section: "9.2.17.2", page: 77, example: "E2"}
     context: unknown
@@ -3649,18 +3649,18 @@ golden:
     summary: "46 chromosomes; sex chromosomes XY; 1 abnormality."
     items:
       - span: {start: 6, text: "t(1;3)(1pter→1p10::3p10→3pter;1qter→1q10::3q10→3qter)"}
-        sentence: "Whole-arm translocation between chromosomes 1 and 3: one chromosome is made up of the short arm of chromosome 1 (end to 1p10) joined to the short arm of chromosome 3 (3p10 to end), the other of the long arm of chromosome 1 (end to 1q10) joined to the long arm of chromosome 3 (3q10 to end)."
+        sentence: "Whole-arm translocation between chromosomes 1 and 3: chromosome 1 is made up of the segment from the end of its short arm to 1p10, joined to the segment from 3p10 to the end of the short arm of chromosome 3; chromosome 3 is made up of the segment from the end of the long arm of chromosome 1 to 1q10, joined to the segment from 3q10 to the end of its long arm."
         kb: ["rule:STRUCT.DETAILED_SYSTEM", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/pter", "vocab:symbols/p", "vocab:symbols/qter", "vocab:symbols/q"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Whole-arm translocation between chromosomes 1 and 3: one chromosome is made up of the short arm of chromosome 1 (end to 1p10) joined to the short arm of chromosome 3 (3p10 to end), the other of the long arm of chromosome 1 (end to 1q10) joined to the long arm of chromosome 3 (3q10 to end)."}
   - input: "45,XX,der(1;3)(1pter→1p10::3q10→3qter)"
     cite: {section: "9.2.17.2", page: 77, example: "E3"}
     context: unknown
     summary: "45 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "der(1;3)(1pter→1p10::3q10→3qter)"}
-        sentence: "Derivative chromosome made up of the short arm of chromosome 1 (end to 1p10), joined to the long arm of chromosome 3 (3q10 to end)."
+        sentence: "Derivative chromosome with the centromeres of chromosomes 1 and 3, made up of the segment from the end of the short arm of chromosome 1 to 1p10, joined to the segment from 3q10 to the end of the long arm of chromosome 3."
         kb: ["rule:STRUCT.DETAILED_SYSTEM", "vocab:symbols/der", "rule:DER.DEFINITION", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/pter", "vocab:symbols/p", "vocab:symbols/q", "vocab:symbols/qter"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Derivative chromosome made up of the short arm of chromosome 1 (end to 1p10), joined to the long arm of chromosome 3 (3q10 to end)."}
   - input: "46,XX,+1,der(1;3)(p10;q10)"
     cite: {section: "9.2.17.2", page: 77, example: "E4"}
     context: unknown
@@ -3829,9 +3829,9 @@ golden:
     summary: "44 chromosomes; sex chromosomes XX; 1 abnormality."
     items:
       - span: {start: 6, text: "trc(4;12;9)(4pter→4q31.2::12q22→12p13::9q34→9pter)"}
-        sentence: "Tricentric chromosome made up of the segment from the end of the short arm of chromosome 4 to 4q31.2, joined to the segment from 12q22 to 12p13, joined to the segment from 9q34 to the end of the short arm of chromosome 9."
+        sentence: "Tricentric chromosome formed from chromosomes 4, 12 and 9, made up of the segment from the end of the short arm of chromosome 4 to 4q31.2, joined to the segment from 12q22 to 12p13, joined to the segment from 9q34 to the end of the short arm of chromosome 9."
         kb: ["rule:STRUCT.DETAILED_SYSTEM", "vocab:symbols/trc", "rule:TRC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/pter", "vocab:symbols/q", "band:4q31.2", "band:12q22", "vocab:symbols/p", "band:12p13", "band:9q34"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Tricentric chromosome made up of the segment from the end of the short arm of chromosome 4 to 4q31.2, joined to the segment from 12q22 to 12p13, joined to the segment from 9q34 to the end of the short arm of chromosome 9."}
   - input: "46,XX,trp(1)(q21q32)"
     cite: {section: "9.2.19", page: 79, example: "E1"}
     context: unknown
@@ -3874,7 +3874,7 @@ golden:
     summary: "48 chromosomes; sex chromosomes XX; 3 abnormalities."
     items:
       - span: {start: 6, text: "del(6)(q13q23)×2"}
-        sentence: "Interstitial deletion of chromosome 6: the segment between 6q13 and 6q23 is lost; 2 copies of this chromosome."
+        sentence: "Interstitial deletion of chromosome 6: the segment between 6q13 and 6q23 is lost; 2 copies."
         kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:6q13", "band:6q23", "vocab:symbols/multiplication sign (×)", "rule:KARYO.MULTIPLY_SIGN_REARRANGED_ONLY"]
       - span: {start: 23, text: "+7"}
         sentence: "Gain of chromosome 7."
@@ -3888,7 +3888,7 @@ golden:
           constitutional: "An extra chromosome 7 (constitutional)."
           neoplastic: "Gain of chromosome 7 (acquired)."
         kb: ["vocab:symbols/plus sign, single (+)", "rule:KARYO.GAIN_LOSS_SIGN"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Interstitial deletion of chromosome 6: the segment between 6q13 and 6q23 is lost; 2 copies of this chromosome."}
   - input: "48,XX,t(8;14)(q24.1;q32),+der(14)t(8;14)×2"
     cite: {section: "9.3", page: 80, example: "E5"}
     context: unknown
@@ -3898,52 +3898,52 @@ golden:
         sentence: "Translocation between chromosomes 8 and 14, with breaks at 8q24.1 and 14q32; the segments distal to the breaks are exchanged."
         kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:8q24.1", "band:14q32"]
       - span: {start: 25, text: "+der(14)t(8;14)×2"}
-        sentence: "2 additional copies of the derivative chromosome 14 from the same translocation between chromosomes 8 and 14; breakpoints as given at its first mention."
+        sentence: "2 additional copies of a derivative chromosome 14 from the same translocation between chromosomes 8 and 14; breakpoints as given at its first mention."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "vocab:symbols/multiplication sign (×)", "rule:KARYO.MULTIPLY_SIGN_REARRANGED_ONLY"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: 2 additional copies of the derivative chromosome 14 from the same translocation between chromosomes 8 and 14; breakpoints as given at its first mention."}
   - input: "92,XXXX,t(8;14)(q24.1;q32)×2"
     cite: {section: "9.3", page: 80, example: "E6"}
     context: unknown
     summary: "92 chromosomes; sex chromosomes XXXX; 1 abnormality."
     items:
       - span: {start: 8, text: "t(8;14)(q24.1;q32)×2"}
-        sentence: "Translocation between chromosomes 8 and 14, with breaks at 8q24.1 and 14q32; the segments distal to the breaks are exchanged; 2 copies of this translocation."
+        sentence: "Translocation between chromosomes 8 and 14, with breaks at 8q24.1 and 14q32; the segments distal to the breaks are exchanged; 2 copies."
         kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:8q24.1", "band:14q32", "vocab:symbols/multiplication sign (×)", "rule:KARYO.MULTIPLY_SIGN_REARRANGED_ONLY"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Translocation between chromosomes 8 and 14, with breaks at 8q24.1 and 14q32; the segments distal to the breaks are exchanged; 2 copies of this translocation."}
   - input: "94,XXYY,t(8;14)(q24.1;q32)×2,+der(14)t(8;14)×2"
     cite: {section: "9.3", page: 80, example: "E7"}
     context: unknown
     summary: "94 chromosomes; sex chromosomes XXYY; 2 abnormalities."
     items:
       - span: {start: 8, text: "t(8;14)(q24.1;q32)×2"}
-        sentence: "Translocation between chromosomes 8 and 14, with breaks at 8q24.1 and 14q32; the segments distal to the breaks are exchanged; 2 copies of this translocation."
+        sentence: "Translocation between chromosomes 8 and 14, with breaks at 8q24.1 and 14q32; the segments distal to the breaks are exchanged; 2 copies."
         kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:8q24.1", "band:14q32", "vocab:symbols/multiplication sign (×)", "rule:KARYO.MULTIPLY_SIGN_REARRANGED_ONLY"]
       - span: {start: 29, text: "+der(14)t(8;14)×2"}
-        sentence: "2 additional copies of the derivative chromosome 14 from the same translocation; breakpoints as given at its first mention."
+        sentence: "2 additional copies of a derivative chromosome 14 from the same translocation between chromosomes 8 and 14; breakpoints as given at its first mention."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "vocab:symbols/multiplication sign (×)", "rule:KARYO.MULTIPLY_SIGN_REARRANGED_ONLY"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Translocation between chromosomes 8 and 14, with breaks at 8q24.1 and 14q32; the segments distal to the breaks are exchanged; 2 copies of this translocation. | 2 additional copies of the derivative chromosome 14 from the same translocation; breakpoints as given at its first mention."}
   - input: "93,XXXX,t(8;14)(q24.1;q32)×2,der(14)t(8;14)×2,+der(14)t(8;14)"
     cite: {section: "9.3", page: 80, example: "E8"}
     context: unknown
     summary: "93 chromosomes; sex chromosomes XXXX; 3 abnormalities."
     items:
       - span: {start: 8, text: "t(8;14)(q24.1;q32)×2"}
-        sentence: "Translocation between chromosomes 8 and 14, with breaks at 8q24.1 and 14q32; the segments distal to the breaks are exchanged; 2 copies of this translocation."
+        sentence: "Translocation between chromosomes 8 and 14, with breaks at 8q24.1 and 14q32; the segments distal to the breaks are exchanged; 2 copies."
         kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:8q24.1", "band:14q32", "vocab:symbols/multiplication sign (×)", "rule:KARYO.MULTIPLY_SIGN_REARRANGED_ONLY"]
       - span: {start: 29, text: "der(14)t(8;14)×2"}
-        sentence: "Derivative chromosome 14 from the same translocation, 2 copies; breakpoints as given at its first mention."
+        sentence: "Derivative chromosome 14 from the same translocation between chromosomes 8 and 14; breakpoints as given at its first mention; 2 copies."
         kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "vocab:symbols/multiplication sign (×)", "rule:KARYO.MULTIPLY_SIGN_REARRANGED_ONLY"]
       - span: {start: 46, text: "+der(14)t(8;14)"}
-        sentence: "An additional derivative chromosome 14 from the same translocation; breakpoints as given at its first mention."
+        sentence: "An additional derivative chromosome 14 from the same translocation between chromosomes 8 and 14; breakpoints as given at its first mention."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Translocation between chromosomes 8 and 14, with breaks at 8q24.1 and 14q32; the segments distal to the breaks are exchanged; 2 copies of this translocation. | Derivative chromosome 14 from the same translocation, 2 copies; breakpoints as given at its first mention. | An additional derivative chromosome 14 from the same translocation; breakpoints as given at its first mention."}
   - input: "94,XXYY,t(8;14)(q24.1;q32)×2,+14,der(14)t(8;14)×2,+der(14)t(8;14)"
     cite: {section: "9.3", page: 80, example: "E9"}
     context: unknown
     summary: "94 chromosomes; sex chromosomes XXYY; 4 abnormalities."
     items:
       - span: {start: 8, text: "t(8;14)(q24.1;q32)×2"}
-        sentence: "Translocation between chromosomes 8 and 14, with breaks at 8q24.1 and 14q32; the segments distal to the breaks are exchanged; 2 copies of this translocation."
+        sentence: "Translocation between chromosomes 8 and 14, with breaks at 8q24.1 and 14q32; the segments distal to the breaks are exchanged; 2 copies."
         kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:8q24.1", "band:14q32", "vocab:symbols/multiplication sign (×)", "rule:KARYO.MULTIPLY_SIGN_REARRANGED_ONLY"]
       - span: {start: 29, text: "+14"}
         sentence: "Gain of chromosome 14."
@@ -3952,12 +3952,12 @@ golden:
           neoplastic: "Gain of chromosome 14 (acquired)."
         kb: ["vocab:symbols/plus sign, single (+)", "rule:KARYO.GAIN_LOSS_SIGN"]
       - span: {start: 33, text: "der(14)t(8;14)×2"}
-        sentence: "Derivative chromosome 14 from the same translocation, 2 copies; breakpoints as given at its first mention."
+        sentence: "Derivative chromosome 14 from the same translocation between chromosomes 8 and 14; breakpoints as given at its first mention; 2 copies."
         kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "vocab:symbols/multiplication sign (×)", "rule:KARYO.MULTIPLY_SIGN_REARRANGED_ONLY"]
       - span: {start: 50, text: "+der(14)t(8;14)"}
-        sentence: "An additional derivative chromosome 14 from the same translocation; breakpoints as given at its first mention."
+        sentence: "An additional derivative chromosome 14 from the same translocation between chromosomes 8 and 14; breakpoints as given at its first mention."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: Translocation between chromosomes 8 and 14, with breaks at 8q24.1 and 14q32; the segments distal to the breaks are exchanged; 2 copies of this translocation. | Derivative chromosome 14 from the same translocation, 2 copies; breakpoints as given at its first mention. | An additional derivative chromosome 14 from the same translocation; breakpoints as given at its first mention."}
   - input: "47,XX,+8,i(8)(q10)×2"
     cite: {section: "9.3", page: 80, example: "E10"}
     context: unknown
@@ -3982,9 +3982,9 @@ golden:
         sentence: "Isochromosome of the long arm of chromosome 8: both arms are copies of the long arm."
         kb: ["vocab:symbols/i", "rule:ISO.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q"]
       - span: {start: 16, text: "+i(8)(q10)"}
-        sentence: "An additional isochromosome of the long arm of chromosome 8."
+        sentence: "An additional isochromosome of the long arm of chromosome 8: both arms are copies of the long arm."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/i", "rule:ISO.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: An additional isochromosome of the long arm of chromosome 8."}
   - input: "47,XY,+21"
     origin: synthetic
     note: "Context unknown: the gain gets both readings."
@@ -4107,9 +4107,9 @@ golden:
     summary: "47 chromosomes; sex chromosomes XY; 1 abnormality."
     items:
       - span: {start: 6, text: "+r"}
-        sentence: "A ring chromosome of unknown origin."
+        sentence: "An additional ring chromosome of unknown origin."
         kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/r", "rule:RING.FORMAT"]
-    review: {checked: false}
+    review: {checked: false, note: "T-058: wording normalized for the renderer; was: A ring chromosome of unknown origin."}
   - input: "46,XY,add(7)(q31)"
     origin: synthetic
     context: unknown

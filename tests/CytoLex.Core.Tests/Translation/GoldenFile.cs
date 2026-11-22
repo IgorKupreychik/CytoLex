@@ -6,11 +6,11 @@ using CytoLex.Core.Text;
 
 namespace CytoLex.Core.Tests.Translation;
 
-/// <summary>One item of a golden entry: where it is, and the KB entries it links to.</summary>
-internal sealed record GoldenItem(int Start, string Text, IReadOnlyList<string> Kb);
+/// <summary>One item of a golden entry: where it is, its sentence and readings, and the KB entries it links to.</summary>
+internal sealed record GoldenItem(int Start, string Text, IReadOnlyList<string> Kb, string Sentence = "", string? Constitutional = null, string? Neoplastic = null);
 
 /// <summary>One entry of <c>kb/translation/&lt;version&gt;/golden.yaml</c> (T-057), as embedded in <c>kb.json</c>.</summary>
-internal sealed record GoldenEntry(string Input, bool IsFragment, bool IsSynthetic, string Context, IReadOnlyList<GoldenItem> Items);
+internal sealed record GoldenEntry(string Input, bool IsFragment, bool IsSynthetic, string Context, IReadOnlyList<GoldenItem> Items, string Summary = "");
 
 /// <summary>
 /// The translation golden file (T-057) and the item list it is written against: which parts of a string get a sentence
@@ -38,15 +38,21 @@ internal static class GoldenFile
             var items = e.GetProperty("items").EnumerateArray().Select(i => new GoldenItem(
                 i.GetProperty("span").GetProperty("start").GetInt32(),
                 i.GetProperty("span").GetProperty("text").GetString()!,
-                [.. i.GetProperty("kb").EnumerateArray().Select(k => k.GetString()!)])).ToList();
+                [.. i.GetProperty("kb").EnumerateArray().Select(k => k.GetString()!)],
+                i.GetProperty("sentence").GetString()!,
+                Reading(i, "constitutional"),
+                Reading(i, "neoplastic"))).ToList();
             var input = e.GetProperty("input").GetString()!;
             var fragment = e.TryGetProperty("fragment", out var f) && f.GetBoolean();
             var synthetic = e.TryGetProperty("origin", out var o) && o.GetString() == "synthetic";
-            result[input] = new GoldenEntry(input, fragment, synthetic, e.GetProperty("context").GetString()!, items);
+            result[input] = new GoldenEntry(input, fragment, synthetic, e.GetProperty("context").GetString()!, items, e.GetProperty("summary").GetString()!);
         }
 
         return result;
     }
+
+    private static string? Reading(JsonElement item, string context) =>
+        item.TryGetProperty("readings", out var r) && r.TryGetProperty(context, out var text) ? text.GetString() : null;
 
     /// <summary>
     /// The translated items of a karyotype model, in input order: with two or more cell lines, each line's header
