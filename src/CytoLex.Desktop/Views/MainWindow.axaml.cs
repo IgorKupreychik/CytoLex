@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using CytoLex.Core.Text;
 using CytoLex.Desktop.Highlighting;
 using CytoLex.Desktop.ViewModels;
@@ -15,6 +16,8 @@ namespace CytoLex.Desktop.Views;
 /// renderers, and selects <see cref="MainWindowViewModel.SelectedSpan"/> (a picked diagnostic, card or part) in the editor.
 /// The Batch tab (T-038) uses it only for the file pickers and the row double-click; the work is in <see cref="BatchViewModel"/>.
 /// The Rules tab (T-039) is bound to <see cref="RuleBrowserViewModel"/>; a diagnostic's rule-ID link opens it.
+/// The translation (T-059): the mouse over the editor text sets <see cref="MainWindowViewModel.HoverOffset"/>; hovering a part
+/// card marks it and its span.
 /// </summary>
 public partial class MainWindow : Window
 {
@@ -31,6 +34,10 @@ public partial class MainWindow : Window
 
         // One-line input: Enter does nothing (tunnel, before the editor's own key handling).
         Input.AddHandler(KeyDownEvent, OnEditorKeyDown, RoutingStrategies.Tunnel);
+
+        // Editor → translation part under the mouse (T-059).
+        Input.TextArea.TextView.PointerMoved += OnEditorPointerMoved;
+        Input.TextArea.TextView.PointerExited += OnEditorPointerExited;
     }
 
     protected override void OnDataContextChanged(EventArgs e)
@@ -86,14 +93,45 @@ public partial class MainWindow : Window
         var text = Input.Text;
         if (text.Contains('\r', StringComparison.Ordinal) || text.Contains('\n', StringComparison.Ordinal))
         {
-            // Pasted line breaks become spaces (same length, so the caret stays put).
-            var caret = Input.CaretOffset;
-            Input.Text = text.Replace("\r\n", " ", StringComparison.Ordinal).Replace('\r', ' ').Replace('\n', ' ');
-            Input.CaretOffset = Math.Min(caret, Input.Text.Length);
+            // Pasted line breaks become spaces. Not here: this runs inside the paste's open undo group, where changing the
+            // document (or setting Text, which clears the undo stack) throws. Replace them once the paste is done.
+            Dispatcher.UIThread.Post(ReplaceLineBreaks);
             return;
         }
 
         _viewModel.Input = text;
+    }
+
+    // Each line break ("\r\n", "\r" or "\n") becomes one space, as one undoable document change; the caret moves with the text.
+    private void ReplaceLineBreaks()
+    {
+        var document = Input.Document;
+        var breaks = new List<(int Offset, int Length)>();
+        var text = document.Text;
+        for (var i = 0; i < text.Length; i++)
+        {
+            if (text[i] == '\r' && i + 1 < text.Length && text[i + 1] == '\n')
+            {
+                breaks.Add((i++, 2));
+            }
+            else if (text[i] is '\r' or '\n')
+            {
+                breaks.Add((i, 1));
+            }
+        }
+
+        if (breaks.Count == 0)
+        {
+            return;
+        }
+
+        using (document.RunUpdate())
+        {
+            for (var k = breaks.Count - 1; k >= 0; k--)
+            {
+                document.Replace(breaks[k].Offset, breaks[k].Length, " ");
+            }
+        }
     }
 
     private void OnEditorKeyDown(object? sender, KeyEventArgs e)
@@ -133,7 +171,7 @@ public partial class MainWindow : Window
     // Abnormalities panel (T-069): clicking a card or a part selects its span; hovering a card marks it in the editor.
     private void OnSpanItemTapped(object? sender, TappedEventArgs e)
     {
-        if (sender is Control { DataContext: ISpanItem item })
+        if (sender is Control { DataContext: ISpanItem item } && item is not TranslationItemViewModel { IsSummary: true })
         {
             _viewModel?.SelectSpan(item.Span);
             e.Handled = true; // a part inside a card selects only the part
@@ -153,6 +191,53 @@ public partial class MainWindow : Window
         if (_viewModel is not null && sender is Control { DataContext: AbnormalityItemViewModel item } && _viewModel.HoverSpan == item.Span)
         {
             _viewModel.HoverSpan = null;
+        }
+    }
+
+    // Translation (T-059): hovering a part marks it and its span in the editor.
+    private void OnTranslationPointerEntered(object? sender, PointerEventArgs e)
+    {
+        if (_viewModel is not null && sender is Control { DataContext: TranslationItemViewModel item })
+        {
+            _viewModel.HoverTranslationItem(item, hovered: true);
+        }
+    }
+
+    private void OnTranslationPointerExited(object? sender, PointerEventArgs e)
+    {
+        if (_viewModel is not null && sender is Control { DataContext: TranslationItemViewModel item })
+        {
+            _viewModel.HoverTranslationItem(item, hovered: false);
+        }
+    }
+
+    // Translation (T-059): the mouse over the editor text marks the translation part at that offset.
+    private void OnEditorPointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (_viewModel is null)
+        {
+            return;
+        }
+
+        var textView = Input.TextArea.TextView;
+        var position = textView.GetPosition(e.GetPosition(textView) + textView.ScrollOffset);
+        int? offset = position is { } p ? Input.Document.GetOffset(p.Location) : null;
+        if (offset is { } o && o >= Input.Document.TextLength)
+        {
+            offset = null; // past the end of the text
+        }
+
+        if (_viewModel.HoverOffset != offset)
+        {
+            _viewModel.HoverOffset = offset;
+        }
+    }
+
+    private void OnEditorPointerExited(object? sender, PointerEventArgs e)
+    {
+        if (_viewModel is not null)
+        {
+            _viewModel.HoverOffset = null;
         }
     }
 

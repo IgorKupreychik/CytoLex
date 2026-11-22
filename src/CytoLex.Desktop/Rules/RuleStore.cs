@@ -35,17 +35,31 @@ public enum RuleMatch
 
     /// <summary>A verbatim source quote (<c>quotes_fts</c>).</summary>
     Quote = 2,
+
+    /// <summary>The label, a token or a meaning of a vocab item (T-059).</summary>
+    Vocab = 4,
 }
 
-/// <summary>One rule in the result list of the rule browser.</summary>
+/// <summary>What a hit of the rule browser is (T-059: vocab items are listed next to the rules).</summary>
+public enum KbEntryKind
+{
+    /// <summary>A KB rule.</summary>
+    Rule,
+
+    /// <summary>A vocab item (symbol, abbreviation, banding code).</summary>
+    Vocab,
+}
+
+/// <summary>One rule or vocab item in the result list of the rule browser.</summary>
 /// <param name="Edition">The ISCN edition.</param>
-/// <param name="Id">The rule ID.</param>
-/// <param name="Title">The rule title.</param>
-/// <param name="Section">The ISCN section.</param>
-/// <param name="Severity">The KB severity (<c>error</c>, <c>warning</c>, <c>info</c>).</param>
-/// <param name="Snippet">The matching text with the match context, or <c>null</c> without a query.</param>
+/// <param name="Id">The rule ID, or <c>&lt;vocabulary&gt;/&lt;label&gt;</c> of a vocab item.</param>
+/// <param name="Title">The rule title, or the vocab item's first meaning.</param>
+/// <param name="Section">The ISCN section (of the vocab file for a vocab item).</param>
+/// <param name="Severity">The KB severity (<c>error</c>, <c>warning</c>, <c>info</c>); the entry kind of a vocab item (<c>abbreviation</c>, <c>code</c>, …).</param>
+/// <param name="Snippet">The matching text with the match context (the tokens of a vocab item), or <c>null</c>.</param>
 /// <param name="Match">Where the query matched.</param>
-public sealed record RuleHit(string Edition, string Id, string Title, string Section, string Severity, string? Snippet, RuleMatch Match);
+/// <param name="Kind">Rule or vocab item.</param>
+public sealed record RuleHit(string Edition, string Id, string Title, string Section, string Severity, string? Snippet, RuleMatch Match, KbEntryKind Kind = KbEntryKind.Rule);
 
 /// <summary>A valid or invalid KB example of a rule.</summary>
 /// <param name="IsValid">Whether it is a valid example.</param>
@@ -85,7 +99,7 @@ public sealed record RuleDetail(
 
 /// <summary>
 /// Read-only access to <c>build/kb.sqlite</c> (written by <c>kb build</c>; tables and FTS5 indexes in kb/README.md) for the
-/// rule browser (T-039). User queries are turned into safe FTS5 queries: every whitespace-separated word becomes a prefix
+/// rule browser (T-039), rules and vocab items (T-059, via <see cref="VocabStore"/>). User queries are turned into safe FTS5 queries: every whitespace-separated word becomes a prefix
 /// phrase of its letter/digit tokens (<c>t(9;22)</c> → <c>"t 9 22"*</c>), words are ANDed. Quotes are optional: an empty
 /// <c>quotes</c> table is a normal KB build without <c>kb/source-quotes/</c>.
 /// </summary>
@@ -102,10 +116,12 @@ public sealed class RuleStore : IDisposable
 
     private static int _initialized;
     private readonly SqliteConnection _connection;
+    private readonly VocabStore _vocab;
 
     private RuleStore(SqliteConnection connection, ImmutableArray<string> editions)
     {
         _connection = connection;
+        _vocab = new VocabStore(connection);
         Editions = editions;
     }
 
@@ -155,7 +171,7 @@ public sealed class RuleStore : IDisposable
         }
     }
 
-    /// <summary>The sections that state rules in <paramref name="edition"/>, in book order (<c>2.1</c> before <c>9.2.10</c>).</summary>
+    /// <summary>The sections that state rules or print a vocab list in <paramref name="edition"/>, in book order (<c>2.1</c> before <c>9.2.10</c>).</summary>
     public ImmutableArray<string> Sections(string edition)
     {
         using var cmd = Command("SELECT DISTINCT section FROM rules WHERE version = $v", ("$v", edition));
@@ -168,13 +184,16 @@ public sealed class RuleStore : IDisposable
             }
         }
 
+        sections.AddRange(_vocab.Sections(edition).Where(s => s.Length > 0 && !sections.Contains(s)));
         sections.Sort(CompareSections);
         return [.. sections];
     }
 
     /// <summary>
-    /// The rules of <paramref name="edition"/> (optionally of one <paramref name="section"/>) that match <paramref name="query"/>:
-    /// an exact ID first, then by relevance. A blank query (or one without letters or digits) lists every rule in book order.
+    /// The rules and vocab items of <paramref name="edition"/> (optionally of one <paramref name="section"/>) that match
+    /// <paramref name="query"/>: a vocab item whose label or token equals the query and an exact rule ID first, then the
+    /// rules by relevance, then the other vocab items. A blank query (or one without letters or digits) lists every rule
+    /// in book order, then every vocab item (a vocab item named exactly by a symbol-only query first).
     /// </summary>
     public ImmutableArray<RuleHit> Search(string edition, string? query, string? section = null)
     {
@@ -182,9 +201,38 @@ public sealed class RuleStore : IDisposable
         var fts = ToFtsQuery(query);
         if (fts is null)
         {
-            return ListAll(edition, section);
+            // A symbol-only query (→, ::, ;) has no FTS words but can still name a vocab item exactly: list that first.
+            var exactSymbols = string.IsNullOrWhiteSpace(query) ? [] : _vocab.Search(edition, query, section).Exact;
+            return
+            [
+                .. exactSymbols.Select(r => r.ToHit(edition, RuleMatch.Vocab)),
+                .. ListAll(edition, section),
+                .. _vocab.Rows(edition, section).Where(r => !exactSymbols.Contains(r)).Select(r => r.ToHit(edition, RuleMatch.None)),
+            ];
         }
 
+        var (exactVocab, otherVocab) = _vocab.Search(edition, query!, section);
+        var rules = SearchRules(edition, query!, fts, section);
+        return
+        [
+            .. exactVocab.Select(r => r.ToHit(edition, RuleMatch.Vocab))
+                .Concat(rules)
+                .Concat(otherVocab.Select(r => r.ToHit(edition, RuleMatch.Vocab)))
+                .Take(_maxHits),
+        ];
+    }
+
+    /// <summary>The vocab item <paramref name="label"/> of <paramref name="vocabulary"/> in <paramref name="edition"/>, or <c>null</c>.</summary>
+    public VocabDetail? Vocab(string edition, string vocabulary, string label)
+    {
+        ArgumentNullException.ThrowIfNull(edition);
+        ArgumentNullException.ThrowIfNull(vocabulary);
+        ArgumentNullException.ThrowIfNull(label);
+        return _vocab.Detail(edition, vocabulary, label);
+    }
+
+    private ImmutableArray<RuleHit> SearchRules(string edition, string query, string fts, string? section)
+    {
         // Relevance: bm25 (smaller = better) of the rule text, else of the best quote.
         var hits = new Dictionary<string, (double Score, string? Snippet, RuleMatch Match)>(StringComparer.Ordinal);
         using (var cmd = Command(
@@ -229,7 +277,7 @@ public sealed class RuleStore : IDisposable
         }
 
         var rules = RuleRows(edition, section);
-        var exact = query!.Trim();
+        var exact = query.Trim();
         return
         [
             .. hits
@@ -331,7 +379,7 @@ public sealed class RuleStore : IDisposable
     }
 
     // Letter/digit runs, like FTS5's unicode61 tokenizer (which also splits on '.', '_', '(' …).
-    private static List<string> Tokens(string word)
+    internal static List<string> Tokens(string word)
     {
         var tokens = new List<string>();
         var current = new StringBuilder();

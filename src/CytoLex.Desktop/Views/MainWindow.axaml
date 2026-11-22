@@ -101,8 +101,14 @@
             </StackPanel>
 
             <Grid ColumnDefinitions="3*,Auto,2*" IsVisible="{Binding IsImplemented}">
-            <!-- Diagnostics -->
-            <ListBox Grid.Column="0" ItemsSource="{Binding Diagnostics}" SelectedItem="{Binding SelectedDiagnostic}">
+            <!-- Diagnostics: a full-height panel whose header lines up with the tab strip on the right -->
+            <Border Grid.Column="0" Classes="panel">
+            <DockPanel>
+            <Border DockPanel.Dock="Top" Classes="panelheader">
+              <TextBlock Text="{Binding DiagnosticsHeader}" />
+            </Border>
+            <TextBlock DockPanel.Dock="Top" Text="No findings." IsVisible="{Binding !HasDiagnostics}" Margin="10,6" Opacity="0.6" />
+            <ListBox ItemsSource="{Binding Diagnostics}" SelectedItem="{Binding SelectedDiagnostic}" Background="Transparent">
               <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="vm:DiagnosticItemViewModel">
                   <Grid ColumnDefinitions="Auto,*" Margin="0,2">
@@ -152,16 +158,20 @@
                 </DataTemplate>
               </ListBox.ItemTemplate>
             </ListBox>
+            </DockPanel>
+            </Border>
 
             <GridSplitter Grid.Column="1" Width="6" Background="Transparent" ResizeDirection="Columns" />
 
-            <!-- Abnormalities (T-069) -->
-            <DockPanel Grid.Column="2">
-              <TextBlock DockPanel.Dock="Top" Text="Abnormalities" FontWeight="SemiBold" Margin="0,0,0,6" />
+            <!-- Right-hand tabs (T-059): abnormalities (T-069, default) | literal translation; the same full-height panel -->
+            <Border Grid.Column="2" Classes="panel">
+            <TabControl Classes="side" SelectedIndex="{Binding SelectedSideTab}">
+            <TabItem Header="Abnormalities">
+            <DockPanel>
               <TextBlock DockPanel.Dock="Top" Text="No karyotype cell lines." Opacity="0.6"
                          IsVisible="{Binding !HasCellLines}" />
               <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-                <ItemsControl ItemsSource="{Binding CellLineGroups}">
+                <ItemsControl ItemsSource="{Binding CellLineGroups}" Margin="0,0,14,8">
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:CellLineGroupViewModel">
                       <StackPanel Spacing="4" Margin="0,0,0,10">
@@ -242,6 +252,45 @@
                 </ItemsControl>
               </ScrollViewer>
             </DockPanel>
+            </TabItem>
+            <TabItem Header="Translation">
+            <DockPanel>
+              <!-- Options shared by every edition: coordinates toggle + build -->
+              <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,6">
+                <CheckBox Content="Genomic coordinates" FontSize="13"
+                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowCoordinates}"
+                          ToolTip.Tip="Approximate base-pair positions of the named bands on the reference genome and segment sizes (NCBI/UCSC band data; band edges are estimates)" />
+                <ComboBox FontSize="13" MinWidth="100"
+                          IsEnabled="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowCoordinates}"
+                          ItemsSource="{x:Static vm:MainWindowViewModel.CoordinateBuilds}"
+                          SelectedItem="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SelectedCoordinateBuild}"
+                          ToolTip.Tip="Genome build of the coordinates">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:CoordinateBuildChoice">
+                      <TextBlock Text="{Binding Label}" />
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+              </StackPanel>
+              <TextBlock DockPanel.Dock="Top" Text="No translation for this edition." Opacity="0.6" FontSize="13"
+                         IsVisible="{Binding !HasTranslation}" />
+              <ScrollViewer HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding HasTranslation}">
+                <StackPanel Spacing="6" Margin="0,0,14,8" DataContext="{Binding Translation}" x:DataType="vm:TranslationViewModel">
+                  <Border Classes="banner" IsVisible="{Binding HasBanner}">
+                    <TextBlock Text="{Binding Banner}" FontWeight="SemiBold" TextWrapping="Wrap" FontSize="13" />
+                  </Border>
+                  <TextBlock Text="{Binding DraftNote}" IsVisible="{Binding HasDraftNote}" FontSize="11" FontStyle="Italic"
+                             Opacity="0.65" TextWrapping="Wrap" ToolTip.Tip="The wording is reviewed in task T-082" />
+                  <TextBlock Text="{Binding ReadingBasisText}" IsVisible="{Binding HasReadingBasisText}" FontSize="12"
+                             Opacity="0.75" TextWrapping="Wrap" />
+                  <ContentControl Content="{Binding Summary}" ContentTemplate="{StaticResource TranslationItemTemplate}" />
+                  <ItemsControl ItemsSource="{Binding Items}" ItemTemplate="{StaticResource TranslationItemTemplate}" />
+                </StackPanel>
+              </ScrollViewer>
+            </DockPanel>
+            </TabItem>
+            </TabControl>
+            </Border>
             </Grid>
           </DockPanel>
         </DataTemplate>
@@ -368,7 +417,7 @@
       <!-- Search, edition, section -->
       <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto,Auto" Margin="0,0,0,8" IsVisible="{Binding IsAvailable}">
         <TextBox Grid.Column="0" Text="{Binding Query}"
-                 PlaceholderText="Search rules: ID, words, example strings like t(9;22), quotes" />
+                 PlaceholderText="Search rules and symbols: ID, words, example strings like t(9;22), quotes, a symbol like del or →" />
         <ComboBox Grid.Column="1" MinWidth="120" Margin="8,0,0,0" ToolTip.Tip="ISCN edition"
                   ItemsSource="{Binding Editions}" SelectedItem="{Binding SelectedEdition}">
           <ComboBox.ItemTemplate>
@@ -410,8 +459,41 @@
         <GridSplitter Grid.Column="1" Width="6" Background="Transparent" ResizeDirection="Columns" />
 
         <!-- Detail -->
-        <TextBlock Grid.Column="2" Text="Select a rule, or click a diagnostic's rule ID in the single-string check."
-                   Opacity="0.6" TextWrapping="Wrap" Margin="8,0,0,0" IsVisible="{Binding !HasDetail}" />
+        <TextBlock Grid.Column="2" Text="Select a rule or symbol, or click a diagnostic's rule ID or a translation link in the single-string check."
+                   Opacity="0.6" TextWrapping="Wrap" Margin="8,0,0,0">
+          <TextBlock.IsVisible>
+            <MultiBinding Converter="{x:Static BoolConverters.And}">
+              <Binding Path="!HasDetail" />
+              <Binding Path="!HasVocabDetail" />
+            </MultiBinding>
+          </TextBlock.IsVisible>
+        </TextBlock>
+        <!-- Vocab item detail (T-059): a symbol, abbreviation or banding code -->
+        <ScrollViewer Grid.Column="2" HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding HasVocabDetail}">
+          <StackPanel Margin="8,0,8,8" Spacing="8" DataContext="{Binding VocabDetail}" x:DataType="vm:VocabDetailViewModel">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Border Background="{x:Static vm:VocabDetailViewModel.KindBrush}" CornerRadius="3" Padding="6,1" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Kind}" Foreground="White" />
+              </Border>
+              <SelectableTextBlock Text="{Binding Id}" FontFamily="Cascadia Mono,Consolas,monospace" VerticalAlignment="Center" />
+            </StackPanel>
+            <TextBlock Text="{Binding Label}" FontSize="17" FontWeight="SemiBold" FontFamily="Cascadia Mono,Consolas,monospace" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding Header}" Opacity="0.7" TextWrapping="Wrap" />
+            <StackPanel Spacing="2">
+              <TextBlock Text="Meanings" FontWeight="SemiBold" />
+              <ItemsControl ItemsSource="{Binding Meanings}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="x:String">
+                    <SelectableTextBlock Text="{Binding}" TextWrapping="Wrap" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+            <TextBlock Text="{Binding TokensText}" TextWrapping="Wrap" Opacity="0.85" />
+            <TextBlock Text="{Binding Note}" IsVisible="{Binding HasNote}" TextWrapping="Wrap" FontStyle="Italic" Opacity="0.8" />
+            <TextBlock Text="{Binding Citation}" FontSize="12" Opacity="0.75" />
+          </StackPanel>
+        </ScrollViewer>
         <ScrollViewer Grid.Column="2" HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding HasDetail}">
           <StackPanel Margin="8,0,8,8" Spacing="8" DataContext="{Binding Detail}" x:DataType="vm:RuleDetailViewModel">
             <StackPanel Orientation="Horizontal" Spacing="10">
@@ -496,6 +578,65 @@
       </Grid>
     </DataTemplate>
 
+    <!-- The summary or one part of a translation (T-059): text, sentence, readings, KB links, diagnostics, coordinates -->
+    <DataTemplate x:Key="TranslationItemTemplate" x:DataType="vm:TranslationItemViewModel">
+      <Border Classes="card" Classes.highlighted="{Binding IsHighlighted}" Classes.summary="{Binding IsSummary}"
+              Opacity="{Binding Opacity}"
+              Tapped="OnSpanItemTapped" PointerEntered="OnTranslationPointerEntered" PointerExited="OnTranslationPointerExited">
+        <StackPanel Spacing="3">
+          <TextBlock Text="{Binding Text}" IsVisible="{Binding HasText}" FontFamily="Cascadia Mono,Consolas,monospace"
+                     TextWrapping="Wrap" Opacity="0.8" />
+          <SelectableTextBlock Text="{Binding Sentence}" FontStyle="{Binding SentenceStyle}" TextWrapping="Wrap"
+                               Classes.summarytext="{Binding IsSummary}" />
+          <StackPanel Spacing="1" IsVisible="{Binding HasReadings}" Margin="8,0,0,0">
+            <SelectableTextBlock Text="{Binding ConstitutionalReading}" TextWrapping="Wrap" FontSize="13" />
+            <SelectableTextBlock Text="{Binding AcquiredReading}" TextWrapping="Wrap" FontSize="13" />
+          </StackPanel>
+          <ItemsControl ItemsSource="{Binding Diagnostics}" IsVisible="{Binding HasDiagnostics}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:DiagnosticLinkViewModel">
+                <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,0,10,0">
+                  <Ellipse Width="8" Height="8" Fill="{Binding Brush}" VerticalAlignment="Center" />
+                  <Button Classes="link" Content="{Binding Label}" Command="{Binding SelectCommand}" FontSize="12"
+                          ToolTip.Tip="{Binding Tip}" />
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <ItemsControl ItemsSource="{Binding Links}" IsVisible="{Binding HasLinks}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:KbLinkViewModel">
+                <Panel Margin="0,0,6,4">
+                  <Button Classes="link kblink" Content="{Binding Title}" Command="{Binding OpenCommand}" IsVisible="{Binding IsNavigable}"
+                          ToolTip.Tip="{Binding Tip}" />
+                  <Border Classes="tag" IsVisible="{Binding IsBand}" ToolTip.Tip="{Binding Tip}" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Title}" FontSize="11" />
+                  </Border>
+                </Panel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <ItemsControl ItemsSource="{Binding CoordinateLines}" IsVisible="{Binding HasCoordinates}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="x:String">
+                <SelectableTextBlock Text="{Binding}" FontSize="11" Opacity="0.75" FontFamily="Cascadia Mono,Consolas,monospace" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+    </DataTemplate>
+
     <!-- One run of a fix diff (T-040): removed text red and struck through, added text green -->
     <DataTemplate x:Key="DiffPartTemplate" x:DataType="vm:DiffPartViewModel">
       <Border Classes="diff" Classes.removed="{Binding IsRemoved}" Classes.added="{Binding IsAdded}" CornerRadius="2">
@@ -528,6 +669,15 @@
       <Setter Property="FontSize" Value="12" />
       <Setter Property="Cursor" Value="Hand" />
     </Style>
+    <!-- A translation's KB link (T-059): a small pill in the normal font, several per line -->
+    <Style Selector="Button.link.kblink">
+      <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Padding" Value="6,1" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="BorderBrush" Value="#550078D4" />
+    </Style>
     <Style Selector="Button.link:pointerover /template/ ContentPresenter">
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="Foreground" Value="#005A9E" />
@@ -552,6 +702,52 @@
     </Style>
     <Style Selector="Border.card:pointerover">
       <Setter Property="BorderBrush" Value="#0078D4" />
+    </Style>
+    <!-- Result columns (T-059): diagnostics | abnormalities/translation as two full-height panels with aligned 36 px headers -->
+    <Style Selector="Border.panel">
+      <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" />
+      <Setter Property="BorderBrush" Value="#40808080" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="ClipToBounds" Value="True" />
+    </Style>
+    <Style Selector="Border.panelheader">
+      <Setter Property="Height" Value="36" />
+      <Setter Property="Padding" Value="12,0" />
+      <Setter Property="BorderBrush" Value="#40808080" />
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+    </Style>
+    <Style Selector="Border.panelheader > TextBlock">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TabControl.side">
+      <Setter Property="Padding" Value="8,8,8,0" />
+    </Style>
+    <Style Selector="TabControl.side > TabItem">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="MinHeight" Value="36" />
+      <Setter Property="Height" Value="36" />
+      <Setter Property="Padding" Value="12,0" />
+    </Style>
+    <!-- Translation (T-059): the part at the mouse in the editor, the summary card, the partial-translation banner -->
+    <Style Selector="Border.card.highlighted">
+      <Setter Property="BorderBrush" Value="#0078D4" />
+      <Setter Property="Background" Value="#220078D4" />
+    </Style>
+    <Style Selector="Border.card.summary">
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+    <Style Selector="SelectableTextBlock.summarytext">
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Border.banner">
+      <Setter Property="Background" Value="#33C42B1C" />
+      <Setter Property="BorderBrush" Value="#C42B1C" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Padding" Value="8,4" />
     </Style>
     <Style Selector="Border.tag">
       <Setter Property="Background" Value="#200078D4" />

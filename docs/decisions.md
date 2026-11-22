@@ -125,8 +125,9 @@ The KB is the single source for all validation decisions.
 - Single-string check with type detection, highlighting and cited diagnostics.
 - Version selector.
 - Batch validation (text/CSV, CSV/JSON export).
-- Rule browser.
+- Rule browser (rules and vocab items, T-059).
 - Fix UI.
+- Translation view (T-059).
 
 ## External comparison (CytoGPS)
 - Compare our results with CytoGPS for single strings and batches:
@@ -458,6 +459,12 @@ _(entries added by `discussion` tasks: date — task — decision — rationale)
   - **Triage:** labels `our-bug` / `checker-limitation` / `version-difference` / `severity-policy` live in a committed YAML file keyed by string (`tests/data/comparison/cytogps-2016-triage.yaml`; book/synthetic strings only, T-048), with `confirmed`, `note` and optional `expected` + `kb_rule`. The report writes the untriaged disagreements as a draft. It suggests `checker-limitation` only for CytoLex-only rejections whose every error rule is in a family CytoGPS doesn't check (§5.2); a person confirms every label. Entries that no longer disagree are listed as stale. Rejected: triage under `build/` (lost on a clean checkout, not reviewed).
   - **`severity-policy` label (user, after the first run):** 5 book-invalid examples (`dl(5)`, `47,XXXc?`, `+min mar`, `sl2×2 … sdl`, `trp(1)(q21;q32)`) are rejected by CytoGPS while CytoLex reports the fault only as a warning or info (T-022/T-056), so CytoLex's verdict is valid. That is neither a bug nor a CytoGPS limitation, so it gets its own label. The report shows CytoLex's warnings/infos next to checker-only rejections and suggests the label when there are any. Rejected: `our-bug` (it would reopen the T-056 severities; that belongs to T-075/T-080).
   - **KB export:** confirmed entries with `expected` + `kb_rule` are written as a KB-example draft (`build/review/comparison/cytogps-2016-kb-examples-draft.yaml`, `cite: TODO`), which a person pastes into `kb/rules/` with a book citation. Nothing edits the KB automatically, because examples must trace to the book. Rejected: appending to the rule files directly.
+- **2026-11-22 — T-059 — Desktop translation view: right-hand tabs, band links tooltip-only, vocab items in the rule browser.**
+  - **Layout (user):** the right-hand column of each edition panel became the tabs "Abnormalities" (default) | "Translation"; the diagnostics stay on the left, so the translation sits next to them. *Changed during review (user, 2026-11-22):* "Abnormalities" is the default tab, "Translation" opens on click (and stays selected while typing). Rejected: a full-width band above the grid (takes the vertical space of both lists) and a third column (too narrow at the default window size).
+  - **Band links (user):** tooltip only (band name and GRCh37/38 coordinates, or "no coordinates" for book-only bands); rule and vocab links open the rule browser. Rejected for now: a band table in `kb.sqlite` and a band detail in the browser (bigger scope; follow-up T-084).
+  - **Vocab in the rule browser:** vocab items are listed after the rules and searched in memory (about 150 rows per edition) with the same word rules as the FTS query; a query equal to a label or token (`del`, `→`) puts that item first. Rejected: an FTS table for vocab (a schema change for no gain at this size). `kb.sqlite`'s `vocab` table gained the vocab file's `section` for the section filter; additive, so no `format_version` bump.
+  - **Coordinates:** validated with `IncludeCoordinates` only while the toggle is on (off by default, T-054); GRCh38 is the default build, and switching the build only re-renders (both builds are in the result).
+  - **Hover both ways:** a hovered card marks its span in the editor (`HoverSpan`, as the abnormality cards); the mouse over the editor text marks the narrowest part at that offset (a cell line header contains its items).
 - **2026-11-22 — T-058 — Code standard: avoid partial classes.**
   - **Decision (user):** hand-written classes are not split over several files with `partial`; a class that grows too big is split into smaller classes with explicit dependencies (a context object for shared state, one class per area). Partials hide size and shared mutable state behind a modular-looking file layout. Exceptions: `partial` required by source generators or frameworks (`[GeneratedRegex]`, CommunityToolkit.Mvvm, Avalonia code-behind). Recorded in `CLAUDE.md` → Code standards.
   - **Applied:** the T-058 renderer (first written as six partial files of one class) was restructured into `RenderContext` + phrase classes before the task closed (behaviour unchanged: the golden test is an exact match). The older splits `Binder`/`Binder.Arr.cs` and `Parser`/`Parser.Arr.cs` are T-083.

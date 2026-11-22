@@ -15,9 +15,11 @@ public sealed class RuleBrowserTests
         Assert.True(rules.IsAvailable);
         Assert.Equal("2016", rules.SelectedEdition);
         Assert.Same(SectionChoice.All, rules.SelectedSection);
-        Assert.Equal(CytoLex.Core.Kb.KnowledgeBase.LoadEmbedded().ForEdition("2016")!.Rules.Count, rules.Hits.Count);
+        var ekb = CytoLex.Core.Kb.KnowledgeBase.LoadEmbedded().ForEdition("2016")!;
+        Assert.Equal(ekb.Rules.Count, rules.Hits.Count(h => h.Kind == KbEntryKind.Rule));
+        Assert.Equal(ekb.Vocab.Entries.Length, rules.Hits.Count(h => h.Kind == KbEntryKind.Vocab)); // T-059
         Assert.Null(rules.Detail);
-        Assert.EndsWith("rule(s)", rules.ResultText, StringComparison.Ordinal);
+        Assert.EndsWith("vocab item(s)", rules.ResultText, StringComparison.Ordinal);
     }
 
     [Fact]

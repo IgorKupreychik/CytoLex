@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CytoLex.Core.Semantics;
 using CytoLex.Core.Validation;
 using CytoLex.Desktop.Highlighting;
 using CytoLex.Desktop.Rules;
@@ -24,6 +25,8 @@ public sealed record SectionChoice(string? Section, string Label)
 /// <summary>
 /// The rule browser (T-039): full-text search over the rules of one edition in <c>build/kb.sqlite</c> (<see cref="RuleStore"/>),
 /// a section filter, the hit list and the selected rule's detail. <see cref="OpenRule"/> is the diagnostic → rule link.
+/// Vocab items (symbols, banding codes) are listed after the rules with their own detail (T-059), so the translation's
+/// KB links (<see cref="OpenKbRef"/>) have a target.
 /// A missing or stale database only disables this tab (<see cref="ErrorText"/>).
 /// </summary>
 public partial class RuleBrowserViewModel : ObservableObject, IDisposable
@@ -106,6 +109,14 @@ public partial class RuleBrowserViewModel : ObservableObject, IDisposable
     /// <summary>Whether a rule is shown.</summary>
     public bool HasDetail => Detail is not null;
 
+    /// <summary>The detail of the selected vocab item (T-059).</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasVocabDetail))]
+    public partial VocabDetailViewModel? VocabDetail { get; set; }
+
+    /// <summary>Whether a vocab item is shown.</summary>
+    public bool HasVocabDetail => VocabDetail is not null;
+
     /// <summary><c>177 rule(s)</c>, <c>3 rule(s) match</c>, or a note on a rule that could not be opened.</summary>
     [ObservableProperty]
     public partial string ResultText { get; set; } = string.Empty;
@@ -140,8 +151,62 @@ public partial class RuleBrowserViewModel : ObservableObject, IDisposable
             Refresh();
         }
 
-        SelectedHit = Hits.FirstOrDefault(h => h.Id == id);
+        SelectedHit = Hits.FirstOrDefault(h => h.Kind == KbEntryKind.Rule && h.Id == id);
         return SelectedHit is not null;
+    }
+
+    /// <summary>
+    /// Shows the vocab item <paramref name="label"/> of <paramref name="vocabulary"/> in <paramref name="edition"/> (a translation
+    /// link, T-059), like <see cref="OpenRule"/>.
+    /// </summary>
+    /// <returns>Whether the item exists in the database.</returns>
+    public bool OpenVocab(string edition, string vocabulary, string label)
+    {
+        ArgumentNullException.ThrowIfNull(edition);
+        ArgumentNullException.ThrowIfNull(vocabulary);
+        ArgumentNullException.ThrowIfNull(label);
+        if (_store is null)
+        {
+            return false;
+        }
+
+        var id = $"{vocabulary}/{label}";
+        if (!Editions.Contains(edition) || _store.Vocab(edition, vocabulary, label) is null)
+        {
+            ResultText = $"{id} is not a vocab item of the ISCN {edition} KB.";
+            return false;
+        }
+
+        SelectedEdition = edition;
+        if (!Hits.Any(h => h.Kind == KbEntryKind.Vocab && h.Id == id))
+        {
+            _suspendRefresh = true;
+            Query = string.Empty;
+            SelectedSection = SectionChoice.All;
+            _suspendRefresh = false;
+            Refresh();
+        }
+
+        SelectedHit = Hits.FirstOrDefault(h => h.Kind == KbEntryKind.Vocab && h.Id == id);
+        return SelectedHit is not null;
+    }
+
+    /// <summary>Opens the KB entry of a translation link (T-059): a rule or a vocab item. Bands have no browser entry (tooltip only).</summary>
+    /// <returns>Whether the entry was found.</returns>
+    public bool OpenKbRef(string edition, KbRef kbRef)
+    {
+        ArgumentNullException.ThrowIfNull(edition);
+        switch (kbRef.Kind)
+        {
+            case KbRefKind.Rule:
+                return OpenRule(edition, kbRef.Id);
+            case KbRefKind.Vocab:
+                var slash = kbRef.Id.IndexOf('/', StringComparison.Ordinal);
+                return slash > 0 && OpenVocab(edition, kbRef.Id[..slash], kbRef.Id[(slash + 1)..]);
+            case KbRefKind.Band:
+            default:
+                return false;
+        }
     }
 
     /// <inheritdoc/>
@@ -179,11 +244,20 @@ public partial class RuleBrowserViewModel : ObservableObject, IDisposable
 
     partial void OnSelectedHitChanged(RuleHitViewModel? value)
     {
-        var detail = value is null || _store is null ? null : _store.Rule(value.Edition, value.Id);
+        var isVocab = value?.Kind == KbEntryKind.Vocab;
+        var detail = value is null || _store is null || isVocab ? null : _store.Rule(value.Edition, value.Id);
         Detail = detail is null ? null : new RuleDetailViewModel(detail, OpenRelated, _checkExample);
+        var vocab = value is null || _store is null || !isVocab ? null : VocabOf(value);
+        VocabDetail = vocab is null ? null : new VocabDetailViewModel(vocab);
     }
 
-    private bool Find(string id) => Hits.Any(h => h.Id == id);
+    private bool Find(string id) => Hits.Any(h => h.Kind == KbEntryKind.Rule && h.Id == id);
+
+    private VocabDetail? VocabOf(RuleHitViewModel hit)
+    {
+        var slash = hit.Id.IndexOf('/', StringComparison.Ordinal);
+        return slash > 0 ? _store!.Vocab(hit.Edition, hit.Id[..slash], hit.Id[(slash + 1)..]) : null;
+    }
 
     private void OpenRelated(string id)
     {
@@ -200,7 +274,7 @@ public partial class RuleBrowserViewModel : ObservableObject, IDisposable
             return;
         }
 
-        var selected = SelectedHit?.Id;
+        var selected = SelectedHit is { } current ? (current.Kind, current.Id) : default((KbEntryKind, string)?);
         var hits = _store.Search(edition, Query, SelectedSection?.Section);
         Hits.Clear();
         foreach (var hit in hits)
@@ -209,8 +283,11 @@ public partial class RuleBrowserViewModel : ObservableObject, IDisposable
         }
 
         var hasQuery = RuleStore.ToFtsQuery(Query) is not null;
-        ResultText = hasQuery ? $"{hits.Length} rule(s) match" : $"{hits.Length} rule(s)";
-        SelectedHit = Hits.FirstOrDefault(h => h.Id == selected) ?? (hasQuery ? Hits.FirstOrDefault() : null);
+        var rules = hits.Count(h => h.Kind == KbEntryKind.Rule);
+        var vocab = hits.Length - rules;
+        var counts = $"{rules} rule(s)" + (vocab > 0 ? $", {vocab} vocab item(s)" : string.Empty);
+        ResultText = hasQuery ? counts + " match" : counts;
+        SelectedHit = Hits.FirstOrDefault(h => (h.Kind, h.Id) == selected) ?? (hasQuery ? Hits.FirstOrDefault() : null);
     }
 
     internal static Severity SeverityOf(string severity) => severity switch
@@ -230,14 +307,21 @@ public sealed class RuleHitViewModel(RuleHit hit)
     /// <summary>The edition.</summary>
     public string Edition => Hit.Edition;
 
-    /// <summary>The rule ID.</summary>
+    /// <summary>The rule ID, or <c>&lt;vocabulary&gt;/&lt;label&gt;</c> of a vocab item.</summary>
     public string Id => Hit.Id;
+
+    /// <summary>Rule or vocab item.</summary>
+    public KbEntryKind Kind => Hit.Kind;
 
     /// <summary>The title.</summary>
     public string Title => Hit.Title;
 
-    /// <summary><c>§9.2.17 · error</c>, plus <c>· quote</c> when only a source quote matched.</summary>
-    public string Meta => $"§{Hit.Section} · {Hit.Severity}" + (Hit.Match == RuleMatch.Quote ? " · matched in a quote" : string.Empty);
+    /// <summary>
+    /// <c>§9.2.17 · error</c>, plus <c>· quote</c> when only a source quote matched; <c>§3 · vocab · abbreviation</c> for a vocab item.
+    /// </summary>
+    public string Meta => Hit.Kind == KbEntryKind.Vocab
+        ? $"§{Hit.Section} · vocab · {Hit.Severity}"
+        : $"§{Hit.Section} · {Hit.Severity}" + (Hit.Match == RuleMatch.Quote ? " · matched in a quote" : string.Empty);
 
     /// <summary>The matching text.</summary>
     public string? Snippet => Hit.Snippet;
@@ -245,8 +329,62 @@ public sealed class RuleHitViewModel(RuleHit hit)
     /// <summary>Whether <see cref="Snippet"/> is set.</summary>
     public bool HasSnippet => Hit.Snippet is not null;
 
-    /// <summary>The severity colour.</summary>
-    public IBrush SeverityBrush { get; } = SeverityBrushes.For(RuleBrowserViewModel.SeverityOf(hit.Severity));
+    /// <summary>The severity colour; a neutral colour for a vocab item.</summary>
+    public IBrush SeverityBrush { get; } = hit.Kind == KbEntryKind.Vocab
+        ? VocabDetailViewModel.KindBrush
+        : SeverityBrushes.For(RuleBrowserViewModel.SeverityOf(hit.Severity));
+}
+
+/// <summary>The detail of one vocab item in the rule browser (T-059).</summary>
+public sealed class VocabDetailViewModel
+{
+    public VocabDetailViewModel(VocabDetail item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        Item = item;
+        Header = $"ISCN {item.Edition} §{item.Section} · vocab/{item.File}";
+        var tokens = item.Tokens.IsDefaultOrEmpty ? "none (not written in a notation string)" : string.Join("  ", item.Tokens);
+        TokensText = "Tokens: " + tokens
+            + (item.PairOpen is { } open && item.PairClose is { } close ? $" · pair {open} … {close}" : string.Empty)
+            + (item.EquivalentForms ? " · typed forms of the printed symbol" : string.Empty);
+        Meanings = [.. item.Meanings.Select(m => m.Sections.IsDefaultOrEmpty ? m.Text : $"{m.Text} (§{string.Join(", §", m.Sections)})")];
+    }
+
+    /// <summary>The chip colour of vocab items (neutral, not a severity).</summary>
+    public static IBrush KindBrush { get; } = new Avalonia.Media.Immutable.ImmutableSolidColorBrush(Color.FromRgb(0x03, 0x83, 0x87));
+
+    /// <summary>The item.</summary>
+    public VocabDetail Item { get; }
+
+    /// <summary>The KB ID shown, <c>vocab:symbols/del</c>.</summary>
+    public string Id => "vocab:" + Item.Id;
+
+    /// <summary>The label as printed.</summary>
+    public string Label => Item.Label;
+
+    /// <summary>The title (first meaning).</summary>
+    public string Title => Item.Title;
+
+    /// <summary>The entry kind (<c>abbreviation</c>, <c>code</c>, …).</summary>
+    public string Kind => Item.Kind;
+
+    /// <summary><c>ISCN 2016 §3 · vocab/ch03/03-symbols.yaml</c>.</summary>
+    public string Header { get; }
+
+    /// <summary>The tokens (and pair / typed forms).</summary>
+    public string TokensText { get; }
+
+    /// <summary>Each meaning with the sections that use it.</summary>
+    public ImmutableArray<string> Meanings { get; }
+
+    /// <summary>The note, if any.</summary>
+    public string? Note => Item.Note;
+
+    /// <summary>Whether <see cref="Note"/> is set.</summary>
+    public bool HasNote => Item.Note is { Length: > 0 };
+
+    /// <summary>The rendered book citation of the printed row.</summary>
+    public string Citation => Item.Citation;
 }
 
 /// <summary>The detail of one rule in the rule browser.</summary>

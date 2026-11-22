@@ -688,7 +688,7 @@ CREATE TABLE quotes (
 CREATE TABLE vocab (
   version TEXT, vocabulary TEXT, file TEXT, ord INTEGER, label TEXT, kind TEXT,
   tokens TEXT, pair_open TEXT, pair_close TEXT, equivalent_forms INTEGER, meanings TEXT,
-  note TEXT, cite_rendered TEXT,
+  note TEXT, cite_rendered TEXT, section TEXT,
   PRIMARY KEY (version, vocabulary, label));
 CREATE TABLE vocab_tokens (version TEXT, vocabulary TEXT, token TEXT, label TEXT);
 CREATE INDEX vocab_tokens_token ON vocab_tokens (version, token);
@@ -785,7 +785,7 @@ def write_sqlite(report: BuildReport, path: Path) -> None:
             for i, e in enumerate(f.data["entries"]):
                 pair = e.get("pair") or {}
                 con.execute(
-                    "INSERT INTO vocab VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    "INSERT INTO vocab VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                     (
                         v,
                         name,
@@ -800,6 +800,7 @@ def write_sqlite(report: BuildReport, path: Path) -> None:
                         json.dumps(e["meanings"], ensure_ascii=False),
                         e.get("note"),
                         render_cite(v, e["cite"]),
+                        f.data["section"],
                     ),
                 )
                 for tok in e["tokens"]:

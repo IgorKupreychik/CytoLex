@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CytoLex.Core.Context;
+using CytoLex.Core.Semantics;
 using CytoLex.Core.Validation;
 using CytoLex.Desktop.Highlighting;
 
@@ -13,6 +14,17 @@ namespace CytoLex.Desktop.ViewModels;
 public partial class EditionPanelViewModel : ObservableObject
 {
     public EditionPanelViewModel(ValidationReport report, EditionResult result, ApplyFixHandler? applyFix = null)
+        : this(report, result, applyFix, CoordinateBuild.Grch38, null)
+    {
+    }
+
+    /// <summary>A panel with the translation view (T-059).</summary>
+    /// <param name="report">The report.</param>
+    /// <param name="result">The edition's result.</param>
+    /// <param name="applyFix">Applies a fix to the input.</param>
+    /// <param name="build">The genome build whose coordinates are shown.</param>
+    /// <param name="openKbEntry">Opens a translation link (edition, KB entry) in the rule browser.</param>
+    public EditionPanelViewModel(ValidationReport report, EditionResult result, ApplyFixHandler? applyFix, CoordinateBuild build, Action<string, KbRef>? openKbEntry)
     {
         ArgumentNullException.ThrowIfNull(report);
         ArgumentNullException.ThrowIfNull(result);
@@ -33,6 +45,45 @@ public partial class EditionPanelViewModel : ObservableObject
         FixAll = FixAllViewModel.From(input, result, report.Context.Effective, applyFix);
         CellLineGroups = CellLineGroupViewModel.From(result);
         Highlights = IsNotImplemented ? [] : HighlightBuilder.Build(input, result, report.Context.Effective);
+        Translation = result.Translation is { } translation
+            ? new TranslationViewModel(
+                translation,
+                result.Diagnostics,
+                build,
+                openKbEntry is null ? null : r => openKbEntry(result.Edition, r),
+                SelectDiagnostic)
+            : null;
+    }
+
+    /// <summary>The literal translation (T-059); <c>null</c> when the edition has none (not implemented, or not requested).</summary>
+    public TranslationViewModel? Translation { get; }
+
+    /// <summary>Whether there is a translation to show.</summary>
+    public bool HasTranslation => Translation is not null;
+
+    /// <summary>The right-hand tab: <see cref="AbnormalitiesTab"/> (default) or <see cref="TranslationTab"/>.</summary>
+    [ObservableProperty]
+    public partial int SelectedSideTab { get; set; }
+
+    /// <summary>The translation tab of the right-hand column.</summary>
+    public const int TranslationTab = 1;
+
+    /// <summary>The abnormalities tab of the right-hand column.</summary>
+    public const int AbnormalitiesTab = 0;
+
+    /// <summary>Selects diagnostic <paramref name="index"/> (into <c>EditionResult.Diagnostics</c>) in the list: a translation part's diagnostic link.</summary>
+    public void SelectDiagnostic(int index)
+    {
+        if (index >= 0 && index < Diagnostics.Count)
+        {
+            // Re-selecting the same item still selects its span again.
+            if (ReferenceEquals(SelectedDiagnostic, Diagnostics[index]))
+            {
+                SelectedDiagnostic = null;
+            }
+
+            SelectedDiagnostic = Diagnostics[index];
+        }
     }
 
     /// <summary>The edition's result.</summary>
@@ -67,6 +118,12 @@ public partial class EditionPanelViewModel : ObservableObject
 
     /// <summary>The diagnostics of the edition, in span order.</summary>
     public IReadOnlyList<DiagnosticItemViewModel> Diagnostics { get; }
+
+    /// <summary>Whether there are diagnostics (else the list shows "No findings.").</summary>
+    public bool HasDiagnostics => Diagnostics.Count > 0;
+
+    /// <summary>The header of the diagnostics panel: <c>Diagnostics</c> or <c>Diagnostics (3)</c>.</summary>
+    public string DiagnosticsHeader => Diagnostics.Count == 0 ? "Diagnostics" : $"Diagnostics ({Diagnostics.Count})";
 
     /// <summary>"Fix all" (T-040): one previewed round of every applicable level-1 fix; <c>null</c> when fewer than two apply.</summary>
     public FixAllViewModel? FixAll { get; }

@@ -342,6 +342,8 @@ def test_vocab_sqlite(kb):
     assert con.execute("SELECT label FROM vocab WHERE equivalent_forms = 1").fetchall() == [
         ("minus sign (–)",)
     ]
+    # the vocab file's section, for the rule browser's section filter (T-059)
+    assert con.execute("SELECT DISTINCT section FROM vocab").fetchall() == [("3",)]
     con.close()
 
 

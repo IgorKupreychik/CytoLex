@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CytoLex.Core.Context;
+using CytoLex.Core.Semantics;
 using CytoLex.Core.Text;
 using CytoLex.Core.Validation;
 using CytoLex.Desktop.Highlighting;
@@ -13,7 +14,7 @@ namespace CytoLex.Desktop.ViewModels;
 /// <summary>
 /// The single-string check (T-036): validates <see cref="Input"/> on every change in the edition picked in the selector, or in
 /// every known edition (T-037), and exposes the context plus one <see cref="EditionPanelViewModel"/> per edition (verdict,
-/// segments, diagnostics, abnormalities by cell line (T-069), editor highlights).
+/// segments, diagnostics, abnormalities by cell line (T-069), literal translation (T-059), editor highlights).
 /// </summary>
 public partial class MainWindowViewModel : ObservableObject
 {
@@ -88,6 +89,92 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// <summary>The rule browser (T-039).</summary>
     public RuleBrowserViewModel Rules { get; }
+
+    /// <summary>Opens a translation link (T-059) of <paramref name="edition"/> in the rule browser: a rule or a vocab item.</summary>
+    /// <returns>Whether the entry was found (bands have no browser entry and return <c>false</c> without switching tabs).</returns>
+    public bool OpenKbEntry(string edition, KbRef kbRef)
+    {
+        ArgumentNullException.ThrowIfNull(edition);
+        if (kbRef.Kind == KbRefKind.Band)
+        {
+            return false;
+        }
+
+        var found = Rules.OpenKbRef(edition, kbRef);
+        SelectedMainTab = RulesTab;
+        return found;
+    }
+
+    /// <summary>The genome builds offered for the coordinates (T-059).</summary>
+    public static IReadOnlyList<CoordinateBuildChoice> CoordinateBuilds { get; } =
+    [
+        new(CoordinateBuild.Grch38, "GRCh38"),
+        new(CoordinateBuild.Grch37, "GRCh37"),
+    ];
+
+    /// <summary>Whether the translation shows approximate band coordinates and segment sizes (T-059; off by default). Changing it re-validates.</summary>
+    [ObservableProperty]
+    public partial bool ShowCoordinates { get; set; }
+
+    /// <summary>The build whose coordinates are shown; changing it re-renders the coordinates only (both builds are in the result).</summary>
+    [ObservableProperty]
+    public partial CoordinateBuildChoice SelectedCoordinateBuild { get; set; } = CoordinateBuilds[0];
+
+    /// <summary>
+    /// The editor offset under the mouse (T-059), set by the view; <c>null</c> when the mouse is not over the text. Marks the
+    /// translation part at the offset in the selected panel and its span in the editor.
+    /// </summary>
+    [ObservableProperty]
+    public partial int? HoverOffset { get; set; }
+
+    /// <summary>A translation card is under the mouse (<c>hovered</c>) or left: marks it and its span in the editor.</summary>
+    public void HoverTranslationItem(TranslationItemViewModel item, bool hovered)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        var translation = SelectedPanel?.Translation;
+        if (hovered)
+        {
+            translation?.Highlight(item);
+            HoverSpan = item.IsSummary ? null : item.Span;
+        }
+        else if (item.IsHighlighted)
+        {
+            translation?.Highlight(null);
+            if (HoverSpan == item.Span)
+            {
+                HoverSpan = null;
+            }
+        }
+    }
+
+    partial void OnHoverOffsetChanged(int? value)
+    {
+        var translation = SelectedPanel?.Translation;
+        if (translation is null)
+        {
+            return;
+        }
+
+        if (value is { } offset && translation.HighlightAt(offset) is { } span)
+        {
+            HoverSpan = span;
+        }
+        else
+        {
+            translation.Highlight(null);
+            HoverSpan = null;
+        }
+    }
+
+    partial void OnShowCoordinatesChanged(bool value) => Validate();
+
+    partial void OnSelectedCoordinateBuildChanged(CoordinateBuildChoice value)
+    {
+        foreach (var panel in Panels)
+        {
+            panel.Translation?.SetBuild(value.Build);
+        }
+    }
 
     /// <summary>Opens the KB rule of <paramref name="diagnostic"/> in the rule browser (diagnostic → rule link).</summary>
     /// <returns>Whether the rule was found.</returns>
@@ -259,6 +346,7 @@ public partial class MainWindowViewModel : ObservableObject
     {
         // Keep the shown tab across re-validation ("All editions" while typing).
         var previous = SelectedPanel?.Edition;
+        var sideTab = SelectedPanel?.SelectedSideTab ?? EditionPanelViewModel.AbnormalitiesTab; // and the right-hand tab (T-059)
         SelectedPanel = null;
         Panels.Clear();
         Report = null;
@@ -283,11 +371,15 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         var editions = choice.Edition is { } edition ? EditionSelection.One(edition) : EditionSelection.All;
-        var report = _validator.Validate(input, new ValidationOptions { Editions = editions });
+        var options = new ValidationOptions { Editions = editions, IncludeTranslation = true, IncludeCoordinates = ShowCoordinates };
+        var report = _validator.Validate(input, options);
         Report = report;
         foreach (var result in report.Results)
         {
-            Panels.Add(new EditionPanelViewModel(report, result, ApplyFix));
+            Panels.Add(new EditionPanelViewModel(report, result, ApplyFix, SelectedCoordinateBuild.Build, (edition, r) => OpenKbEntry(edition, r))
+            {
+                SelectedSideTab = sideTab,
+            });
         }
 
         HasResult = true;
@@ -317,6 +409,15 @@ public partial class MainWindowViewModel : ObservableObject
             ? $"Context: unknown, the markers contradict each other{markers}"
             : "Context: unknown (no markers); context-dependent findings are shown per context";
     }
+}
+
+/// <summary>An entry of the genome build selector of the translation coordinates (T-059).</summary>
+/// <param name="Build">The build.</param>
+/// <param name="Label">The text shown, e.g. <c>GRCh38</c>.</param>
+public sealed record CoordinateBuildChoice(CoordinateBuild Build, string Label)
+{
+    /// <inheritdoc/>
+    public override string ToString() => Label;
 }
 
 /// <summary>An entry of the edition selector (T-037).</summary>

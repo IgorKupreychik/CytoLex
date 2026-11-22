@@ -25,7 +25,7 @@ public sealed class RuleStoreTests : IDisposable
         foreach (var edition in kb.Editions)
         {
             var ekb = kb.ForEdition(edition)!;
-            var listed = _store.Search(edition, query: null).Select(h => h.Id).ToHashSet(StringComparer.Ordinal);
+            var listed = _store.Search(edition, query: null).Where(h => h.Kind == KbEntryKind.Rule).Select(h => h.Id).ToHashSet(StringComparer.Ordinal);
             Assert.Equal(ekb.Rules.Count, listed.Count);
             foreach (var rule in ekb.Rules)
             {
@@ -42,11 +42,19 @@ public sealed class RuleStoreTests : IDisposable
     }
 
     [Fact]
-    public void BlankQuery_ListsRulesInBookOrder()
+    public void BlankQuery_ListsRulesInBookOrder_ThenVocabItems()
     {
         var hits = _store.Search("2016", "  ");
-        var sections = hits.Select(h => h.Section).ToList();
-        Assert.Equal(sections.Order(Comparer<string>.Create(RuleStore.CompareSections)), sections);
+        var rules = hits.TakeWhile(h => h.Kind == KbEntryKind.Rule).ToList();
+        var vocab = hits.Skip(rules.Count).ToList();
+        Assert.NotEmpty(vocab);
+        Assert.All(vocab, h => Assert.Equal(KbEntryKind.Vocab, h.Kind));
+        foreach (var part in new[] { rules, vocab })
+        {
+            var sections = part.Select(h => h.Section).ToList();
+            Assert.Equal(sections.Order(Comparer<string>.Create(RuleStore.CompareSections)), sections);
+        }
+
         Assert.All(hits, h => Assert.Equal(RuleMatch.None, h.Match));
     }
 
