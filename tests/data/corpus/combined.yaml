@@ -1,0 +1,69 @@
+# Test corpus (T-062): strings with several segments joined by '.'. Format and label policy: tests/data/corpus/README.md.
+# Synthetic strings only (data policy T-048); labels trace to the KB rules named in `rules`/`fires`.
+format: cytolex-corpus
+version: 1
+corpus:
+  - id: C-001
+    iscn: "46,XX.ish del(22)(q11.2q11.2)(HIRA–)"
+    types: [karyotype, ish]
+    features: [karyotype-and-ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed, context: constitutional}}
+    review: {checked: false}
+  - id: C-002
+    iscn: "47,XY,+mar.ish r(1)(p13.1q11?)(D1Z1+)"
+    types: [karyotype, ish]
+    features: [karyotype-and-ish, marker]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed, context: constitutional}}
+    review: {checked: false}
+  - id: C-003
+    iscn: "46,XY,t(9;22)(q34;q11.2)[20].nuc ish(ABL1,BCR)×3(ABL1 con BCR×2)[400]"
+    types: [karyotype, nuc_ish]
+    features: [karyotype-and-nuc-ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed, context: acquired}}
+    review: {checked: false}
+  - id: C-004
+    iscn: "47,XY,+mar.arr[GRCh38] 1p12p11.2(117596421_121013236)×3 dn"
+    types: [karyotype, arr]
+    features: [karyotype-and-arr, marker]
+    rules: [ARR.COMBINED_WITH_OTHER_METHODS]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: C-005
+    iscn: "46,XX.arr[GRCh38] 22q11.21(18912231_21465672)×1 dn"
+    types: [karyotype, arr]
+    features: [karyotype-and-arr]
+    rules: [ARR.COMBINED_WITH_OTHER_METHODS]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: C-006
+    iscn: "47,XY,+21.arr(21)×3"
+    types: [karyotype, arr]
+    features: [karyotype-and-arr, trisomy]
+    rules: [ARR.COMBINED_WITH_OTHER_METHODS]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: C-007
+    iscn: "46,XY,der(4)t(4;8)(p16.1;p23.1)pat.arr[GRCh38] 4p16.3p16.1(68345_8500000)×1,8p23.3p23.1(191530_6900000)×3"
+    types: [karyotype, arr]
+    features: [karyotype-and-arr, derivative]
+    rules: [ARR.COMBINED_WITH_OTHER_METHODS, ARR.ABERRATION_ORDER]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: C-008
+    iscn: "46,XY,der(15)t(8;15)(q22.3;q26.2)mat.ish der(15)t(8;15)(RP11-1143I12+,RP11-14C10–).arr[GRCh38] 8q23.1q24.3(105171556_146201911)×3,15q26.2q26.3(96062102_100201136)×1"
+    types: [karyotype, ish, arr]
+    features: [karyotype-ish-arr]
+    rules: [ARR.COMBINED_WITH_OTHER_METHODS]
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed, context: constitutional}}
+    review: {checked: false}

@@ -10,7 +10,7 @@ from .config import REPO_ROOT, iscn_pdf_path
 SUBCOMMANDS = {
     "extract": ("Extract per-section source text from the ISCN PDF", "T-002"),
     "tables": ("Render the configured table regions to PNG for review", "T-003"),
-    "check": ("Check KB rule/quote/vocab YAML files against the schemas in kb/schema/", "T-004"),
+    "check": ("Check KB and test-corpus YAML files against the schemas in kb/schema/", "T-004"),
     "build": ("Validate the KB and build SQLite (FTS5) + JSON bundle", "T-005"),
     "bands": ("Generate band data from NCBI GDP ideograms + UCSC cytoBand", "T-006"),
     "ideograms": ("Decode the band labels of the book's idiograms from the ISCN PDF", "T-007"),
@@ -126,6 +126,7 @@ def cmd_check(args: argparse.Namespace) -> int:
         REPO_ROOT / "kb" / "source-quotes",
         REPO_ROOT / "kb" / "vocab",
         REPO_ROOT / "kb" / "translation",
+        REPO_ROOT / "tests" / "data" / "corpus",
     ]
     missing = [p for p in paths if not p.exists() and args.paths]
     for p in missing:

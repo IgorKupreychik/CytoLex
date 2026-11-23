@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cytolex.local/schema/corpus.schema.json",
+  "title": "CytoLex — test corpus of ISCN strings",
+  "description": "One corpus file per notation type: tests/data/corpus/<type>.yaml (T-062). Realistic strings that complement the KB examples: combined strings, volume, robustness inputs. Strings are synthetic or adapted from the book: never real patient strings (data policy T-048), so there is no 'lab' source. Format and label policy: tests/data/corpus/README.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "version", "corpus"],
+  "properties": {
+    "format": { "const": "cytolex-corpus" },
+    "version": { "const": 1 },
+    "corpus": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "iscn", "types", "features", "rules", "source", "expected", "review"],
+        "if": { "properties": { "source": { "const": "book-adapted" } } },
+        "then": { "required": ["cite"] },
+        "properties": {
+          "id": {
+            "description": "Stable, unique across all corpus files; the prefix names the file (K karyotype, A arr, I ish, N nuc_ish, C combined, R robustness).",
+            "type": "string",
+            "pattern": "^[KAINCR]-[0-9]{3}$",
+            "x-expected": "an ID like K-001 (file prefix K/A/I/N/C/R, dash, three digits)"
+          },
+          "iscn": { "description": "The string as written (book forms →, –, × or typed ASCII forms).", "$ref": "common.schema.json#/$defs/text" },
+          "types": {
+            "description": "The notation types of its segments, in order (as the Segmenter splits them).",
+            "type": "array",
+            "minItems": 1,
+            "items": { "enum": ["karyotype", "breakage", "meiotic", "ish", "nuc_ish", "fib_ish", "rev_ish", "cgh", "arr", "rsa", "seq"] }
+          },
+          "features": {
+            "description": "What the string exercises (free lower-kebab tags, e.g. translocation, clone-count, mosaic).",
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "x-expected": "a lower-kebab tag" },
+            "uniqueItems": true
+          },
+          "rules": {
+            "description": "KB rule IDs the string relies on (its constructs and conventions).",
+            "type": "array",
+            "items": { "$ref": "common.schema.json#/$defs/rule_id" },
+            "uniqueItems": true
+          },
+          "source": { "enum": ["synthetic", "book-adapted"] },
+          "cite": { "description": "The book example the string is adapted from.", "$ref": "common.schema.json#/$defs/cite" },
+          "expected": {
+            "description": "Expected result per ISCN edition (editions are not backward compatible).",
+            "type": "object",
+            "minProperties": 1,
+            "propertyNames": { "$ref": "common.schema.json#/$defs/version" },
+            "additionalProperties": { "$ref": "#/$defs/expected" }
+          },
+          "review": {
+            "description": "checked = a person confirmed the expected results.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["checked"],
+            "properties": {
+              "checked": { "type": "boolean" },
+              "note": { "$ref": "common.schema.json#/$defs/text" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict"],
+      "if": { "properties": { "verdict": { "const": "invalid" } } },
+      "then": { "required": ["fires"], "properties": { "fires": { "minItems": 1 } } },
+      "else": { "not": { "required": ["fires"] } },
+      "properties": {
+        "verdict": {
+          "description": "valid / invalid in this edition, or unreviewed (parse-only: it must split and parse, no claim about validity).",
+          "enum": ["valid", "invalid", "unreviewed"]
+        },
+        "context": {
+          "description": "Context hint the verdict is given for; omitted = no hint.",
+          "enum": ["constitutional", "acquired"]
+        },
+        "fires": {
+          "description": "Rule IDs (or core codes such as CORE.UNPARSED) that must be reported; others may be reported too.",
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/rule_id" },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

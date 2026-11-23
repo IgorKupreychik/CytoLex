@@ -17,4 +17,4 @@ Columns:
 
 The batch reader takes the string from the `iscn` column and the ID from `id`; it ignores the other columns.
 
-**These files are not the reviewed corpus.** T-062 adds realistic, hand-labelled strings with expected results per edition and a mutation generator, in its own files.
+**These files are not the test corpus.** The corpus (T-062) has realistic labelled strings with expected results per edition and a mutation generator: `tests/data/corpus/` (README there). Its opt-in export `build/review/corpus/corpus-2016.csv` is a batch file too.

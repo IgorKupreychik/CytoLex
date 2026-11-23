@@ -1,0 +1,213 @@
+# Test corpus (T-062): robustness inputs (typed ASCII forms, spacing, letter case, typos, truncation). Format and label policy: tests/data/corpus/README.md.
+# Synthetic strings only (data policy T-048); labels trace to the KB rules named in `rules`/`fires`.
+format: cytolex-corpus
+version: 1
+corpus:
+  - id: R-001
+    iscn: "45,XX,-7[10]/46,XX[10]"
+    types: [karyotype]
+    features: [typed-form, hyphen-minus]
+    rules: [SYM.TYPED_SYMBOL_FORMS]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: R-002
+    iscn: "45,XX,−7[10]/46,XX[10]"
+    types: [karyotype]
+    features: [typed-form, minus-sign]
+    rules: [SYM.TYPED_SYMBOL_FORMS]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: R-003
+    iscn: "46,XY,del(7)(pter->q11.2::q22->qter)"
+    types: [karyotype]
+    features: [typed-form, arrow]
+    rules: [SYM.TYPED_SYMBOL_FORMS, STRUCT.DETAILED_SYSTEM]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: R-004
+    iscn: "46,XY,t(9;22)(q34;q11.2)[15]/92,XXYY,t(9;22)(q34;q11.2)x2[5]"
+    types: [karyotype]
+    features: [typed-form, letter-x]
+    rules: [SYM.TYPED_SYMBOL_FORMS]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: R-005
+    iscn: "47,XX, +21"
+    types: [karyotype]
+    features: [spacing]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: constitutional, fires: [SYM.NO_OTHER_SPACE]}}
+    review: {checked: false}
+  - id: R-006
+    iscn: "46, XX"
+    types: [karyotype]
+    features: [spacing]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: constitutional, fires: [SYM.NO_OTHER_SPACE]}}
+    review: {checked: false}
+  - id: R-007
+    iscn: "46,XY,t(9;22) (q34;q11.2)[20]"
+    types: [karyotype]
+    features: [spacing]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: acquired, fires: [SYM.NO_OTHER_SPACE]}}
+    review: {checked: false}
+  - id: R-008
+    iscn: "46,XY,del (11)(q23)[10]"
+    types: [karyotype]
+    features: [spacing]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: acquired, fires: [SYM.NO_SPACE_AT_PARENTHESIS]}}
+    review: {checked: false}
+  - id: R-009
+    iscn: "mos45,X[10]/46,XX[20]"
+    types: [karyotype]
+    features: [spacing]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: constitutional, fires: [SYM.SPACE_BEFORE_CHROMOSOME_COUNT]}}
+    review: {checked: false}
+  - id: R-010
+    iscn: "48,XXY c,+8[15]"
+    types: [karyotype]
+    features: [spacing]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: acquired, fires: [KARYO.CONSTITUTIONAL_C]}}
+    review: {checked: false, note: "Same fault as the book's invalid example of KARYO.CONSTITUTIONAL_C (a space before c)."}
+  - id: R-011
+    iscn: "46,xx"
+    types: [karyotype]
+    features: [letter-case]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: constitutional, fires: [SYM.LETTER_CASE]}}
+    review: {checked: false}
+  - id: R-012
+    iscn: "46,XY,Inv(9)(p12q13)"
+    types: [karyotype]
+    features: [letter-case]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: constitutional, fires: [SYM.LETTER_CASE]}}
+    review: {checked: false}
+  - id: R-013
+    iscn: "46,XY,T(9;22)(q34;q11.2)[20]"
+    types: [karyotype]
+    features: [letter-case]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: acquired, fires: [SYM.LETTER_CASE]}}
+    review: {checked: false}
+  - id: R-014
+    iscn: "46,XY,dle(7)(q22)"
+    types: [karyotype]
+    features: [typo, unknown-symbol]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: constitutional, fires: [SYM.LISTED_ONLY]}}
+    review: {checked: false, note: "SYM.LISTED_ONLY is needs_review, so it is reported as a warning (policy T-022)."}
+  - id: R-015
+    iscn: "46,XY,t(9,22)(q34;q11.2)[20]"
+    types: [karyotype]
+    features: [typo, separator]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: acquired, fires: [STRUCT.CHROMOSOME_SEPARATOR]}}
+    review: {checked: false}
+  - id: R-016
+    iscn: "46,XX,inv(16)(p13.1;q22)[20]"
+    types: [karyotype]
+    features: [typo, separator]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: acquired, fires: [INV.FORMAT]}}
+    review: {checked: false}
+  - id: R-017
+    iscn: "47,XY,21+"
+    types: [karyotype]
+    features: [typo, sign-position]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: constitutional, fires: [KARYO.GAIN_LOSS_SIGN]}}
+    review: {checked: false}
+  - id: R-018
+    iscn: "46XY"
+    types: [karyotype]
+    features: [typo, missing-comma]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: constitutional, fires: [KARYO.COUNT_SEX_ORDER]}}
+    review: {checked: false}
+  - id: R-019
+    iscn: "46,XY,t(9;22)(q34;q11.2)"
+    types: [karyotype]
+    features: [no-cell-count]
+    rules: [CLONE.CELL_COUNT_REQUIRED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false, note: "A single karyotype without [n] is never flagged (CLONE.CELL_COUNT_REQUIRED, decided in T-032); the count is required between clones."}
+  - id: R-020
+    iscn: "46,XY,t(9;22)(q34;q11"
+    types: [karyotype]
+    features: [truncated]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: acquired, fires: [CORE.UNPARSED]}}
+    review: {checked: false, note: "Truncated: no KB rule covers a missing closing parenthesis yet, so the text is unparsed (T-085)."}
+  - id: R-021
+    iscn: "46,XY,del(5)(q13"
+    types: [karyotype]
+    features: [truncated]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: constitutional, fires: [CORE.UNPARSED]}}
+    review: {checked: false, note: "Truncated: no KB rule covers a missing closing parenthesis yet, so the text is unparsed (T-085)."}
+  - id: R-022
+    iscn: "47,XX,+"
+    types: [karyotype]
+    features: [truncated]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: constitutional, fires: [CORE.UNPARSED]}}
+    review: {checked: false, note: "Truncated: a sign without a chromosome is unparsed (T-085)."}
+  - id: R-023
+    iscn: "46,XX,del(9)(q35)"
+    types: [karyotype]
+    features: [nonexistent-band]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: constitutional, fires: [BAND.MUST_EXIST]}}
+    review: {checked: false}
+  - id: R-024
+    iscn: "46,XY,t(22;9)(q11.2;q34)[20]"
+    types: [karyotype]
+    features: [chromosome-order]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: acquired, fires: [STRUCT.CHROMOSOME_ORDER]}}
+    review: {checked: false}
+  - id: R-025
+    iscn: "47,XY,+21,del(5)(q13q33)"
+    types: [karyotype]
+    features: [abnormality-order]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: constitutional, fires: [KARYO.ABNORMALITY_ORDER]}}
+    review: {checked: false}
+  - id: R-026
+    iscn: "48,XX,+21"
+    types: [karyotype]
+    features: [count]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: invalid, context: constitutional, fires: [NUM.COUNT_MATCHES_CHANGES]}}
+    review: {checked: false}

@@ -1,0 +1,1133 @@
+# Test corpus (T-062): karyotypes (constitutional, acquired, mosaics/chimeras, structural, uncertainty, clones). Format and label policy: tests/data/corpus/README.md.
+# Synthetic strings only (data policy T-048); labels trace to the KB rules named in `rules`/`fires`.
+format: cytolex-corpus
+version: 1
+corpus:
+  - id: K-001
+    iscn: "46,XX"
+    types: [karyotype]
+    features: [normal]
+    rules: [KARYO.COUNT_SEX_ORDER]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-002
+    iscn: "46,XY"
+    types: [karyotype]
+    features: [normal]
+    rules: [KARYO.COUNT_SEX_ORDER]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-003
+    iscn: "47,XX,+21"
+    types: [karyotype]
+    features: [trisomy]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-004
+    iscn: "47,XY,+21"
+    types: [karyotype]
+    features: [trisomy]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-005
+    iscn: "47,XY,+13"
+    types: [karyotype]
+    features: [trisomy]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-006
+    iscn: "47,XX,+18"
+    types: [karyotype]
+    features: [trisomy]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-007
+    iscn: "45,X"
+    types: [karyotype]
+    features: [sex-chromosomes, monosomy]
+    rules: [KARYO.COUNT_SEX_ORDER, SEX.CONSTITUTIONAL_COMPLEMENT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-008
+    iscn: "47,XXY"
+    types: [karyotype]
+    features: [sex-chromosomes]
+    rules: [KARYO.COUNT_SEX_ORDER, SEX.CONSTITUTIONAL_COMPLEMENT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-009
+    iscn: "47,XYY"
+    types: [karyotype]
+    features: [sex-chromosomes]
+    rules: [KARYO.COUNT_SEX_ORDER, SEX.CONSTITUTIONAL_COMPLEMENT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-010
+    iscn: "47,XXX"
+    types: [karyotype]
+    features: [sex-chromosomes]
+    rules: [KARYO.COUNT_SEX_ORDER, SEX.CONSTITUTIONAL_COMPLEMENT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-011
+    iscn: "48,XXXY"
+    types: [karyotype]
+    features: [sex-chromosomes]
+    rules: [KARYO.COUNT_SEX_ORDER, SEX.CONSTITUTIONAL_COMPLEMENT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-012
+    iscn: "49,XXXXY"
+    types: [karyotype]
+    features: [sex-chromosomes]
+    rules: [KARYO.COUNT_SEX_ORDER, SEX.CONSTITUTIONAL_COMPLEMENT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-013
+    iscn: "69,XXY"
+    types: [karyotype]
+    features: [polyploidy, triploidy]
+    rules: [KARYO.COUNT_SEX_ORDER]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-014
+    iscn: "69,XXX"
+    types: [karyotype]
+    features: [polyploidy, triploidy]
+    rules: [KARYO.COUNT_SEX_ORDER]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-015
+    iscn: "48,XXY,+21"
+    types: [karyotype]
+    features: [trisomy, sex-chromosomes]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, SEX.CONSTITUTIONAL_COMPLEMENT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-016
+    iscn: "46,XY,del(5)(p14)"
+    types: [karyotype]
+    features: [deletion, terminal]
+    rules: [KARYO.COUNT_SEX_ORDER, DEL.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-017
+    iscn: "46,XX,del(4)(p16.1)"
+    types: [karyotype]
+    features: [deletion, terminal, sub-band]
+    rules: [KARYO.COUNT_SEX_ORDER, DEL.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-018
+    iscn: "46,XY,del(1)(p36.1)"
+    types: [karyotype]
+    features: [deletion, terminal, sub-band]
+    rules: [KARYO.COUNT_SEX_ORDER, DEL.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-019
+    iscn: "46,XX,del(18)(q21.1)"
+    types: [karyotype]
+    features: [deletion, terminal, sub-band]
+    rules: [KARYO.COUNT_SEX_ORDER, DEL.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-020
+    iscn: "46,XY,del(22)(q11.21q11.23)"
+    types: [karyotype]
+    features: [deletion, interstitial]
+    rules: [KARYO.COUNT_SEX_ORDER, DEL.FORMAT, STRUCT.PROXIMAL_BREAKPOINT_FIRST]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-021
+    iscn: "46,XX,del(7)(q11.23q11.23)"
+    types: [karyotype]
+    features: [deletion, interstitial]
+    rules: [KARYO.COUNT_SEX_ORDER, DEL.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-022
+    iscn: "46,XY,del(5)(p13p15.1)"
+    types: [karyotype]
+    features: [deletion, interstitial, short-arm]
+    rules: [KARYO.COUNT_SEX_ORDER, DEL.FORMAT, STRUCT.PROXIMAL_BREAKPOINT_FIRST]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-023
+    iscn: "46,XX,dup(15)(q11.2q13)"
+    types: [karyotype]
+    features: [duplication]
+    rules: [KARYO.COUNT_SEX_ORDER, DUP.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-024
+    iscn: "46,XY,dup(22)(q11.21q11.23)"
+    types: [karyotype]
+    features: [duplication]
+    rules: [KARYO.COUNT_SEX_ORDER, DUP.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-025
+    iscn: "46,XX,dup(1)(q32q25)"
+    types: [karyotype]
+    features: [duplication, inverted]
+    rules: [KARYO.COUNT_SEX_ORDER, DUP.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-026
+    iscn: "46,XY,inv(9)(p12q13)"
+    types: [karyotype]
+    features: [inversion, pericentric]
+    rules: [KARYO.COUNT_SEX_ORDER, INV.FORMAT, STRUCT.SHORT_ARM_BREAKPOINT_FIRST]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-027
+    iscn: "46,XX,inv(11)(p15q23)"
+    types: [karyotype]
+    features: [inversion, pericentric]
+    rules: [KARYO.COUNT_SEX_ORDER, INV.FORMAT, STRUCT.SHORT_ARM_BREAKPOINT_FIRST]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-028
+    iscn: "46,XY,inv(10)(p11.2q21.2)"
+    types: [karyotype]
+    features: [inversion, pericentric, sub-band]
+    rules: [KARYO.COUNT_SEX_ORDER, INV.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-029
+    iscn: "46,XX,inv(3)(p13p25)"
+    types: [karyotype]
+    features: [inversion, paracentric]
+    rules: [KARYO.COUNT_SEX_ORDER, INV.FORMAT, STRUCT.PROXIMAL_BREAKPOINT_FIRST]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-030
+    iscn: "46,XY,inv(7)(q11.2q32)"
+    types: [karyotype]
+    features: [inversion, paracentric]
+    rules: [KARYO.COUNT_SEX_ORDER, INV.FORMAT, STRUCT.PROXIMAL_BREAKPOINT_FIRST]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-031
+    iscn: "46,XX,t(11;22)(q23;q11.2)"
+    types: [karyotype]
+    features: [translocation, balanced]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-032
+    iscn: "46,XY,t(1;4)(p32;q25)"
+    types: [karyotype]
+    features: [translocation, balanced]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-033
+    iscn: "46,XX,t(1;3)(p36.1;q21)"
+    types: [karyotype]
+    features: [translocation, balanced, sub-band]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-034
+    iscn: "46,X,t(X;7)(q22;p15)"
+    types: [karyotype]
+    features: [translocation, sex-chromosomes]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-035
+    iscn: "46,XY,t(4;8)(p16.1;p23.1)mat"
+    types: [karyotype]
+    features: [translocation, inheritance]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, KARYO.PARENTAL_ORIGIN]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-036
+    iscn: "46,XX,t(5;6)(q35;q21)pat,inv(9)(p12q13)mat"
+    types: [karyotype]
+    features: [translocation, inversion, inheritance]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, KARYO.PARENTAL_ORIGIN, KARYO.ABNORMALITY_ORDER]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-037
+    iscn: "46,XX,t(9;22;17)(q34;q11.2;q22)"
+    types: [karyotype]
+    features: [translocation, three-way]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, STRUCT.MULTI_CHROMOSOME_ORDER]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-038
+    iscn: "46,XY,t(2;7;5)(p21;q22;q23)"
+    types: [karyotype]
+    features: [translocation, three-way]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, STRUCT.MULTI_CHROMOSOME_ORDER]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-039
+    iscn: "47,XX,+der(22)t(11;22)(q23;q11.2)mat"
+    types: [karyotype]
+    features: [derivative, unbalanced, inheritance]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, DER.DEFINITION, KARYO.PARENTAL_ORIGIN]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-040
+    iscn: "47,XY,+der(22)t(11;22)(q23;q11.2)"
+    types: [karyotype]
+    features: [derivative, unbalanced]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, DER.DEFINITION]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-041
+    iscn: "46,XY,der(4)t(4;8)(p16.1;p23.1)pat"
+    types: [karyotype]
+    features: [derivative, unbalanced, inheritance]
+    rules: [KARYO.COUNT_SEX_ORDER, DER.DEFINITION, KARYO.PARENTAL_ORIGIN]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-042
+    iscn: "46,XX,der(7)t(7;12)(q36;p13)"
+    types: [karyotype]
+    features: [derivative, unbalanced]
+    rules: [KARYO.COUNT_SEX_ORDER, DER.DEFINITION]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-043
+    iscn: "46,XY,der(1)t(1;3)(p32;q21)t(1;11)(q25;q13)"
+    types: [karyotype]
+    features: [derivative, complex]
+    rules: [KARYO.COUNT_SEX_ORDER, DER.DEFINITION, DER.ABERRATION_ORDER]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-044
+    iscn: "46,XX,der(1)t(1;3)(p22;q13)t(3;7)(q28;q11.2)"
+    types: [karyotype]
+    features: [derivative, complex]
+    rules: [KARYO.COUNT_SEX_ORDER, DER.DEFINITION, DER.ABERRATION_ORDER]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-045
+    iscn: "45,XX,rob(13;14)(q10;q10)"
+    types: [karyotype]
+    features: [robertsonian]
+    rules: [KARYO.COUNT_SEX_ORDER, ROB.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-046
+    iscn: "45,XY,der(13;14)(q10;q10)"
+    types: [karyotype]
+    features: [robertsonian, derivative]
+    rules: [KARYO.COUNT_SEX_ORDER, ROB.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-047
+    iscn: "46,XY,rob(14;21)(q10;q10),+21"
+    types: [karyotype]
+    features: [robertsonian, trisomy]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, ROB.FORMAT, KARYO.ABNORMALITY_ORDER]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-048
+    iscn: "46,XX,+13,der(13;14)(q10;q10)"
+    types: [karyotype]
+    features: [robertsonian, trisomy]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, ROB.FORMAT, ORDER.NUMERICAL_BEFORE_STRUCTURAL]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-049
+    iscn: "46,X,i(X)(q10)"
+    types: [karyotype]
+    features: [isochromosome, sex-chromosomes]
+    rules: [KARYO.COUNT_SEX_ORDER, ISO.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-050
+    iscn: "47,XX,+i(18)(p10)"
+    types: [karyotype]
+    features: [isochromosome, gain]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, ISO.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-051
+    iscn: "46,XY,r(18)(p11.2q23)"
+    types: [karyotype]
+    features: [ring]
+    rules: [KARYO.COUNT_SEX_ORDER, RING.FORMAT, STRUCT.SHORT_ARM_BREAKPOINT_FIRST]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-052
+    iscn: "46,XX,r(14)(p13q32.3)"
+    types: [karyotype]
+    features: [ring]
+    rules: [KARYO.COUNT_SEX_ORDER, RING.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-053
+    iscn: "46,XY,ins(2;7)(p13;q21q31)"
+    types: [karyotype]
+    features: [insertion]
+    rules: [KARYO.COUNT_SEX_ORDER, STRUCT.INSERTION_RECEPTOR_FIRST, INS.ORIENTATION]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-054
+    iscn: "46,XX,ins(11;9)(p13;q22q34)"
+    types: [karyotype]
+    features: [insertion, receptor-first]
+    rules: [KARYO.COUNT_SEX_ORDER, STRUCT.INSERTION_RECEPTOR_FIRST]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-055
+    iscn: "46,XY,ins(3)(p13q21q26)"
+    types: [karyotype]
+    features: [insertion, within-chromosome]
+    rules: [KARYO.COUNT_SEX_ORDER, INS.ORIENTATION]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-056
+    iscn: "45,XX,dic(13;15)(q22;q24)"
+    types: [karyotype]
+    features: [dicentric]
+    rules: [KARYO.COUNT_SEX_ORDER, DIC.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-057
+    iscn: "46,XY,add(19)(p13.3)"
+    types: [karyotype]
+    features: [additional-material]
+    rules: [KARYO.COUNT_SEX_ORDER, ADD.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-058
+    iscn: "47,X,fra(X)(q27.3),+21"
+    types: [karyotype]
+    features: [fragile-site, sex-chromosomes, trisomy]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, FRA.FORMAT, SEX.ABNORMAL_SEX_CHROMOSOME_IN_LIST]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-059
+    iscn: "46,XX,rec(6)dup(6p)inv(6)(p22.2q25.2)mat"
+    types: [karyotype]
+    features: [recombinant, inheritance]
+    rules: [KARYO.COUNT_SEX_ORDER, REC.FORMAT, KARYO.PARENTAL_ORIGIN]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-060
+    iscn: "46,XY,rec(2)dup(2q)inv(2)(p21q31)pat"
+    types: [karyotype]
+    features: [recombinant, inheritance]
+    rules: [KARYO.COUNT_SEX_ORDER, REC.FORMAT, KARYO.PARENTAL_ORIGIN]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-061
+    iscn: "47,XX,+mar"
+    types: [karyotype]
+    features: [marker]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, MAR.PLUS_SIGN]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-062
+    iscn: "47,XY,t(12;16)(q13;p11.2),+mar"
+    types: [karyotype]
+    features: [marker, translocation]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, MAR.PLUS_SIGN, KARYO.ABNORMALITY_ORDER]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-063
+    iscn: "46,XY,16qh+"
+    types: [karyotype]
+    features: [variant, heterochromatin]
+    rules: [KARYO.COUNT_SEX_ORDER, VAR.LENGTH_SIGN]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-064
+    iscn: "46,XX,21ps+"
+    types: [karyotype]
+    features: [variant]
+    rules: [KARYO.COUNT_SEX_ORDER, VAR.LENGTH_SIGN]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-065
+    iscn: "46,XY,del(7)(pter→q11.2::q22→qter)"
+    types: [karyotype]
+    features: [deletion, detailed-system]
+    rules: [KARYO.COUNT_SEX_ORDER, DEL.FORMAT, STRUCT.DETAILED_SYSTEM]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-066
+    iscn: "46,XX,t(4;11)(4pter→4q21::11q23→11qter;11pter→11q23::4q21→4qter)"
+    types: [karyotype]
+    features: [translocation, detailed-system]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, STRUCT.DETAILED_SYSTEM]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-067
+    iscn: "46,XY,inv(3)(pter→p13::q21→p13::q21→qter)"
+    types: [karyotype]
+    features: [inversion, detailed-system]
+    rules: [KARYO.COUNT_SEX_ORDER, INV.FORMAT, STRUCT.DETAILED_SYSTEM]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-068
+    iscn: "46,XX,der(6)(pter→q25.2::p22.2→pter)"
+    types: [karyotype]
+    features: [derivative, detailed-system]
+    rules: [KARYO.COUNT_SEX_ORDER, STRUCT.DETAILED_SYSTEM]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-069
+    iscn: "46,XY,?del(1)(q23)"
+    types: [karyotype]
+    features: [uncertainty, questioned-item]
+    rules: [KARYO.COUNT_SEX_ORDER, UNCERTAIN.QUESTIONABLE_ITEM]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-070
+    iscn: "47,XX,+?8"
+    types: [karyotype]
+    features: [uncertainty, questioned-item]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, UNCERTAIN.QUESTIONABLE_ITEM]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-071
+    iscn: "46,XX,del(1)(q21~24)"
+    types: [karyotype]
+    features: [uncertainty, approximate-band]
+    rules: [KARYO.COUNT_SEX_ORDER, UNCERTAIN.APPROX_INTERVAL]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-072
+    iscn: "46,XY,t(3;12)(q27~29;q13~15)"
+    types: [karyotype]
+    features: [uncertainty, approximate-band, translocation]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, UNCERTAIN.APPROX_INTERVAL]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-073
+    iscn: "46,XX,add(19)(p13 or q13)"
+    types: [karyotype]
+    features: [uncertainty, alternative]
+    rules: [KARYO.COUNT_SEX_ORDER, UNCERTAIN.OR_ALTERNATIVE, ADD.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-074
+    iscn: "46,XY,del(8)(q21.1) or i(8)(p10)"
+    types: [karyotype]
+    features: [uncertainty, alternative]
+    rules: [KARYO.COUNT_SEX_ORDER, UNCERTAIN.OR_ALTERNATIVE]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-075
+    iscn: "mos 45,X[15]/46,XX[35]"
+    types: [karyotype]
+    features: [mosaic, sex-chromosomes]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.MOSAIC_CHIMERA_PREFIX, SYM.SPACE_BEFORE_CHROMOSOME_COUNT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-076
+    iscn: "mos 47,XXY[12]/46,XY[38]"
+    types: [karyotype]
+    features: [mosaic, sex-chromosomes]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.MOSAIC_CHIMERA_PREFIX]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-077
+    iscn: "mos 47,XX,+21[8]/46,XX[22]"
+    types: [karyotype]
+    features: [mosaic, trisomy]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, KARYO.MOSAIC_CHIMERA_PREFIX]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-078
+    iscn: "mos 46,X,i(X)(q10)[20]/45,X[10]"
+    types: [karyotype]
+    features: [mosaic, isochromosome, clone-order]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.MOSAIC_CHIMERA_PREFIX, ISO.FORMAT, KARYO.CLONE_ORDER_CONSTITUTIONAL]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-079
+    iscn: "mos 47,XX,+i(12)(p10)[12]/46,XX[18]"
+    types: [karyotype]
+    features: [mosaic, isochromosome]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, KARYO.MOSAIC_CHIMERA_PREFIX, ISO.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-080
+    iscn: "mos 45,X[8]/47,XXX[4]/46,XX[38]"
+    types: [karyotype]
+    features: [mosaic, three-lines]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.MOSAIC_CHIMERA_PREFIX]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-081
+    iscn: "chi 46,XX[30]/46,XY[20]"
+    types: [karyotype]
+    features: [chimera]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.MOSAIC_CHIMERA_PREFIX]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-082
+    iscn: "chi 46,XY[25]/46,XX[5]"
+    types: [karyotype]
+    features: [chimera]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.MOSAIC_CHIMERA_PREFIX]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: constitutional}}
+    review: {checked: false}
+  - id: K-083
+    iscn: "46,XY,t(9;22)(q34;q11.2)[20]"
+    types: [karyotype]
+    features: [translocation, clone-count]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-084
+    iscn: "46,XX,t(15;17)(q24;q21)[18]/46,XX[2]"
+    types: [karyotype]
+    features: [translocation, normal-line]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED, CLONE.NORMAL_LAST]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-085
+    iscn: "46,XY,t(8;21)(q22;q22)[15]/46,XY[5]"
+    types: [karyotype]
+    features: [translocation, normal-line]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED, CLONE.NORMAL_LAST]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-086
+    iscn: "46,XX,inv(16)(p13.1q22)[20]"
+    types: [karyotype]
+    features: [inversion]
+    rules: [KARYO.COUNT_SEX_ORDER, INV.FORMAT, CLONE.CELL_COUNT_REQUIRED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-087
+    iscn: "46,XY,inv(3)(q21q26.2)[20]"
+    types: [karyotype]
+    features: [inversion]
+    rules: [KARYO.COUNT_SEX_ORDER, INV.FORMAT, CLONE.CELL_COUNT_REQUIRED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-088
+    iscn: "46,XX,t(3;3)(q21;q26.2)[15]"
+    types: [karyotype]
+    features: [translocation, same-chromosome]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-089
+    iscn: "46,XY,t(4;11)(q21;q23)[20]"
+    types: [karyotype]
+    features: [translocation]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-090
+    iscn: "46,XY,t(12;21)(p13;q22)[18]/46,XY[2]"
+    types: [karyotype]
+    features: [translocation, normal-line]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-091
+    iscn: "46,XX,t(1;19)(q23;p13.3)[20]"
+    types: [karyotype]
+    features: [translocation]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-092
+    iscn: "46,XY,t(6;9)(p23;q34)[20]"
+    types: [karyotype]
+    features: [translocation]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-093
+    iscn: "46,XY,t(11;14)(q13;q32)[20]"
+    types: [karyotype]
+    features: [translocation]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-094
+    iscn: "46,XX,t(14;18)(q32;q21)[20]"
+    types: [karyotype]
+    features: [translocation]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-095
+    iscn: "46,XY,t(8;14)(q24.1;q32)[20]"
+    types: [karyotype]
+    features: [translocation, sub-band]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-096
+    iscn: "46,XX,t(11;19)(q23;p13.1)[20]"
+    types: [karyotype]
+    features: [translocation, sub-band]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-097
+    iscn: "47,XY,+8[12]/46,XY[8]"
+    types: [karyotype]
+    features: [trisomy, normal-line]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-098
+    iscn: "45,XY,–7[10]/46,XY[10]"
+    types: [karyotype]
+    features: [monosomy, normal-line]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-099
+    iscn: "46,XX,del(5)(q13q33)[14]/46,XX[6]"
+    types: [karyotype]
+    features: [deletion, normal-line]
+    rules: [KARYO.COUNT_SEX_ORDER, DEL.FORMAT, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-100
+    iscn: "46,XY,del(20)(q11.2q13.3)[9]/46,XY[11]"
+    types: [karyotype]
+    features: [deletion, normal-line]
+    rules: [KARYO.COUNT_SEX_ORDER, DEL.FORMAT, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-101
+    iscn: "46,XY,del(11)(q23)[10]"
+    types: [karyotype]
+    features: [deletion, terminal]
+    rules: [KARYO.COUNT_SEX_ORDER, DEL.FORMAT, CLONE.CELL_COUNT_REQUIRED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-102
+    iscn: "46,XX,del(13)(q14q22)[12]/46,XX[8]"
+    types: [karyotype]
+    features: [deletion, normal-line]
+    rules: [KARYO.COUNT_SEX_ORDER, DEL.FORMAT, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-103
+    iscn: "46,XX,i(17)(q10)[15]/46,XX[5]"
+    types: [karyotype]
+    features: [isochromosome, normal-line]
+    rules: [KARYO.COUNT_SEX_ORDER, ISO.FORMAT, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-104
+    iscn: "46,XY,r(7)(p22q36)[10]/46,XY[10]"
+    types: [karyotype]
+    features: [ring, normal-line]
+    rules: [KARYO.COUNT_SEX_ORDER, RING.FORMAT, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-105
+    iscn: "45,XX,dic(9;12)(p13;p13)[10]"
+    types: [karyotype]
+    features: [dicentric]
+    rules: [KARYO.COUNT_SEX_ORDER, DIC.FORMAT, CLONE.CELL_COUNT_REQUIRED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-106
+    iscn: "46,XX,hsr(1)(p22)[5]/46,XX[15]"
+    types: [karyotype]
+    features: [hsr]
+    rules: [KARYO.COUNT_SEX_ORDER, HSR.FORMAT, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-107
+    iscn: "46,XY,dup(1)(q12q32)[10]/46,XY[10]"
+    types: [karyotype]
+    features: [duplication]
+    rules: [KARYO.COUNT_SEX_ORDER, DUP.FORMAT, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-108
+    iscn: "45,X,–Y[12]/46,XY[8]"
+    types: [karyotype]
+    features: [sex-chromosomes, loss]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, SEX.ACQUIRED_GAIN_LOSS, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-109
+    iscn: "47,XX,+X[10]/46,XX[10]"
+    types: [karyotype]
+    features: [sex-chromosomes, gain]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, SEX.ACQUIRED_GAIN_LOSS, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-110
+    iscn: "47,XX,+8,t(9;22)(q34;q11.2)[20]"
+    types: [karyotype]
+    features: [trisomy, translocation]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, KARYO.ABNORMALITY_ORDER]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-111
+    iscn: "47,XX,t(9;22)(q34;q11.2),+der(22)t(9;22)(q34;q11.2)[20]"
+    types: [karyotype]
+    features: [translocation, derivative, gain]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, DER.DEFINITION]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-112
+    iscn: "46,XX,del(5)(q13q33),–7,+8[12]/46,XX[8]"
+    types: [karyotype]
+    features: [deletion, monosomy, trisomy]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, DEL.FORMAT, KARYO.ABNORMALITY_ORDER, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-113
+    iscn: "44,X,–X,–7[10]/46,XX[10]"
+    types: [karyotype]
+    features: [monosomy, sex-chromosomes]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, SEX.ACQUIRED_GAIN_LOSS, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-114
+    iscn: "46,X,–Y,+8[10]/46,XY[10]"
+    types: [karyotype]
+    features: [monosomy, trisomy, sex-chromosomes]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, SEX.ACQUIRED_GAIN_LOSS, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-115
+    iscn: "48,XY,+8,+8[10]/46,XY[10]"
+    types: [karyotype]
+    features: [tetrasomy]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-116
+    iscn: "47,XY,+8,i(17)(q10)[10]/46,XY[10]"
+    types: [karyotype]
+    features: [trisomy, isochromosome]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, ISO.FORMAT, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-117
+    iscn: "47,XX,+8,inv(16)(p13.1q22)[18]/46,XX[2]"
+    types: [karyotype]
+    features: [trisomy, inversion]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, INV.FORMAT, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-118
+    iscn: "46,XY,+1,der(1;7)(q10;p10)[12]/46,XY[8]"
+    types: [karyotype]
+    features: [derivative, whole-arm, trisomy]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, ORDER.NUMERICAL_BEFORE_STRUCTURAL, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-119
+    iscn: "55,XX,+X,+4,+6,+10,+14,+17,+18,+21,+21[15]/46,XX[5]"
+    types: [karyotype]
+    features: [hyperdiploid, sex-chromosomes]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, ORDER.X_BEFORE_Y, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-120
+    iscn: "68<3n>,XXY,–7[10]"
+    types: [karyotype]
+    features: [ploidy, near-triploid]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, NUM.PLOIDY_IN_ANGLE_BRACKETS, NUM.PLOIDY_REFERENCE]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-121
+    iscn: "68<3n>,XY,–X[10]"
+    types: [karyotype]
+    features: [ploidy, near-triploid, sex-chromosomes]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, NUM.PLOIDY_IN_ANGLE_BRACKETS, SEX.UNEVEN_PLOIDY_MALE]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-122
+    iscn: "46,XX,der(9)del(9)(p12)t(9;22)(q34;q11.2),der(22)t(9;22)(q34;q11.2)[15]"
+    types: [karyotype]
+    features: [derivative, complex]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, DER.DEFINITION, DER.ABERRATION_ORDER]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-123
+    iscn: "47,XX,+mar[5]/46,XX[15]"
+    types: [karyotype]
+    features: [marker]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, MAR.PLUS_SIGN, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-124
+    iscn: "48,XX,i(17)(q10),+mar1,+mar2[17]/46,XX[3]"
+    types: [karyotype]
+    features: [marker, numbered-markers]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, MAR.NUMBERED, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-125
+    iscn: "47,XX,t(9;22)(q34;q11.2),+21c[20]"
+    types: [karyotype]
+    features: [constitutional-in-neoplasm]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, KARYO.CONSTITUTIONAL_C]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-126
+    iscn: "48,XXYc,+8[15]"
+    types: [karyotype]
+    features: [constitutional-in-neoplasm, sex-chromosomes]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, KARYO.CONSTITUTIONAL_C]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-127
+    iscn: "46,XY,del(11)(q23),inc[5]"
+    types: [karyotype]
+    features: [incomplete]
+    rules: [KARYO.COUNT_SEX_ORDER, UNCERTAIN.INC_AT_END, DEL.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-128
+    iscn: "46,XY,t(9;22)(q34;q11.2)[3]/47,idem,+8[17]"
+    types: [karyotype]
+    features: [clones, idem, mainline]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED, CLONE.SUBCLONE_REFERENCE]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-129
+    iscn: "46,XY,t(9;22)(q34;q11.2)[3]/47,sl,+8[10]/48,sdl,+der(22)t(9;22)[7]"
+    types: [karyotype]
+    features: [clones, sl, sdl]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED, CLONE.SUBCLONE_REFERENCE]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-130
+    iscn: "46,XY,t(8;21)(q22;q22)[10]/45,idem,–Y[10]"
+    types: [karyotype]
+    features: [clones, idem, sex-chromosomes]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED, CLONE.SUBCLONE_REFERENCE]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-131
+    iscn: "46,XX,t(8;21)(q22;q22)[12]/45,idem,–X[19]/46,idem,–X,+8[5]"
+    types: [karyotype]
+    features: [clones, idem]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-132
+    iscn: "46,XY,t(9;22)(q34;q11.2)[15]/92,XXYY,t(9;22)(q34;q11.2)×2[5]"
+    types: [karyotype]
+    features: [clones, polyploid, multiplied]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED, CLONE.POLYPLOID_SUBCLONE, KARYO.MULTIPLY_SIGN_REARRANGED_ONLY]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-133
+    iscn: "47,XX,+8[5]/46,XX,t(3;5)(q25;q34)[4]/46,XX[11]"
+    types: [karyotype]
+    features: [clones, unrelated]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.ORDER_UNRELATED, CLONE.NORMAL_LAST]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-134
+    iscn: "46,XY,t(3;9)(p13;p13)[14]/48,XY,+3,+9[11]/46,XY[7]"
+    types: [karyotype]
+    features: [clones, unrelated]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, CLONE.ORDER_UNRELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-135
+    iscn: "44~47,XY,del(5)(q13q33),–7,+8[cp8]"
+    types: [karyotype]
+    features: [composite]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, CP.FORMAT, DEL.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-136
+    iscn: "52~56,XX,+4,+6,+10,+14,+17,+18,+21,+21[cp12]"
+    types: [karyotype]
+    features: [composite, hyperdiploid]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, CP.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-137
+    iscn: "45~48,XY,del(3)(p12)[2],–5[4],+8[3],+11[3][cp7]"
+    types: [karyotype]
+    features: [composite, per-abnormality-count]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, CP.FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-138
+    iscn: "46,XY[3]//46,XX[17]"
+    types: [karyotype]
+    features: [chimera, transplant]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.TRANSPLANT_CHIMERA]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-139
+    iscn: "46,XX,t(9;22)(q34;q11.2)[2]//46,XY[18]"
+    types: [karyotype]
+    features: [chimera, transplant, translocation]
+    rules: [KARYO.COUNT_SEX_ORDER, TRANSLOC.FORMAT, STRUCT.CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, KARYO.TRANSPLANT_CHIMERA]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-140
+    iscn: "//46,XY[20]"
+    types: [karyotype]
+    features: [chimera, transplant, donor-only]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.TRANSPLANT_CHIMERA]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}
+  - id: K-141
+    iscn: "47,XY,+?8[5]/46,XY[15]"
+    types: [karyotype]
+    features: [uncertainty, questioned-item, clones]
+    rules: [KARYO.COUNT_SEX_ORDER, KARYO.GAIN_LOSS_SIGN, NUM.COUNT_MATCHES_CHANGES, UNCERTAIN.QUESTIONABLE_ITEM, CLONE.CELL_COUNT_REQUIRED, CLONE.ORDER_RELATED]
+    source: synthetic
+    expected: {"2016": {verdict: valid, context: acquired}}
+    review: {checked: false}

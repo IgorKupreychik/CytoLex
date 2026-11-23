@@ -3,7 +3,8 @@
 A file's kind is taken from its top-level key: `rules` → rules.schema.json,
 `quotes` → quotes.schema.json, `exceptions` → band-exceptions.schema.json (T-007),
 `entries` → vocab.schema.json (T-008), `templates` → translation-templates.schema.json and
-`golden` → translation-golden.schema.json (T-057).
+`golden` → translation-golden.schema.json (T-057); `corpus` → corpus.schema.json (test corpus
+in tests/data/corpus/, T-062).
 Only the schema is checked here; cross-file checks
 (unique IDs, quote ↔ rule links, version vs directory) belong to `kb build` (T-005).
 """
@@ -29,6 +30,7 @@ SCHEMA_FILES = {
     "entries": "vocab.schema.json",  # kb/vocab/<version>/*.yaml (T-008)
     "templates": "translation-templates.schema.json",  # kb/translation/<version>/ (T-057)
     "golden": "translation-golden.schema.json",  # kb/translation/<version>/golden.yaml (T-057)
+    "corpus": "corpus.schema.json",  # tests/data/corpus/<type>.yaml (T-062)
 }
 YAML_SUFFIXES = {".yaml", ".yml"}
 

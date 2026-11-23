@@ -15,7 +15,7 @@
     <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
   </ItemGroup>
   <ItemGroup Label="External">
-    <!-- CytoLex.External (T-049): reads the cytogps section of config/local.yaml. -->
+    <!-- CytoLex.External (T-049): reads the cytogps section of config/local.yaml; core tests read the test corpus (T-062). -->
     <PackageVersion Include="YamlDotNet" Version="18.1.0" />
   </ItemGroup>
   <ItemGroup Label="Tests">

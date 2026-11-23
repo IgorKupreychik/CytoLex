@@ -71,7 +71,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-059 | done | 2 | T-058, T-036, T-039 | Desktop: translation view |
 | T-060 | done | 1 | T-023 | `kb build`: lean runtime bundle (rules metadata, vocab, bands) for the core |
 | T-061 | discussion | 3 | – | Presentation & documentation material for the pilot: define what to prepare |
-| T-062 | todo | 2 | T-026 | Test corpus of ISCN strings per notation type (review-flagged) + mutation generator |
+| T-062 | done | 2 | T-026 | Test corpus of ISCN strings per notation type (review-flagged) + mutation generator |
 | T-063 | done | 1 | T-053 | KB: typed symbol forms (`-`/`x`/`->`) in the ch. 3 vocab + rule `SYM.TYPED_SYMBOL_FORMS` |
 | T-064 | done | 3 | – | Merged into T-055 (line endings of generated committed files) |
 | T-065 | done | 1 | T-027 | Binder: syntax tree → semantic model (meaning nodes, KbRefs, IsPartial) |
@@ -94,6 +94,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-082 | todo | 3 | T-057 | Review the translation templates and golden file (ISCN 2016) |
 | T-083 | todo | 3 | – | Refactor: remove hand-written partial classes (`Binder`, `Parser`) per the code standard |
 | T-084 | todo | 3 | T-059 | Rule browser: bands (band table in `kb.sqlite`, band links of the translation open it) |
+| T-085 | todo | 3 | T-062 | Parser: report truncated input (missing `)`, trailing sign) under a KB rule instead of `CORE.UNPARSED` |
 
 ---
 
@@ -520,7 +521,7 @@ Outcome (2026-11-20):
 - Deviations: an "all occurrences" fix when one rule reports several faults; `Fix.Citations` added; the one-fix report method is `ReportWithFix`. Decisions in `docs/decisions.md` (2026-11-20), design in `docs/design/core.md` §10 "As built (T-035)".
 
 ### T-062 — Test corpus of ISCN strings per notation type
-**Status:** todo
+**Status:** done
 **Description:** A corpus of realistic ISCN strings, one file per notation type (e.g. `tests/corpus/karyotype.yaml`, `ish.yaml`, `nuc_ish.yaml`, `arr.yaml`, …), to complement the book-cited KB examples. The KB examples stay the reference suite; the corpus adds what they lack:
 - realistic, combined strings (several abnormalities, clones with `[n]`, mosaics/chimeras, karyotype + `ish` + `nuc ish` + `arr` joined by `.`);
 - volume for batch validation (T-038), the CytoGPS comparison (T-051) and the translation golden file (T-057);
@@ -539,6 +540,7 @@ Expected results start as `unreviewed`. Until a person checks an entry, or every
 - Files for the other types aim at "every construct at least once" rather than a fixed count. For `ish`, `nuc_ish` and `arr`, expected results are labelled only once their KB tasks (T-015/T-016, T-017) are done; before that they are parse-only.
 - A schema for the corpus files, the mutation generator with tests, and the harness running the corpus in `dotnet test` (parse-only entries skip until the parser exists).
 **Notes:** Raised 2026-11-18 by the user, after T-025. Labels must trace to KB rules, never to ISCN from memory (CLAUDE.md). Anonymised real strings from the user's lab would be the most valuable source; check the data policy first (no patient identifiers in the repo). Builds on the T-025 harness (`tests/CytoLex.Core.Tests/KbExamples/`).
+**Outcome (2026-11-23):** `tests/data/corpus/` (README: format, label policy, operators): 213 synthetic entries — `karyotype.yaml` 141 (constitutional, acquired, mosaic/chimera, structural incl. complex derivatives, uncertainty, clones/composite), `arr.yaml` 23 (labelled), `ish.yaml` 8 and `nuc_ish.yaml` 7 (`unreviewed`, skip until T-033), `combined.yaml` 8, `robustness.yaml` 26 (typed forms, spacing, case, typos, truncation). Schema `kb/schema/corpus.schema.json`; `kb check` covers `tests/data/corpus/` by default (pytest for the schema). Harness `tests/CytoLex.Core.Tests/Corpus/` (`CorpusData`, `CorpusExpectations`, `CorpusTests`, empty `PendingCorpus`): a label is checked when reviewed or when every named rule is in the edition's KB, else parse-only; `invalid` needs every `fires` rule and not-valid unless the severity policy keeps the findings below error; a `fires` rule without a check skips (as in the KB harness). Mutation generator `Corpus/Mutations/`: 14 operators, each grounded in a KB invalid example of its rule (`BookPair`), 916 mutants, each reports its rule. Opt-in export `CYTOLEX_CORPUS_EXPORT=1` → `build/review/corpus/corpus-2016.csv`. YamlDotNet added to Core.Tests. Deviations: no `lab` source (data policy T-048); one mutant per operator and entry (first site); mutants generated at test time, not committed. First run triage: 3 wrong labels fixed, 4 expected behaviours noted in `review.note` (T-032 cell-count decision, `needs_review` cap, `KARYO.CONSTITUTIONAL_C` not implemented, `inc`), no CytoLex bug; truncated input only gives `CORE.UNPARSED` → T-085. `dotnet test`: 8,184 tests, 0 failed.
 
 ### T-063 — KB: typed symbol forms in the ch. 3 vocab + `SYM.TYPED_SYMBOL_FORMS`
 **Status:** done
@@ -568,6 +570,12 @@ Outcome (2026-11-18):
 **Description:** Duplicate of T-055 (same ideograms test failure on CRLF checkouts).
 **Acceptance:** –
 **Notes:** Found during T-063 (2026-11-18). Merged into T-055 on 2026-11-18 at the user's request: its description, acceptance (`uv run --directory tools pytest` passes on Windows with `core.autocrlf=true`; generators and checkout agree) and fix options now live there. No work done here; the ID is kept so references stay valid.
+
+### T-085 — Parser: truncated input under a KB rule
+**Status:** todo
+**Description:** Truncated strings from the test corpus (`tests/data/corpus/robustness.yaml`: `46,XY,t(9;22)(q34;q11`, `46,XY,del(5)(q13`, `47,XX,+`) are reported only as `CORE.UNPARSED` ("text not attributed to any KB rule"). Find the KB rule that covers each fault (e.g. a breakpoint group that lacks its closing parenthesis, a sign without a chromosome); if the KB has none, add it with a citation first. Then let the parser report the fault under that rule, with a level-1 fix where one edit is certain (insert `)`).
+**Acceptance:** the three corpus entries report a KB rule (their `fires` updated from `CORE.UNPARSED`); KB examples and the corpus stay green.
+**Notes:** Created 2026-11-23 from T-062 (corpus robustness entries). Labels must trace to KB rules (CLAUDE.md).
 
 ## Desktop app (pilot)
 

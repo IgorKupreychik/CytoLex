@@ -1,0 +1,69 @@
+# Test corpus (T-062): metaphase in situ hybridization (ch. 13; parse-only until T-015/T-033). Format and label policy: tests/data/corpus/README.md.
+# Synthetic strings only (data policy T-048); labels trace to the KB rules named in `rules`/`fires`.
+format: cytolex-corpus
+version: 1
+corpus:
+  - id: I-001
+    iscn: "ish del(22)(q11.2q11.2)(HIRA–)"
+    types: [ish]
+    features: [ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed}}
+    review: {checked: false}
+  - id: I-002
+    iscn: "ish del(7)(q11.23q11.23)(ELN–)"
+    types: [ish]
+    features: [ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed}}
+    review: {checked: false}
+  - id: I-003
+    iscn: "ish dup(17)(p11.2p11.2)(RAI1++)"
+    types: [ish]
+    features: [ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed}}
+    review: {checked: false}
+  - id: I-004
+    iscn: "ish t(9;22)(q34;q11.2)(ABL1+;BCR+,ABL1+)"
+    types: [ish]
+    features: [ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed}}
+    review: {checked: false}
+  - id: I-005
+    iscn: "ish der(15)t(8;15)(RP11-1143I12+,RP11-14C10–)"
+    types: [ish]
+    features: [ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed}}
+    review: {checked: false}
+  - id: I-006
+    iscn: "ish r(1)(p13.1q11?)(D1Z1+)"
+    types: [ish]
+    features: [ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed}}
+    review: {checked: false}
+  - id: I-007
+    iscn: "ish 22q11.2(HIRA×2)"
+    types: [ish]
+    features: [ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed}}
+    review: {checked: false}
+  - id: I-008
+    iscn: "ish i(12)(p10)(wcp12+)"
+    types: [ish]
+    features: [ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed}}
+    review: {checked: false}

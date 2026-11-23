@@ -222,3 +222,79 @@ def test_translation_samples_validate():
 def test_translation_schema_rejects(data, where):
     problems = validate_data(data, Path("x.yaml"))
     assert [p.where for p in problems] == [where], problems
+
+
+# --- Test corpus (T-062) -------------------------------------------------------------------------
+
+CORPUS_DIR = SCHEMA_DIR.parents[1] / "tests" / "data" / "corpus"
+
+
+def test_corpus_schema_is_valid_draft_2020_12():
+    schema = json.loads((SCHEMA_DIR / "corpus.schema.json").read_text(encoding="utf-8"))
+    Draft202012Validator.check_schema(schema)
+
+
+def _corpus(**over) -> dict:
+    e = {
+        "id": "K-001",
+        "iscn": "47,XY,+21",
+        "types": ["karyotype"],
+        "features": ["trisomy"],
+        "rules": ["KARYO.GAIN_LOSS_SIGN"],
+        "source": "synthetic",
+        "expected": {"2016": {"verdict": "valid", "context": "constitutional"}},
+        "review": {"checked": False},
+    }
+    return {
+        "format": "cytolex-corpus",
+        "version": 1,
+        "corpus": [{k: v for k, v in (e | over).items() if v is not None}],
+    }
+
+
+def test_corpus_sample_validates():
+    assert validate_data(_corpus(), Path("karyotype.yaml")) == []
+    invalid = {"2016": {"verdict": "invalid", "fires": ["SYM.NO_OTHER_SPACE"]}}
+    assert validate_data(_corpus(expected=invalid), Path("x.yaml")) == []
+    cite = {"section": "4.1", "page": 37, "example": "E1"}
+    assert validate_data(_corpus(source="book-adapted", cite=cite), Path("x.yaml")) == []
+
+
+@pytest.mark.parametrize(
+    ("data", "where"),
+    [
+        (_corpus(source="lab"), "corpus[0].source"),
+        (_corpus(expected=None), "corpus[0]"),
+        (_corpus(expected={"2016": {"verdict": "invalid"}}), "corpus[0].expected.2016"),
+        (
+            _corpus(expected={"2016": {"verdict": "valid", "fires": ["SYM.NO_OTHER_SPACE"]}}),
+            "corpus[0].expected.2016",
+        ),
+        (_corpus(expected={"16": {"verdict": "valid"}}), "corpus[0].expected"),
+        (_corpus(source="book-adapted"), "corpus[0]"),
+        (_corpus(id="K1"), "corpus[0].id"),
+        (_corpus(types=["fish"]), "corpus[0].types[0]"),
+        (_corpus(rules=["del"]), "corpus[0].rules[0]"),
+    ],
+    ids=[
+        "lab-source",
+        "no-expected",
+        "invalid-without-fires",
+        "valid-with-fires",
+        "edition-key",
+        "book-adapted-without-cite",
+        "id",
+        "type",
+        "rule-id",
+    ],
+)
+def test_corpus_schema_rejects(data, where):
+    problems = validate_data(data, Path("x.yaml"))
+    assert [p.where for p in problems] == [where], problems
+
+
+def test_committed_corpus_files_validate():
+    files = sorted(CORPUS_DIR.glob("*.yaml"))
+    assert files, f"no corpus files in {CORPUS_DIR}"
+    for f in files:
+        assert validate_file(f) == [], f

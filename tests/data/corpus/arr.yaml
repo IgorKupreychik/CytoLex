@@ -1,0 +1,189 @@
+# Test corpus (T-062): microarray results (ch. 14). Format and label policy: tests/data/corpus/README.md.
+# Synthetic strings only (data policy T-048); labels trace to the KB rules named in `rules`/`fires`.
+format: cytolex-corpus
+version: 1
+corpus:
+  - id: A-001
+    iscn: "arr[GRCh38] 22q11.21(18912231_21465672)×1"
+    types: [arr]
+    features: [deletion, single-region]
+    rules: [ARR.COPY_NUMBER, ARR.NUCLEOTIDE_FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-002
+    iscn: "arr[GRCh38] 7q11.23(73330452_74762001)×1 dn"
+    types: [arr]
+    features: [deletion, inheritance]
+    rules: [ARR.COPY_NUMBER, ARR.INHERITANCE_SPACING]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-003
+    iscn: "arr[GRCh38] 15q11.2q13.1(22770421_28823722)×3 mat"
+    types: [arr]
+    features: [duplication, region-range, inheritance]
+    rules: [ARR.REGION_FORMAT, ARR.INHERITANCE_SPACING]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-004
+    iscn: "arr[GRCh38] 17p12(14194598_15567589)×3"
+    types: [arr]
+    features: [duplication]
+    rules: [ARR.COPY_NUMBER]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-005
+    iscn: "arr[GRCh37] 1q21.1q21.2(146106602_147830830)×1 pat"
+    types: [arr]
+    features: [deletion, grch37, inheritance]
+    rules: [GEN.GENOME_BUILD_REQUIRED, ARR.INHERITANCE_SPACING]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-006
+    iscn: "arr[GRCh38] 4p16.3p15.33(68345_12560044)×1,8p23.3p22(191530_14011218)×3"
+    types: [arr]
+    features: [deletion, duplication, two-regions]
+    rules: [ARR.ABERRATION_ORDER, ARR.PTER_TO_QTER]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-007
+    iscn: "arr[GRCh38] Xp22.31(6537070_8167697)×0"
+    types: [arr]
+    features: [nullisomy, sex-chromosomes]
+    rules: [ARR.COPY_NUMBER]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-008
+    iscn: "arr[GRCh38] 13q14.2q14.3(48200000_50900000)×1"
+    types: [arr]
+    features: [deletion]
+    rules: [ARR.COPY_NUMBER]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-009
+    iscn: "arr[GRCh38] 2p24.3(15800000_16200000)amp"
+    types: [arr]
+    features: [amplification]
+    rules: [ARR.COPY_NUMBER]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-010
+    iscn: "arr[GRCh38] 8q24.21(127700000_128300000)×2~4"
+    types: [arr]
+    features: [copy-number-range]
+    rules: [ARR.COPY_NUMBER]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-011
+    iscn: "arr(13)×3"
+    types: [arr]
+    features: [whole-chromosome, trisomy]
+    rules: [ARR.REGION_FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-012
+    iscn: "arr(8)×3,(21)×3"
+    types: [arr]
+    features: [whole-chromosome, two-regions]
+    rules: [ARR.ABERRATION_ORDER]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-013
+    iscn: "arr(1–22,X)×2"
+    types: [arr]
+    features: [normal]
+    rules: [ARR.NORMAL_RESULT]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-014
+    iscn: "arr(1–22)×2,(X,Y)×1"
+    types: [arr]
+    features: [normal, male]
+    rules: [ARR.NORMAL_RESULT]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-015
+    iscn: "arr[GRCh38] 11p15.5(1958000_2850000)×2 hmz"
+    types: [arr]
+    features: [zygosity]
+    rules: [ARR.ZYGOSITY]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-016
+    iscn: "arr[GRCh38] 6p22.3(15000000_16500000)×2 hmz pat"
+    types: [arr]
+    features: [zygosity, inheritance]
+    rules: [ARR.ZYGOSITY]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-017
+    iscn: "arr[GRCh38] 18q21.33q23(62000000_80200000)×1[0.3]"
+    types: [arr]
+    features: [mosaic]
+    rules: [ARR.MOSAIC_PROPORTION]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-018
+    iscn: "arr(X)×1[0.4]"
+    types: [arr]
+    features: [mosaic, whole-chromosome, sex-chromosomes]
+    rules: [ARR.MOSAIC_PROPORTION]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-019
+    iscn: "arr(1–22,X)cx"
+    types: [arr]
+    features: [complex]
+    rules: [ARR.COMPLEX_CX]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-020
+    iscn: "arr(5q)cth"
+    types: [arr]
+    features: [chromothripsis]
+    rules: [ARR.CHROMOTHRIPSIS]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-021
+    iscn: "arr[GRCh38] 1p36.33p36.32(827048_3736354)×1,1q41q44(221649655_247175095)×3"
+    types: [arr]
+    features: [same-chromosome, pter-to-qter]
+    rules: [ARR.ABERRATION_ORDER, ARR.PTER_TO_QTER]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-022
+    iscn: "arr[GRCh38] 9p24.3p13.1(204166_38756057)×1,Xq28(152000000_153000000)×3"
+    types: [arr]
+    features: [sex-chromosomes-last]
+    rules: [ARR.ABERRATION_ORDER]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}
+  - id: A-023
+    iscn: "arr[GRCh38] Xq25(126023321×2,126228413_126535347×1,126556900×2)"
+    types: [arr]
+    features: [detailed-system]
+    rules: [ARR.SHORT_AND_DETAILED_SYSTEMS, ARR.NUCLEOTIDE_FORMAT]
+    source: synthetic
+    expected: {"2016": {verdict: valid}}
+    review: {checked: false}

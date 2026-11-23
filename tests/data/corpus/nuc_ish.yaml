@@ -1,0 +1,61 @@
+# Test corpus (T-062): interphase in situ hybridization (ch. 13; parse-only until T-016/T-033). Format and label policy: tests/data/corpus/README.md.
+# Synthetic strings only (data policy T-048); labels trace to the KB rules named in `rules`/`fires`.
+format: cytolex-corpus
+version: 1
+corpus:
+  - id: N-001
+    iscn: "nuc ish(D13Z1,D18Z1,D21Z1)×2[200]"
+    types: [nuc_ish]
+    features: [nuc-ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed}}
+    review: {checked: false}
+  - id: N-002
+    iscn: "nuc ish(DXZ1×1,DYZ3×1)[200]"
+    types: [nuc_ish]
+    features: [nuc-ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed}}
+    review: {checked: false}
+  - id: N-003
+    iscn: "nuc ish(D21S65×3)[200]"
+    types: [nuc_ish]
+    features: [nuc-ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed}}
+    review: {checked: false}
+  - id: N-004
+    iscn: "nuc ish(ABL1,BCR)×3(ABL1 con BCR×2)[400]"
+    types: [nuc_ish]
+    features: [nuc-ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed}}
+    review: {checked: false}
+  - id: N-005
+    iscn: "nuc ish(KMT2A×2)(5'KMT2A sep 3'KMT2A×1)[100/200]"
+    types: [nuc_ish]
+    features: [nuc-ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed}}
+    review: {checked: false}
+  - id: N-006
+    iscn: "nuc ish(TP53×1,D17Z1×2)[150/200]"
+    types: [nuc_ish]
+    features: [nuc-ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed}}
+    review: {checked: false}
+  - id: N-007
+    iscn: "nuc ish(DXZ1×2)[180]/(DXZ1×1)[20]"
+    types: [nuc_ish]
+    features: [nuc-ish]
+    rules: []
+    source: synthetic
+    expected: {"2016": {verdict: unreviewed}}
+    review: {checked: false}
