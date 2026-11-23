@@ -108,6 +108,7 @@ internal sealed class AbnormalityList(string input)
             Breakpoints = [.. breakpoints.Select(Summary)],
             Parts = a.Parts.Length > 1 ? [.. a.Parts.Select(Part)] : [],
             Kb = [.. a.Kb.Concat(a.Parts.SelectMany(p => p.Symbols).SelectMany(s => s.Kb)).Distinct()],
+            Detailed = a.Composition?.Detailed,
         };
     }
 

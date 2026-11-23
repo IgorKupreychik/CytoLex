@@ -196,6 +196,9 @@
                                              IsVisible="{Binding HasDiagnostics}" VerticalAlignment="Center"
                                              ToolTip.Tip="{Binding DiagnosticsTip}" />
                                   </Grid>
+                                  <TextBlock Text="{Binding Detailed}" IsVisible="{Binding ShowDetailed}" Opacity="0.65" TextWrapping="Wrap"
+                                             FontFamily="Cascadia Mono,Consolas,monospace"
+                                             ToolTip.Tip="Detailed system: the band composition from the short-arm end (ISCN §4.3.2)" />
                                   <ItemsControl ItemsSource="{Binding Tags}">
                                     <ItemsControl.ItemsPanel>
                                       <ItemsPanelTemplate>

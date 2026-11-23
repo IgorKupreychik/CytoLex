@@ -137,6 +137,10 @@ public sealed record AbnormalityFlags(
 /// <param name="Flags">Qualifiers.</param>
 /// <param name="Diagnostics">Indices into <see cref="EditionResult.Diagnostics"/> of the diagnostics inside <see cref="Span"/>.</param>
 /// <param name="Kb">The KB entries that define it (symbol vocab items and format rules).</param>
+/// <param name="Detailed">
+/// The abnormality in the detailed system (T-066): <c>der(9)(9pter→9q34::22q11.2→22qter)</c>, computed from the short
+/// system or as written; <c>null</c> without a band composition (<see cref="Semantics.Abnormality.Composition"/>).
+/// </param>
 public sealed record AbnormalityEntry(
     int Index,
     int CellLine,
@@ -153,4 +157,5 @@ public sealed record AbnormalityEntry(
     ImmutableArray<AbnormalityEntry> Readings,
     AbnormalityFlags Flags,
     ImmutableArray<int> Diagnostics,
-    ImmutableArray<KbRef> Kb);
+    ImmutableArray<KbRef> Kb,
+    string? Detailed = null);

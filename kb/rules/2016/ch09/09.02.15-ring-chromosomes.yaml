@@ -8,10 +8,15 @@ rules:
     statement: >-
       A ring chromosome is written with the symbol r and may be made of one or several chromosomes.
       A ring from one chromosome is written r(chromosome)(breakpoint breakpoint), with no semicolon
-      between the two breakpoints.
+      between the two breakpoints. Breakage and reunion occur at the two bands: the segments
+      distal to them are lost and the segment between them forms the ring. In a ring of several
+      chromosomes the segments follow in the written order, each oriented by the order of its
+      breakpoints.
     cite:
       - {section: "9.2.15", page: 72, para: "¶1"}
       - {section: "9.2.15", page: 73, para: "¶2"}
+      - {section: "9.2.15", page: 73, example: E1}
+      - {section: "9.2.15", page: 73, para: "¶4"}
     examples:
       valid:
         - text: "46,XX,r(7)(p22q36)"
@@ -24,8 +29,10 @@ rules:
           corrected: "46,XX,r(7)(p22q36)"
     fix: {level: 1, kind: delete, hint: Remove the semicolon between the breakpoints.}
     review:
-      paraphrase_checked: true
+      paraphrase_checked: false
       needs_review: false
+      note: >-
+        Statement extended for the band composition of the short system (T-066), from the cited example notes.
     related: [STRUCT.BREAKPOINT_GROUPS, RING.MONOCENTRIC_AS_DER, RING.DIC_TRC_ORDER, RING.UNIDENTIFIED]
 
   - id: RING.MONOCENTRIC_AS_DER

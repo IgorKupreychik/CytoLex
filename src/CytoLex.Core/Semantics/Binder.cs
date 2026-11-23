@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Text;
+using CytoLex.Core.Composing;
 using CytoLex.Core.Kb;
 using CytoLex.Core.Syntax;
 using CytoLex.Core.Text;
@@ -17,7 +18,8 @@ namespace CytoLex.Core.Semantics;
 /// breakpoint group without a chromosome and the like are facts in the model, reported by the rules (T-029+).</item>
 /// <item>Short and detailed systems give the same <see cref="Breakpoint"/>s: in the detailed system they are the band
 /// ends at the joins (<c>::</c>, <c>:</c>). The band composition (<see cref="DerivativeStructure"/>) is kept as written;
-/// it is not computed from the short system (T-066).</item>
+/// <see cref="Abnormality.Composition"/> gives it for both systems (computed from the short system by the
+/// <see cref="Composer"/>, T-066).</item>
 /// <item>Every node built from recovered or skipped input carries those <see cref="SyntaxDiagnostic"/>s as
 /// <see cref="MeaningNode.Issues"/> (partial); its ancestors too.</item>
 /// <item>KB refs: each symbol's vocab item and its format rule(s) (<see cref="SymbolRules"/>), each band of the band
@@ -112,6 +114,7 @@ public sealed partial class Binder
     private sealed partial class Run(Binder binder, SyntaxTree tree)
     {
         private readonly IEditionKb _kb = binder._kb;
+        private readonly Composer _composer = new(id => binder._kb.Rule(id) is not null);
 
         // ── Helpers ──────────────────────────────────────────────────────────────────────────────────
 
@@ -602,7 +605,7 @@ public sealed partial class Binder
             var leading = node.ChildNodes(SyntaxKind.LeadingCount).FirstOrDefault();
             var parts = node.ChildNodes(SyntaxKind.AbnormalityPart).Select(BindPart).ToImmutableArray();
             var (copies, constitutional, inheritance) = Suffixes(node);
-            return new Abnormality
+            var abnormality = new Abnormality
             {
                 Span = node.Span,
                 Syntax = node,
@@ -616,6 +619,7 @@ public sealed partial class Binder
                 Issues = IssuesOf(node),
                 Kb = Refs(VocabOf(signTokens), questioned ? Rules(QuestionableItem) : []),
             };
+            return abnormality with { Composition = _composer.Compose(abnormality) };
         }
 
         private AbnormalityPart BindPart(SyntaxNode node)

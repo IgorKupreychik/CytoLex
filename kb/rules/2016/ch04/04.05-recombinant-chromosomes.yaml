@@ -10,7 +10,10 @@ rules:
       arising de novo during gametogenesis from meiotic crossing-over between a displaced
       segment and its normally placed counterpart in a structural heterozygote (most often an
       inversion or insertion carrier). A derivative chromosome, by contrast, is a product of the
-      original rearrangement and passes through meiosis unchanged.
+      original rearrangement and passes through meiosis unchanged. Crossing-over in a pericentric
+      inversion inv(n)(pXqY) gives rec(n)dup(np)inv(n)(pXqY), with a duplication from pter to pX
+      and a deletion from qY to qter, and rec(n)dup(nq)inv(n)(pXqY), with a duplication from qY to
+      qter and a deletion from pter to pX.
     cite:
       - {section: "4.5", page: 46, para: "¶1"}
       - {section: "4.5", page: 46, para: "¶2"}
@@ -22,11 +25,12 @@ rules:
           cite: {section: "4.5", page: 46, para: "¶4"}
           note: The maternal pericentric inversion of the book's example; the text layer has a line-wrap space before "(p21q31)" (a line break on printed p.46, checked 2026-11-17).
     review:
-      paraphrase_checked: true
+      paraphrase_checked: false
       needs_review: false
       note: >-
         ¶4 refers to Fig. 9 (inversion loop diagram); the duplicated and deleted segments are
         spelled out in the text, so the rule does not depend on the diagram.
+        Statement extended for the band composition of the short system (T-066), from ¶4.
     related: [REC.FORMAT, DER.DEFINITION, REC.NOT_ACQUIRED]
 
   - id: REC.FORMAT

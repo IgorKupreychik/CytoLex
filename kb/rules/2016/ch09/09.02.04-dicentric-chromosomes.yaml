@@ -9,10 +9,14 @@ rules:
       A dicentric chromosome is written dic(chromosome;chromosome)(breakpoint;breakpoint), an
       isodicentric one idic(chromosome)(breakpoint). A dicentric counts as one chromosome, and
       the symbol shows that it replaces one or two normal chromosomes, which are not written as
-      missing. A dicentric formed from sister chromatids may be written dic(13)(q14q32).
+      missing. A dicentric formed from sister chromatids may be written dic(13)(q14q32). The two
+      segments that carry the centromeres are joined at the breakpoints and the segments distal to
+      them are lost; an isodicentric is two copies of one chromosome joined at the same band.
     cite:
       - {section: "9.2.4", page: 65, para: "¶1"}
       - {section: "9.2.4", page: 65, example: E1}
+      - {section: "9.2.4", page: 65, example: E2}
+      - {section: "9.2.4", page: 66, example: E6}
     examples:
       valid:
         - text: "45,XX,dic(13;13)(q14;q32)"
@@ -62,8 +66,10 @@ rules:
           corrected: "45,XX,dic(13;15)(q22;q24)"
     fix: {level: 1, kind: delete, hint: Remove the losses of the chromosomes that the dicentric replaces.}
     review:
-      paraphrase_checked: true
+      paraphrase_checked: false
       needs_review: false
+      note: >-
+        Statement extended for the band composition of the short system (T-066), from the cited example notes.
     related: [DIC.NO_DER_DIC, DIC.PSEUDODICENTRIC_ORDER, DER.DICENTRIC_FORMAT, KARYO.REPLACED_NORMAL_NOT_MISSING, ISO.FORMAT, DER.WHOLE_ARM_TWO_CHROMOSOMES, ROB.DICENTRIC_USE_DIC]
 
   - id: DIC.NO_DER_DIC

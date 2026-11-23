@@ -295,6 +295,12 @@ public sealed record Abnormality : SuffixedItem
     /// <summary>All breakpoints of all parts, in input order.</summary>
     public IEnumerable<Breakpoint> Breakpoints => Parts.SelectMany(p => p.Breakpoints);
 
+    /// <summary>
+    /// The band composition (T-066): computed from the short system or read from the detailed system, one composed
+    /// chromosome per product; <c>null</c> when the abnormality has none (partial, uncertain breakpoints, <c>mar</c>, …).
+    /// </summary>
+    public Composing.AbnormalityComposition? Composition { get; init; }
+
     public override IEnumerable<MeaningNode> Children() => Join([LeadingCount], Parts, SuffixNodes);
 }
 

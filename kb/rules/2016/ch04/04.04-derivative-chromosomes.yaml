@@ -35,7 +35,9 @@ rules:
     severity: error
     statement: >-
       A derivative chromosome is written der, followed in parentheses by the chromosome that
-      supplies its intact centromere (or neocentromere, section 9.2.13).
+      supplies its intact centromere (or neocentromere, section 9.2.13). The aberrations written
+      after it are those that generated it from that chromosome, as in
+      der(1)t(1;3)(p32;q21)t(1;11)(q25;q13): chromosome 1 changed by both translocations.
     cite:
       - {section: "4.4", page: 44, para: "¶2"}
       - {section: "4.4", page: 45, para: "¶3"}
@@ -73,12 +75,13 @@ rules:
           corrected: "46,XX,der(2)(2pter→2q21::5q31→5qter)"
     fix: {level: 1, kind: replace, hint: Name the derivative after the chromosome whose centromere it contains.}
     review:
-      paraphrase_checked: true
+      paraphrase_checked: false
       needs_review: false
       note: >-
         ¶3 refers to Fig. 8 (pachytene diagram); the karyotype strings and their meaning are in
         the text and Table 4 (signed off 2026-11-17), so the rule does not depend on the
         diagram.
+        Statement extended for the band composition of the short system (T-066), from the cited example notes.
     related: [DER.ABERRATIONS_NO_COMMA, DER.ABERRATION_ORDER]
 
   - id: DER.ABERRATIONS_NO_COMMA

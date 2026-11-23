@@ -8,7 +8,7 @@ rules:
     statement: >-
       Centric fission is written fis. The two products are written separately, with the
       breakpoint assigned to p10 or q10 according to their morphology (fis(10)(p10),
-      fis(10)(q10)).
+      fis(10)(q10)). Each product is one arm, from its end to the centromere.
     cite:
       - {section: "9.2.6", page: 67, para: "¶1"}
       - {section: "9.2.6", page: 67, example: E1}
@@ -24,9 +24,10 @@ rules:
           corrected: "47,XY,–10,+fis(10)(p10),+fis(10)(q10)"
     fix: {level: 1, kind: replace, hint: "Write the breakpoint as the centromeric band p10 or q10."}
     review:
-      paraphrase_checked: true
+      paraphrase_checked: false
       needs_review: false
       note: >-
         Unlike other rearrangements, the book's only example writes the lost normal chromosome
         (–10) and both products with +.
+        Statement extended for the band composition of the short system (T-066), from the cited example notes.
     related: [BAND.CENTROMERE_10]

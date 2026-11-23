@@ -10,9 +10,12 @@ rules:
       breakpoint group per chromosome, in the order of the chromosomes. A chromosome that exchanges
       an interstitial segment has two bands in its group; their order shows the orientation of the
       segment relative to the centromere, so the distal band may come first. Derivatives from
-      malsegregation of a reciprocal translocation are written as der (section 9.2.3).
+      malsegregation of a reciprocal translocation are written as der (section 9.2.3). Breakage
+      and reunion occur at the given bands and the segments distal to them are exchanged, so each
+      derivative keeps its own centromere.
     cite:
       - {section: "9.2.17.1", page: 75, para: "¶1"}
+      - {section: "9.2.17.1", page: 75, example: E1}
       - {section: "9.2.17.1", page: 76, example: E12}
       - {section: "9.2.17.1", page: 77, para: "¶2"}
     examples:
@@ -72,12 +75,13 @@ rules:
           corrected: "46,XY,t(5;6)(q13q23;q15q23)"
     fix: {level: 1, kind: replace, hint: "Group the breakpoints by chromosome: one group per chromosome, groups separated by semicolons."}
     review:
-      paraphrase_checked: true
+      paraphrase_checked: false
       needs_review: false
       note: >-
         Chromosome order: STRUCT.CHROMOSOME_ORDER (two chromosomes) and STRUCT.MULTI_CHROMOSOME_ORDER
         (three or more); sex field: SEX.ABNORMAL_SEX_CHROMOSOME_IN_LIST; homologues:
         TRANSLOC.HOMOLOGUE_UNDERLINING.
+        Statement extended for the band composition of the short system (T-066), from the cited example notes.
     related: [STRUCT.CHROMOSOME_ORDER, STRUCT.MULTI_CHROMOSOME_ORDER, STRUCT.BREAKPOINT_GROUPS, STRUCT.PROXIMAL_BREAKPOINT_FIRST, DER.UNBALANCED_USE_DER, SEX.ABNORMAL_SEX_CHROMOSOME_IN_LIST, TRANSLOC.HOMOLOGUE_UNDERLINING]
 
   - id: TRANSLOC.HOMOLOGUE_UNDERLINING

@@ -127,4 +127,19 @@ public class AbnormalityPanelTests
         var group = Assert.Single(vm.SelectedPanel!.CellLineGroups);
         Assert.True(group.IsEmpty);
     }
+
+    /// <summary>T-066: a card shows the detailed-system form when it differs from the written text.</summary>
+    [Fact]
+    public void DetailedForm_Shown()
+    {
+        var vm = new MainWindowViewModel { Input = "47,XY,+8,der(9)t(9;22)(q34;q11.2)" };
+        var items = Assert.Single(vm.SelectedPanel!.CellLineGroups).Items;
+        Assert.False(items[0].ShowDetailed);
+        Assert.Equal("der(9)(9pter→9q34::22q11.2→22qter)", items[1].Detailed);
+        Assert.True(items[1].ShowDetailed);
+
+        vm.Input = "46,XX,der(9)(9pter→9q34::22q11.2→22qter)";
+        var written = Assert.Single(Assert.Single(vm.SelectedPanel!.CellLineGroups).Items);
+        Assert.False(written.ShowDetailed); // already written in the detailed system
+    }
 }

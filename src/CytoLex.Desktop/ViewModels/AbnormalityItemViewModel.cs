@@ -51,6 +51,7 @@ public sealed class AbnormalityItemViewModel : ISpanItem
         Span = entry.Span;
         Text = entry.Text;
         ShortForm = entry.ShortForm;
+        Detailed = entry.Detailed;
         KindLabel = KindLabelOf(entry);
         KindBrush = KindBrushOf(entry.Kind);
         Tags = TagsOf(entry.Chromosomes, entry.Breakpoints);
@@ -83,6 +84,12 @@ public sealed class AbnormalityItemViewModel : ISpanItem
 
     /// <summary>Whether the short form differs from the written text (otherwise it is not shown twice).</summary>
     public bool ShowShortForm => !string.Equals(ShortForm, Text, StringComparison.Ordinal);
+
+    /// <summary>The abnormality in the detailed system (T-066): <c>der(9)(9pter→9q34::22q11.2→22qter)</c>; <c>null</c> without a band composition.</summary>
+    public string? Detailed { get; }
+
+    /// <summary>Whether there is a detailed form that differs from the written text (a string already in the detailed system isn't shown twice).</summary>
+    public bool ShowDetailed => Detailed is not null && !string.Equals(Detailed, Text, StringComparison.Ordinal);
 
     /// <summary>The kind chip: <c>gain</c>, <c>loss</c>, the symbol (<c>del</c>, <c>der</c>), <c>variant</c>, <c>or</c>, <c>clone</c>, <c>?</c>.</summary>
     public string KindLabel { get; }

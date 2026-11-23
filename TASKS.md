@@ -75,7 +75,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-063 | done | 1 | T-053 | KB: typed symbol forms (`-`/`x`/`->`) in the ch. 3 vocab + rule `SYM.TYPED_SYMBOL_FORMS` |
 | T-064 | done | 3 | – | Merged into T-055 (line endings of generated committed files) |
 | T-065 | done | 1 | T-027 | Binder: syntax tree → semantic model (meaning nodes, KbRefs, IsPartial) |
-| T-066 | todo | 2 | T-065 | Band composition from the short system (derivative structure for short-form abnormalities) |
+| T-066 | done | 2 | T-065 | Band composition from the short system (derivative structure for short-form abnormalities) |
 | T-067 | discussion | 3 | T-045, T-046 | Revisit genome-assembly-only bands per edition (2016 error vs. later-edition valid?) |
 | T-068 | done | 1 | T-031 | Rules: ch. 9 symbol rules (split from T-031) |
 | T-069 | done | 2 | T-036 | Abnormality list: core API + desktop panel |
@@ -95,6 +95,8 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-083 | todo | 3 | – | Refactor: remove hand-written partial classes (`Binder`, `Parser`) per the code standard |
 | T-084 | todo | 3 | T-059 | Rule browser: bands (band table in `kb.sqlite`, band links of the translation open it) |
 | T-085 | todo | 3 | T-062 | Parser: report truncated input (missing `)`, trailing sign) under a KB rule instead of `CORE.UNPARSED` |
+| T-086 | todo | 3 | T-066 | Use `Abnormality.Composition`: detailed composition vs. its symbol (rule), translation and LGF read one shape |
+| T-087 | discussion | 3 | T-066 | Band compositions the KB doesn't define yet: insertion recombinants, `der(?)` with an insertion or hsr at an unknown site |
 
 ---
 
@@ -577,6 +579,18 @@ Outcome (2026-11-18):
 **Acceptance:** the three corpus entries report a KB rule (their `fires` updated from `CORE.UNPARSED`); KB examples and the corpus stay green.
 **Notes:** Created 2026-11-23 from T-062 (corpus robustness entries). Labels must trace to KB rules (CLAUDE.md).
 
+### T-086 — Use the band composition in rules and the translation
+**Status:** todo
+**Description:** T-066 gives every rearrangement one composition shape (`Abnormality.Composition`, both systems). Use it: (1) a rule check that a composition written in the detailed system matches what its symbol and breakpoints say (e.g. `del(5)(pter→q13::q33→qter)` vs. the deletion's own breakpoints, `inv` pieces actually reversed) — find or add the KB rule first; (2) the translation (T-058, `CompositionRenderer`) and LGF (T-050) read `Composition` instead of `DerivativeStructure`, so short-system derivatives get the same sentences/counts as detailed ones; (3) `DER.COMPLEX_USE_DETAILED` can tell when the short system is ambiguous (no composition).
+**Acceptance:** each part done with tests on the KB pairs; golden translations unchanged or reviewed.
+**Notes:** Created 2026-11-23 from T-066.
+
+### T-087 — Band compositions the KB doesn't define yet
+**Status:** discussion
+**Description:** T-066 leaves `Abnormality.Composition` `null` where no KB rule defines the product: insertion recombinants (`rec(21)del(21)ins(21)(p13q22.2q22.3)`, `rec(1)dup(5q)ins(1;5)(…)`, §9.2.3 E3–E4) and `der(?)` with an insertion or hsr at an unknown site (§9.2.3 E28–E29, printed as `…?→cen→?::7q11.2→7q32::?` and `…?→cen→?::hsr→?`; pending in `PendingCompositions`). Decide whether the book's examples are enough to state a rule (KB first), or whether these stay without a composition.
+**Acceptance:** decision recorded in `docs/decisions.md`; KB rule + composer change, or the cases documented as having no composition and removed from the pending table.
+**Notes:** Created 2026-11-23 from T-066.
+
 ## Desktop app (pilot)
 
 ### T-036 — App shell + single-string check
@@ -884,10 +898,10 @@ Deviations from the plan: no CLI (user); new label `severity-policy` and CytoLex
 **Outcome (2026-11-18):** Binder in `src/CytoLex.Core/Semantics/` (`Binder.cs`, `MeaningNodes.cs`, `KbRef.cs`); the validator binds every karyotype segment and checks read `RuleContext.Model` (`EditionProfile.Binder`). Decided with the user: breakpoints normalised for both systems (detailed = points at the `::`/`:` joins, minus arm ends and hsr/neo), `DerivativeStructure` only as written (short-system compositions → new task T-066); the binder reports no diagnostics (facts in the model, rules report). KbRefs: symbol vocab items + format rules (`Binder.SymbolRules`, section-checked against the vocab), resolved bands, construct rules. Partial nodes carry the `SyntaxDiagnostic`s themselves. Tests in `tests/CytoLex.Core.Tests/Semantics/` (KB examples valid/corrected complete, invalid → diagnostics named by partial nodes, 32 spot checks incl. 11 short/detailed pairs, KB-trace tests). Docs: `docs/design/core.md` §5 "As built (T-065)" lists the deviations from the sketch (parts, groups, item kinds, `Issues` instead of diagnostic IDs); CLAUDE.md/README status; note on T-050.
 
 ### T-066 — Band composition from the short system
-**Status:** todo
+**Status:** done
 **Description:** The binder (T-065) keeps `DerivativeStructure` only as written (detailed system); short-form abnormalities have none. Compute the band composition (ordered pieces with orientation, joins) from the short system for every pilot rearrangement type (del, dup, inv, ins, i, idic, r, t, der with several parts, rec, dic, trc, tas, trp, qdp, add, hsr, fis …), so rules can compare both systems and LGF (T-050) and the translation (T-058) can use one shape. Each type's composition must trace to its KB rule (§4.3, §9); missing semantics go into the KB first. Also show the composition in the abnormality list (T-069: `AbnormalityList.cs`, desktop "Abnormalities" panel) as the derivative written out in the detailed system, e.g. `der(9)t(9;22)(q34;q11.2)` → `der(9)(9pter→9q34::22q11.2→22qter)`. CytoGPS shows this (`derivative_chromosome_detailed_systems`, `docs/research/cytogps.md` §3).
 **Acceptance:** For every KB example pair printed in both systems, the computed composition of the short form equals the bound detailed form; per-type unit tests; types without a defined composition are listed and left `null`. The abnormality list shows the detailed-system form for every abnormality with a composition (core API + desktop panel; checked on the KB pairs printed in both systems).
-**Notes:** Created 2026-11-18 from T-065 (decided with the user: T-065 normalises breakpoints only). Useful for T-031 (short-vs-detailed rules such as `DER.COMPLEX_USE_DETAILED`), T-050 (LGF) and T-058 (translation). 2026-11-20: abnormality-list display added from the CytoGPS comparison (T-047, user).
+**Notes:** Created 2026-11-18 from T-065 (decided with the user: T-065 normalises breakpoints only). Useful for T-031 (short-vs-detailed rules such as `DER.COMPLEX_USE_DETAILED`), T-050 (LGF) and T-058 (translation). 2026-11-20: abnormality-list display added from the CytoGPS comparison (T-047, user). **Outcome (2026-11-23):** `src/CytoLex.Core/Composing/` — `Composer` (set by the binder → `Abnormality.Composition`: one `ComposedChromosome` per product, `Source` Computed/Written, `Detailed` string, `Kb` rules), `WorkingChromosome` (split/remove/insert/reverse/mirror), `Rearrangements` (one operation per type citing its rule: del, add, inv, dup/trp/qdp, ins, hsr, t incl. 3–4 chromosomes and interstitial segments, whole-arm/rob, dic/psu dic, idic, i, r/dic r/trc r, trc, tas, fis; der/ider/der(a;b)/der(?) applying aberrations in turn; rec of a pericentric inversion), `Orientation` (`STRUCT.COMPOSITION_ORDER`); `BandPosition` moved there from `Rules/Checks/`. `AbnormalityEntry.Detailed` + a grey detailed-system line in the desktop "Abnormalities" panel. KB: 8 statements extended from cited example notes (`TRANSLOC.FORMAT`, `TRANSLOC.WHOLE_ARM`, `RING.FORMAT`, `DIC.FORMAT`, `ISO.FORMAT`, `FIS.FORMAT`, `DER.CENTROMERE_CHROMOSOME`, `REC.DEFINITION` §4.5 ¶4), `paraphrase_checked: false` for review. Tests `tests/CytoLex.Core.Tests/Composition/`: `CompositionPairTests` (89 book blocks in both systems: 87 equal, §9.2.3 E28–E29 `der(?)` with insertion/hsr at an unknown site pending → T-087; detailed strings bind back to the same composition), `CompositionTypeTests` (50 cases incl. null cases); abnormality-list and desktop panel tests. Deviation: batch export unchanged (it doesn't serialize abnormalities); `rec` handled for pericentric inversions only. Docs: CLAUDE.md, README, `docs/design/core.md` §5, `docs/research/cytogps-comparison.md`. Follow-ups T-086, T-087.
 
 ### T-067 — Revisit genome-assembly-only bands per edition
 **Status:** discussion

@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 using CytoLex.Core.Semantics;
 
-namespace CytoLex.Core.Rules.Checks;
+namespace CytoLex.Core.Composing;
 
 /// <summary>
 /// The position of a band along its chromosome, from pter to qter, read from the band designation alone (§2.3.2: regions
@@ -21,7 +21,16 @@ internal readonly record struct BandPosition(int Arm, ImmutableArray<int> Digits
             return null;
         }
 
-        switch (bp.Landmark)
+        return Of(bp.Landmark, bp.Arm, bp.BandNumber);
+    }
+
+    /// <summary>
+    /// The position of a landmark (<c>pter</c>, <c>qter</c>, <c>cen</c>) or of a band given by its arm and digits;
+    /// <c>null</c> for other landmarks and malformed bands.
+    /// </summary>
+    public static BandPosition? Of(string? landmark, string? arm, string? bandNumber)
+    {
+        switch (landmark)
         {
             case "pter":
                 return new BandPosition(_p, [int.MaxValue]);
@@ -33,12 +42,12 @@ internal readonly record struct BandPosition(int Arm, ImmutableArray<int> Digits
                 return null;
         }
 
-        if (bp.Arm is not ("p" or "q") || bp.BandNumber is not { Length: > 0 } number || !number.All(c => char.IsAsciiDigit(c) || c == '.'))
+        if (arm is not ("p" or "q") || bandNumber is not { Length: > 0 } number || !number.All(c => char.IsAsciiDigit(c) || c == '.'))
         {
             return null;
         }
 
-        return new BandPosition(bp.Arm == "p" ? _p : 1, [.. number.Where(char.IsAsciiDigit).Select(c => c - '0')]);
+        return new BandPosition(arm == "p" ? _p : 1, [.. number.Where(char.IsAsciiDigit).Select(c => c - '0')]);
     }
 
     /// <summary>The arm: <c>p</c>, <c>q</c>, or <c>null</c> at the centromere.</summary>

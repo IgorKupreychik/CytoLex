@@ -9,7 +9,8 @@ rules:
       An isochromosome is written i(chromosome)(breakpoint), never iso; an isodicentric
       chromosome is written idic(chromosome)(breakpoint). The breakpoint of an isochromosome is the
       centromeric band p10 or q10, chosen by the isochromosome's morphology. The shorter form
-      i(17q) may be used in running text but not in a karyotype.
+      i(17q) may be used in running text but not in a karyotype. An isochromosome is two copies of
+      one arm joined at the centromere.
     cite:
       - {section: "9.2.11", page: 70, para: "¶1"}
       - {section: "9.2.11", page: 70, example: E1}
@@ -47,7 +48,9 @@ rules:
           corrected: "46,XX,i(17)(q10)"
     fix: {level: 1, kind: replace, hint: "Write i(chromosome)(p10) or i(chromosome)(q10)."}
     review:
-      paraphrase_checked: true
+      paraphrase_checked: false
       needs_review: false
-      note: Complex isochromosomes (isoderivatives) are derivatives - DER.ISODERIVATIVE (§9.2.11 ¶2).
+      note: >-
+        Complex isochromosomes (isoderivatives) are derivatives - DER.ISODERIVATIVE (§9.2.11 ¶2).
+        Statement extended for the band composition of the short system (T-066), from the cited example notes.
     related: [DER.ISODERIVATIVE, DIC.FORMAT, BAND.CENTROMERE_10, KARYO.REPLACED_NORMAL_NOT_MISSING, ROB.FORMAT]

@@ -217,4 +217,40 @@ public class AbnormalityListTests
         var back = JsonSerializer.Deserialize<ValidationReport>(json, Validator.JsonOptions)!;
         Assert.Equal(json, JsonSerializer.Serialize(back, Validator.JsonOptions));
     }
+
+    /// <summary>T-066: the detailed-system form of an abnormality with a band composition.</summary>
+    [Fact]
+    public void Detailed_FromTheComposition()
+    {
+        Assert.Equal("t(9;22)(9pter→9q34::22q11.2→22qter;22pter→22q11.2::9q34→9qter)", One("46,XX,t(9;22)(q34;q11.2)").Detailed);
+        Assert.Equal("der(9)(9pter→9q34::22q11.2→22qter)", One("46,XX,der(9)t(9;22)(q34;q11.2)").Detailed);
+        Assert.Null(One("47,XX,+8").Detailed);
+        Assert.Null(One("47,XX,+mar").Detailed);
+    }
+
+    public static IEnumerable<TheoryDataRow<string>> PairShortForms() =>
+        Composition.CompositionPairTests.Pairs
+            .Where(p => !Composition.PendingCompositions.Table.ContainsKey(p.Cite))
+            .SelectMany(p => p.ShortForms)
+            .Distinct(StringComparer.Ordinal)
+            .Select(s => new TheoryDataRow<string>(s));
+
+    /// <summary>T-066 acceptance: on every KB pair printed in both systems, each abnormality with a composition lists its detailed form.</summary>
+    [Theory]
+    [MemberData(nameof(PairShortForms))]
+    public void KbPair_ShortForm_ListsTheDetailedForm(string text)
+    {
+        var fragment = KbCatalog.IsFragment(text);
+        var result = Result(text, fragment);
+        var items = BindHelper.Bind(text, fragment).SelectMany(m => m.CellLines).SelectMany(l => l.Items).Where(i => i is not OmittedItems).ToList();
+        var composed = 0;
+        for (var i = 0; i < items.Count; i++)
+        {
+            var expected = (items[i] as Abnormality)?.Composition?.Detailed;
+            Assert.Equal(expected, result.Abnormalities[i].Detailed);
+            composed += expected is null ? 0 : 1;
+        }
+
+        Assert.True(composed > 0, "no abnormality with a composition");
+    }
 }
