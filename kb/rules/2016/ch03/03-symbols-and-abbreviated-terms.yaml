@@ -44,6 +44,11 @@ rules:
         mat, pat, inh, dn, c, cx, cth, or, qter, upd). Ch. 13.1–13.2 (T-015): every symbol used
         is listed (ish, wcp, amp, dim, enh, subtel, idic, ider, dmin, mos, mat, dn, ×, ~, /, or,
         +, –); the 5′/3′ prefixes of E35/E38 (5′CBFB) belong to the locus names, not the notation.
+        Ch. 13.3–13.8 (T-016): every symbol used is listed (nuc, fib, rev, ish, cgh, con, sep, amp,
+        dim, enh, pcp, ×, ~, /, //, [ ], +, ?, der, t, add, dup, inv, mar, r, qter); the 5′/3′
+        prefixes of §13.3.2.4 again belong to the locus names. The ">" of ×12~>50 (§13.3.1 E4,
+        "more than 50") is not listed in that meaning: the list has < > only as the angle
+        brackets around a ploidy level.
 
   - id: SYM.SPACE_BETWEEN_SYMBOLS
     title: Space between combined symbols
@@ -124,13 +129,19 @@ rules:
       together (psu dic, +mar dn, +mar c), after a symbol or abbreviation that precedes the number
       of chromosomes (mos 47,XXX), after the genome build of a microarray result, between a copy
       number and the inheritance or zygosity symbol after it, and around "or" between alternative
-      interpretations. Nowhere else does a string contain a space: the number of chromosomes is
-      followed directly by a comma, the sex chromosome constitution is written as one item, and the
-      abnormalities are separated by commas alone.
+      interpretations. In in situ results a space also stands between the words of the technique
+      symbols (nuc ish, fib ish, rev ish, ish cgh), after the technique symbols before a band or
+      an abnormality (ish del(22)…, nuc ish 21q22(…), rev ish 15q), around con and sep, and
+      between a locus and amp, dim or enh. Nowhere else does a string contain a space: the number
+      of chromosomes is followed directly by a comma, the sex chromosome constitution is written
+      as one item, the abnormalities are separated by commas alone, and a signal count follows
+      its parenthesis directly.
     cite:
       - {section: "3", page: 34, para: "¶1"}
       - {section: "4.1", page: 37, para: "¶1"}
       - {section: "4.1", page: 37, para: "¶2"}
+      - {section: "13.2", page: 101, para: "¶1"}
+      - {section: "13.3.1", page: 106, para: "¶1"}
     examples:
       valid:
         - text: "46,XY"
@@ -144,9 +155,16 @@ rules:
         - text: "46,X Y,dup(1)(q21q32)"
           why: A space inside the sex chromosome constitution.
           corrected: "46,XY,dup(1)(q21q32)"
+        - text: "nuc ish(D17Z1,ERBB2) ×2[100]"
+          cite: {section: "13.3.1", page: 107, example: E6}
+          why: >-
+            Printed with a space between the parenthesis and the shared count (also E7, E9); every
+            other shared count in ch. 13 follows the parenthesis directly (E11, E14, E15, E22, …).
+            Treated as a book inconsistency (T-016).
+          corrected: "nuc ish(D17Z1,ERBB2)×2[100]"
     fix: {level: 1, kind: delete, hint: Remove the space.}
     review:
-      paraphrase_checked: false
+      paraphrase_checked: true
       needs_review: false
       note: >-
         The book never states "no other spaces"; it names where a space is placed (§3 ¶1, §4.1 ¶9
@@ -155,7 +173,11 @@ rules:
         format: all 720 valid KB examples (T-073 survey, 2026-11-20) put spaces only in those
         places. Severity error per the T-022 wording map (printed format) and its decision on
         non-canonical input. A spacing form added by a later section or edition needs its own rule
-        and must be added to the list above.
+        and must be added to the list above. T-016 added the in situ places of ch. 13
+        (ISH.COMBINED_WITH_KARYOTYPE, NUC_ISH.DETAILED_FORMAT, NUC_ISH.SIGNAL_POSITION_FORMAT,
+        ISH.SIGNAL_QUALIFIERS, REV_ISH.FORMAT, CGH.FORMAT) and the printed §13.3.1 E6 as an invalid
+        example (decided with the user: E6, E7 and E9 put a space before ×; the KB keeps their
+        no-space forms as valid examples).
     related: [SYM.SPACE_BETWEEN_SYMBOLS, SYM.SPACE_BEFORE_CHROMOSOME_COUNT, SYM.NO_SPACE_AT_PARENTHESIS, KARYO.DE_NOVO_SPACE, MAR.CONSTITUTIONAL_C_SPACE, ARR.INHERITANCE_SPACING, GEN.GENOME_BUILD_REQUIRED, BREAK.ALTERNATIVE_BANDS, BAND.DESIGNATION_FORMAT]
 
   - id: SYM.LETTER_CASE

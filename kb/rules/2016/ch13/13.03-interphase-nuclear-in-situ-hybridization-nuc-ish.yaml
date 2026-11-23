@@ -1,0 +1,37 @@
+version: "2016"
+section: "13.3"
+rules:
+  - id: NUC_ISH.BAND_DESIGNATION_OPTIONAL
+    title: nuc ish short form without bands; band designation optional
+    applies_to: [nuc_ish]
+    severity: info
+    statement: >-
+      Interphase ish (nuc ish) records the number of signals and their positions relative to
+      each other. The short form gives no chromosome bands, since interphase nuclei show no
+      bands; a band designation is an optional detailed form at the discretion of the
+      investigator or laboratory. The short form is recommended, especially for amplification.
+    cite:
+      - {section: "13.3", page: 106, para: "¶1"}
+    examples:
+      valid:
+        - text: "nuc ish(D21S65×2)"
+          cite: {section: "13.3.1", page: 107, example: E1}
+        - text: "nuc ish 21q22(D21S65×2)"
+          cite: {section: "13.3.1", page: 107, example: E1}
+          note: The same result in the detailed form.
+        - text: "nuc ish(D21S65×3)"
+          cite: {section: "13.3.1", page: 107, example: E2}
+        - text: "nuc ish 21q22(D21S65×3)"
+          cite: {section: "13.3.1", page: 107, example: E2}
+        - text: "nuc ish(ABL1,BCR)×2[400]"
+          cite: {section: "13.3.1", page: 107, example: E13}
+        - text: "nuc ish 9q34(ABL1×2),22q11.2(BCR×2)[400]"
+          cite: {section: "13.3.1", page: 107, example: E13}
+          note: Both forms are correct ("expressed with or without band designations").
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info: both forms are allowed; the short form is only "recommended". The
+        detailed form's own format is NUC_ISH.DETAILED_FORMAT.
+    related: [NUC_ISH.DETAILED_FORMAT, NUC_ISH.SIGNAL_COUNT_FORMAT, ISH.LOCUS_LIST]

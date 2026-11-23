@@ -162,7 +162,7 @@ tables:
   # "xxxx") and the fibre line are drawn, not text; only the labels are kept, quoted verbatim.
   - id: Fibre diagram
     kind: figure
-    review: {image: ok, human: pending, fallback: none}
+    review: {image: ok, human: ok, fallback: none}
     regions:
       - book_page: 112
         top: 565

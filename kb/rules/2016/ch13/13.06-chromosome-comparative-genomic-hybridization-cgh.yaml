@@ -1,0 +1,44 @@
+version: "2016"
+section: "13.6"
+rules:
+  - id: CGH.FORMAT
+    title: "ish cgh: enh (gain) or dim (loss), (chromosome)(region)"
+    applies_to: [cgh]
+    severity: error
+    statement: >-
+      Chromosomal comparative genomic hybridization (cgh) detects relative gains and losses of
+      copy number only. A result based on CGH alone is written ish cgh, a space, then each gain
+      as enh and each loss as dim, with the chromosome in parentheses and, when only part of it
+      is involved, the arm or the bands in a second set of parentheses (enh(10)(p),
+      dim(7)(q21qter)); several changes are separated by commas. A banded karyotype may come
+      first, followed by a period, and a rearrangement the result clarifies may be written in
+      karyotype form before the change (der(7)t(7;21)(q36;q22)enh(21)(q22)).
+    cite:
+      - {section: "13.6", page: 113, para: "¶1"}
+    examples:
+      valid:
+        - text: "47,XX,+mar.ish cgh enh(10)(p)"
+          cite: {section: "13.6", page: 113, example: E1}
+        - text: "46,XX,add(7)(q36).ish cgh der(7)t(7;21)(q36;q22)enh(21)(q22)"
+          cite: {section: "13.6", page: 113, example: E2}
+        - text: "47,XY,+r.ish cgh enh(1)(q32q43),enh(12)(q13)"
+          cite: {section: "13.6", page: 113, example: E3}
+        - text: "ish cgh enh(21)"
+          cite: {section: "13.6", page: 113, example: E4}
+        - text: "ish cgh dim(7)(q21qter)"
+          cite: {section: "13.6", page: 113, example: E5}
+        - text: "ish cgh dim(18)(q21qter)"
+          cite: {section: "13.6", page: 113, example: E6}
+      invalid:
+        - text: "ish cgh enh21"
+          why: The chromosome is written in parentheses after enh.
+          corrected: "ish cgh enh(21)"
+    fix: {level: 1, kind: insert, hint: "Put the chromosome in parentheses after enh or dim."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        ¶1 gives the examples without stating the format; it is taken from E1–E6. The book
+        writes chromosomal CGH as "ish cgh" in every example (the segmenter detects "ish cgh" as
+        a cgh segment, T-016). The invalid example is inferred.
+    related: [ISH.SIGNAL_QUALIFIERS, ISH.COMBINED_WITH_KARYOTYPE, REV_ISH.FORMAT]

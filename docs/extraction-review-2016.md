@@ -171,8 +171,8 @@ checked):
 | 7.2, 9.2.3, 9.2.17.1, 16.3.7 | 53, 61–65, 75–76, 129 | underlined homologues (U+0332 in the source text; validator behaviour is T-042). §7.2: `FRA.HOMOLOGUE_UNDERLINING` (T-010) and §9.2.3: `DER.HOMOLOGUE_UNDERLINING` (T-012) carry `needs_review`; the other §9.2.3 rules cite no underlined block. §9.2.17.1: `TRANSLOC.HOMOLOGUE_UNDERLINING` (T-013) holds E8/E10 and carries `needs_review`; `TRANSLOC.FORMAT`, `STRUCT.CHROMOSOME_ORDER` and `STRUCT.MULTI_CHROMOSOME_ORDER` cite ¶1, whose underlining only demonstrates the words "single underlining", and use no underlined example |
 | 10.3 | 83 | small table — until `review.human: ok` |
 | 11.1.6 / 11.2 (Ploidy table) | 90 | table; indentation and bold lost. **Signed off 2026-11-20 (T-014):** all 48 cells match; the lost hierarchy is carried by the names (Near-/Hypo-/Hyper-), so rules that encode it from the names need no `needs_review` for this. Encoded in `PLOIDY.LEVELS` (T-014, `needs_review: false`) |
-| 13.3.2, 13.3.2.4 | 109–112 | signal positions shown only in drawings |
-| 13.4 | 112 | fibre diagram symbols lost |
+| 13.3.2, 13.3.2.4 | 109–112 | signal positions shown only in drawings. **Checked by the user 2026-11-23 (T-016):** the nucleus drawings illustrate the strings (con/sep, ● and ○ legends kept in the chunks) and add no notation rule, so `NUC_ISH.SIGNAL_POSITION_FORMAT` and `NUC_ISH.BREAK_APART_FORMS` keep `needs_review: false` |
+| 13.4 | 112 | fibre diagram symbols lost. **Labels signed off 2026-11-23 (T-016):** legend labels (D15S11, SNRPN, GABRB3) and `pter`/`qter` match; the drawn symbols, the fibre line and the gene-name italics are lost. The locus order the drawing shows is stated in the text by E1's note, so rules citing E1 need no `needs_review` for it |
 | 16.2 | 125–126 | alignment figure: shading, bold and italic carry meaning |
 
 ## Backup plan for tables

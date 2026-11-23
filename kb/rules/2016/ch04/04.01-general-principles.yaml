@@ -444,14 +444,16 @@ rules:
 
   - id: KARYO.TRANSPLANT_CHIMERA
     title: Transplant chimerism - recipient first, // before the donor
-    applies_to: [karyotype]
+    applies_to: [karyotype, nuc_ish]
     severity: error
     statement: >-
       In chimerism after bone marrow transplantation, the recipient cell line(s) are listed
       first and the donor cell line(s) after them, separated by a double slant line (//). When
-      only donor or only recipient cells are found, the other side of // is left empty.
+      only donor or only recipient cells are found, the other side of // is left empty. The
+      same applies to interphase ish (nuc ish) used to tell donor from recipient cells.
     cite:
       - {section: "4.1", page: 38, para: "¶10"}
+      - {section: "13.3.1", page: 108, para: "¶4"}
     examples:
       valid:
         - text: "46,XY[3]//46,XX[17]"
@@ -462,12 +464,28 @@ rules:
           cite: {section: "4.1", page: 39, example: E4}
         - text: "46,XY[20]//"
           cite: {section: "4.1", page: 39, example: E5}
+        - text: "nuc ish(DXZ1×2)[400]//"
+          cite: {section: "13.3.1", page: 108, example: E18}
+          note: 400 cells, all of the recipient.
+        - text: "//nuc ish(DXZ1,DYZ3)×1[400]"
+          cite: {section: "13.3.1", page: 108, example: E19}
+          note: 400 cells, all of the donor.
+        - text: "nuc ish(DXZ1×2)[50]//(DXZ1,DYZ3)×1[350]"
+          cite: {section: "13.3.1", page: 108, example: E20}
+        - text: "nuc ish(DXZ1×2)[50]//(DXZ1,DYZ3)×1[300]/(DXZ1×1)[10]"
+          cite: {section: "13.3.1", page: 108, example: E21}
+          note: The cells with loss of the Y are listed as though they come from the donor.
       invalid:
         - text: "46,XY[3]/46,XX[17]"
           why: Recipient and donor cell lines are separated by a double slant line (//) when describing transplant chimerism.
           corrected: "46,XY[3]//46,XX[17]"
     fix: {level: 3, hint: Separate recipient (first) and donor (second) cell lines with //.}
-    review: {paraphrase_checked: true, needs_review: false}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        T-016 added nuc ish (§13.3.1 ¶4, E18–E21). E19 puts // before the technique symbols
+        (//nuc ish(…)), as the karyotype form //46,XX[20] does.
     related: [KARYO.CLONE_SEPARATOR]
 
   - id: KARYO.PLOIDY_RELATIVE

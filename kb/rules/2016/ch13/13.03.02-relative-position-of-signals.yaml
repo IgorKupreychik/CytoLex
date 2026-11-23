@@ -1,0 +1,75 @@
+version: "2016"
+section: "13.3.2"
+rules:
+  - id: NUC_ISH.SIGNAL_POSITION_FORMAT
+    title: "Relative position after the count: (A con B×n), (A sep B×n)"
+    applies_to: [nuc_ish]
+    severity: error
+    statement: >-
+      The relative position of the signals follows the parentheses with the number of signals,
+      in a second set of parentheses: the loci joined by con (connected, juxtaposed signals) or
+      sep (separated signals), with a space on each side, then × and the number of signals with
+      that pattern. Each different pattern gets its own set of parentheses, and a pattern may
+      join more than two signals (ABL1 con BCR con ABL1×1). Loci that are normally apart (on
+      different chromosomes) or normally together (close on one chromosome) need no position
+      parentheses when the result is normal.
+    cite:
+      - {section: "13.3.2", page: 109, para: "¶1"}
+      - {section: "13.3.2", page: 109, para: "¶2"}
+      - {section: "13.3.2", page: 109, para: "¶4"}
+      - {section: "13.3.2", page: 110, para: "¶6"}
+      - {section: "13.3.2", page: 110, para: "¶7"}
+    examples:
+      valid:
+        - text: "nuc ish(ABL1,BCR)×2[400]"
+          cite: {section: "13.3.2", page: 109, example: E1}
+          note: Normal result for loci on different chromosomes; no position parentheses.
+        - text: "nuc ish(ABL1,BCR)×2(ABL1 con BCR×1)[400]"
+          cite: {section: "13.3.2", page: 109, example: E2}
+          note: Also printed as §13.3.2 E5 and §13.3.2.1 E1.
+        - text: "nuc ish(ABL1,BCR)×3(ABL1 con BCR×2)[400]"
+          cite: {section: "13.3.2", page: 109, example: E3}
+          note: Also printed as §13.3.2.3 E1.
+        - text: "nuc ish(ABL1,BCR)×3(ABL1 con BCR×1)(ABL1 con BCR con ABL1×1)[400]"
+          cite: {section: "13.3.2", page: 110, example: E4}
+        - text: "nuc ish(ABL1×2,BCR×3)(ABL1 con BCR×1)[400]"
+          cite: {section: "13.3.2", page: 110, example: E6}
+        - text: "nuc ish(ABL1,BCR)×4(ABL1 con BCR×3)[198]"
+          cite: {section: "13.3.2", page: 110, example: E7}
+        - text: "nuc ish(KAL1,STS)×2"
+          cite: {section: "13.3.2", page: 110, example: E8}
+          note: Normal result for loci that are normally juxtaposed; no position parentheses.
+        - text: "nuc ish(KAL1,STS)×2(KAL1 sep STS×1)"
+          cite: {section: "13.3.2", page: 110, example: E9}
+        - text: "nuc ish(IGH×3,BCL2×2,BCL2 amp)(IGH con BCL2×1)(IGH con BCL2 amp×1)"
+          cite: {section: "13.3.2", page: 110, example: E10}
+        - text: "nuc ish(IGH×3,BCL2×2,BCL2 amp)(IGH con BCL2×2)"
+          cite: {section: "13.3.2", page: 111, example: E11}
+        - text: "nuc ish(PAX7×1,PAX7 amp,FOXO1×1,FOXO1 amp)(PAX7 con FOXO1)amp"
+          cite: {section: "13.3.2", page: 111, example: E12}
+          note: An amplified fusion; amp follows the position parentheses in place of ×n.
+        - text: "nuc ish(ETV6×2,RUNX1×3)(ETV6 con RUNX1×1)[300/400]"
+          cite: {section: "13.3.2.2", page: 111, example: E1}
+        - text: "nuc ish(ETV6×1,RUNX1×3)(ETV6 con RUNX1×1)[300/400]"
+          cite: {section: "13.3.2.2", page: 111, example: E2}
+        - text: "nuc ish(D8Z1×2,MYC×3,IGH×3)(MYC con IGH×2)[100/200],(IGH×3,BCL2×2)[100/200]"
+          cite: {section: "13.3.2.3", page: 111, example: E2}
+        - text: "nuc ish(MYH11,CBFB)×3(MYH11 con CBFB×2)"
+          cite: {section: "13.3.2.3", page: 111, example: E3}
+      invalid:
+        - text: "nuc ish(ABL1,BCR)×2(ABL1conBCR×1)[400]"
+          why: con is separated from the loci by a space on each side.
+          corrected: "nuc ish(ABL1,BCR)×2(ABL1 con BCR×1)[400]"
+        - text: "nuc ish(ABL1 con BCR×1)(ABL1,BCR)×2[400]"
+          why: The parentheses with the number of signals come first, then the relative position.
+          corrected: "nuc ish(ABL1,BCR)×2(ABL1 con BCR×1)[400]"
+    fix: {level: 1, kind: replace, hint: "Give the number of signals first, then each signal pattern in its own parentheses with con or sep between spaces."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The nucleus drawings of §13.3.2–13.3.2.4 (pp.109–112; ● and ○ legends kept in the
+        chunks) were checked by the user (T-016, 2026-11-23): they illustrate the strings and add
+        no notation rule. §13.3.2.1–13.3.2.3 have examples only; they are filed here. Both
+        invalid examples are inferred from ¶2.
+    related: [NUC_ISH.SIGNAL_COUNT_FORMAT, NUC_ISH.BREAK_APART_FORMS, ISH.SIGNAL_QUALIFIERS, SYM.NO_OTHER_SPACE]

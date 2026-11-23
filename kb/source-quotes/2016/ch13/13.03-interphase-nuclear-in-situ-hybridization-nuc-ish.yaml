@@ -1,0 +1,12 @@
+version: "2016"
+section: "13.3"
+quotes:
+  - rule: NUC_ISH.BAND_DESIGNATION_OPTIONAL
+    cite: {section: "13.3", page: 106, para: "¶1"}
+    text: >-
+      ISCN (1995) provided for the use of a band designation in interphase FISH. This is
+      considered an optional detailed form to be used at the discretion of the investigator or
+      laboratory director. A short nomenclature description has now been provided that does not
+      indicate chromosome band locations, providing for the ambiguity of hybridization location
+      in interphase nuclei in the absence of discernible bands (chromosomes). Especially in the
+      case of amplification, the short nomenclature description is recommended.

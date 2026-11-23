@@ -1,0 +1,262 @@
+version: "2016"
+section: "13.3.1"
+rules:
+  - id: NUC_ISH.SIGNAL_COUNT_FORMAT
+    title: "nuc ish(locus×n): locus, × and the number of signals"
+    applies_to: [nuc_ish]
+    severity: error
+    statement: >-
+      The number of signals is written directly after the symbols nuc ish, in parentheses: the
+      locus designation, a multiplication sign (×) and the number of signals seen. The number
+      may be a range (×4~5, ×12~>50) or 0 for a locus with no signal.
+    cite:
+      - {section: "13.3.1", page: 106, para: "¶1"}
+    examples:
+      valid:
+        - text: "nuc ish(D21S65×2)"
+          cite: {section: "13.3.1", page: 107, example: E1}
+        - text: "nuc ish(DXZ1×3)"
+          cite: {section: "13.3.1", page: 107, example: E3}
+        - text: "nuc ish(MYCN×12~>50)[200]"
+          cite: {section: "13.3.1", page: 107, example: E4}
+          note: A range of 12 to more than 50 signals.
+        - text: "nuc ish(D13S319×0)[100/400]"
+          cite: {section: "13.3.1", page: 108, example: E25}
+          note: ×0 for no signal (homozygous deletion).
+        - text: "nuc ish(D20Z1×2,D20S108×1)[100/200]"
+          cite: {section: "13.3.1", page: 109, example: E29}
+      invalid:
+        - text: "nuc ish (D21S65×2)"
+          why: In the short form the parentheses follow nuc ish directly, without a space.
+          corrected: "nuc ish(D21S65×2)"
+        - text: "nuc ish(D21S65+)"
+          why: The number of signals is given with × and a number, not with + or –.
+    fix: {level: 3, hint: "Write nuc ish directly followed by (locus×number of signals)."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Both invalid examples are inferred from ¶1 ("followed immediately in parentheses"). The
+        ">" of ×12~>50 (E4) is not a listed symbol in this meaning (see SYM.LISTED_ONLY).
+    related: [NUC_ISH.SHARED_COUNT, NUC_ISH.DETAILED_FORMAT, ISH.NORMAL_CHROMOSOME_FORMAT]
+
+  - id: NUC_ISH.DETAILED_FORMAT
+    title: "Detailed nuc ish: space, band, then (locus×n)"
+    applies_to: [nuc_ish]
+    severity: error
+    statement: >-
+      In the detailed system, nuc ish is followed by a space and the band designation of the
+      locus, then the parentheses with the locus and its number of signals. Loci on different
+      chromosomes each get their own band and parentheses, separated by commas.
+    cite:
+      - {section: "13.3.1", page: 106, para: "¶1"}
+    examples:
+      valid:
+        - text: "nuc ish 21q22(D21S65×2)"
+          cite: {section: "13.3.1", page: 107, example: E1}
+        - text: "nuc ish 21q22(D21S65×3)"
+          cite: {section: "13.3.1", page: 107, example: E2}
+        - text: "nuc ish 9q34(ABL1×2),22q11.2(BCR×2)[400]"
+          cite: {section: "13.3.1", page: 107, example: E13}
+      invalid:
+        - text: "nuc ish21q22(D21S65×2)"
+          why: A space follows ish before the band designation.
+          corrected: "nuc ish 21q22(D21S65×2)"
+    fix: {level: 1, kind: insert, hint: "Insert a space between nuc ish and the band designation."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The comma between the band groups of different chromosomes is the printed form of E13;
+        the invalid example is inferred from ¶1.
+    related: [NUC_ISH.BAND_DESIGNATION_OPTIONAL, NUC_ISH.SIGNAL_COUNT_FORMAT, SYM.NO_OTHER_SPACE]
+
+  - id: NUC_ISH.SHARED_COUNT
+    title: "Several loci: × outside the parentheses if the counts are equal, inside if not"
+    applies_to: [nuc_ish]
+    severity: error
+    statement: >-
+      Probes for two or more loci used in the same hybridization are listed in one set of
+      parentheses, separated by commas. When every locus shows the same number of signals, one
+      multiplication sign and number follow the closing parenthesis; when the numbers differ,
+      each locus carries its own × and number inside the parentheses.
+    cite:
+      - {section: "13.3.1", page: 106, para: "¶1"}
+    examples:
+      valid:
+        - text: "nuc ish(D17Z1,ERBB2)×2[100]"
+          cite: {section: "13.3.1", page: 107, example: E6}
+          note: Printed with a space before ×, "(D17Z1,ERBB2) ×2"; see SYM.NO_OTHER_SPACE.
+        - text: "nuc ish(D17Z1,ERBB2)×4~5[100/200]"
+          cite: {section: "13.3.1", page: 107, example: E7}
+          note: Printed with a space before ×, "(D17Z1,ERBB2) ×4~5"; see SYM.NO_OTHER_SPACE.
+        - text: "nuc ish(D17Z1×2,ERBB2×10~20)[100/200]"
+          cite: {section: "13.3.1", page: 107, example: E8}
+        - text: "nuc ish(D21S65,D21S64)×3"
+          cite: {section: "13.3.1", page: 107, example: E11}
+        - text: "nuc ish(KAL1,D21S65)×2"
+          cite: {section: "13.3.1", page: 107, example: E14}
+        - text: "nuc ish(KAL1,GK,DMD)×1"
+          cite: {section: "13.3.1", page: 107, example: E15}
+        - text: "nuc ish(ATM,D12Z3,D13S319,LAMP1,TP53)×2[200]"
+          cite: {section: "13.3.1", page: 108, example: E22}
+      invalid:
+        - text: "nuc ish(D21S65×3,D21S64×3)"
+          why: Both loci show three signals, so one ×3 follows the parentheses.
+          corrected: "nuc ish(D21S65,D21S64)×3"
+    fix: {level: 1, kind: replace, hint: "Write one × count after the parentheses when every locus has the same number of signals; otherwise give each locus its own count inside."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        E6, E7 and E9 are printed with a space between ")" and "×"; every other example has none
+        (E11, E14, E15, E22, …). Decided with the user (T-016): a book inconsistency; the valid
+        examples here drop the space and the printed E6 is an invalid example of
+        SYM.NO_OTHER_SPACE. The invalid example is inferred from ¶1.
+    related: [NUC_ISH.SIGNAL_COUNT_FORMAT, NUC_ISH.HYBRIDIZATION_GROUPS, ISH.NORMAL_CHROMOSOME_FORMAT]
+
+  - id: NUC_ISH.CHROMOSOME_ORDER
+    title: "Loci of different chromosomes: sex chromosomes, then 1 to 22"
+    applies_to: [nuc_ish]
+    severity: error
+    statement: >-
+      Results for loci on different chromosomes are separated by commas and given in the order
+      sex chromosomes, then autosomes 1 to 22. This holds within one set of parentheses and
+      between the probe sets of separate hybridizations, where the set with the lowest
+      chromosome number comes first. Loci on one chromosome are listed from pter to qter
+      (ISH.LOCUS_ORDER_PTER_QTER).
+    cite:
+      - {section: "13.3.1", page: 106, para: "¶1"}
+      - {section: "13.3.1", page: 108, para: "¶5"}
+    examples:
+      valid:
+        - text: "nuc ish(DXZ1×2,DYZ3×1,D18Z1×3),(RB1,D21S259/D21S341/D21S342)×3"
+          cite: {section: "13.3.1", page: 107, example: E12}
+        - text: "nuc ish(ABL1,BCR)×2[400]"
+          cite: {section: "13.3.1", page: 107, example: E13}
+        - text: "nuc ish(KAL1,D21S65)×2"
+          cite: {section: "13.3.1", page: 107, example: E14}
+          note: KAL1 is on the X chromosome.
+        - text: "nuc ish(ATM,TP53)×2[200],(D12Z3×3,D13S319×2,LAMP1×2)[100/200]"
+          cite: {section: "13.3.1", page: 108, example: E23}
+        - text: "nuc ish(ATM×1,TP53×2)[200/400],(D12Z3×3,D13S319×2,LAMP1×2)[100/400]"
+          cite: {section: "13.3.1", page: 108, example: E24}
+        - text: "nuc ish(TP73×1,ANGPTL×2)[107/200],(ZNF443×2,GLTSCR×1)[105/200]"
+          cite: {section: "13.3.1", page: 109, example: E28}
+      invalid:
+        - text: "nuc ish(BCR,ABL1)×2[400]"
+          why: ABL1 (9q34) comes before BCR (22q11.2), the bands given in the detailed form of E13.
+          corrected: "nuc ish(ABL1,BCR)×2[400]"
+        - text: "nuc ish(ZNF443×2,GLTSCR×1)[105/200],(TP73×1,ANGPTL×2)[107/200]"
+          why: The probe set of chromosome 1 (TP73 at 1p36, ANGPTL at 1q25) comes before that of chromosome 19 (ZNF443, GLTSCR), as the E28 explanation places them.
+          corrected: "nuc ish(TP73×1,ANGPTL×2)[107/200],(ZNF443×2,GLTSCR×1)[105/200]"
+    fix: {level: 3, hint: "List the loci by chromosome: sex chromosomes first, then autosomes 1 to 22."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        A check needs the chromosome of each locus, which the string gives only in the detailed
+        form; the KB has no locus positions. Both invalid examples are inferred; their loci's
+        chromosomes are the ones the book prints (E13's detailed line, E28's explanation).
+    related: [ISH.LOCUS_ORDER_PTER_QTER, NUC_ISH.HYBRIDIZATION_GROUPS]
+
+  - id: NUC_ISH.CELLS_SCORED
+    title: Cancer specimens give the number of cells scored in square brackets
+    applies_to: [nuc_ish]
+    context: [neoplastic]
+    severity: error
+    statement: >-
+      If the study is on a cancer specimen, the number of cells scored is given in square
+      brackets after the result.
+    cite:
+      - {section: "13.3.1", page: 106, para: "¶1"}
+      - {section: "13.3.1", page: 108, para: "¶3"}
+    examples:
+      valid:
+        - text: "nuc ish(MYCN×12~>50)[200]"
+          cite: {section: "13.3.1", page: 107, example: E4}
+        - text: "nuc ish(MYCN amp)[200]"
+          cite: {section: "13.3.1", page: 107, example: E5}
+        - text: "nuc ish(ABL1,BCR)×2[400]"
+          cite: {section: "13.3.1", page: 107, example: E13}
+      invalid:
+        - text: "nuc ish(MYCN amp)"
+          why: In a cancer specimen the number of cells scored is given in square brackets.
+    fix: {level: 3, hint: "Give the number of cells scored in square brackets."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The invalid example is inferred from ¶1; it needs the neoplastic context (MYCN
+        amplification alone doesn't set it).
+    related: [NUC_ISH.ABNORMAL_OVER_TOTAL, ISH.CELL_LINES, CLONE.CELL_COUNT_REQUIRED]
+
+  - id: NUC_ISH.ABNORMAL_OVER_TOTAL
+    title: "Abnormal cells over the total scored, [100/200]; normal cells not listed"
+    applies_to: [nuc_ish]
+    severity: error
+    statement: >-
+      When normal and abnormal cells are found, the number of abnormal cells is written over the
+      total number of cells scored, for each abnormal locus ([100/200]). The normal cells are
+      not listed; they are the remainder of the total.
+    cite:
+      - {section: "13.3.1", page: 108, para: "¶5"}
+    examples:
+      valid:
+        - text: "nuc ish(D17Z1×2,ERBB2×10~20)[100/200]"
+          cite: {section: "13.3.1", page: 107, example: E8}
+        - text: "nuc ish(D13S319×1,D13S319 dim×1,LAMP1×2)[197/200]"
+          cite: {section: "13.3.1", page: 107, example: E10}
+          note: Only the abnormal cells are described.
+        - text: "nuc ish(D13S319×0)[100/400]"
+          cite: {section: "13.3.1", page: 108, example: E25}
+        - text: "nuc ish(D13S319×0)[100/400]/(D13S319×1)[50/400]"
+          cite: {section: "13.3.1", page: 108, example: E26}
+        - text: "nuc ish(D13S319×0,LAMP1×2)[100/400]/(D13S319×1,LAMP1×2)[50/400]"
+          cite: {section: "13.3.1", page: 109, example: E27}
+        - text: "nuc ish(D20Z1×2,D20S108×1)[100/200]"
+          cite: {section: "13.3.1", page: 109, example: E29}
+      invalid:
+        - text: "nuc ish(D13S319×0)[100/400]/(D13S319×2)[300/400]"
+          why: The 300 normal cells are not listed; they are implied as the remainder of the 400 scored.
+          corrected: "nuc ish(D13S319×0)[100/400]"
+    fix: {level: 1, kind: delete, hint: "Leave out the normal cells; give the abnormal cells over the total scored."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The invalid example is inferred from ¶5 and E25. Chimeras are the exception: the
+        recipient and donor lines of E20/E21 are listed with their own counts (see
+        KARYO.TRANSPLANT_CHIMERA).
+    related: [NUC_ISH.CELLS_SCORED, ISH.CELL_LINES, KARYO.TRANSPLANT_CHIMERA]
+
+  - id: NUC_ISH.HYBRIDIZATION_GROUPS
+    title: One set of parentheses per hybridization; normal results may share one
+    applies_to: [nuc_ish]
+    severity: info
+    statement: >-
+      Probes hybridized together are given in one set of parentheses. The results of separate
+      hybridizations are given in separate sets, separated by commas, each with its own cell
+      numbers. Normal results from several hybridizations may be combined in a single set of
+      parentheses.
+    cite:
+      - {section: "13.3.1", page: 106, para: "¶1"}
+      - {section: "13.3.1", page: 108, para: "¶5"}
+    examples:
+      valid:
+        - text: "nuc ish(ATM,D12Z3,D13S319,LAMP1,TP53)×2[200]"
+          cite: {section: "13.3.1", page: 108, example: E22}
+          note: Normal results of different hybridizations in one set of parentheses.
+        - text: "nuc ish(ATM,TP53)×2[200],(D12Z3×3,D13S319×2,LAMP1×2)[100/200]"
+          cite: {section: "13.3.1", page: 108, example: E23}
+        - text: "nuc ish(TP73×1,ANGPTL×2)[107/200],(ZNF443×2,GLTSCR×1)[105/200]"
+          cite: {section: "13.3.1", page: 109, example: E28}
+        - text: "nuc ish(D8Z1×2,MYC×3,IGH×3)(MYC con IGH×2)[100/200],(IGH×3,BCL2×2)[100/200]"
+          cite: {section: "13.3.2.3", page: 111, example: E2}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info: which probes were hybridized together can't be seen from the string, so
+        the rule records the format and forbids nothing a check could find.
+    related: [NUC_ISH.SHARED_COUNT, NUC_ISH.CHROMOSOME_ORDER, NUC_ISH.ABNORMAL_OVER_TOTAL]

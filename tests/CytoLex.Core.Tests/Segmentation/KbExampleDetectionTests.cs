@@ -47,10 +47,10 @@ public class KbExampleDetectionTests
     }
 
     [Fact]
-    public void KbExamples_CoverKaryotypeIshAndArr()
+    public void KbExamples_CoverTheirNotationTypes()
     {
         // The 2016 KB has whole-string examples of these types; the other types are covered by
-        // SegmenterTests until their chapters (T-016, T-018, T-019) add examples.
+        // SegmenterTests until their chapters (T-018, T-019) add examples.
         var detected = KbCatalog.Default.Cases
             .Where(c => !c.IsFragment)
             .SelectMany(c => Segmenter.Split(c.CheckedText).Select(s => s.Type.ToKbName()))
@@ -58,6 +58,10 @@ public class KbExampleDetectionTests
 
         Assert.Contains("karyotype", detected);
         Assert.Contains("ish", detected);
+        Assert.Contains("nuc_ish", detected);
+        Assert.Contains("fib_ish", detected);
+        Assert.Contains("rev_ish", detected);
+        Assert.Contains("cgh", detected);
         Assert.Contains("arr", detected);
     }
 }

@@ -1,0 +1,14 @@
+version: "2016"
+section: "13.5.1"
+quotes:
+  - rule: REV_ISH.FORMAT
+    cite: {section: "13.5", page: 113, para: "¶2"}
+    text: >-
+      Another method of reverse in situ hybridization uses DNA probes derived from parts of the
+      genome from a test tissue, such as the DNA of sorted or microdissected marker chromosomes.
+      In situ hybridization of such DNA probes to normal reference chromosomes or to DNA arrays
+      reveals the composition of the isolated chromosome.
+  - rule: REV_ISH.FORMAT
+    cite: {section: "13.5.1", page: 113, example: E1}
+    text: >-
+      Signifies that the marker chromosome is composed largely or wholly of material from 15q.

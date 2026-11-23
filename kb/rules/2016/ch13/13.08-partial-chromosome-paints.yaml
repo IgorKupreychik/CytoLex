@@ -1,0 +1,31 @@
+version: "2016"
+section: "13.8"
+rules:
+  - id: ISH.PARTIAL_PAINT
+    title: "Partial paint: pcp, chromosome and arm or band, status as for wcp"
+    applies_to: [ish]
+    severity: error
+    statement: >-
+      A band-specific or arm-specific probe used as a partial chromosome paint is written pcp,
+      directly followed by the chromosome and the band or arm it paints, with its status as for
+      a whole chromosome paint (pcp18p11.2+, pcp8p++).
+    cite:
+      - {section: "13.8", page: 114, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,?dup(18)(p11.2p11.3).ish dup(18)(pcp18p11.2+)"
+          cite: {section: "13.8", page: 114, example: E1}
+        - text: "46,XY,inv(8)(p21q13).ish inv(8)(pcp8p++)"
+          cite: {section: "13.8", page: 114, example: E2}
+      invalid:
+        - text: "46,XX,?dup(18)(p11.2p11.3).ish dup(18)(pcp 18p11.2+)"
+          why: The chromosome and band follow pcp directly, as the chromosome follows wcp (wcp4).
+          corrected: "46,XX,?dup(18)(p11.2p11.3).ish dup(18)(pcp18p11.2+)"
+    fix: {level: 1, kind: delete, hint: "Remove the space after pcp."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        ¶1 says only that the nomenclature is similar to that of wcp; the form is taken from E1
+        and E2 and the wcp examples of §13.2. The invalid example is inferred.
+    related: [ISH.LOCUS_DESIGNATION, ISH.LOCUS_STATUS, ISH.MULTICOLOR_PAINTING, SYM.NO_OTHER_SPACE]

@@ -113,3 +113,8 @@ def test_fragments_and_segment_types():
     ]
     # sub-band points and decimals stay inside their segment
     assert segment_types("arr[GRCh38] 9q34.11(1_2)×1") == ["arr"]
+    # chromosomal CGH is printed "ish cgh" (§13.6); // may precede the keyword (§13.3.1 E19)
+    assert segment_types("47,XX,+mar.ish cgh enh(10)(p)") == ["karyotype", "cgh"]
+    assert segment_types("//nuc ish(DXZ1,DYZ3)×1[400]") == ["nuc_ish"]
+    assert segment_types("//46,XX[20]") == ["karyotype"]
+    assert segment_types("//ishx") == ["karyotype"]

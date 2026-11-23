@@ -1,0 +1,15 @@
+version: "2016"
+section: "13.4"
+quotes:
+  - rule: FIB_ISH.FORMAT
+    cite: {section: "13.4", page: 112, para: "¶1"}
+    text: >-
+      Hybridization can be carried out on extended chromatin/DNA fibers usually obtained from
+      interphase nuclei, abbreviated fib ish. In this situation, the object of interest is the
+      relative position of the loci at a particular chromosomal location. Where the order of the
+      loci tested is known, they are recorded in the order pter to qter and the chromosomal band
+      is indicated.
+  - rule: FIB_ISH.FORMAT
+    cite: {section: "13.4", page: 112, example: E1}
+    text: >-
+      Signifies that the three loci are present and in the order D15S11, SNRPN, GABRB3.

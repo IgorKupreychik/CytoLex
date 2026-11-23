@@ -1,0 +1,37 @@
+version: "2016"
+section: "13.5.1"
+rules:
+  - id: REV_ISH.FORMAT
+    title: "rev ish, space, then the material the probe painted"
+    applies_to: [rev_ish]
+    severity: error
+    statement: >-
+      Reverse in situ hybridization (rev ish) hybridizes DNA from the test tissue, such as a
+      sorted or microdissected marker chromosome, to normal reference chromosomes, revealing the
+      composition of the isolated chromosome. The result follows the banded karyotype and a
+      period: rev ish, a space, and the chromosome material found, as a chromosome arm or region
+      (15q) or as the rearrangement it reveals in karyotype form (der(5)t(5;10)(p15;q22)).
+    cite:
+      - {section: "13.5", page: 113, para: "¶2"}
+      - {section: "13.5.1", page: 113, example: E1}
+      - {section: "13.5.1", page: 113, example: E2}
+    examples:
+      valid:
+        - text: "47,XX,+mar.rev ish 15q"
+          cite: {section: "13.5.1", page: 113, example: E1}
+          note: The marker is composed largely or wholly of 15q material.
+        - text: "46,XY,add(5)(p15).rev ish der(5)t(5;10)(p15;q22)"
+          cite: {section: "13.5.1", page: 113, example: E2}
+      invalid:
+        - text: "47,XX,+mar.rev ish15q"
+          why: A space follows rev ish before the result.
+          corrected: "47,XX,+mar.rev ish 15q"
+    fix: {level: 1, kind: insert, hint: "Insert a space after rev ish."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        §13.5.1 has examples only; the format is taken from E1 and E2. §13.5 ¶1 describes rev ish
+        with enhanced (enh) or diminished (dim) fluorescence ratios as a copy-number method but
+        prints no string for it. The invalid example is inferred.
+    related: [ISH.COMBINED_WITH_KARYOTYPE, CGH.FORMAT, SYM.NO_OTHER_SPACE]

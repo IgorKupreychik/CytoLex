@@ -119,3 +119,45 @@ quotes:
       On the deleted chromosome, the signals of clones RP1-112K5 (Xp11.2) and RP11-265P11
       (Xp11.4) are consistently less intense than on the normal homologue, indicating that they
       are partially deleted and recognize the proximal and distal breakpoints respectively.
+  - rule: ISH.LOCUS_LIST
+    cite: {section: "13.3", page: 106, para: "¶1"}
+    text: >-
+      If a collection of contiguous probes is used to designate a locus, a single designation
+      may be used in the nomenclature and the composition is described in the report or all
+      probes can be designated and separated by single slant lines.
+  - rule: ISH.SIGNAL_QUALIFIERS
+    cite: {section: "13.3", page: 106, para: "¶1"}
+    text: >-
+      Especially in the case of amplification, the short nomenclature description is
+      recommended.
+  - rule: ISH.LOCUS_ORDER_PTER_QTER
+    cite: {section: "13.3.1", page: 106, para: "¶1"}
+    text: >-
+      If multiple probes on the same chromosome are used, they are listed pter→qter, separated
+      by commas. For a single locus visualized with probes to the 3′ and 5′ ends of a gene, they
+      should be listed as they reside on the chromosome pter to qter.
+  - rule: ISH.COMBINED_WITH_KARYOTYPE
+    cite: {section: "13.3.1", page: 107, para: "¶2"}
+    text: >-
+      If chromosome analysis and interphase FISH are performed, each is reported within the
+      string, separated by a period (.).
+  - rule: ISH.COMBINED_WITH_KARYOTYPE
+    cite: {section: "13.3.1", page: 108, para: "¶3"}
+    text: >-
+      If metaphase and interphase FISH are both performed, each is reported within the string,
+      separated by a period (.). For cancer studies, the number of cells scored is shown in
+      square brackets for each.
+  - rule: ISH.CELL_LINES
+    cite: {section: "13.3.1", page: 108, example: E26}
+    text: >-
+      Homozygous deletion of D13S319 in 100 among 400 cells scored. Fifty cells show a
+      heterozygous deletion. The remainder, 250 cells, show a normal pattern.
+  - rule: ISH.LOCUS_ORDER_PTER_QTER
+    cite: {section: "13.3.2.4", page: 112, example: E6}
+    text: >-
+      Note that the orientation is from pter to qter.
+  - rule: ISH.LOCUS_ORDER_PTER_QTER
+    cite: {section: "13.4", page: 112, para: "¶1"}
+    text: >-
+      Where the order of the loci tested is known, they are recorded in the order pter to qter
+      and the chromosomal band is indicated.

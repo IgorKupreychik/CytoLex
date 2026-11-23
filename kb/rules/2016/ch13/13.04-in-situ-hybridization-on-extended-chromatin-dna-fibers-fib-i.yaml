@@ -1,0 +1,35 @@
+version: "2016"
+section: "13.4"
+rules:
+  - id: FIB_ISH.FORMAT
+    title: "fib ish, space, band, then the loci with + from pter to qter"
+    applies_to: [fib_ish]
+    severity: error
+    statement: >-
+      In situ hybridization on extended chromatin or DNA fibres (fib ish) shows the relative
+      position of loci at one chromosomal location. The result is written fib ish, a space, the
+      chromosomal band, then in parentheses the loci tested, each with + when present. When the
+      order of the loci is known, they are listed from pter to qter, so the string records their
+      order on the fibre.
+    cite:
+      - {section: "13.4", page: 112, para: "¶1"}
+      - {section: "13.4", page: 112, example: E1}
+      - {section: "13.4", page: 112, float: "Fibre diagram"}
+    examples:
+      valid:
+        - text: "fib ish 15q11.2(D15S11+,SNRPN+,GABRB3+)"
+          cite: {section: "13.4", page: 112, example: E1}
+          note: The three loci are present, in the order D15S11, SNRPN, GABRB3.
+      invalid:
+        - text: "fib ish(D15S11+,SNRPN+,GABRB3+)"
+          why: The chromosomal band of the loci is given after fib ish.
+    fix: {level: 3, hint: "Write fib ish, a space and the chromosomal band before the loci."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The Fibre diagram (p.112) was signed off on 2026-11-23 (T-016): its drawn symbols are lost,
+        but the locus order it shows is stated by the E1 explanation. The + status of each locus
+        is the printed form of E1 (its explanation: "present"). The invalid example is inferred
+        from ¶1 ("the chromosomal band is indicated").
+    related: [ISH.LOCUS_ORDER_PTER_QTER, ISH.LOCUS_STATUS, ISH.LOCUS_DESIGNATION]

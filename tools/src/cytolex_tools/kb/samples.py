@@ -31,6 +31,7 @@ _KEYWORDS = (
     (("nuc", "ish"), "nuc_ish"),
     (("fib", "ish"), "fib_ish"),
     (("rev", "ish"), "rev_ish"),
+    (("ish", "cgh"), "cgh"),
     (("ish",), "ish"),
     (("cgh",), "cgh"),
     (("arr",), "arr"),
@@ -84,6 +85,15 @@ def _next_is_letter(text: str, start: int) -> bool:
 
 def _segment_type(segment: str) -> str:
     s = segment.lstrip()
+    # A donor-only chimera result puts // before the keyword (§13.3.1 E19).
+    if s.startswith("//"):
+        rest = s[2:].lstrip()
+        if _keyword_type(rest) != "karyotype":
+            s = rest
+    return _keyword_type(s)
+
+
+def _keyword_type(s: str) -> str:
     for words, name in _KEYWORDS:
         pos, ok = 0, True
         for w, word in enumerate(words):

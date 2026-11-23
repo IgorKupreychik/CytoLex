@@ -1,0 +1,10 @@
+version: "2016"
+section: "13.6"
+quotes:
+  - rule: CGH.FORMAT
+    cite: {section: "13.6", page: 113, para: "¶1"}
+    text: >-
+      CGH is a method which can detect relative copy-number changes. Only unbalanced gains or
+      losses can be detected with this method. After chromosomal CGH, the karyotype can be
+      re-written based on the knowledge gained from the FISH results. Alterations based on CGH
+      alone can be written as follows:

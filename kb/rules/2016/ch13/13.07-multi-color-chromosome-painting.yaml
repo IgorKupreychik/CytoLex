@@ -1,0 +1,22 @@
+version: "2016"
+section: "13.7"
+rules:
+  - id: ISH.MULTICOLOR_PAINTING
+    title: Multi-color painting has no own nomenclature; wcp-like notation may be used
+    applies_to: [ish]
+    severity: info
+    statement: >-
+      24-color karyotyping and FISH banding have no nomenclature of their own. The karyotype may
+      be rewritten from their results, and a notation like that of whole chromosome paints (wcp)
+      may be used. The use of these techniques is stated in the report.
+    cite:
+      - {section: "13.7", page: 114, para: "¶1"}
+    examples:
+      valid: []
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info: the section permits a notation and asks for a statement in the report,
+        which can't be seen in the string. No example is printed.
+    related: [ISH.LOCUS_DESIGNATION, ISH.PARTIAL_PAINT]

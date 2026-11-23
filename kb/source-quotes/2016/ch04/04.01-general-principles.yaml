@@ -208,3 +208,8 @@ quotes:
       When two chromosomes are involved, the chromosome having the lowest number is always
       listed first; however, if one of the rearranged chromosomes is a sex chromosome this is
       listed first.
+  - rule: KARYO.TRANSPLANT_CHIMERA
+    cite: {section: "13.3.1", page: 108, para: "¶4"}
+    text: >-
+      Interphase analysis may be used to determine donor versus recipient. For explanation of the
+      use of double slant line (//) in chimeras, see section 4.1.

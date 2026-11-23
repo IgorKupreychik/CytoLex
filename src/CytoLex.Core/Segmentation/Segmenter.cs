@@ -13,13 +13,15 @@ public static class Segmenter
     /// Technique keywords, longest first. Each word is a ch. 3 symbol (ISCN 2016 §3, pp.34–36:
     /// <c>ish</c>, <c>nuc</c>, <c>fib</c>, <c>rev</c>, <c>cgh</c>, <c>arr</c>, <c>rsa</c>, <c>seq</c>); a test checks them
     /// against the embedded vocab. Two-word keywords accept any (or no) spaces or tabs between the words,
-    /// so <c>nucish</c> is still detected; spacing is checked by the parser's rules.
+    /// so <c>nucish</c> is still detected; spacing is checked by the parser's rules. Chromosomal CGH is
+    /// printed <c>ish cgh</c> (§13.6, p.113), so that pair is a cgh segment, not an ish one.
     /// </summary>
     internal static readonly ImmutableArray<(ImmutableArray<string> Words, NotationType Type)> Keywords =
     [
         (["nuc", "ish"], NotationType.NucIsh),
         (["fib", "ish"], NotationType.FibIsh),
         (["rev", "ish"], NotationType.RevIsh),
+        (["ish", "cgh"], NotationType.Cgh),
         (["ish"], NotationType.Ish),
         (["cgh"], NotationType.Cgh),
         (["arr"], NotationType.Arr),
@@ -82,9 +84,17 @@ public static class Segmenter
     private static Segment MakeSegment(string input, int index, TextSpan span, TextSpan? separator)
     {
         var pos = span.Start;
-        while (pos < span.End && char.IsWhiteSpace(input[pos]))
+        pos = SkipWhitespace(input, pos, span.End);
+
+        // A donor-only chimera result puts // before the technique symbols (ISCN 2016 §13.3.1 E19:
+        // //nuc ish(DXZ1,DYZ3)×1[400]); the keyword follows it.
+        if (span.End - pos >= 2 && input[pos] == '/' && input[pos + 1] == '/')
         {
-            pos++;
+            var afterSlants = SkipWhitespace(input, pos + 2, span.End);
+            if (Keywords.Any(k => MatchKeyword(input, afterSlants, span.End, k.Words) is not null))
+            {
+                pos = afterSlants;
+            }
         }
 
         foreach (var (words, type) in Keywords)
@@ -102,6 +112,16 @@ public static class Segmenter
         }
 
         return new Segment(index, span, NotationType.Karyotype, null, [], separator);
+    }
+
+    private static int SkipWhitespace(string input, int pos, int limit)
+    {
+        while (pos < limit && char.IsWhiteSpace(input[pos]))
+        {
+            pos++;
+        }
+
+        return pos;
     }
 
     /// <summary>End offset of <paramref name="words"/> at <paramref name="pos"/>, or <c>null</c>. The keyword must not be followed by a letter.</summary>

@@ -1,0 +1,12 @@
+version: "2016"
+section: "13.3.2.4"
+quotes:
+  - rule: NUC_ISH.BREAK_APART_FORMS
+    cite: {section: "13.3.2.4", page: 111, para: "¶1"}
+    text: >-
+      Given that break-apart probes are made of two probes, the short form does not convey that
+      the normal situation is the presence of two fusion signals.
+  - rule: NUC_ISH.BREAK_APART_FORMS
+    cite: {section: "13.3.2.4", page: 112, para: "¶2"}
+    text: >-
+      Abnormal cells show the separation of signals.

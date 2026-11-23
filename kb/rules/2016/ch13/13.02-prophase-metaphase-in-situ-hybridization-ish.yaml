@@ -8,9 +8,13 @@ rules:
     statement: >-
       When a standard (banded) cytogenetic result exists, it may be written first, followed by a
       period (.), the symbol ish, a space and the ish results. Without a banded result, only the
-      ish result is given.
+      ish result is given. When banded analysis, metaphase ish and interphase ish (nuc ish) are
+      done, each result is written in the string, separated from the next by a period; in cancer
+      studies each gives its number of cells in square brackets.
     cite:
       - {section: "13.2", page: 101, para: "¶1"}
+      - {section: "13.3.1", page: 107, para: "¶2"}
+      - {section: "13.3.1", page: 108, para: "¶3"}
     examples:
       valid:
         - text: "46,XY.ish 22q11.2(D22S75×2)"
@@ -20,6 +24,11 @@ rules:
           note: No banded analysis was done; only the ish result is given.
         - text: "46,XX,del(15)(q11.2q13).ish del(15)(q11.2q11.2)(SNRPN–,D15S10–)"
           cite: {section: "13.2", page: 102, example: E8}
+        - text: "46,XY[20].nuc ish(TP53×2)[400]"
+          cite: {section: "13.3.1", page: 108, example: E16}
+          note: nuc ish is followed directly by its parentheses (NUC_ISH.SIGNAL_COUNT_FORMAT).
+        - text: "46,XY[20].ish 9q34(ABL1×2),22q11.2(BCR×2)[20].nuc ish(TP53×2)[400]"
+          cite: {section: "13.3.1", page: 108, example: E17}
       invalid:
         - text: "46,XY ish 22q11.2(D22S75×2)"
           why: The banded result and the ish result are joined by a period (.), not a space.
@@ -31,12 +40,14 @@ rules:
     review:
       paraphrase_checked: true
       needs_review: false
-      note: Both invalid examples are inferred from §13.2 ¶1.
+      note: >-
+        Both invalid examples are inferred from §13.2 ¶1. T-016 added the several-technique
+        strings of §13.3.1 ¶2–¶3 (E16, E17).
     related: [ISH.CRYPTIC_NOT_IN_KARYOTYPE, ARR.COMBINED_WITH_OTHER_METHODS, SYM.SPACE_BETWEEN_SYMBOLS]
 
   - id: ISH.LOCUS_DESIGNATION
     title: Locus names in capitals; clone name preferred
-    applies_to: [ish]
+    applies_to: [ish, nuc_ish, fib_ish]
     severity: error
     statement: >-
       Loci are written in capital letters and never in italics, even gene symbols that are
@@ -65,6 +76,12 @@ rules:
           note: An accession number.
         - text: "46,XX,t(2;17)(q32;q24)[20].ish t(2;17)(CTD-3115L8+;RP11-959M22+)[20]"
           cite: {section: "13.2", page: 104, example: E40}
+        - text: "nuc ish(DXZ1×2,DYZ3×1,D18Z1×3),(RB1,D21S259/D21S341/D21S342)×3"
+          cite: {section: "13.3.1", page: 107, example: E12}
+          note: D-numbers and a gene name in nuc ish.
+        - text: "nuc ish(3′IGH×2,5′IGH×3)(3′IGH con 5′IGH×1)[210/237]"
+          cite: {section: "13.3.2.4", page: 112, example: E6}
+          note: The 5′/3′ prefix of a break-apart probe belongs to the locus name.
       invalid:
         - text: "46,XX.ish del(22)(q11.2q11.2)(d22s75–)"
           why: Locus designations are written in capital letters.
@@ -76,20 +93,24 @@ rules:
       note: >-
         The invalid example is inferred from §13.2 ¶1. Which name is preferred (clone, browser
         locus, gene) can't be checked from the string; a check can only judge the letter case
-        outside listed symbols (wcp) and the 5′/3′ prefixes of E35/E38.
+        outside listed symbols (wcp) and the 5′/3′ prefixes of E35/E38. §13.3–13.4 don't restate
+        the locus convention; T-016 applies it to nuc ish and fib ish because every string of
+        §13.3–13.8 follows it (capitals, 5′/3′ prefixes in §13.3.2.4).
     related: [ISH.LOCUS_LIST, ISH.BANDS_FROM_UCSC, SYM.LETTER_CASE]
 
   - id: ISH.LOCUS_LIST
     title: Loci separated by commas; contig loci by a slant line; chromosomes by a semicolon
-    applies_to: [ish]
+    applies_to: [ish, nuc_ish]
     severity: error
     statement: >-
       The loci tested on one chromosome are separated by commas. The loci of a contig probe may
-      each be listed, joined by single slant lines (/). For a rearrangement of several
+      each be listed, joined by single slant lines (/), or the contig may be given one
+      designation, with its composition described in the report. For a rearrangement of several
       chromosomes, the loci of each chromosome form a group, the groups separated by semicolons
       in the order of the chromosomes, as in the examples.
     cite:
       - {section: "13.2", page: 101, para: "¶1"}
+      - {section: "13.3", page: 106, para: "¶1"}
     examples:
       valid:
         - text: "46,XX,del(15)(q11.2q13).ish del(15)(q11.2q11.2)(SNRPN–,D15S10–)"
@@ -101,6 +122,9 @@ rules:
           cite: {section: "13.2", page: 104, example: E32}
         - text: "46,XX,t(16;16)(p13.1;q22)[20].ish t(16;16)(3′CBFB+;3′CBFB–)[20]"
           cite: {section: "13.2", page: 104, example: E38}
+        - text: "nuc ish(DXZ1×2,DYZ3×1,D18Z1×3),(RB1,D21S259/D21S341/D21S342)×3"
+          cite: {section: "13.3.1", page: 107, example: E12}
+          note: The chromosome 21 contig probe with each locus listed, joined by slant lines.
       invalid:
         - text: "46,XY.ish del(15)(q11.2q11.2)(SNRPN–D15S10–)"
           why: The two loci must be separated by a comma.
@@ -115,24 +139,34 @@ rules:
       note: >-
         The semicolon between chromosomes is not stated in the prose; it is the form of every
         multi-chromosome example (E21–E23, E28, E30–E32, E38–E40; §13.2.2 E2). Both invalid
-        examples are inferred.
+        examples are inferred. §13.3 ¶1 (T-016) adds the single designation for a contig.
     related: [ISH.LOCUS_DESIGNATION, ISH.LOCUS_STATUS, STRUCT.BREAKPOINT_GROUPS]
 
   - id: ISH.LOCUS_ORDER_PTER_QTER
     title: Loci in order from pter to qter
-    applies_to: [ish]
+    applies_to: [ish, nuc_ish, fib_ish]
     severity: warning
     statement: >-
       The loci are listed in the order in which they lie on the chromosome described, from pter
-      to qter.
+      to qter. This also holds for the probes to the 5′ and 3′ ends of one gene, and for the
+      loci of interphase (nuc ish) and fibre (fib ish) results.
     cite:
       - {section: "13.2", page: 101, para: "¶1"}
+      - {section: "13.3.1", page: 106, para: "¶1"}
+      - {section: "13.4", page: 112, para: "¶1"}
     examples:
       valid:
         - text: "46,XY.ish del(15)(q11.2q12)(D15S11+,SNRPN–,D15S10–,GABRB3+)"
           cite: {section: "13.2", page: 102, example: E10}
         - text: "46,XX.ish t(4;11)(p16.3;p15)(wcp11+,D4F26–,D4S96+,D4Z1+;D4F26+,wcp11+)"
           cite: {section: "13.2", page: 103, example: E23}
+        - text: "nuc ish(KAL1,GK,DMD)×1"
+          cite: {section: "13.3.1", page: 107, example: E15}
+        - text: "nuc ish(3′IGH×2,5′IGH×3)(3′IGH con 5′IGH×1)[210/237]"
+          cite: {section: "13.3.2.4", page: 112, example: E6}
+          note: The 3′ end of IGH lies nearer pter ("the orientation is from pter to qter").
+        - text: "fib ish 15q11.2(D15S11+,SNRPN+,GABRB3+)"
+          cite: {section: "13.4", page: 112, example: E1}
       invalid:
         - text: "46,XY.ish del(15)(q11.2q12)(GABRB3+,D15S10–,SNRPN–,D15S11+)"
           why: The loci are listed from qter to pter; D15S11 lies nearest pter and comes first.
@@ -143,7 +177,8 @@ rules:
       needs_review: false
       note: >-
         Severity warning: the book says the loci "should be used in order". A check needs locus
-        positions, which the KB doesn't have; the invalid example is inferred from E10.
+        positions, which the KB doesn't have; the invalid example is inferred from E10. T-016
+        added §13.3.1 ¶1 (nuc ish, 5′/3′ probes) and §13.4 ¶1 (fib ish).
     related: [ISH.LOCUS_LIST, ARR.PTER_TO_QTER]
 
   - id: ISH.BANDS_FROM_UCSC
@@ -419,7 +454,7 @@ rules:
 
   - id: ISH.CELL_LINES
     title: ish cell lines with cell numbers in square brackets
-    applies_to: [ish]
+    applies_to: [ish, nuc_ish]
     severity: error
     statement: >-
       When the ish result differs between cell lines, each line is written with its number of
@@ -428,6 +463,7 @@ rules:
     cite:
       - {section: "13.2", page: 105, example: E46}
       - {section: "13.2", page: 105, example: E47}
+      - {section: "13.3.1", page: 108, example: E26}
     examples:
       valid:
         - text: "mos 46,X,+r[15]/45,X[10].ish r(X)(wcpX+,DXZ1+)"
@@ -441,6 +477,13 @@ rules:
           cite: {section: "13.2", page: 105, example: E49}
         - text: "46,XY,t(9;22)(q34;q11.2)[20].ish t(9;22)(ABL1–;BCR+,ABL1+)[20]"
           cite: {section: "13.2", page: 103, example: E30}
+        - text: "nuc ish(D17Z1×2~3,ERBB2 amp)[100/200]/(D17Z1,ERBB2)×3[20/200]"
+          cite: {section: "13.3.1", page: 107, example: E9}
+          note: Printed with a space before ×, "(D17Z1,ERBB2) ×3"; see SYM.NO_OTHER_SPACE.
+        - text: "nuc ish(D13S319×0)[100/400]/(D13S319×1)[50/400]"
+          cite: {section: "13.3.1", page: 108, example: E26}
+        - text: "nuc ish(D13S319×0,LAMP1×2)[100/400]/(D13S319×1,LAMP1×2)[50/400]"
+          cite: {section: "13.3.1", page: 109, example: E27}
       invalid:
         - text: "46,X,+r.ish r(X)(wcpX+,DXZ1+)[60%]/r(X)(wcpX+,DXZ1++)[40%]"
           why: Square brackets hold the number of cells, not a percentage.
@@ -450,7 +493,9 @@ rules:
       needs_review: false
       note: >-
         From the examples E46–E49 and the E46 explanation; no paragraph states it. The invalid
-        example is inferred from the E46 explanation.
+        example is inferred from the E46 explanation. T-016 added the nuc ish cell lines of
+        §13.3.1 (E9, E26, E27), where the counts are abnormal cells over the total scored
+        (NUC_ISH.ABNORMAL_OVER_TOTAL).
     related: [CLONE.CELL_COUNT_REQUIRED, KARYO.CLONE_SEPARATOR]
 
   - id: ISH.RELEVANT_RESULTS_ONLY
@@ -477,7 +522,7 @@ rules:
 
   - id: ISH.SIGNAL_QUALIFIERS
     title: amp, dim and enh after the locus, separated by a space
-    applies_to: [ish]
+    applies_to: [ish, nuc_ish]
     severity: error
     statement: >-
       When the signals are too many to count, the abbreviation amp (amplified) may be written
@@ -489,6 +534,7 @@ rules:
       - {section: "13.2.1", page: 105, example: E1}
       - {section: "3", page: 34, para: "¶2"}
       - {section: "3", page: 35, para: "¶3"}
+      - {section: "13.3", page: 106, para: "¶1"}
     examples:
       valid:
         - text: "ish der(21)(RUNX1 amp)"
@@ -497,6 +543,13 @@ rules:
           cite: {section: "13.2.1", page: 105, example: E1}
         - text: "46,XX.ish 17p11.2(RAI1 enh)"
           cite: {section: "13.2.1", page: 105, example: E2}
+        - text: "nuc ish(MYCN amp)[200]"
+          cite: {section: "13.3.1", page: 107, example: E5}
+        - text: "nuc ish(D13S319×1,D13S319 dim×1,LAMP1×2)[197/200]"
+          cite: {section: "13.3.1", page: 107, example: E10}
+          note: dim before the signal count.
+        - text: "nuc ish(IGH×3,BCL2×2,BCL2 amp)(IGH con BCL2×1)(IGH con BCL2 amp×1)"
+          cite: {section: "13.3.2", page: 110, example: E10}
       invalid:
         - text: "46,XX.ish 17p11.2(RAI1enh)"
           why: A space separates enh from the locus.
@@ -507,5 +560,6 @@ rules:
       needs_review: false
       note: >-
         §13.2.1 has examples only; dim and enh are defined in the ch. 3 symbol list. The space is
-        the printed form of all three examples. The invalid example is inferred.
+        the printed form of all three examples. The invalid example is inferred. T-016 added nuc
+        ish (§13.3 ¶1 recommends the short form for amplification; E5, E10, §13.3.2 E10).
     related: [ISH.ABNORMAL_SIGNAL_COUNT, SYM.SPACE_BETWEEN_SYMBOLS]

@@ -1,0 +1,8 @@
+version: "2016"
+section: "13.8"
+quotes:
+  - rule: ISH.PARTIAL_PAINT
+    cite: {section: "13.8", page: 114, para: "¶1"}
+    text: >-
+      Band-specific or arm-specific probes can be used as partial chromosome paints (pcp). The
+      nomenclature is similar to that of wcp (13.2).

@@ -1,0 +1,29 @@
+version: "2016"
+section: "13.3.2"
+quotes:
+  - rule: NUC_ISH.SIGNAL_POSITION_FORMAT
+    cite: {section: "13.3.2", page: 109, para: "¶1"}
+    text: >-
+      If loci on two separate chromosomes are tested, they are expected under normal
+      circumstances to be spatially separated and results are expressed as follows:
+  - rule: NUC_ISH.SIGNAL_POSITION_FORMAT
+    cite: {section: "13.3.2", page: 109, para: "¶2"}
+    text: >-
+      However, if they have become juxtaposed on one chromosome because of a t(9;22), the results
+      are expressed with the first set of parentheses indicating the number of signals and the
+      second set of parentheses describing the relative position of the signals to one another:
+  - rule: NUC_ISH.SIGNAL_POSITION_FORMAT
+    cite: {section: "13.3.2", page: 109, para: "¶4"}
+    text: >-
+      If a strange rearrangement has occurred resulting in the juxtaposition of one BCR locus
+      with two ABL1 loci, the results are expressed as follows:
+  - rule: NUC_ISH.SIGNAL_POSITION_FORMAT
+    cite: {section: "13.3.2", page: 110, para: "¶6"}
+    text: >-
+      If hybridization signals are normally juxtaposed because of close physical association of
+      the respective loci on the same chromosome, normal results would be expressed as follows:
+  - rule: NUC_ISH.SIGNAL_POSITION_FORMAT
+    cite: {section: "13.3.2", page: 110, para: "¶7"}
+    text: >-
+      However, if the loci (example above) are separated because of a structural rearrangement
+      of one X chromosome, the result is expressed as follows:

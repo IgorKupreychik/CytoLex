@@ -55,3 +55,7 @@ quotes:
     text: >-
       All symbols and abbreviated terms used in the description of chromosomes and chromosome
       abnormalities are listed below.
+  - rule: SYM.NO_OTHER_SPACE
+    cite: {section: "13.3.1", page: 106, para: "¶1"}
+    text: >-
+      the symbols nuc ish are followed immediately in parentheses by the locus designation

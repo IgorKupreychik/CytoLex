@@ -1,0 +1,47 @@
+version: "2016"
+section: "13.3.2.4"
+rules:
+  - id: NUC_ISH.BREAK_APART_FORMS
+    title: "Break-apart probes: short (MLL×2) or full (5′MLL,3′MLL)×2(5′MLL con 3′MLL×2)"
+    applies_to: [nuc_ish]
+    severity: info
+    statement: >-
+      A break-apart probe is made of a 5′ and a 3′ probe. A normal result may be written in the
+      short form, nuc ish(MLL×2), or in full, with both probes and their fused signals,
+      nuc ish(5′MLL,3′MLL)×2(5′MLL con 3′MLL×2); the short form doesn't show that two fusion
+      signals are the normal finding. Abnormal cells show the separation of the 5′ and 3′
+      signals (sep) or unequal numbers of 5′ and 3′ signals.
+    cite:
+      - {section: "13.3.2.4", page: 111, para: "¶1"}
+      - {section: "13.3.2.4", page: 112, para: "¶2"}
+    examples:
+      valid:
+        - text: "nuc ish(MLL×2)[400]"
+          cite: {section: "13.3.2.4", page: 112, example: E1}
+        - text: "nuc ish(5′MLL,3′MLL)×2(5′MLL con 3′MLL×2)[400]"
+          cite: {section: "13.3.2.4", page: 112, example: E1}
+        - text: "nuc ish(CBFB×2)[400]"
+          cite: {section: "13.3.2.4", page: 112, example: E2}
+        - text: "nuc ish(5′CBFB,3′CBFB)×2(5′CBFB con 3′CBFB×2)[400]"
+          cite: {section: "13.3.2.4", page: 112, example: E2}
+        - text: "nuc ish(MLL×2)(5′MLL sep 3′MLL×1)[200]"
+          cite: {section: "13.3.2.4", page: 112, example: E3}
+        - text: "nuc ish(5′MLL×2,3′MLL×1)(5′MLL con 3′MLL×1)[200]"
+          cite: {section: "13.3.2.4", page: 112, example: E4}
+        - text: "nuc ish(CBFB×2)(5′CBFB sep 3′CBFB×1)[200]"
+          cite: {section: "13.3.2.4", page: 112, example: E5}
+        - text: "nuc ish(3′IGH×2,5′IGH×3)(3′IGH con 5′IGH×1)[210/237]"
+          cite: {section: "13.3.2.4", page: 112, example: E6}
+          note: 3′IGH before 5′IGH, from pter to qter.
+        - text: "nuc ish(3′DDIT3×2,5′DDIT3×1,5′DDIT3 amp)(3′DDIT3 con 5′DDIT3×1)(3′DDIT3 con 5′DDIT3 amp×1)[192/200]"
+          cite: {section: "13.3.2.4", page: 112, example: E7}
+          note: Printed over two lines, wrapped after "con"; joined with a space.
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info: both forms of a normal result are correct; the rule records them and
+        forbids nothing. The book writes the old gene symbol MLL and explains it as KMT2A (E1,
+        E3); kept as printed. The nucleus drawing of E7 was checked with the §13.3.2 drawings
+        (see NUC_ISH.SIGNAL_POSITION_FORMAT).
+    related: [NUC_ISH.SIGNAL_POSITION_FORMAT, ISH.LOCUS_ORDER_PTER_QTER, ISH.LOCUS_DESIGNATION]

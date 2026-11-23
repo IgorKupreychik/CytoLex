@@ -1,0 +1,10 @@
+version: "2016"
+section: "13.7"
+quotes:
+  - rule: ISH.MULTICOLOR_PAINTING
+    cite: {section: "13.7", page: 114, para: "¶1"}
+    text: >-
+      The karyotype can be re-written based on the knowledge gained from the FISH results using
+      these techniques. The use of these FISH techniques should be stated in the report. No
+      special nomenclature has been devised for these techniques. However, a nomenclature
+      similar to that used for wcp (Section 13.2) may be used.

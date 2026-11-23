@@ -1,0 +1,53 @@
+version: "2016"
+section: "13.3.1"
+quotes:
+  - rule: NUC_ISH.SIGNAL_COUNT_FORMAT
+    cite: {section: "13.3.1", page: 106, para: "¶1"}
+    text: >-
+      To indicate the number of signals, the symbols nuc ish are followed immediately in
+      parentheses by the locus designation, a multiplication sign (×), and the number of signals
+      seen.
+  - rule: NUC_ISH.DETAILED_FORMAT
+    cite: {section: "13.3.1", page: 106, para: "¶1"}
+    text: >-
+      If the detailed system is used, a space should follow ish, and then the band designation.
+  - rule: NUC_ISH.SHARED_COUNT
+    cite: {section: "13.3.1", page: 106, para: "¶1"}
+    text: >-
+      If probes for two or more loci are used in the same hybridization, they follow one another
+      in a single set of parentheses, separated by a comma (,), and a multiplication sign (×)
+      outside the parentheses if the number of signals for each probe is the same and inside the
+      parentheses if the number of hybridization signals varies.
+  - rule: NUC_ISH.CHROMOSOME_ORDER
+    cite: {section: "13.3.1", page: 106, para: "¶1"}
+    text: >-
+      If loci on two different chromosomes are tested, results are reported in a string,
+      separated by commas, in the order sex chromosomes and autosomes 1 to 22.
+  - rule: NUC_ISH.CHROMOSOME_ORDER
+    cite: {section: "13.3.1", page: 108, para: "¶5"}
+    text: >-
+      The probe set with the lowest chromosome number is listed first.
+  - rule: NUC_ISH.CELLS_SCORED
+    cite: {section: "13.3.1", page: 106, para: "¶1"}
+    text: >-
+      If the study is on a cancer specimen, the number of cells scored is placed in square
+      brackets.
+  - rule: NUC_ISH.HYBRIDIZATION_GROUPS
+    cite: {section: "13.3.1", page: 106, para: "¶1"}
+    text: >-
+      Normal results from multiple hybridizations can be combined in a single set of
+      parentheses.
+  - rule: NUC_ISH.HYBRIDIZATION_GROUPS
+    cite: {section: "13.3.1", page: 108, para: "¶5"}
+    text: >-
+      Probe sets co-hybridized are included in the same parentheses.
+  - rule: NUC_ISH.ABNORMAL_OVER_TOTAL
+    cite: {section: "13.3.1", page: 108, para: "¶5"}
+    text: >-
+      When normal and abnormal cells are found, the number of abnormal cells is listed over the
+      total number of cells scored for each abnormal locus. The normal cells are not listed as it
+      is implied that they are the remainder of the total.
+  - rule: NUC_ISH.CELLS_SCORED
+    cite: {section: "13.3.1", page: 108, para: "¶3"}
+    text: >-
+      For cancer studies, the number of cells scored is shown in square brackets for each.
