@@ -52,14 +52,14 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-040 | done | 2 | T-036, T-035 | Desktop: fix UI (diff view, Apply → re-validate) |
 | T-041 | todo | 3 | T-035 | Level 2 "did you mean" suggestions |
 | T-042 | todo | 3 | T-027 | Handling of underlined homologue notation |
-| T-043 | discussion | 3 | – | Copyright cleanup before any public deployment |
-| T-044 | todo | 4 | T-028 | Web service wrapping the core library + browser page |
-| T-045 | todo | 3 | T-013 | ISCN 2020 KB + version profile |
-| T-046 | todo | 3 | T-045 | ISCN 2024 KB + version profile |
+| T-043 | discussion | 5 | – | Copyright cleanup before any public deployment |
+| T-044 | todo | 5 | T-028 | Web service wrapping the core library + browser page |
+| T-045 | todo | 5 | T-013 | ISCN 2020 KB + version profile |
+| T-046 | todo | 5 | T-045 | ISCN 2024 KB + version profile |
 | T-047 | done | 2 | – | Research CytoGPS (API, LGF output, ISCN version, source/licence, local options, terms) |
 | T-048 | done | 2 | T-047 | Decide CytoGPS integration mode and data policy |
 | T-049 | done | 2 | T-028, T-048 | `ExternalChecker` interface + CytoGPS adapter |
-| T-050 | todo | 3 | T-031 | LGF computation in the core library |
+| T-050 | todo | 5 | T-031 | LGF computation in the core library |
 | T-051 | done | 2 | T-049 | Comparison engine + report (no CLI) |
 | T-052 | todo | 3 | T-051, T-038 | Desktop: comparison view |
 | T-053 | done | 1 | T-003 | Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`? |
@@ -70,13 +70,13 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-058 | done | 2 | T-030, T-031, T-057 | Literal translation renderer in the core library |
 | T-059 | done | 2 | T-058, T-036, T-039 | Desktop: translation view |
 | T-060 | done | 1 | T-023 | `kb build`: lean runtime bundle (rules metadata, vocab, bands) for the core |
-| T-061 | discussion | 3 | – | Presentation & documentation material for the pilot: define what to prepare |
+| T-061 | discussion | 4 | – | Presentation & documentation material for the pilot: define what to prepare |
 | T-062 | done | 2 | T-026 | Test corpus of ISCN strings per notation type (review-flagged) + mutation generator |
 | T-063 | done | 1 | T-053 | KB: typed symbol forms (`-`/`x`/`->`) in the ch. 3 vocab + rule `SYM.TYPED_SYMBOL_FORMS` |
 | T-064 | done | 3 | – | Merged into T-055 (line endings of generated committed files) |
 | T-065 | done | 1 | T-027 | Binder: syntax tree → semantic model (meaning nodes, KbRefs, IsPartial) |
 | T-066 | done | 2 | T-065 | Band composition from the short system (derivative structure for short-form abnormalities) |
-| T-067 | discussion | 3 | T-045, T-046 | Revisit genome-assembly-only bands per edition (2016 error vs. later-edition valid?) |
+| T-067 | discussion | 5 | T-045, T-046 | Revisit genome-assembly-only bands per edition (2016 error vs. later-edition valid?) |
 | T-068 | done | 1 | T-031 | Rules: ch. 9 symbol rules (split from T-031) |
 | T-069 | done | 2 | T-036 | Abnormality list: core API + desktop panel |
 | T-070 | todo | 3 | T-032, T-069 | Abnormality list: inherited changes of idem/sl/sdl clones (expandable reference, full form) |
@@ -85,19 +85,18 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-073 | done | 2 | T-029 | Stray spaces inside a karyotype (`47,XY, +21`, `46,X Y`) are not reported: KB basis and fix |
 | T-074 | done | 2 | T-073, T-035 | Checks for `SYM.NO_OTHER_SPACE` and `SYM.LETTER_CASE` (stray spaces, letter case; level-1 fixes) |
 | T-075 | discussion | 3 | T-047, T-073 | Severity of stray spaces and letter case (`SYM.NO_OTHER_SPACE`, `SYM.LETTER_CASE`) vs. CytoGPS behaviour |
-| T-076 | todo | 3 | T-047 | Ask the CytoGPS authors: licence of the GitHub code, newer parser/server code |
-| T-077 | todo | 3 | T-050, T-038 | Batch statistics per band (loss/gain/fusion share of clones, aggregate LGF table) |
-| T-078 | todo | 3 | T-050, T-069 | Desktop: ideogram view of loss/gain/fusion per band and clone |
-| T-079 | todo | 3 | T-050, T-038 | Export in CytoGPS's JSON result format (RCytoGPS-compatible) |
+| T-077 | todo | 5 | T-050, T-038 | Batch statistics per band (loss/gain/fusion share of clones, aggregate LGF table) |
+| T-078 | todo | 5 | T-050, T-069 | Desktop: ideogram view of loss/gain/fusion per band and clone |
+| T-079 | todo | 5 | T-050, T-038 | Export in CytoGPS's JSON result format (RCytoGPS-compatible) |
 | T-080 | discussion | 3 | T-075 | Optional lenient mode (stray spaces, letter case as warnings) |
 | T-081 | done | 2 | T-049, T-036 | Desktop: CytoGPS panel in the single-string check (optional, never blocks CytoLex) |
-| T-082 | todo | 3 | T-057 | Review the translation templates and golden file (ISCN 2016) |
+| T-082 | todo | 5 | T-057 | Review the translation templates and golden file (ISCN 2016) |
 | T-083 | todo | 3 | – | Refactor: remove hand-written partial classes (`Binder`, `Parser`) per the code standard |
 | T-084 | todo | 3 | T-059 | Rule browser: bands (band table in `kb.sqlite`, band links of the translation open it) |
 | T-085 | todo | 3 | T-062 | Parser: report truncated input (missing `)`, trailing sign) under a KB rule instead of `CORE.UNPARSED` |
 | T-086 | todo | 3 | T-066 | Use `Abnormality.Composition`: detailed composition vs. its symbol (rule), translation and LGF read one shape |
 | T-087 | discussion | 3 | T-066 | Band compositions the KB doesn't define yet: insertion recombinants, `der(?)` with an insertion or hsr at an unknown site |
-| T-088 | todo | 2 | T-071, T-034 | Arr: check positions against the bands of the stated build (`ARR.POSITIONS_IN_BANDS`) |
+| T-088 | in_progress | 2 | T-071, T-034 | Arr: check positions against the bands of the stated build (`ARR.POSITIONS_IN_BANDS`) |
 | T-089 | todo | 3 | T-081 | Desktop: settings view to set up external checkers (CytoGPS paths, cache, timeout) instead of editing `config/local.yaml` by hand |
 
 ---
@@ -594,7 +593,7 @@ Outcome (2026-11-18):
 **Notes:** Created 2026-11-23 from T-066.
 
 ### T-088 — Arr: check positions against the bands of the stated build
-**Status:** todo
+**Status:** in_progress
 **Description:** Implement `ARR.POSITIONS_IN_BANDS` (warning, decided in T-071): a `[KbRule]` check in `src/CytoLex.Core/Rules/Checks/` that reads each arr segment's span from `ArrModel` and the band coordinates of the stated build (GRCh37/GRCh38) from the runtime bundle. Short system: first position in the first band, last position in the last band (one band holds both); `pter`/`qter` = the chromosome ends; a position beyond the chromosome end is always a finding; detailed system: only the abnormal span `a_b×n`; `or` alternatives one by one; tolerance 0. Skip: no build, another build, book-only bands without coordinates, whole chromosomes/arms. One finding per segment naming what failed; when the segment fits the other build, the message says so. Level-3 fix (KB hint), no edit.
 **Acceptance:** the 9 invalid KB examples of `ARR.POSITIONS_IN_BANDS` fire and its 5 valid examples pass in the KB-example harness; every other arr KB example and corpus entry stays as it is, or its label is reviewed for the new warning (`tests/data/corpus/`); tests for the qter span, the detailed-system flanks, the "fits the other build" hint and each skip.
 **Notes:** Created 2026-11-23 from T-071.
@@ -750,13 +749,7 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 - Terms of use and privacy.
 - Contact the authors if needed. Sites: `https://cytogps-app.mangograss-a1cf8a6c.westus2.azurecontainerapps.io/karyotype_parser`, cytogps.org, the RCytoGPS package.
 **Acceptance:** Findings with source URLs in `docs/research/cytogps.md`.
-**Notes:** **Outcome (2026-11-20):** `docs/research/cytogps.md` — findings with sources: interfaces (hosted `POST /singleKaryotypeAnalysis` returns HTML in JSON, `POST /batchKaryotypeAnalysis` returns a zip; no documented API; `cytogps.org` no longer resolves), JSON/LGF format (5 statuses, 916 ISCN 2016 bands), coverage (ISCN 2016, short-system karyotypes only, ASCII only, whitespace stripped, case-insensitive; no ish/arr/detailed system), licence (no file in the repo; site User Agreement = non-commercial use), privacy (no policy; batch results kept on the server). Beyond the plan (with the user): the local copy at `C:\_\NMDP\ISCN\CytoGPS` was built and run with a portable Temurin 21 JDK in `C:\_\Tests\PortableJDK` plus `javax.json-1.1.4.jar` and a small wrapper (§7); it matches the hosted app on 28 probe strings and a 5-line batch. Both tools were run on the 951 KB example strings → `docs/research/cytogps-comparison.md` (feature table today/planned, accuracy, caveats; for business presentations) and `docs/research/data/cytogps-vs-cytolex-2016.csv`. Docs: `docs/decisions.md` pointer, `README.md`/`CLAUDE.md` (`docs/research/`), notes in T-048/T-075. Follow-ups: T-076 (licence enquiry), T-077–T-080 (batch statistics, ideogram, CytoGPS JSON export, lenient mode); T-066 and T-044 extended (derivative structure in the abnormality list, browser page).
-
-### T-076 — Ask the CytoGPS authors about the licence and newer code
-**Status:** todo
-**Description:** The GitHub repo `i2-wustl/CytoGPS` has no licence file. The hosted site's User Agreement grants non-commercial use of "the computer code provided here". Ask the authors (WashU Institute for Informatics / the RCytoGPS maintainer) whether that agreement covers the repo code, and whether a newer parser or the web app's server code is available. Draft text: `docs/research/cytogps.md` §9. The user sends it; Claude doesn't.
-**Acceptance:** The answer (or "no reply by <date>") recorded in `docs/research/cytogps.md` §6/§9. If redistribution is allowed, add a note to T-043/T-049.
-**Notes:** Created 2026-11-20 from T-047. Needed only before any redistribution or public deployment; private local use is already covered.
+**Notes:** **Outcome (2026-11-20):** `docs/research/cytogps.md` — findings with sources: interfaces (hosted `POST /singleKaryotypeAnalysis` returns HTML in JSON, `POST /batchKaryotypeAnalysis` returns a zip; no documented API; `cytogps.org` no longer resolves), JSON/LGF format (5 statuses, 916 ISCN 2016 bands), coverage (ISCN 2016, short-system karyotypes only, ASCII only, whitespace stripped, case-insensitive; no ish/arr/detailed system), licence (no file in the repo; site User Agreement = non-commercial use), privacy (no policy; batch results kept on the server). Beyond the plan (with the user): the local copy at `C:\_\NMDP\ISCN\CytoGPS` was built and run with a portable Temurin 21 JDK in `C:\_\Tests\PortableJDK` plus `javax.json-1.1.4.jar` and a small wrapper (§7); it matches the hosted app on 28 probe strings and a 5-line batch. Both tools were run on the 951 KB example strings → `docs/research/cytogps-comparison.md` (feature table today/planned, accuracy, caveats; for business presentations) and `docs/research/data/cytogps-vs-cytolex-2016.csv`. Docs: `docs/decisions.md` pointer, `README.md`/`CLAUDE.md` (`docs/research/`), notes in T-048/T-075. Follow-ups: T-076 (licence enquiry; removed 2026-11-23), T-077–T-080 (batch statistics, ideogram, CytoGPS JSON export, lenient mode); T-066 and T-044 extended (derivative structure in the abnormality list, browser page).
 
 ### T-077 — Batch statistics per band
 **Status:** todo

@@ -73,12 +73,22 @@ public class ArrChecksTests
         Assert.True(result.Validity.IsValid);
     }
 
-    /// <summary>GRCh37 positions printed under [GRCh38] (§14.2 E23, E40, E44, E45): no position-vs-band check yet (T-071).</summary>
+    /// <summary>
+    /// GRCh37 positions printed under [GRCh38] (§14.2 E23, E44, E45): only the ARR.POSITIONS_IN_BANDS warning (T-088), so
+    /// the strings stay valid as examples of their other rules.
+    /// </summary>
     [Theory]
     [InlineData("arr[GRCh38] 8q23.1q24.3(105171556_146201911)×3,15q26.2q26.3(96062102_100201136)×1")]
     [InlineData("arr[GRCh38] 21q11.2q22.3(13531865_46914745)×3")]
     [InlineData("arr[GRCh38] 18p11.32p11.21(102328_15079388)×1,18q22.3q23(69172132_79093443)×1")]
-    public void BookPositionsOfAnotherBuild_AreNotFlagged(string input) => Assert.Empty(Diagnostics(input));
+    public void BookPositionsOfAnotherBuild_GetOnlyThePositionWarning(string input)
+    {
+        var result = Result(input);
+        var d = Assert.Single(result.Diagnostics);
+        Assert.Equal("ARR.POSITIONS_IN_BANDS", d.RuleId);
+        Assert.Equal(Severity.Warning, d.Severity);
+        Assert.True(result.Validity.IsValid);
+    }
 
     [Theory]
     [InlineData("arr[GRCh38] 4q35.1q32.2(183022312_163146681)×1", "ARR.PTER_TO_QTER", "arr[GRCh38] 4q32.2q35.1(163146681_183022312)×1")]

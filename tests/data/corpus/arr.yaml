@@ -116,7 +116,7 @@ corpus:
     expected: {"2016": {verdict: valid}}
     review: {checked: false}
   - id: A-015
-    iscn: "arr[GRCh38] 11p15.5(1958000_2850000)×2 hmz"
+    iscn: "arr[GRCh38] 11p15.5(1958000_2750000)×2 hmz"
     types: [arr]
     features: [zygosity]
     rules: [ARR.ZYGOSITY]
@@ -124,7 +124,7 @@ corpus:
     expected: {"2016": {verdict: valid}}
     review: {checked: false}
   - id: A-016
-    iscn: "arr[GRCh38] 6p22.3(15000000_16500000)×2 hmz pat"
+    iscn: "arr[GRCh38] 6p22.3(15300000_16500000)×2 hmz pat"
     types: [arr]
     features: [zygosity, inheritance]
     rules: [ARR.ZYGOSITY]

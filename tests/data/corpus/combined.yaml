@@ -66,4 +66,4 @@ corpus:
     rules: [ARR.COMBINED_WITH_OTHER_METHODS]
     source: synthetic
     expected: {"2016": {verdict: unreviewed, context: constitutional}}
-    review: {checked: false}
+    review: {checked: false, note: "The arr part is §14.2 E23 as printed: its positions don't fit the GRCh38 bands, so ARR.POSITIONS_IN_BANDS warns (T-088); kept as printed."}
