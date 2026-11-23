@@ -96,7 +96,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-085 | todo | 3 | T-062 | Parser: report truncated input (missing `)`, trailing sign) under a KB rule instead of `CORE.UNPARSED` |
 | T-086 | todo | 3 | T-066 | Use `Abnormality.Composition`: detailed composition vs. its symbol (rule), translation and LGF read one shape |
 | T-087 | discussion | 3 | T-066 | Band compositions the KB doesn't define yet: insertion recombinants, `der(?)` with an insertion or hsr at an unknown site |
-| T-088 | in_progress | 2 | T-071, T-034 | Arr: check positions against the bands of the stated build (`ARR.POSITIONS_IN_BANDS`) |
+| T-088 | done | 2 | T-071, T-034 | Arr: check positions against the bands of the stated build (`ARR.POSITIONS_IN_BANDS`) |
 | T-089 | todo | 3 | T-081 | Desktop: settings view to set up external checkers (CytoGPS paths, cache, timeout) instead of editing `config/local.yaml` by hand |
 
 ---
@@ -593,10 +593,10 @@ Outcome (2026-11-18):
 **Notes:** Created 2026-11-23 from T-066.
 
 ### T-088 — Arr: check positions against the bands of the stated build
-**Status:** in_progress
+**Status:** done
 **Description:** Implement `ARR.POSITIONS_IN_BANDS` (warning, decided in T-071): a `[KbRule]` check in `src/CytoLex.Core/Rules/Checks/` that reads each arr segment's span from `ArrModel` and the band coordinates of the stated build (GRCh37/GRCh38) from the runtime bundle. Short system: first position in the first band, last position in the last band (one band holds both); `pter`/`qter` = the chromosome ends; a position beyond the chromosome end is always a finding; detailed system: only the abnormal span `a_b×n`; `or` alternatives one by one; tolerance 0. Skip: no build, another build, book-only bands without coordinates, whole chromosomes/arms. One finding per segment naming what failed; when the segment fits the other build, the message says so. Level-3 fix (KB hint), no edit.
 **Acceptance:** the 9 invalid KB examples of `ARR.POSITIONS_IN_BANDS` fire and its 5 valid examples pass in the KB-example harness; every other arr KB example and corpus entry stays as it is, or its label is reviewed for the new warning (`tests/data/corpus/`); tests for the qter span, the detailed-system flanks, the "fits the other build" hint and each skip.
-**Notes:** Created 2026-11-23 from T-071.
+**Notes:** Created 2026-11-23 from T-071. **Outcome (2026-11-23):** `src/CytoLex.Core/Rules/Checks/ArrPositionsInBandsCheck.cs` (`ARR.POSITIONS_IN_BANDS`, warning): abnormal span of each region (detailed system: span items only; `or` readings paired with their positions) vs. the GRCh37/GRCh38 band coordinates of the runtime `BandSet`; chromosome length = largest band end of the build; `pter`/`qter` = chromosome ends; tolerance 0; skips as planned plus recovered regions and reversed spans (`ARR.PTER_TO_QTER`). One finding per arr segment: primary span = first failing position, the others secondary; the detail names each failure and the band the position lies in (at the written band's lowest level, e.g. `17p12` → `17p13`), plus "The positions fit the GRCh37/38 bands." when they do; level-3 fix (KB hint). Harness: 9 invalid examples fire, 5 valid pass. Tests: `tests/CytoLex.Core.Tests/Rules/ArrPositionsInBandsTests.cs` (25 cases); `ArrChecksTests.BookPositionsOfAnotherBuild_GetOnlyThePositionWarning` replaces the old "not flagged" test. Corpus: A-015/A-016 synthetic positions moved inside their bands, C-008 (= §14.2 E23) kept as printed with a review note. `dotnet test`: 8,614 total, 0 failed, 36 skipped; `dotnet format` clean. Docs: `docs/design/core.md` §7 (arr checks), `CLAUDE.md`, `README.md`. No KB change. Deviation: none.
 
 ## Desktop app (pilot)
 
