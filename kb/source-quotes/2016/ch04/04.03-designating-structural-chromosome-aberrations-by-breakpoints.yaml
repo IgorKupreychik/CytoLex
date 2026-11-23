@@ -25,3 +25,11 @@ quotes:
     text: >-
       Each abnormality is described first with the short system and, when appropriate, also with
       the detailed system.
+  - rule: GEN.GENOME_BUILD_REQUIRED
+    cite: {section: "15.1", page: 123, para: "¶1"}
+    text: >-
+      When nucleotide numbers are used, the specified genome build (e.g. [GRCh38]) is placed
+      within the string as illustrated in this chapter.
+  - rule: GEN.GENOME_BUILD_REQUIRED
+    cite: {section: "16.2", page: 125, para: "¶5"}
+    text: It must include the genome build in square brackets after seq.

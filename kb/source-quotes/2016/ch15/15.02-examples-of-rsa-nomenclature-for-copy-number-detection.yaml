@@ -1,0 +1,9 @@
+version: "2016"
+section: "15.2"
+quotes:
+  - rule: RSA.FORMAT
+    cite: {section: "15.1", page: 123, para: "¶1"}
+    text: >-
+      As is done for microarray, the span of the abnormal nucleotides is separated by an
+      underscore. When nucleotide numbers are used, the specified genome build (e.g. [GRCh38]) is
+      placed within the string as illustrated in this chapter.

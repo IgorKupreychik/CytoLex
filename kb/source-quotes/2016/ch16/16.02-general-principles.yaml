@@ -1,0 +1,107 @@
+version: "2016"
+section: "16.2"
+quotes:
+  - rule: SEQ.FORMAT
+    cite: {section: "16.2", page: 125, para: "¶3"}
+    text: >-
+      • Both the ISCN-like description of chromosome aberrations and the HGVS-like nucleotide
+      variant descriptions m̲u̲s̲t̲ be included for full clarity and information.
+  - rule: SEQ.FORMAT
+    cite: {section: "16.2", page: 125, para: "¶4"}
+    text: >-
+      • The ISCN-like portion of the description appears first and can be modelled on short or
+      long form ISCN description of structural rearrangements.
+  - rule: SEQ.FORMAT
+    cite: {section: "16.2", page: 125, para: "¶5"}
+    text: >-
+      • The ISCN-like portion of the description begins with seq to indicate that the aberration
+      was identified by sequence-based technology. It must include the genome build in square
+      brackets after seq.
+  - rule: SEQ.COMBINED_WITH_OTHER_METHODS
+    cite: {section: "16.2", page: 125, para: "¶6"}
+    text: >-
+      • Observations combined with other techniques, such as banded chromosome analysis or
+      microarrays can be expressed by using the symbol .seq, where a period (.) precedes the
+      sequencing nomenclature.
+  - rule: SEQ.HGVS_PORTION
+    cite: {section: "16.2", page: 125, para: "¶7"}
+    text: >-
+      • The combined nomenclature uses the existing HGVS standards for the HGVS-like portion
+      (see below and www.hgvs.org/mutnomen/) along with additional recommendations outlined below
+      for the description of an aberration.
+  - rule: SEQ.HGVS_PORTION
+    cite: {section: "16.2", page: 125, para: "¶9"}
+    text: >-
+      • An underscore indicates a range of nucleotides. For example, g.123_456del indicates a
+      deletion of segment including nucleotides 123 to 456.
+  - rule: SEQ.HGVS_PORTION
+    cite: {section: "16.2", page: 126, para: "¶10"}
+    text: >-
+      • Uncertainty is indicated by enclosing the uncertainty with parentheses. Thus, g.123_
+      (450_856)del indicates that the deletion extends to an unknown location between
+      nucleotides 450 and 856.
+  - rule: SEQ.HGVS_PORTION
+    cite: {section: "16.2", page: 126, para: "¶12"}
+    text: >-
+      • Curly braces { } are used to indicate differences in the altered segment compared to the
+      reference sequence in duplications, inversions, conversions, insertions, etc., e.g.,
+      g.123_456dup{234G>A}.
+  - rule: SEQ.HGVS_PORTION
+    cite: {section: "16.2", page: 126, para: "¶13"}
+    text: "• Inverted sequences are described using inv."
+  - rule: SEQ.ABERRATION_ORDER
+    cite: {section: "16.2", page: 126, para: "¶15"}
+    text: >-
+      • Aberrations affecting autosomes are listed first (numbers from low to high), followed by
+      those affecting sex chromosomes (X then Y).
+  - rule: SEQ.ABERRATION_ORDER
+    cite: {section: "16.2", page: 126, para: "¶17"}
+    text: "• Multiple breakpoints in one chromosome are listed in order of occurrence from pter to qter."
+  - rule: SEQ.BREAKPOINT_ORIENTATION
+    cite: {section: "16.2", page: 126, para: "¶16"}
+    text: >-
+      • Breakpoint location is determined by the first breakpoint encountered starting as
+      described above, i.e. from pter of the chromosome with the lowest number involved.
+  - rule: SEQ.BREAKPOINT_ORIENTATION
+    cite: {section: "16.2", page: 126, para: "¶18"}
+    text: >-
+      • Variant descriptions are always in the forward orientation (from nucleotide 1 to the end
+      of the chromosome), determined by the chromosomal origin of the intact centromere.
+  - rule: SEQ.CHROMOSOME_ENDS
+    cite: {section: "16.2", page: 126, para: "¶19"}
+    text: >-
+      • The start of the chromosome is described as pter, the end as qter since the genomic
+      reference sequence contains Ns at the start and end of the chromosome (telomeres) making the
+      use of specific nucleotide positions undesirable.
+  - rule: SEQ.CHROMOSOME_ENDS
+    cite: {section: "16.2", page: 126, para: "¶20"}
+    text: "• The centromere is described as cen since this helps to recognize the derivative chromosome."
+  - rule: SEQ.JUNCTIONS
+    cite: {section: "16.2", page: 126, para: "¶21"}
+    text: "• Breakpoint junctions are designated by a double colon (::)."
+  - rule: SEQ.JUNCTIONS
+    cite: {section: "16.2", page: 126, para: "¶22"}
+    text: >-
+      • Non-template sequences (inserts) at imperfect breakpoints are described using the format
+      ::sequence::, e.g., ::AAGTAC::
+  - rule: SEQ.SUPERNUMERARY_ADD
+    cite: {section: "16.2", page: 126, para: "¶23"}
+    text: "• The presence of an additional sequence (marker/ring chromosome) is indicated by add."
+  - rule: SEQ.THREE_PRIME_RULE
+    cite: {section: "16.2", page: 126, para: "¶11"}
+    text: >-
+      • In runs of identical nucleotides, the most 3′ base in the run is designated as the
+      variant. This is termed the “3′ rule”. For example, g.4delT (not g.2delT or g.3delT)
+      describes the change CTTTA to CTTA.
+  - rule: SEQ.THREE_PRIME_RULE
+    cite: {section: "16.2", page: 126, para: "¶24"}
+    text: >-
+      To determine the location of the breakpoint, the general HGVS rule of maintaining the
+      longest unchanged sequence applies (the 3′ rule).
+  - rule: SEQ.THREE_PRIME_RULE
+    cite: {section: "16.2", page: 126, para: "¶26"}
+    text: >-
+      The 3′ rule determines that, starting with the lowest chromosome involved (here chr2), the
+      sequence should be aligned as far 3′ as possible. The A should therefore be counted as
+      derived from chr2 and the correct description* of the breakpoint is therefore
+      g.[chr2:6::chrX:7].

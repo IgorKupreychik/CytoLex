@@ -5,7 +5,7 @@ import io
 import json
 
 from cytolex_tools.cli import main
-from cytolex_tools.kb.samples import LARGE_ROWS, is_fragment, segment_types
+from cytolex_tools.kb.samples import LARGE_ROWS, is_fragment, is_multiline, segment_types
 
 KB = {
     "format_version": 1,
@@ -20,6 +20,8 @@ KB = {
                             {"text": "46,XX"},
                             {"text": "inv(2)(p21q31)"},  # fragment
                             {"text": "46,XX.nuc ish(D20S108×1)[40/200]"},
+                            # multi-line seq result (T-019): left out
+                            {"text": "seq[GRCh38] del(X)(q21.31q22.1)\nchrX:g.1_2del"},
                         ],
                         "invalid": [
                             {"text": "46XX", "corrected": "46,XX", "why": "comma"},
@@ -125,3 +127,14 @@ def test_fragments_and_segment_types():
     assert segment_types("fem dia,II(2,2)(xma=4)") == ["meiotic"]
     assert segment_types("chtgx") == ["karyotype"]
     assert not is_fragment("MI,23,XY") and not is_fragment("pvz(1)")
+    # rsa/seq segments (T-019); seq results keep their line breaks and are not batch samples
+    assert segment_types("arr[GRCh38] 8p23.1(8479797_11897580)×1.rsa 8p23.1(GATA4)×1") == [
+        "arr",
+        "rsa",
+    ]
+    assert segment_types("46,XX,t(2;11)(p24;p15.1).seq[GRCh38] t(2;11)(p25.1;p15.2)\ng.[x]") == [
+        "karyotype",
+        "seq",
+    ]
+    assert is_multiline("seq[GRCh38] del(X)(q21.31q22.1)\nchrX:g.1_2del")
+    assert not is_multiline("rsa(BCR::ABL1)pos")

@@ -5,6 +5,9 @@ nuc ish(DXZ1×2)[400]//
 nuc ish(DXZ1×2)[50]//(DXZ1,DYZ3)×1[350]
 nuc ish(DXZ1×2)[50]//(DXZ1,DYZ3)×1[300]/(DXZ1×1)[10]
 ish del(14)(q21.2q21.2)(RP11-453F20–)dn[6]/14q21.2(RP11-453F20×2)[4]
+rsa[GRCh38] 1p36.33(849466_2432509)×1
+rsa 22q11.21(HIRA)×1
+rsa 1p36.33(849466_2432509)×1
 chtg(4)(q25)
 chtb(4)(q25)
 cht del(1)(q12q25)
@@ -112,3 +115,18 @@ ish cgh enh(21)
 ish cgh dim(7)(q21qter)
 ish cgh dim(18)(q21qter)
 ish cgh enh21
+rsa(13,18)×2,(21)×3,(X,Y)×1
+rsa(21)×3,(X)×2,(Y)×1
+rsa 22q11.2(kitname)×1
+rsa Xp21.1(DMDexons22–27)×1
+rsa 22q11.2("kitname")×1
+rsa(13,18,21)×2,(X)×1
+rsa(13,18,21)×2,(X,Y)×1
+rsa(13,18)×2,(21)×3,(X)×2
+rsa(13,18,21)×2,(X)×2,(Y)×1
+rsa(13,18)×2,(21)3,(X,Y)×1
+rsa22q11.21(HIRA)×1
+rsa(BCR::ABL1)neg
+rsa(BCR::ABL1)pos
+rsa(BCR::ABL1)+
+seq[GRCh38] del(X)(q21.31q22.1)

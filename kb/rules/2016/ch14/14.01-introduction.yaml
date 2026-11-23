@@ -31,7 +31,7 @@ rules:
 
   - id: ARR.NUCLEOTIDE_FORMAT
     title: Nucleotide positions without commas, span with an underscore
-    applies_to: [arr]
+    applies_to: [arr, rsa]
     severity: error
     statement: >-
       Nucleotide positions are written as plain numbers, without thousands separators. A span
@@ -41,12 +41,16 @@ rules:
     cite:
       - {section: "14.1", page: 115, para: "¶2"}
       - {section: "14.2", page: 116, para: "¶3"}
+      - {section: "15.1", page: 123, para: "¶1"}
     examples:
       valid:
         - text: "arr[GRCh38] Xq25(126228413_126535347)×1"
           cite: {section: "14.2", page: 117, example: E13}
         - text: "arr[GRCh38] Xq25(126023321×2,126228413_126535347×1,126556900×2)"
           cite: {section: "14.2", page: 117, example: E13}
+        - text: "rsa[GRCh38] 1p36.33(849466_2432509)×1"
+          cite: {section: "15.2", page: 124, example: E8}
+          note: Region-specific assay (§15.1 ¶1, "as is done for microarray"; T-019).
       invalid:
         - text: "arr[GRCh38] 4q32.2q35.1(163,146,681_183,022,312)×1"
           why: The positions contain thousands separators (commas).
@@ -58,7 +62,7 @@ rules:
     review:
       paraphrase_checked: true
       needs_review: false
-      note: Both invalid examples are inferred from §14.1 ¶2.
+      note: Both invalid examples are inferred from §14.1 ¶2. T-019 extended the rule to rsa (§15.1 ¶1).
     related: [ARR.SHORT_AND_DETAILED_SYSTEMS, ARR.PTER_TO_QTER]
 
   - id: ARR.RESULT_TABLE

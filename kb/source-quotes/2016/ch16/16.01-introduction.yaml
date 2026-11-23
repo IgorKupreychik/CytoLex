@@ -1,0 +1,12 @@
+version: "2016"
+section: "16.1"
+quotes:
+  - rule: SEQ.SCOPE
+    cite: {section: "16.1", page: 125, para: "¶1"}
+    text: >-
+      The following method of combining ISCN-like description of chromosome rearrangements with
+      HGVS-like nucleotide variant descriptions has been developed jointly between the ISCN and
+      HGVS.
+  - rule: SEQ.SCOPE
+    cite: {section: "16.2", page: 125, para: "¶2"}
+    text: "• Only aberrant findings are described."

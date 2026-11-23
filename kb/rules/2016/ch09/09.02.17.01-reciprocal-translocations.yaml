@@ -86,7 +86,7 @@ rules:
 
   - id: TRANSLOC.HOMOLOGUE_UNDERLINING
     title: Underlining to tell homologues apart in a translocation
-    applies_to: [karyotype]
+    applies_to: [karyotype, seq]
     severity: info
     statement: >-
       When two homologous chromosomes take part in a translocation, one of the numerals may be
@@ -95,6 +95,7 @@ rules:
     cite:
       - {section: "9.2.17.1", page: 75, para: "¶1"}
       - {section: "9.2.17.1", page: 76, example: E8}
+      - {section: "16.3.7", page: 129, example: E2}
     examples:
       valid:
         - text: "46,XX,t(2;7;7̲)(q21;q22;p13)"
@@ -107,10 +108,16 @@ rules:
         - text: "46,XX,t(3;9;9̲;22)(22qter→22q11.2::3p13→3qter;9pter→9q22::3p13→3pter;9̲pter→9̲q34::9q22→9qter;22pter→22q11.2::9̲q34→9̲qter)"
           cite: {section: "9.2.17.1", page: 76, example: E10}
           note: Printed over two lines; joined here without a space.
+        - text: |-
+            seq[GRCh37] t(9;9̲)(9̲qter→9̲q22.33::9p21.2→9qter;9pter→9q22.33::9̲p21.2→9̲pter)
+            g.[chr9:102425452_qterinv::chr9:26393002_cen_qter]
+            g.[chr9:pter_cen_102425451::chr9:26393001_pterinv]
+          cite: {section: "16.3.7", page: 129, example: E2}
+          note: Sequence-based translocation between homologous chromosomes 9 (T-019).
     review:
       paraphrase_checked: true
       needs_review: true
       note: >-
         Underlining is recovered as U+0332 after the underlined character (T-003); how the
-        validator reads and accepts it is T-042.
+        validator reads and accepts it is T-042. T-019 added seq (§16.3.7 E2).
     related: [DER.HOMOLOGUE_UNDERLINING, FRA.HOMOLOGUE_UNDERLINING, STRUCT.MULTI_CHROMOSOME_ORDER]

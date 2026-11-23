@@ -99,3 +99,8 @@ quotes:
       centromeric bands are rarely included in the nomenclature of rings and markers after
       microarray analysis, although the centromere is probably included in the aberration and
       would need to be confirmed by FISH.
+  - rule: ARR.ABERRATION_ORDER
+    cite: {section: "15.1", page: 123, para: "¶1"}
+    text: >-
+      Aberrations are listed from lowest to highest chromosome; sex chromosome abnormalities
+      should be listed last.

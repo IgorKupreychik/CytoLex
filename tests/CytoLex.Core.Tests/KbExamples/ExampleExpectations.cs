@@ -1,4 +1,6 @@
 using System.Globalization;
+using CytoLex.Core.Rules;
+using CytoLex.Core.Segmentation;
 
 namespace CytoLex.Core.Tests.KbExamples;
 
@@ -26,6 +28,8 @@ internal sealed record ExampleOutcome(string? SkipReason, IReadOnlyList<string> 
 /// rule is implemented or reported by the parser, a fix of the rule's diagnostic previews it exactly (T-035). Level-3
 /// rules have no single fix, so their corrected forms are checked for validity only.</item>
 /// <item>No <c>CORE.UNPARSED</c> on any example.</item>
+/// <item>Fragments of a rule that applies only to types the edition doesn't implement (seq's <c>g.4delT</c>) skip with the
+/// "not implemented" reason: a fragment has no keyword, so it would be read as a karyotype (decided in T-019).</item>
 /// <item>Invalid and corrected cases whose invalid string has no implemented segment (e.g. an ish-only example of a general
 /// rule; arr was in this case until T-034) skip with the segment's "not implemented" reason: no check can run on it (decided in T-017). Its
 /// corrected form is still checked where it is a valid example of its own.</item>
@@ -41,6 +45,13 @@ internal static class ExampleExpectations
         if (validator is null)
         {
             return ExampleOutcome.Skip(NoValidator);
+        }
+
+        // A fragment has no keyword to type it, so the validator would read it as a karyotype; when its rule applies only
+        // to types the edition doesn't implement (seq's g.4delT, T-019), no check can run on it.
+        if (c.IsFragment && FragmentNotImplemented(c.Rule) is { } fragmentReason)
+        {
+            return ExampleOutcome.Skip(fragmentReason);
         }
 
         if (c.Kind != ExampleKind.Valid)
@@ -79,6 +90,20 @@ internal static class ExampleExpectations
         }
 
         return new ExampleOutcome(null, failures);
+    }
+
+    /// <summary>The "not implemented" reason for a fragment of a rule none of whose types the edition implements, else null.</summary>
+    internal static string? FragmentNotImplemented(KbRuleInfo rule)
+    {
+        if (rule.AppliesTo.Contains("general") || !EditionProfiles.ImplementedTypes.TryGetValue(rule.Edition, out var types))
+        {
+            return null;
+        }
+
+        var implemented = types.Select(t => t.ToKbName()).ToHashSet(StringComparer.Ordinal);
+        return rule.AppliesTo.Any(implemented.Contains)
+            ? null
+            : $"{string.Join("/", rule.AppliesTo)}: not implemented in the pilot (fragment)";
     }
 
     /// <summary>The runs to make: without a hint, then once per context the rule is limited to.</summary>

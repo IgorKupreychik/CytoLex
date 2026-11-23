@@ -2,7 +2,7 @@
 
 Reusable inputs for batch validation (T-038), the CytoGPS comparison (T-051) and manual testing of the desktop app's **Batch** tab. One folder per ISCN edition (`2016/`).
 
-The files are **generated** from the KB examples by `uv run --directory tools kb samples [--version 2016]` (it reads `build/kb.json`, so run `kb build` first). Don't edit them by hand. Regenerate them after KB edits that change examples. Every string traces to a KB rule and its citation. Book fragments (`inv(2)`, strings with `…`) are left out.
+The files are **generated** from the KB examples by `uv run --directory tools kb samples [--version 2016]` (it reads `build/kb.json`, so run `kb build` first). Don't edit them by hand. Regenerate them after KB edits that change examples. Every string traces to a KB rule and its citation. Book fragments (`inv(2)`, strings with `…`) are left out, and so are multi-line strings: a seq result prints each part on its own line (T-019), which a one-string-per-line file can't hold and the batch reader doesn't read from CSV either.
 
 | File | Content |
 |---|---|

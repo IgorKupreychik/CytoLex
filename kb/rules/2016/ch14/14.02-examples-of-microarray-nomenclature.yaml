@@ -78,7 +78,7 @@ rules:
 
   - id: ARR.ABERRATION_ORDER
     title: Aberrations by chromosome, sex chromosomes last, pter to qter
-    applies_to: [arr]
+    applies_to: [arr, rsa]
     severity: error
     statement: >-
       Aberrations are listed from the lowest to the highest chromosome number, whether they are
@@ -90,6 +90,7 @@ rules:
       - {section: "14.2", page: 119, example: E28}
       - {section: "14.2", page: 119, example: E29}
       - {section: "14.2", page: 119, example: E33}
+      - {section: "15.1", page: 123, para: "¶1"}
     examples:
       valid:
         - text: "arr[GRCh38] 20q13.13q13.33(51001876_62375085)×1,22q13.32q13.33(48533211_49525263)×3"
@@ -105,6 +106,10 @@ rules:
           cite: {section: "14.2", page: 119, example: E29}
         - text: "arr[GRCh37] 20q13.2q13.33(51840606_62375085)×3,Yq11.23(26887746_27019505)×0"
           cite: {section: "14.2", page: 119, example: E33}
+        - text: "rsa(13,18)×2,(21)×3,(X,Y)×1"
+          cite: {section: "15.2", page: 123, example: E3}
+        - text: "rsa(21)×3,(X)×2,(Y)×1"
+          cite: {section: "15.2", page: 124, example: E7}
       invalid:
         - text: "arr(21)×3,(8)×3"
           why: Chromosome 21 is listed before chromosome 8.
@@ -121,7 +126,9 @@ rules:
       needs_review: false
       note: >-
         The invalid examples are the book's E3, E36 and E28 reordered. E27 is written with the
-        corrected band 18q21.33 (decided with the user in T-017; see BAND.MUST_EXIST).
+        corrected band 18q21.33 (decided with the user in T-017; see BAND.MUST_EXIST). T-019
+        extended the rule to rsa (§15.1 ¶1: the same order; "sex chromosome abnormalities should
+        be listed last" is read as the arr rule, an error).
     related: [ARR.PTER_TO_QTER, ARR.NORMAL_RESULT, KARYO.ABNORMALITY_ORDER]
 
   - id: ARR.REGION_FORMAT

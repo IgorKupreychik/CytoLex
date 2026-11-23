@@ -36,3 +36,8 @@ quotes:
       The descriptive narrative, or interpretation, in the report should indicate the platform
       used, the resolution, and whether the array represents the entire genome of all
       chromosomes.
+  - rule: ARR.NUCLEOTIDE_FORMAT
+    cite: {section: "15.1", page: 123, para: "¶1"}
+    text: >-
+      As is done for microarray, the span of the abnormal nucleotides is separated by an
+      underscore.

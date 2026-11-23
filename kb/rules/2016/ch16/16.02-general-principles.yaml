@@ -1,0 +1,468 @@
+version: "2016"
+section: "16.2"
+rules:
+  - id: SEQ.FORMAT
+    title: "seq[build] ISCN-like part first, then the HGVS-like descriptions"
+    applies_to: [seq]
+    severity: error
+    statement: >-
+      A sequence-based result must contain both an ISCN-like description of the chromosome
+      aberration and HGVS-like nucleotide variant descriptions. The ISCN-like part comes first;
+      it begins with seq and the genome build in square brackets, then a space, and may use the
+      short or the detailed (long) form of the structural rearrangement. The HGVS-like
+      descriptions follow, each on its own line.
+    cite:
+      - {section: "16.2", page: 125, para: "¶3"}
+      - {section: "16.2", page: 125, para: "¶4"}
+      - {section: "16.2", page: 125, para: "¶5"}
+    examples:
+      valid:
+        - text: |-
+            seq[GRCh38] del(X)(q21.31q22.1)
+            chrX:g.89555676_100352080del
+          cite: {section: "16.3.1", page: 127, example: E1}
+        - text: |-
+            seq[GRCh37] der(3)(3pter→3q25.32::8q24.21→8qter)
+            g.[chr3:158573187_qterdelinschr8:(128534000_128546000)_qter]
+          cite: {section: "16.3.2", page: 127, example: E2}
+          note: ISCN-like part in the detailed form.
+        - text: |-
+            seq[GRCh37] inv(6)(pter→p25.3::q16.1→p25.3::q16.1→qter)
+            chr6:g.[776788_cen_93191545inv;93191546T>C]
+          cite: {section: "16.3.5", page: 128, example: E1}
+          note: ISCN-like part in the detailed form.
+      invalid:
+        - text: "seq[GRCh38] del(X)(q21.31q22.1)"
+          why: The HGVS-like nucleotide description is missing; both parts must be given.
+        - text: |-
+            chrX:g.89555676_100352080del
+            seq[GRCh38] del(X)(q21.31q22.1)
+          why: The ISCN-like part (seq[build] …) must come first, before the HGVS-like description.
+          corrected: |-
+            seq[GRCh38] del(X)(q21.31q22.1)
+            chrX:g.89555676_100352080del
+    fix: {level: 3, hint: "Write seq[build], a space and the ISCN-like description first, then each HGVS-like description on its own line."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The book prints each part on its own line and gives no other separator; KB examples keep
+        the line breaks (decided in T-019). Line wraps inside one description are joined without a
+        space. Both invalid examples are inferred. The build itself is GEN.GENOME_BUILD_REQUIRED.
+    related: [SEQ.SCOPE, SEQ.HGVS_PORTION, SEQ.HGVS_DESCRIPTION_FORMS, GEN.GENOME_BUILD_REQUIRED, STRUCT.SHORT_AND_DETAILED_SYSTEMS]
+
+  - id: SEQ.COMBINED_WITH_OTHER_METHODS
+    title: ".seq after the result of another technique"
+    applies_to: [general]
+    severity: error
+    statement: >-
+      Sequencing observations combined with another technique, such as banded chromosome
+      analysis or a microarray, are written after that result, separated from it by a period
+      (.seq).
+    cite:
+      - {section: "16.2", page: 125, para: "¶6"}
+    examples:
+      valid:
+        - text: |-
+            46,XX,t(2;11)(p24;p15.1).seq[GRCh38] t(2;11)(p25.1;p15.2)
+            g.[chr11:pter_15825272::chr2:8247757_cen_qter]
+            g.[chr2:pter_8247756::chr11:15825273_cen_qter]
+          cite: {section: "16.3.7", page: 129, example: E1}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: No invalid example; a missing period is a general segmentation fault, not specific to seq.
+    related: [SEQ.FORMAT, ARR.COMBINED_WITH_OTHER_METHODS, ISH.COMBINED_WITH_KARYOTYPE]
+
+  - id: SEQ.HGVS_PORTION
+    title: HGVS conventions in the nucleotide descriptions
+    applies_to: [seq]
+    severity: error
+    statement: >-
+      The nucleotide descriptions follow the existing HGVS recommendations: an underscore joins
+      the ends of a range of nucleotides (g.123_456del); an uncertain position is enclosed in
+      parentheses (g.123_(450_856)del: the deletion ends somewhere between 450 and 856); curly
+      braces give how an altered segment differs from the reference sequence in duplications,
+      inversions, conversions, insertions and similar changes (g.123_456dup{234G>A}); an
+      inverted sequence is marked inv.
+    cite:
+      - {section: "16.2", page: 125, para: "¶7"}
+      - {section: "16.2", page: 125, para: "¶9"}
+      - {section: "16.2", page: 126, para: "¶10"}
+      - {section: "16.2", page: 126, para: "¶12"}
+      - {section: "16.2", page: 126, para: "¶13"}
+    examples:
+      valid:
+        - text: "g.123_456del"
+          cite: {section: "16.2", page: 125, para: "¶9"}
+        - text: "g.123_(450_856)del"
+          cite: {section: "16.2", page: 126, para: "¶10"}
+          note: Printed "g.123_ (450_856)del" with a stray space; written without it.
+        - text: "g.123_456dup{234G>A}"
+          cite: {section: "16.2", page: 126, para: "¶12"}
+        - text: |-
+            seq[GRCh37] dup(8)(q24.21q24.21)
+            chr8:g.128746677_128749160dup
+          cite: {section: "16.3.3", page: 128, example: E1}
+        - text: |-
+            seq[GRCh37] dup(8)(q24.21q24.21)
+            chr8:g.128746677_128749160dupinv
+          cite: {section: "16.3.3", page: 128, example: E2}
+          note: The duplicated segment is inverted.
+        - text: |-
+            seq[GRCh37] der(4)ins(4;X)(q28.3;q22.2q21.31)
+            g.[chr4:134850793_134850794inschrX:89555676_100352080inv]
+          cite: {section: "16.3.2", page: 127, example: E3}
+        - text: |-
+            seq[GRCh37] der(3)(3pter→3q25.32::8q24.21→8qter)
+            g.[chr3:158573187_qterdelinschr8:(128534000_128546000)_qter]
+          cite: {section: "16.3.2", page: 127, example: E2}
+          note: Uncertain breakpoint on chromosome 8 in parentheses.
+      invalid:
+        - text: |-
+            seq[GRCh37] dup(8)(q24.21q24.21)
+            chr8:g.128746677-128749160dup
+          why: A range of nucleotides is joined with an underscore (_), not a hyphen.
+          corrected: |-
+            seq[GRCh37] dup(8)(q24.21q24.21)
+            chr8:g.128746677_128749160dup
+    fix: {level: 3, hint: "Write the nucleotide descriptions with the HGVS conventions: _ for a range, ( ) for an uncertain position, { } for differences in an altered segment, inv for an inverted sequence."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Only the HGVS conventions the book lists are paraphrased; the rest of HGVS is not part of
+        the KB. The invalid example is inferred.
+    related: [SEQ.FORMAT, SEQ.HGVS_DESCRIPTION_FORMS, SEQ.THREE_PRIME_RULE, ARR.NUCLEOTIDE_FORMAT]
+
+  - id: SEQ.HGVS_DESCRIPTION_FORMS
+    title: "Forms of the HGVS-like descriptions: chrN:g.…, chrN:g.[…;…], g.[chrA:…::chrB:…]"
+    applies_to: [seq]
+    severity: error
+    statement: >-
+      As the book's examples write them: a change within one chromosome is chrN:g. followed by
+      the change (chrX:g.89555676_100352080del); several changes of one chromosome are enclosed in
+      square brackets and separated by semicolons (chr6:g.[776788_cen_93191545inv;93191546T>C]);
+      a description that joins or replaces material of different chromosomes starts with g. and
+      gives each segment with its chromosome inside square brackets
+      (g.[chr2:pter_8247756delinschr11:pter_15825266]). Each derivative or changed chromosome
+      gets its own description.
+    cite:
+      - {section: "16.3.1", page: 127, example: E1}
+      - {section: "16.3.2", page: 127, example: E1}
+      - {section: "16.3.4", page: 128, example: E1}
+      - {section: "16.3.5", page: 128, example: E1}
+    examples:
+      valid:
+        - text: |-
+            seq[GRCh38] del(X)(q21.31q22.1)
+            chrX:g.89555676_100352080del
+          cite: {section: "16.3.1", page: 127, example: E1}
+        - text: |-
+            seq[GRCh38] der(2)t(2;11)(p25.1;p15.2)
+            g.[chr2:pter_8247756delinschr11:pter_15825266]
+          cite: {section: "16.3.2", page: 127, example: E1}
+        - text: |-
+            seq[GRCh37] der(6)t(6;13)(q13.3;q31.1),der(13)t(6;13)(q13.3;q31.1)inv(6)(q14.3q14.3)
+            g.[chr6:pter_cen_85897870::A::chr13:80659609_qter]
+            g.[chr13:pter_cen_80659606::chr6:85897899_85900540inv::85900541_86488291::93909933_qter]
+          cite: {section: "16.3.2", page: 127, example: E5}
+          note: >-
+            Printed with ")" closing the second description (misprint, see the invalid example)
+            and wrapped after "::"; written with "]" and joined without a space.
+        - text: |-
+            seq[GRCh37] ins(4;X)(q28.3;q21.31q22.2)
+            g.[chr4:134850793_134850794inschrX:89555676_100352080]
+            chrX:g.89555676_100352080del
+          cite: {section: "16.3.4", page: 128, example: E1}
+          note: Balanced insertion; one description per changed chromosome.
+        - text: |-
+            seq[GRCh37] ins(4;X)(q28.3;q22.2q21.31)
+            g.[chr4:134850793_134850794inschrX:89555676_100352080inv]
+            chrX:g.89555676_100352080del
+          cite: {section: "16.3.4", page: 128, example: E2}
+        - text: |-
+            seq[GRCh37] inv(6)(pter→p25.3::q16.1→p25.3::q16.1→qter)
+            chr6:g.[776788_cen_93191545inv;93191546T>C]
+          cite: {section: "16.3.5", page: 128, example: E1}
+        - text: |-
+            seq[GRCh37] inv(2)(pter→p22.3::q31.1→p22.3::q31.1→qter)dn
+            chr2:g.[32310435_32310710del;32310711_171827243inv::G]
+          cite: {section: "16.3.5", page: 128, example: E2}
+        - text: |-
+            seq[GRCh37] inv(6)(p21.2p22.3)
+            chr6:g.[20000000_40000000inv;40000001T>C]
+          cite: {section: "16.3.5", page: 128, example: E3}
+      invalid:
+        - text: |-
+            seq[GRCh37] der(6)t(6;13)(q13.3;q31.1),der(13)t(6;13)(q13.3;q31.1)inv(6)(q14.3q14.3)
+            g.[chr6:pter_cen_85897870::A::chr13:80659609_qter]
+            g.[chr13:pter_cen_80659606::chr6:85897899_85900540inv::85900541_86488291::93909933_qter)
+          why: The second description opens with "g.[" but closes with ")"; a bracket is closed by "]".
+          corrected: |-
+            seq[GRCh37] der(6)t(6;13)(q13.3;q31.1),der(13)t(6;13)(q13.3;q31.1)inv(6)(q14.3q14.3)
+            g.[chr6:pter_cen_85897870::A::chr13:80659609_qter]
+            g.[chr13:pter_cen_80659606::chr6:85897899_85900540inv::85900541_86488291::93909933_qter]
+          cite: {section: "16.3.2", page: 127, example: E5}
+    fix: {level: 3, hint: "Write chrN:g.… for one chromosome, chrN:g.[…;…] for several changes of one chromosome and g.[chrA:…::chrB:…] across chromosomes."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        §16.3 has examples only; the statement describes the forms they all share. The invalid
+        example is the printed §16.3.2 E5 (misprint, decided in T-019). §16.3.1 E1 (GRCh38,
+        Xq21.31q22.1) and §16.3.4 E1/E2 (GRCh37, Xq21.31q22.2) give the same X positions with
+        different builds and bands; kept as printed (positions vs. bands are checked for arr only,
+        ARR.POSITIONS_IN_BANDS).
+    related: [SEQ.FORMAT, SEQ.HGVS_PORTION, SEQ.JUNCTIONS]
+
+  - id: SEQ.ABERRATION_ORDER
+    title: Autosomes first (low to high), then X, then Y; breakpoints pter to qter
+    applies_to: [seq]
+    severity: error
+    statement: >-
+      Aberrations affecting autosomes are listed first, from the lowest to the highest chromosome
+      number, followed by those affecting the sex chromosomes, X before Y. Several breakpoints in
+      one chromosome are listed in the order they occur from pter to qter.
+    cite:
+      - {section: "16.2", page: 126, para: "¶15"}
+      - {section: "16.2", page: 126, para: "¶17"}
+    examples:
+      valid:
+        - text: |-
+            seq[GRCh37] t(2;11)(q31.1;q22.3)
+            g.[chr2:pter_cen_174500098::chr11:108111987_qter]
+            g.[chr11:pter_cen_108111981::chr2:174500099_qter]
+          cite: {section: "16.3.7", page: 129, example: E3}
+        - text: |-
+            seq[GRCh37] der(6)t(6;13)(q13.3;q31.1),der(13)t(6;13)(q13.3;q31.1)inv(6)(q14.3q14.3)
+            g.[chr6:pter_cen_85897870::A::chr13:80659609_qter]
+            g.[chr13:pter_cen_80659606::chr6:85897899_85900540inv::85900541_86488291::93909933_qter]
+          cite: {section: "16.3.2", page: 127, example: E5}
+          note: Printed with ")" closing the second description (misprint, SEQ.HGVS_DESCRIPTION_FORMS).
+      invalid:
+        - text: |-
+            seq[GRCh37] t(2;11)(q31.1;q22.3)
+            g.[chr11:pter_cen_108111981::chr2:174500099_qter]
+            g.[chr2:pter_cen_174500098::chr11:108111987_qter]
+          why: The description of the derivative chromosome 11 is given before that of chromosome 2.
+          corrected: |-
+            seq[GRCh37] t(2;11)(q31.1;q22.3)
+            g.[chr2:pter_cen_174500098::chr11:108111987_qter]
+            g.[chr11:pter_cen_108111981::chr2:174500099_qter]
+    fix: {level: 1, kind: reorder, hint: "List autosomes from low to high, then X, then Y; breakpoints within a chromosome from pter to qter."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The invalid example is inferred: it applies the order to the descriptions of the
+        derivatives (named by the chromosome with the centromere), as every §16.3 example lists
+        them.
+    related: [SEQ.BREAKPOINT_ORIENTATION, ARR.ABERRATION_ORDER, STRUCT.CHROMOSOME_ORDER]
+
+  - id: SEQ.BREAKPOINT_ORIENTATION
+    title: Forward orientation from the chromosome with the intact centromere
+    applies_to: [seq]
+    severity: error
+    statement: >-
+      Each variant description runs in the forward orientation, from nucleotide 1 toward the end
+      of the chromosome, of the chromosome that contributes the intact centromere; material of
+      another chromosome present in the opposite orientation is marked inv. The breakpoint
+      location is taken from the first breakpoint met when reading from pter of the
+      lowest-numbered chromosome involved.
+    cite:
+      - {section: "16.2", page: 126, para: "¶16"}
+      - {section: "16.2", page: 126, para: "¶18"}
+    examples:
+      valid:
+        - text: |-
+            46,XX,t(2;11)(p24;p15.1).seq[GRCh38] t(2;11)(p25.1;p15.2)
+            g.[chr11:pter_15825272::chr2:8247757_cen_qter]
+            g.[chr2:pter_8247756::chr11:15825273_cen_qter]
+          cite: {section: "16.3.7", page: 129, example: E1}
+        - text: |-
+            seq[GRCh37] der(5)t(5;10)(p13.3;q21.3)
+            g.[chr5:pter_29658442delinschr10:67539995_qterinv]
+          cite: {section: "16.3.2", page: 127, example: E4}
+          note: Chromosome 10 material is inverted relative to chromosome 5, which has the centromere.
+        - text: |-
+            seq[GRCh37] t(3;14)(14qter→14q12::3p22.2→3qter;14pter→14q12::3p22.2→3pter)
+            g.[chr14:29745314_qterinv::CATTTGTTCAAATTTAGTTCAAATGA::chr3:36969142_cen_qter]
+            g.[chr14:pter_cen_29745313::chr3:pter_36969141inv]
+          cite: {section: "16.3.7", page: 129, example: E4}
+          note: The first description was printed over two lines after "_"; joined without a space.
+    review:
+      paraphrase_checked: true
+      needs_review: true
+      note: >-
+        ¶16 ("starting as described above, i.e. from pter of the chromosome with the lowest number
+        involved") is unclear: in §16.3.7 E1 the description of der(2) starts at chr11 pter, not
+        chr2. Read with ¶18, each description follows the chromosome with the centromere; how ¶16
+        picks "the" breakpoint needs a person's reading before a check is written.
+    related: [SEQ.ABERRATION_ORDER, SEQ.THREE_PRIME_RULE, SEQ.CHROMOSOME_ENDS]
+
+  - id: SEQ.CHROMOSOME_ENDS
+    title: pter, qter and cen instead of nucleotide positions
+    applies_to: [seq]
+    severity: warning
+    statement: >-
+      The start of a chromosome is written pter and its end qter rather than as nucleotide
+      positions, because the reference sequence has runs of N at the telomeres. The centromere is
+      written cen, which helps to recognize the derivative chromosome.
+    cite:
+      - {section: "16.2", page: 126, para: "¶19"}
+      - {section: "16.2", page: 126, para: "¶20"}
+    examples:
+      valid:
+        - text: |-
+            seq[GRCh37] r(8)(p23.2q24.3)
+            chr8:g.[pter_3300000del::140000000_qterdel]
+          cite: {section: "16.3.6", page: 128, example: E1}
+        - text: |-
+            seq[GRCh37] t(2;11)(q31.1;q22.3)
+            g.[chr2:pter_cen_174500098::chr11:108111987_qter]
+            g.[chr11:pter_cen_108111981::chr2:174500099_qter]
+          cite: {section: "16.3.7", page: 129, example: E3}
+      invalid:
+        - text: |-
+            seq[GRCh37] r(8)(p23.2q24.3)
+            chr8:g.[1_3300000del::140000000_qterdel]
+          why: The start of the chromosome is written pter, not as nucleotide 1.
+          corrected: |-
+            seq[GRCh37] r(8)(p23.2q24.3)
+            chr8:g.[pter_3300000del::140000000_qterdel]
+    fix: {level: 3, hint: "Write pter for the start and qter for the end of the chromosome, and cen for the centromere."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity warning: the book calls nucleotide positions at the ends "undesirable"
+        (preference). A description without cen is not a finding (§16.3.2 E1 has none). The
+        invalid example is inferred.
+    related: [SEQ.BREAKPOINT_ORIENTATION, SEQ.JUNCTIONS]
+
+  - id: SEQ.JUNCTIONS
+    title: "Junctions :: and non-template inserts ::sequence::"
+    applies_to: [seq]
+    severity: error
+    statement: >-
+      A breakpoint junction is written with a double colon (::). A non-template sequence inserted
+      at an imperfect breakpoint is written between two junctions (::AAGTAC::).
+    cite:
+      - {section: "16.2", page: 126, para: "¶21"}
+      - {section: "16.2", page: 126, para: "¶22"}
+    examples:
+      valid:
+        - text: "::AAGTAC::"
+          cite: {section: "16.2", page: 126, para: "¶22"}
+        - text: |-
+            seq[GRCh37] t(3;14)(14qter→14q12::3p22.2→3qter;14pter→14q12::3p22.2→3pter)
+            g.[chr14:29745314_qterinv::CATTTGTTCAAATTTAGTTCAAATGA::chr3:36969142_cen_qter]
+            g.[chr14:pter_cen_29745313::chr3:pter_36969141inv]
+          cite: {section: "16.3.7", page: 129, example: E4}
+        - text: |-
+            seq[GRCh37] der(6)t(6;13)(q13.3;q31.1),der(13)t(6;13)(q13.3;q31.1)inv(6)(q14.3q14.3)
+            g.[chr6:pter_cen_85897870::A::chr13:80659609_qter]
+            g.[chr13:pter_cen_80659606::chr6:85897899_85900540inv::85900541_86488291::93909933_qter]
+          cite: {section: "16.3.2", page: 127, example: E5}
+          note: Printed with ")" closing the second description (misprint, SEQ.HGVS_DESCRIPTION_FORMS).
+      invalid:
+        - text: |-
+            seq[GRCh37] t(2;11)(q31.1;q22.3)
+            g.[chr2:pter_cen_174500098:chr11:108111987_qter]
+            g.[chr11:pter_cen_108111981::chr2:174500099_qter]
+          why: The junction in the first description is written with a single colon; junctions use a double colon (::).
+          corrected: |-
+            seq[GRCh37] t(2;11)(q31.1;q22.3)
+            g.[chr2:pter_cen_174500098::chr11:108111987_qter]
+            g.[chr11:pter_cen_108111981::chr2:174500099_qter]
+    fix: {level: 1, kind: replace, hint: "Write the breakpoint junction as a double colon (::)."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: The invalid example is inferred.
+    related: [SEQ.HGVS_DESCRIPTION_FORMS, SEQ.CHROMOSOME_ENDS]
+
+  - id: SEQ.SUPERNUMERARY_ADD
+    title: Additional marker or ring sequence marked add
+    applies_to: [seq]
+    severity: error
+    statement: >-
+      The presence of an additional sequence, such as a supernumerary marker or ring chromosome,
+      is indicated by add at the end of its nucleotide description.
+    cite:
+      - {section: "16.2", page: 126, para: "¶23"}
+      - {section: "16.3.6", page: 129, example: E2}
+    examples:
+      valid:
+        - text: |-
+            seq[GRCh37] +r(8)(p23.2q24.3)
+            chr8:g.[pter_3300000del::140000000_qterdel]add
+          cite: {section: "16.3.6", page: 129, example: E2}
+      invalid:
+        - text: |-
+            seq[GRCh37] +r(8)(p23.2q24.3)
+            chr8:g.[pter_3300000del::140000000_qterdel]
+          why: The ring is supernumerary (+r(8)), so its description ends with add.
+          corrected: |-
+            seq[GRCh37] +r(8)(p23.2q24.3)
+            chr8:g.[pter_3300000del::140000000_qterdel]add
+    fix: {level: 1, kind: insert, hint: "Add add at the end of the description of the additional chromosome."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: The place of add (after the closing bracket) is taken from §16.3.6 E2. The invalid example is inferred.
+    related: [SEQ.HGVS_DESCRIPTION_FORMS, MAR.PLUS_SIGN, RING.FORMAT]
+
+  - id: SEQ.THREE_PRIME_RULE
+    title: The 3′ rule for runs and breakpoints in homologous sequence
+    applies_to: [seq]
+    severity: info
+    statement: >-
+      In a run of identical nucleotides, the most 3′ base of the run is designated as the variant
+      (the HGVS 3′ rule; CTTTA to CTTA is g.4delT). The same rule places a breakpoint that falls in
+      sequence shared by both partners: starting with the lowest-numbered chromosome involved, the
+      sequence is aligned as far 3′ as possible, so the shared bases are counted as derived from
+      that chromosome (g.[chr2:6::chrX:7], not g.[chr2:5::chrX:6]).
+    cite:
+      - {section: "16.2", page: 126, para: "¶11"}
+      - {section: "16.2", page: 126, para: "¶24"}
+      - {section: "16.2", page: 126, float: "Alignment figure"}
+      - {section: "16.2", page: 126, para: "¶26"}
+    examples:
+      valid:
+        - text: "g.4delT"
+          cite: {section: "16.2", page: 126, para: "¶11"}
+        - text: "g.[chr2:6::chrX:7]"
+          cite: {section: "16.2", page: 126, para: "¶26"}
+        - text: "g.[chrX:6::chr2:7]"
+          cite: {section: "16.2", page: 126, para: "¶26"}
+          note: Printed "asg.[chrX:6::chr2:7]" (a space lost in the text layer).
+        - text: |-
+            seq[GRCh37] der(5)t(5;10)(p13.3;q21.3)
+            g.[chr5:pter_29658442delinschr10:67539995_qterinv]
+          cite: {section: "16.3.2", page: 127, example: E4}
+          note: Three nucleotides of homology at the junction; the breakpoint is assigned 3′.
+      invalid:
+        - text: "g.2delT"
+          why: In the run TTT of CTTTA the most 3′ T (position 4) is the deleted base.
+          corrected: "g.4delT"
+          cite: {section: "16.2", page: 126, para: "¶11"}
+        - text: "g.3delT"
+          why: In the run TTT of CTTTA the most 3′ T (position 4) is the deleted base.
+          corrected: "g.4delT"
+          cite: {section: "16.2", page: 126, para: "¶11"}
+        - text: "g.[chr2:5::chrX:6]"
+          why: The shared A must be counted as derived from chromosome 2 (aligned as far 3′ as possible).
+          corrected: "g.[chr2:6::chrX:7]"
+          cite: {section: "16.2", page: 126, para: "¶26"}
+    fix: {level: 3, hint: "Assign the variant or breakpoint to the most 3′ position, starting with the lowest-numbered chromosome."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info: the rule needs the reference sequence, which the string doesn't carry. The
+        Alignment figure lost its shading, bold and italic; it was signed off in T-019, letter case
+        still shows the chromosome of each base and ¶26 restates what the bold and italic mean, so
+        no needs_review.
+    related: [SEQ.HGVS_PORTION, SEQ.BREAKPOINT_ORIENTATION]

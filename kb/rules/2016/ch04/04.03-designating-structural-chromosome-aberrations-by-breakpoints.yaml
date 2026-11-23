@@ -27,14 +27,18 @@ rules:
     statement: >-
       When an aberration is given by nucleotide positions (microarray, region-specific assay or
       sequencing), the genome build or assembly must be stated (sections 14.1, 15.1, 16.2). In a
-      microarray result the build is written in square brackets directly after arr, followed by
-      a space (arr[GRCh38] 6q21q25.1(…)). It is not needed for a normal result or for a
-      whole-chromosome or whole-arm change written in the short form without positions
-      (arr(8)×3,(21)×3).
+      microarray or region-specific assay result the build is written in square brackets directly
+      after arr or rsa, followed by a space (arr[GRCh38] 6q21q25.1(…), rsa[GRCh38] 1p36.33(…)).
+      It is not needed for a normal result, for a whole-chromosome or whole-arm change written in
+      the short form without positions (arr(8)×3,(21)×3), or for a region given by a locus, gene
+      or kit name (rsa 22q11.21(HIRA)×1). A sequence-based result always states the build, in
+      square brackets after seq (seq[GRCh38] …).
     cite:
       - {section: "4.3", page: 41, para: "¶2"}
       - {section: "14.1", page: 115, para: "¶2"}
       - {section: "14.2", page: 118, para: "¶5"}
+      - {section: "15.1", page: 123, para: "¶1"}
+      - {section: "16.2", page: 125, para: "¶5"}
     examples:
       valid:
         - text: "arr[GRCh38] Xp22.33q28(168546_155233730)×1[0.6]"
@@ -47,12 +51,27 @@ rules:
         - text: "arr(8)×3,(21)×3"
           cite: {section: "14.2", page: 116, example: E3}
           note: Short-form aneuploidy; no build needed.
+        - text: "rsa[GRCh38] 1p36.33(849466_2432509)×1"
+          cite: {section: "15.2", page: 124, example: E8}
+        - text: "rsa 22q11.21(HIRA)×1"
+          cite: {section: "15.2", page: 124, example: E12}
+          note: Region given by a locus; no build needed.
+        - text: |-
+            seq[GRCh38] del(X)(q21.31q22.1)
+            chrX:g.89555676_100352080del
+          cite: {section: "16.3.1", page: 127, example: E1}
       invalid:
         - text: "arr Xp22.33q28(168546_155233730)×1[0.6]"
           why: Nucleotide positions are given without the genome build (e.g. [GRCh38]).
         - text: "arr[GRCh38]6q21q25.1(113900000_149100000)×1"
           why: A space is required after the square bracket of the genome build.
           corrected: "arr[GRCh38] 6q21q25.1(113900000_149100000)×1"
+        - text: "rsa 1p36.33(849466_2432509)×1"
+          why: Nucleotide positions are given without the genome build (rsa[GRCh38]).
+        - text: |-
+            seq del(X)(q21.31q22.1)
+            chrX:g.89555676_100352080del
+          why: A sequence-based result must state the genome build in square brackets after seq.
     fix: {level: 3, hint: "Add the genome build in square brackets (e.g. arr[GRCh38]), followed by a space."}
     review:
       paraphrase_checked: true
@@ -60,4 +79,5 @@ rules:
       note: >-
         T-017 extended the statement with the §14.1 ¶2 placement, space and exceptions (re-approved
         by the user). The second invalid example is inferred from "there is a space after the
-        square bracket".
+        square bracket". T-019 added rsa (§15.1 ¶1: only with nucleotide numbers) and seq (§16.2
+        ¶5: always); the rsa and seq invalid examples are inferred.

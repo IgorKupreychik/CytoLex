@@ -1,0 +1,34 @@
+version: "2016"
+section: "15.1"
+quotes:
+  - rule: RSA.SCOPE
+    cite: {section: "15.1", page: 123, para: "¶1"}
+    text: >-
+      Multiplex ligation-dependent probe amplification (MLPA), quantitative fluorescent PCR,
+      real-time PCR, and bead-based assays can all be used to determine the number of copies of a
+      chromosome or chromosomal region. These assays have collectively been referred to in this
+      chapter as region-specific assays (rsa).
+  - rule: RSA.SCOPE
+    cite: {section: "15.1", page: 123, para: "¶1"}
+    text: >-
+      The use of rsa can be applied also to small, targeted arrays that are limited to a number
+      of regions that can be reasonably listed in the nomenclature.
+  - rule: RSA.KIT_OR_LOCUS
+    cite: {section: "15.1", page: 123, para: "¶1"}
+    text: >-
+      When a kit is used, the name of the kit can be designated if the genomic coordinates are
+      not known; however, the greatest precision is achieved by providing nucleotide numbers.
+  - rule: RSA.KIT_OR_LOCUS
+    cite: {section: "15.2", page: 124, example: E10}
+    text: >-
+      The name of the kit can be inserted in the parentheses without the quotation marks.
+  - rule: RSA.NORMAL_LOCI_OPTIONAL
+    cite: {section: "15.1", page: 123, para: "¶1"}
+    text: >-
+      The decision to list the normal loci included in the assay is at the discretion of the
+      laboratory.
+  - rule: RSA.NORMAL_LOCI_OPTIONAL
+    cite: {section: "15.2", page: 123, example: E3}
+    text: >-
+      For clarity, the also tested normal disomic states for the chromosomes 13 and 18 are
+      included in the nomenclature.

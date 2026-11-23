@@ -1,0 +1,17 @@
+version: "2016"
+section: "15.3"
+quotes:
+  - rule: RSA.FUSION_RESULT
+    cite: {section: "15.3", page: 124, example: E1}
+    text: >-
+      Normal result using a region-specific assay to identify a BCR-ABL1 translocation or
+      juxtaposition.
+  - rule: RSA.FUSION_RESULT
+    cite: {section: "15.3", page: 124, example: E2}
+    text: >-
+      Abnormal result using a region-specific assay that shows a BCR-ABL1 translocation or
+      juxtaposition.
+  - rule: RSA.FUSION_RESULT
+    cite: {section: "15.3", page: 124, example: E3}
+    text: >-
+      In addition, two translocations were identified with region-specific assays.

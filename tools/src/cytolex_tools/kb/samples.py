@@ -3,7 +3,9 @@
 Reads the full KB (`build/kb.json`) and writes `tests/data/batch/<version>/`: one-string-per-line
 text files per notation type, `all.csv`/`all.tsv` (one row per KB example or `corrected` form,
 labelled with its rule) and `large.csv` (the same rows cycled to 1,200 for the 1,000+ batch run).
-Book fragments (`inv(2)`, `…`) are left out. The `type` column is the segment types joined with
+Book fragments (`inv(2)`, `…`) and multi-line strings (seq results, one part per line, T-019) are
+left out: the text files hold one string per line and the batch reader splits lines before CSV
+fields. The `type` column is the segment types joined with
 `+`; the C# tests check it against `Segmenter`.
 """
 
@@ -73,6 +75,11 @@ def is_fragment(text: str) -> bool:
     return "…" in text or not _WHOLE_STRING_START.match(text)
 
 
+def is_multiline(text: str) -> bool:
+    """A string with a line break (a seq result prints each part on its own line, T-019)."""
+    return "\n" in text or "\r" in text
+
+
 def segment_types(text: str) -> list[str]:
     """The KB names of the segment types, as `Segmenter.Split` detects them."""
     types: list[str] = []
@@ -136,7 +143,7 @@ def collect(kb: dict, version: str) -> list[Sample]:
                 if ex.get("corrected"):
                     forms.append((ex["corrected"], "corrected"))
                 for text, label in forms:
-                    if is_fragment(text):
+                    if is_fragment(text) or is_multiline(text):
                         continue
                     types = "+".join(segment_types(text))
                     samples.append(Sample(text, types, rule["id"], label, cite))

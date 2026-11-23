@@ -147,7 +147,7 @@ tables:
   # (reference sequence) and italic (alternative alignment) carry meaning and are lost.
   - id: Alignment figure
     kind: float
-    review: {image: ok, human: pending, fallback: none}
+    review: {image: ok, human: ok, fallback: none}
     regions:
       - book_page: 126
         top: 512

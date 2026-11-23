@@ -1,0 +1,87 @@
+version: "2016"
+section: "15.1"
+rules:
+  - id: RSA.SCOPE
+    title: Region-specific assays (rsa)
+    applies_to: [rsa]
+    severity: info
+    statement: >-
+      Assays that measure the copy number of a particular chromosome or region, such as
+      multiplex ligation-dependent probe amplification (MLPA), quantitative fluorescent PCR,
+      real-time PCR and bead-based assays, are written as region-specific assays (rsa). The same
+      notation may be used for small targeted arrays limited to a number of regions that can
+      reasonably be listed.
+    cite:
+      - {section: "15.1", page: 123, para: "¶1"}
+    examples:
+      valid: []
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info: the rule defines which assays the rsa notation covers; a string can't break
+        it. The format is RSA.FORMAT.
+    related: [RSA.FORMAT, RSA.KIT_OR_LOCUS]
+
+  - id: RSA.KIT_OR_LOCUS
+    title: Kit name, locus or gene when the coordinates are not known
+    applies_to: [rsa]
+    severity: error
+    statement: >-
+      When the genomic coordinates are not known, the region may be given in the parentheses by
+      the name of the kit used, written without quotation marks, or by the targeted locus or gene
+      (22q11.21(HIRA), Xp21.1(DMDexons22–27)). Nucleotide numbers give the greatest precision.
+    cite:
+      - {section: "15.1", page: 123, para: "¶1"}
+      - {section: "15.2", page: 124, example: E10}
+    examples:
+      valid:
+        - text: "arr[GRCh38] 8p23.1(8479797_11897580)×1.rsa 8p23.1(GATA4)×1"
+          cite: {section: "15.2", page: 124, example: E9}
+        - text: "rsa 22q11.2(kitname)×1"
+          cite: {section: "15.2", page: 124, example: E10}
+          note: >-
+            The book prints a template, rsa 22q11.2(“kit name”)×1, and says the kit name goes in
+            the parentheses without the quotation marks; written here with a placeholder name.
+        - text: "rsa Xp21.1(DMDexons22–27)×1"
+          cite: {section: "15.2", page: 124, example: E11}
+        - text: "rsa 22q11.21(HIRA)×1"
+          cite: {section: "15.2", page: 124, example: E12}
+      invalid:
+        - text: "rsa 22q11.2(\"kitname\")×1"
+          why: The kit name is written without quotation marks.
+          corrected: "rsa 22q11.2(kitname)×1"
+    fix: {level: 1, kind: delete, hint: "Remove the quotation marks around the kit name."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity error for the written form (no quotation marks, §15.2 E10). The preference for
+        nucleotide numbers can't be checked from a string (the laboratory may not know them), so
+        a kit, locus or gene form is never a finding. The invalid example is inferred from the E10
+        explanation.
+    related: [RSA.FORMAT, GEN.GENOME_BUILD_REQUIRED]
+
+  - id: RSA.NORMAL_LOCI_OPTIONAL
+    title: Listing the tested normal loci is optional
+    applies_to: [rsa]
+    severity: info
+    statement: >-
+      Whether the normal loci tested by the assay are listed is at the laboratory's discretion.
+      The book's examples include the tested normal states for clarity, as in
+      rsa(13,18)×2,(21)×3,(X,Y)×1.
+    cite:
+      - {section: "15.1", page: 123, para: "¶1"}
+      - {section: "15.2", page: 123, example: E3}
+    examples:
+      valid:
+        - text: "rsa(13,18)×2,(21)×3,(X,Y)×1"
+          cite: {section: "15.2", page: 123, example: E3}
+          note: The normal disomic states of 13 and 18 are listed for clarity.
+        - text: "rsa(13,18,21)×2,(X)×1"
+          cite: {section: "15.2", page: 124, example: E5}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: "Severity info: listing or leaving out normal loci is the laboratory's choice."
+    related: [RSA.FORMAT]

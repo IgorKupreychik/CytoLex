@@ -52,7 +52,14 @@ rules:
         chr, g, b, e, del, inv, sce, tr, qr, cx, cen, ace, min, dmin, pvz, cth, pcc, pcd, r, dic,
         der, mar; PI, MI, AI, MII, AII, I–IV, fem, mal, spm, oom, lep, zyg, pac, dip, dit, dia,
         xma, =, prx, med, dis, ter, pter, qter, +, –); chtg, chtb, chte, chrg, chrb, chre and
-        pprx, qmed, qdis are written as listed symbols joined without a space, as printed.
+        pprx, qmed, qdis are written as listed symbols joined without a space, as printed. Ch. 15
+        and 16 (T-019): every ISCN symbol used is listed (rsa, seq, GRCh, [ ], ×, _, ::, pos, neg,
+        del, der, dup, ins, inv, r, t, +, dn, pter, qter, cen, →, ;); add is listed with its §16.2
+        meaning (additional sequence), { } with its §16.2 meaning. The :: joining two genes in
+        §15.3 (BCR::ABL1) is not among the listed meanings of :: (break and reunion). The
+        HGVS-like descriptions use HGVS terms that are not ISCN symbols (g., chr, delins,
+        nucleotide letters, T>C substitutions); the quotation marks of §15.2 E10 belong to a
+        template, not the notation (RSA.KIT_OR_LOCUS).
 
   - id: SYM.SPACE_BETWEEN_SYMBOLS
     title: Space between combined symbols

@@ -43,7 +43,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
 | Microarray (`arr`) | ❌ ("not yet", per its web site) | ✅ | 🗓 arr entries in the abnormality list (T-072) |
 | Combined karyotype + arr strings | ❌ | ✅ | |
 | FISH (`ish`, `nuc ish`) | ❌ | ❌ (reported as not implemented) | 🗓 T-015, T-016, T-033 |
-| Breakage, meiotic, RSA, sequence-based (ch. 10, 12, 15, 16) | ❌ | ❌ (breakage and meiotic strings are detected by their leading symbol and reported as not implemented; their KB rules exist, T-018) | 🗓 T-019 |
+| Breakage, meiotic, RSA, sequence-based (ch. 10, 12, 15, 16) | ❌ | ❌ (breakage and meiotic strings are detected by their leading symbol, rsa and seq by their keyword, and all are reported as not implemented; their KB rules exist, T-018, T-019) | 🗓 T-090, T-091 |
 | Printed symbols `–` `×` `→` (as in the book) | ❌ (ASCII only) | ✅ (printed and typed forms) | |
 | **ISCN editions** | | | |
 | ISCN 2016 | ✅ | ✅ | |

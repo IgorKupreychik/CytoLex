@@ -1,0 +1,37 @@
+version: "2016"
+section: "15.3"
+rules:
+  - id: RSA.FUSION_RESULT
+    title: "Fusion or translocation by rsa: rsa(GENE1::GENE2)pos|neg"
+    applies_to: [rsa]
+    severity: error
+    statement: >-
+      A region-specific assay for a translocation or fusion gene gives the two genes in
+      parentheses, joined by a double colon (::), followed directly by pos when the translocation
+      or juxtaposition is detected and neg when it is not. Several such results are separated by
+      commas, each in its own parentheses (rsa(BCR::ABL1)pos,(CBFB::MYH11)pos).
+    cite:
+      - {section: "15.3", page: 124, example: E1}
+      - {section: "15.3", page: 124, example: E2}
+      - {section: "15.3", page: 124, example: E3}
+    examples:
+      valid:
+        - text: "rsa(BCR::ABL1)neg"
+          cite: {section: "15.3", page: 124, example: E1}
+        - text: "rsa(BCR::ABL1)pos"
+          cite: {section: "15.3", page: 124, example: E2}
+        - text: "arr[GRCh38] (8)×3,9q34.11q34.3(129300000_140273252)×1.rsa(BCR::ABL1)pos,(CBFB::MYH11)pos"
+          cite: {section: "15.3", page: 124, example: E3}
+          note: Printed over two lines after "pos,"; joined here without a space.
+      invalid:
+        - text: "rsa(BCR::ABL1)+"
+          why: The result is written pos (detected) or neg (not detected), not with a plus sign.
+          corrected: "rsa(BCR::ABL1)pos"
+    fix: {level: 1, kind: replace, hint: "Write pos or neg after the gene pair."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        §15.3 has examples only; the statement describes the form they all share. The invalid
+        example is inferred.
+    related: [RSA.FORMAT]

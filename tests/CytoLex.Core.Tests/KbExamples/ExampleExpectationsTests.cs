@@ -35,6 +35,22 @@ public class ExampleExpectationsTests
     }
 
     [Fact]
+    public void Fragment_OfRuleWithoutImplementedType_Skips()
+    {
+        var seq = Rule() with { AppliesTo = ["seq"] };
+        var outcome = ExampleExpectations.Evaluate(Case(seq, ExampleKind.Valid, "g.4delT"), new FakeValidator((_, _) => Clean()), ruleImplemented: false);
+        Assert.Equal("seq: not implemented in the pilot (fragment)", outcome.SkipReason);
+    }
+
+    [Fact]
+    public void Fragment_OfKaryotypeOrGeneralRule_IsChecked()
+    {
+        Assert.Null(ExampleExpectations.FragmentNotImplemented(Rule()));
+        Assert.Null(ExampleExpectations.FragmentNotImplemented(Rule() with { AppliesTo = ["general"] }));
+        Assert.Null(ExampleExpectations.FragmentNotImplemented(Rule() with { AppliesTo = ["arr", "rsa"] }));
+    }
+
+    [Fact]
     public void Invalid_RuleNotImplemented_Skips()
     {
         var outcome = ExampleExpectations.Evaluate(Case(Rule(), ExampleKind.Invalid, "46XX"), new FakeValidator((_, _) => Clean()), ruleImplemented: false);
