@@ -16,6 +16,8 @@ internal sealed class LetterCaseCheck : IRuleCheck
     public void Check(RuleContext context)
     {
         var tokens = context.Syntax.Root.PresentTokens();
+        var inSitu = context.Syntax.Root.MisplacedInSituStart() ?? int.MaxValue;
+        tokens = [.. tokens.Where(t => t.Span.Start < inSitu)];
         for (var i = 0; i < tokens.Count; i++)
         {
             if (!tokens[i].IsCaseFolded)

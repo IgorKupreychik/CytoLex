@@ -1,7 +1,7 @@
 namespace CytoLex.Core.Tests.Parsing;
 
 /// <summary>
-/// What the parser reports for each invalid karyotype/arr/general KB example (T-027, decided with the user: kept test-side,
+/// What the parser reports for each invalid karyotype/arr/in situ/general KB example (T-027, decided with the user: kept test-side,
 /// not in the KB). An empty list means the string is well formed and its fault is left to a rule (T-029+): order,
 /// counts, context, spacing (kept as trivia), band existence, symbol combinations, group counts. Otherwise each entry
 /// is the KB rule the parser names, the text of the span and its offset (zero-length span = an inserted token).
@@ -211,5 +211,39 @@ internal static class InvalidExampleExpectations
             ["arr[GRCh38] 4q32.2q35.1(163,146,681_183,022,312)×1"] = [], // ARR.NUCLEOTIDE_FORMAT
             ["arr[GRCh38] 4q32.2q35.1(163146681-183022312)×1"] = [], // ARR.NUCLEOTIDE_FORMAT
             ["arr[GRCh38] 1p12p11.2(117596421_121013236)×3 dn.47,XY,+mar"] = [("ARR.COMBINED_WITH_OTHER_METHODS", ".47,XY,+mar", 47)], // the segmenter splits only before a letter
+
+            // In situ results (T-033): the parser reports only what it can't place; the ISH/NUC_ISH/FIB_ISH/REV_ISH/CGH checks find the rest.
+            ["nuc ish(D17Z1,ERBB2) ×2[100]"] = [], // SYM.NO_OTHER_SPACE
+            ["46,XY ish 22q11.2(D22S75×2)"] = [("ISH.COMBINED_WITH_KARYOTYPE", "ish", 6)], // ISH.COMBINED_WITH_KARYOTYPE
+            ["46,XX.ish del(22)(q11.2q11.2)(d22s75–)"] = [], // ISH.LOCUS_DESIGNATION
+            ["46,XY.ish del(15)(q11.2q11.2)(SNRPN–D15S10–)"] = [], // ISH.LOCUS_LIST
+            ["46,XY.ish del(15)(q11.2q11.2)(SNRPN–;D15S10–)"] = [], // ISH.LOCUS_LIST
+            ["46,XY.ish del(15)(q11.2q12)(GABRB3+,D15S10–,SNRPN–,D15S11+)"] = [], // ISH.LOCUS_ORDER_PTER_QTER
+            ["ish del(22)(q11.2q11.2D22S75–)"] = [("ISH.STRUCTURAL_FORMAT", "D", 22)], // ISH.STRUCTURAL_FORMAT
+            ["ish del(22)(D22S75–)(q11.2q11.2)"] = [], // ISH.STRUCTURAL_FORMAT
+            ["45,XY,dic(14;21)(p11.2;p11.2).ish dic(14;21)(p11.2p11.2)(D14Z1/D22Z1+;D13Z1/D21Z1+)"] = [], // ISH.STRUCTURAL_FORMAT
+            ["46,XX.ish del(22)(q11.2q11.2)(–D22S75)"] = [], // ISH.LOCUS_STATUS
+            ["46,XX.ish del(22)(q11.2q11.2)(D22S75)–"] = [("ISH.LOCUS_STATUS", "–", 37)], // ISH.LOCUS_STATUS
+            ["46,XX.ish del(22)(q11.2q11.2)(D22S75)"] = [], // ISH.LOCUS_STATUS
+            ["46,XY.ish dup(17)(p11.2p11.2)(RAI1×2)"] = [], // ISH.ABNORMAL_SIGNAL_COUNT
+            ["46,XY.ish (22q11.2)(D22S75×2)"] = [], // ISH.NORMAL_CHROMOSOME_FORMAT
+            ["46,XY.ish 22q11.2(D22S75+)"] = [], // ISH.NORMAL_CHROMOSOME_FORMAT
+            ["46,XX,inv(16)(p13.1q22).ish inv(16)(p13.1q22)(MYH11+,CBFB+;MYH11+,CBFB+)"] = [], // ISH.INVERSION_SEPARATE_BREAKPOINTS
+            ["46,X,+r.ish r(X)(wcpX+,DXZ1+)[60%]/r(X)(wcpX+,DXZ1++)[40%]"] = [], // ISH.CELL_LINES
+            ["46,XX.ish 17p11.2(RAI1enh)"] = [], // ISH.SIGNAL_QUALIFIERS
+            ["nuc ish (D21S65×2)"] = [], // NUC_ISH.SIGNAL_COUNT_FORMAT
+            ["nuc ish(D21S65+)"] = [], // NUC_ISH.SIGNAL_COUNT_FORMAT
+            ["nuc ish21q22(D21S65×2)"] = [], // NUC_ISH.DETAILED_FORMAT
+            ["nuc ish(D21S65×3,D21S64×3)"] = [], // NUC_ISH.SHARED_COUNT
+            ["nuc ish(BCR,ABL1)×2[400]"] = [], // NUC_ISH.CHROMOSOME_ORDER
+            ["nuc ish(ZNF443×2,GLTSCR×1)[105/200],(TP73×1,ANGPTL×2)[107/200]"] = [], // NUC_ISH.CHROMOSOME_ORDER
+            ["nuc ish(MYCN amp)"] = [], // NUC_ISH.CELLS_SCORED
+            ["nuc ish(D13S319×0)[100/400]/(D13S319×2)[300/400]"] = [], // NUC_ISH.ABNORMAL_OVER_TOTAL
+            ["nuc ish(ABL1,BCR)×2(ABL1conBCR×1)[400]"] = [], // NUC_ISH.SIGNAL_POSITION_FORMAT
+            ["nuc ish(ABL1 con BCR×1)(ABL1,BCR)×2[400]"] = [], // NUC_ISH.SIGNAL_POSITION_FORMAT
+            ["fib ish(D15S11+,SNRPN+,GABRB3+)"] = [], // FIB_ISH.FORMAT
+            ["47,XX,+mar.rev ish15q"] = [], // REV_ISH.FORMAT
+            ["ish cgh enh21"] = [("CGH.FORMAT", "21", 11)], // CGH.FORMAT
+            ["46,XX,?dup(18)(p11.2p11.3).ish dup(18)(pcp 18p11.2+)"] = [], // ISH.PARTIAL_PAINT
         };
 }

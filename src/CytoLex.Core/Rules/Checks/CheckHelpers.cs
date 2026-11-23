@@ -38,4 +38,13 @@ internal static class CheckHelpers
     /// <summary>The tokens of <paramref name="element"/> that are in the input (no missing tokens).</summary>
     public static List<SyntaxToken> PresentTokens(this SyntaxElement element) =>
         [.. element.Tokens().Where(t => !t.IsMissing)];
+
+    /// <summary>
+    /// Where an in situ result written after a karyotype without its period starts (<c>46,XY ish 22q11.2(D22S75×2)</c>,
+    /// ISH.COMBINED_WITH_KARYOTYPE, T-033): the karyotype parser keeps it as skipped text, which the spacing and letter-case
+    /// checks leave alone (it is in situ notation, not karyotype); <c>null</c> when there is none.
+    /// </summary>
+    public static int? MisplacedInSituStart(this SyntaxNode root) =>
+        root.Children.OfType<SyntaxNode>().LastOrDefault(n => n.Kind == SyntaxKind.Skipped
+            && n.Children[0] is SyntaxToken { Kind: TokenKind.Word } w && FishGrammar.KeywordWords.Contains(w.Text))?.Span.Start;
 }

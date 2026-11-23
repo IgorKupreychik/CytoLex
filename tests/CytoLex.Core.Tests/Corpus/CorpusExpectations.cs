@@ -9,7 +9,7 @@ namespace CytoLex.Core.Tests.Corpus;
 /// What a corpus entry must produce in one edition (T-062):
 /// <list type="bullet">
 /// <item><b>Every entry</b> (parse-only): no <c>CORE.UNPARSED</c> unless its <c>fires</c> name it. Skipped when none of
-/// its segments is implemented in the pilot (ish, nuc ish until T-033).</item>
+/// its segments is implemented in the pilot (rsa, seq, breakage, meiotic).</item>
 /// <item><b>Enforced labels</b> (<see cref="CorpusData.IsEnforced"/>), run with the entry's context hint:
 /// <c>valid</c> = valid with no errors; <c>invalid</c> = not valid and every rule in <c>fires</c> reported (others may
 /// be reported too). A label is checked only when every segment is implemented; otherwise the entry stays parse-only.</item>

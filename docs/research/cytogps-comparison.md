@@ -10,7 +10,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
 - **Coverage.**
   - CytoLex also validates microarray results (`arr`) and combined karyotype/array strings. CytoGPS rejects all of them.
   - CytoLex validates the detailed system (`->`, `::`) and many more abnormality symbols.
-  - Neither tool handles FISH (`ish`) yet. CytoLex has it planned (T-033).
+  - CytoGPS doesn't handle FISH (`ish`); CytoLex checks it since T-033.
 - **Feedback quality.** Every CytoLex finding:
   - names a rule,
   - cites the book (`ISCN 2016 §…, p.…, ¶…`),
@@ -42,7 +42,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
 | `fra`, `upd`, `rec`, `fis`, `tas`, `neo` | ❌ | ✅ | |
 | Microarray (`arr`) | ❌ ("not yet", per its web site) | ✅ | 🗓 arr entries in the abnormality list (T-072) |
 | Combined karyotype + arr strings | ❌ | ✅ | |
-| FISH (`ish`, `nuc ish`) | ❌ | ❌ (reported as not implemented) | 🗓 T-015, T-016, T-033 |
+| FISH (`ish`, `nuc ish`) | ❌ | ✅ (ish, nuc ish, fib ish, rev ish, cgh; T-033; locus order not checked, T-094) | |
 | Breakage, meiotic, RSA, sequence-based (ch. 10, 12, 15, 16) | ❌ | ❌ (breakage and meiotic strings are detected by their leading symbol, rsa and seq by their keyword, and all are reported as not implemented; their KB rules exist, T-018, T-019) | 🗓 T-090, T-091 |
 | Printed symbols `–` `×` `→` (as in the book) | ❌ (ASCII only) | ✅ (printed and typed forms) | |
 | **ISCN editions** | | | |

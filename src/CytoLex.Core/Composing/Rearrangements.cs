@@ -71,7 +71,9 @@ internal static class Rearrangements
     /// </summary>
     public static bool Multiply(WorkingChromosome w, BandPoint x, BandPoint y, int copies)
     {
-        if (Between(w, x, y) is not { } range)
+        // dup(17)(p11.2p11.2): both breakpoints in one band leave no segment between them; the composition is not computed
+        // (it used to throw, T-033).
+        if (Between(w, x, y) is not { } range || range.From == range.To)
         {
             return false;
         }

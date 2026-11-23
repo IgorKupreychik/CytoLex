@@ -128,6 +128,39 @@ public enum SyntaxKind
     /// <summary>A word after the copy number: <c>mos</c>, <c>htz</c>/<c>hmz</c>, <c>mat</c>/<c>pat</c>/<c>inh</c>/<c>dn</c>, <c>c</c>.</summary>
     ArrQualifier,
 
+    // ── FISH (ch. 13, T-033) ─────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Root of a FISH segment (<c>ish</c>, <c>nuc ish</c>, <c>fib ish</c>, <c>rev ish</c>, <c>ish cgh</c>/<c>cgh</c>): an optional
+    /// leading <c>//</c>, the keyword words, an optional <c>mos</c>/<c>chi</c>, then <see cref="FishCellLine"/>s separated by
+    /// <see cref="CellLineSeparator"/>s.
+    /// </summary>
+    FishResult,
+
+    /// <summary>One cell line of a FISH result: <see cref="FishItem"/>s separated by commas.</summary>
+    FishCellLine,
+
+    /// <summary>One comma-separated FISH result: an abnormality with its loci (<see cref="Item"/>) or a <see cref="FishRegion"/>, then an optional <see cref="FishCellCount"/>.</summary>
+    FishItem,
+
+    /// <summary>
+    /// Locus groups led by a chromosome or band, or by nothing: <c>22q11.2(D22S75×2)</c>, <c>X(DXZ1×2)</c>,
+    /// <c>(ABL1,BCR)×2(ABL1 con BCR×1)</c>, <c>15q11.2(D15S11+,…)</c>, <c>4p16.3(D4F26,D4S96)×2</c>; a nuc ish hybridization.
+    /// </summary>
+    FishRegion,
+
+    /// <summary>Loci in parentheses, separated by <c>,</c>, contig <c>/</c>, <c>;</c> (between chromosomes) or <c>con</c>/<c>sep</c> (signal positions).</summary>
+    LocusGroup,
+
+    /// <summary>One locus: optional signs, the <see cref="TokenKind.Probe"/>, then its status (<c>+</c>, <c>–</c>, <c>++</c>), <see cref="LocusCount"/> and qualifiers (<c>amp</c>, <c>dim</c>, <c>enh</c>).</summary>
+    Locus,
+
+    /// <summary>A signal count: <c>×2</c>, <c>×4~5</c>, <c>×12~&gt;50</c>, <c>×0</c>.</summary>
+    LocusCount,
+
+    /// <summary>The cells of a FISH result in square brackets: <c>[20]</c>, <c>[100/400]</c>.</summary>
+    FishCellCount,
+
     /// <summary>Tokens skipped by error recovery (kept for losslessness).</summary>
     Skipped,
 }

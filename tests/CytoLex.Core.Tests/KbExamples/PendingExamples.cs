@@ -10,8 +10,6 @@ internal static class PendingExamples
     public static readonly IReadOnlyDictionary<string, string> Table =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            // Inferred invalid example (T-015): without the period the karyotype parser leaves "ish …" unparsed.
-            ["46,XY ish 22q11.2(D22S75×2)"] = "T-033: read a missing period before ish under ISH.COMBINED_WITH_KARYOTYPE (now CORE.UNPARSED)",
         };
 
     /// <summary>For a pending example: fails when it now passes, otherwise skips with its reason. No-op for others.</summary>

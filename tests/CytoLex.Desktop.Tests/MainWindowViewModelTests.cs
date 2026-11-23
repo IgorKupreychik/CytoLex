@@ -66,13 +66,23 @@ public class MainWindowViewModelTests
     }
 
     [Fact]
-    public void IshSegment_NotImplemented()
+    public void RsaSegment_NotImplemented()
     {
-        var vm = new MainWindowViewModel { Input = "46,XX.ish 5p15.2(D5S23×2)" };
+        var vm = new MainWindowViewModel { Input = "46,XX.rsa(13,18,21,X)×2" };
+        var panel = vm.SelectedPanel!;
+        Assert.Equal(["karyotype", "rsa"], panel.Segments.Select(s => s.Type));
+        Assert.Equal("rsa: not implemented in the pilot", panel.Segments[1].Note);
+        Assert.Equal("Valid in ISCN 2016 (as far as implemented)", panel.ValidityText);
+    }
+
+    [Fact]
+    public void IshSegment_IsValidated()
+    {
+        var vm = new MainWindowViewModel { Input = "46,XX.ish 22q11.2(HIRA×2)" };
         var panel = vm.SelectedPanel!;
         Assert.Equal(["karyotype", "ish"], panel.Segments.Select(s => s.Type));
-        Assert.Equal("ish: not implemented in the pilot", panel.Segments[1].Note);
-        Assert.Equal("Valid in ISCN 2016 (as far as implemented)", panel.ValidityText);
+        Assert.All(panel.Segments, s => Assert.False(s.HasNote));
+        Assert.Equal("Valid in ISCN 2016", panel.ValidityText);
     }
 
     [Fact]

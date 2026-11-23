@@ -16,9 +16,12 @@ internal static class BindHelper
     public static IReadOnlyList<KaryotypeModel> Bind(string text, bool fragment = false) =>
         [.. ParseHelper.Parse(text, fragment).Where(t => t.Segment.Type == NotationType.Karyotype).Select(Binder2016.Bind)];
 
-    /// <summary>The models of every parsed segment of <paramref name="text"/> (karyotype and arr), as the validator binds them.</summary>
+    /// <summary>The models of every parsed segment of <paramref name="text"/> (karyotype, arr, in situ), as the validator binds them.</summary>
     public static IReadOnlyList<SegmentModel> BindAll(string text, bool fragment = false) =>
-        [.. ParseHelper.Parse(text, fragment).Select(t => t.Segment.Type == NotationType.Arr ? (SegmentModel)Binder2016.BindArr(t) : Binder2016.Bind(t))];
+        [.. ParseHelper.Parse(text, fragment).Select(Binder2016.BindSegment)];
+
+    /// <summary>The model of a one-segment in situ string (T-033).</summary>
+    public static FishModel BindFish(string text) => Assert.IsType<FishModel>(Assert.Single(BindAll(text)));
 
     /// <summary>The model of a one-segment arr string (T-034).</summary>
     public static ArrModel BindArr(string text) => Assert.IsType<ArrModel>(Assert.Single(BindAll(text)));

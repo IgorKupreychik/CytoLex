@@ -10,7 +10,7 @@ internal sealed class BandGenomeAssemblyOnlyCheck : IRuleCheck
 {
     public void Check(RuleContext context)
     {
-        foreach (var bp in context.Model.Breakpoints().Where(b => !b.IsPartial && b.KbBand is { Book: false }))
+        foreach (var bp in context.SegmentModel.Breakpoints().Where(b => !b.IsPartial && b.KbBand is { Book: false }))
         {
             context.Report(
                 bp.BandSpan(),

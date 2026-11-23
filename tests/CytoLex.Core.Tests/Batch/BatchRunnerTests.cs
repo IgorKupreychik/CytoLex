@@ -50,7 +50,7 @@ public class BatchRunnerTests(ITestOutputHelper output)
     [Fact]
     public void Summary_CountsPerEdition()
     {
-        List<BatchItem> items = [new(1, null, "46,XX"), new(2, null, "46XX"), new(3, null, "46,XX.ish 5p15.2(D5S23×2)"), new(4, null, "47,XY,+23")];
+        List<BatchItem> items = [new(1, null, "46,XX"), new(2, null, "46XX"), new(3, null, "46,XX.rsa(13,18,21,X)×2"), new(4, null, "47,XY,+23")];
 
         var result = BatchRunner.Run(V, items, new ValidationOptions { Editions = EditionSelection.All });
         var summaries = BatchSummary.Of(result);
@@ -61,7 +61,7 @@ public class BatchRunnerTests(ITestOutputHelper output)
         Assert.Equal(2, s2016.Valid);
         Assert.Equal(2, s2016.NotValid);
         Assert.Equal(0, s2016.NotImplemented);
-        Assert.Equal(1, s2016.Incomplete); // the ish segment
+        Assert.Equal(1, s2016.Incomplete); // the rsa segment
         Assert.Contains(s2016.TopRules, r => r.RuleId == "KARYO.COUNT_SEX_ORDER" && r.Strings == 1);
         Assert.All(summaries.Where(s => s.Edition != "2016"), s => Assert.Equal(4, s.NotImplemented));
     }

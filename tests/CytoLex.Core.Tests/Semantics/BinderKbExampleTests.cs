@@ -5,7 +5,7 @@ using CytoLex.Core.Tests.Parsing;
 namespace CytoLex.Core.Tests.Semantics;
 
 /// <summary>
-/// T-065 acceptance: every valid and <c>corrected</c> karyotype/arr/general KB example binds (arr: T-034) to a complete model, and every
+/// T-065 acceptance: every valid and <c>corrected</c> karyotype/arr/in situ/general KB example binds (arr: T-034; in situ: T-033) to a complete model, and every
 /// syntax error of an invalid example is named by a partial node below the root.
 /// </summary>
 public class BinderKbExampleTests
@@ -59,7 +59,7 @@ public class BinderKbExampleTests
             Assert.Equal(model.Tree.Diagnostics, model.Issues);
             var below = model.DescendantsAndSelf().Skip(1).Where(n => n.IsPartial).SelectMany(n => n.Issues).ToHashSet();
             var unnamed = model.Tree.Diagnostics.Where(d => !below.Contains(d)).Select(d => $"{d.RuleId} '{d.Span.Of(text)}'@{d.Span.Start}");
-            if (model is ArrModel || model is KaryotypeModel { CellLines.IsEmpty: false } || model is KaryotypeModel { Prefixes.IsEmpty: false })
+            if (model is ArrModel or FishModel || model is KaryotypeModel { CellLines.IsEmpty: false } || model is KaryotypeModel { Prefixes.IsEmpty: false })
             {
                 Assert.Empty(unnamed);
             }

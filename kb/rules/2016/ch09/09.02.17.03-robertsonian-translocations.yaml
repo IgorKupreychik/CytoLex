@@ -103,14 +103,14 @@ rules:
           why: >-
             Book inconsistency: ish proved the whole-arm derivative dicentric and the karyotype was
             rewritten with p11.2 breakpoints, but it still says der; written with dic.
-          corrected: "45,XY,dic(14;21)(p11.2;p11.2).ish dic(14;21)(p11.2p11.2)(D14Z1/D22Z1+;D13Z1/D21Z1+)"
     fix: {level: 1, kind: replace, hint: Replace rob or der with dic.}
     review:
       paraphrase_checked: true
       needs_review: false
       note: >-
         §13.2 E22 (T-015, decided with the user) prints der(14;21)(p11.2;p11.2) for a chromosome
-        ish showed to be dicentric, against ¶4; it is kept as an invalid example. Its corrected
-        form still has the separate ish misprint (p11.2p11.2), an invalid example of
-        ISH.STRUCTURAL_FORMAT.
+        ish showed to be dicentric, against ¶4; it is kept as an invalid example. It has no
+        corrected form (T-033, decided with the user): it also has the separate ish misprint
+        (p11.2p11.2), an invalid example of ISH.STRUCTURAL_FORMAT, so no single fix of this rule
+        makes it valid; the fully corrected string is a valid example of ISH.STRUCTURAL_FORMAT.
     related: [DIC.FORMAT, DIC.NO_DER_DIC, ROB.FORMAT]

@@ -47,7 +47,7 @@ public class ValidatorTests
     [Fact]
     public void AllEditions_2016ImplementedOthersNot()
     {
-        const string input = "46,XX.ish 5p15.2(D5S23×2)";
+        const string input = "46,XX.rsa(13,18,21,X)×2";
         var report = Validate(input, editions: EditionSelection.All);
 
         Assert.Equal(["2016", "2020", "2024"], report.Results.Select(r => r.Edition));
@@ -56,7 +56,7 @@ public class ValidatorTests
         Assert.True(r2016.Validity.IsValid);
         Assert.False(r2016.Validity.IsComplete);
         Assert.Equal([EditionStatus.Implemented, EditionStatus.NotImplemented], r2016.Segments.Select(s => s.Status));
-        Assert.Equal("ish: not implemented in the pilot", r2016.Segments[1].Reason);
+        Assert.Equal("rsa: not implemented in the pilot", r2016.Segments[1].Reason);
 
         foreach (var r in report.Results.Skip(1))
         {
@@ -176,9 +176,9 @@ public class ValidatorTests
     [Fact]
     public void Check_RunsOnlyOnSegmentsItsRuleAppliesTo()
     {
-        // CHROM.IDENTIFIERS applies to general; the ish segment is not implemented, so the check sees one segment.
+        // CHROM.IDENTIFIERS applies to general; the rsa segment is not implemented, so the check sees one segment.
         var v = WithCheck("CHROM.IDENTIFIERS");
-        Assert.Single(v.Validate("46,XX.ish 5p15.2(D5S23×2)").Results[0].Diagnostics);
+        Assert.Single(v.Validate("46,XX.rsa(13,18,21,X)×2").Results[0].Diagnostics);
     }
 
     [Fact]

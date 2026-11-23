@@ -26,7 +26,7 @@ public sealed class BatchViewModelTests : IDisposable
         var batch = main.Batch;
         Assert.False(batch.RunCommand.CanExecute(null));
 
-        await batch.LoadAsync(Write("in.csv", "id,iscn\nok,\"46,XX\"\nbad,46XX\nish,\"46,XX.ish 5p15.2(D5S23×2)\"\n"));
+        await batch.LoadAsync(Write("in.csv", "id,iscn\nok,\"46,XX\"\nbad,46XX\nish,\"46,XX.rsa(13,18,21,X)×2\"\n"));
         Assert.Equal(3, batch.Items.Length);
         Assert.False(batch.HasWarnings);
         Assert.True(batch.RunCommand.CanExecute(null));

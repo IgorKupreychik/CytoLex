@@ -12,6 +12,12 @@ public enum TokenKind
     /// <summary>A letter run that is not made of listed symbols (<c>dl</c>, <c>iso</c>, <c>P</c>).</summary>
     UnknownWord,
 
+    /// <summary>
+    /// A FISH probe or locus name read as one token by the FISH grammars (<c>D22S75</c>, <c>RP11-1143I12</c>, <c>5′CBFB</c>,
+    /// <c>wcp11</c>; T-033). The lexer never produces it: the grammar joins the adjacent pieces the lexer split the name into.
+    /// </summary>
+    Probe,
+
     /// <summary>A sex chromosome letter <c>X</c> or <c>Y</c>.</summary>
     ChromosomeLetter,
 

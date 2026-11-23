@@ -42,7 +42,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-030 | done | 1 | T-029, T-065 | Rules: numerical + sex chromosomes + ordering |
 | T-031 | done | 1 | T-029, T-065 | Rules: structural rearrangements |
 | T-032 | done | 2 | T-031, T-068, T-014 | Rules: neoplastic (clones, idem/sl/sdl, composite) |
-| T-033 | todo | 3 | T-031, T-016 | Parser + rules: FISH (ish, nuc ish) |
+| T-033 | done | 3 | T-031, T-016 | Parser + rules: FISH (ish, nuc ish, fib ish, rev ish, cgh) |
 | T-034 | done | 2 | T-031, T-017 | Parser + rules: microarray (arr) |
 | T-035 | done | 1 | T-030, T-031, T-068 | Level 1 deterministic fixes + level 3 explanations |
 | T-036 | done | 2 | T-028 | Desktop: app shell + single-string check with highlighting |
@@ -91,7 +91,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-080 | discussion | 3 | T-075 | Optional lenient mode (stray spaces, letter case as warnings) |
 | T-081 | done | 2 | T-049, T-036 | Desktop: CytoGPS panel in the single-string check (optional, never blocks CytoLex) |
 | T-082 | todo | 5 | T-057 | Review the translation templates and golden file (ISCN 2016) |
-| T-083 | todo | 3 | – | Refactor: remove hand-written partial classes (`Binder`, `Parser`) per the code standard |
+| T-083 | done | 3 | – | Refactor: remove hand-written partial classes (`Binder`, `Parser`) per the code standard |
 | T-084 | todo | 3 | T-059 | Rule browser: bands (band table in `kb.sqlite`, band links of the translation open it) |
 | T-085 | todo | 3 | T-062 | Parser: report truncated input (missing `)`, trailing sign) under a KB rule instead of `CORE.UNPARSED` |
 | T-086 | todo | 3 | T-066 | Use `Abnormality.Composition`: detailed composition vs. its symbol (rule), translation and LGF read one shape |
@@ -100,6 +100,10 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-089 | todo | 3 | T-081 | Desktop: settings view to set up external checkers (CytoGPS paths, cache, timeout) instead of editing `config/local.yaml` by hand |
 | T-090 | todo | 5 | T-018 | Parser + rules: breakage (ch. 10) and meiotic (ch. 12) notation |
 | T-091 | todo | 5 | T-019 | Parser + rules: region-specific assays (`rsa`, ch. 15) and sequence-based notation (`seq`, ch. 16), incl. multi-line input |
+| T-092 | todo | 3 | T-033, T-069 | Abnormality list: in situ results (core API + desktop panel) |
+| T-093 | todo | 4 | T-033, T-058 | Literal translation of in situ results (templates, golden entries, renderer) |
+| T-094 | discussion | 4 | T-033 | Probe positions for locus and chromosome order in FISH (`ISH.LOCUS_ORDER_PTER_QTER`, `NUC_ISH.CHROMOSOME_ORDER`) |
+| T-095 | discussion | 4 | T-033 | Apply karyotype rules (STRUCT.*, symbol formats) to the abnormalities of ish results? |
 
 ---
 
@@ -479,10 +483,11 @@ Outcome (2026-11-18): `Segmenter.Split` (top-level `.` followed by a letter sepa
 **Outcome (2026-11-20):** 14 checks in `src/CytoLex.Core/Rules/Checks/` (`CLONE.SUBCLONE_REFERENCE`, `IDEM_SL_NOT_MIXED`, `SECOND_STEMLINE`, `ORDER_RELATED`, `ORDER_UNRELATED`, `NORMAL_LAST`, `CELL_COUNT_REQUIRED`, `MIN_CELLS`, `SINGLE_CELL_REPORTING`, `CP.FORMAT`, `CP.NOT_FOR_RANDOM_LOSS`, `SEX.UNEVEN_PLOIDY_MALE`, `KARYO.CONSTITUTIONAL_ALWAYS_GIVEN`, `KARYO.CLONE_ORDER_CONSTITUTIONAL`, `TRANSLOC.JUMPING`) over the shared analyses `Clones.cs` and `UnrelatedClones.cs`; `CLONE.POLYPLOID_SUBCLONE` is parser-reported (`idem,×2` → delete the comma). Parser: per-abnormality cell counts (`SyntaxKind.ItemCellCount`), clone notation no longer `NotImplemented` (`ConstructKind.CloneReference`/`Composite` removed). Binder: `CellLine.BasedOn` (`CloneReference`), resolved by `Semantics/CloneReferences.cs`; `SuffixedItem.CellCount`; `CellLineSummary.BasedOn`. `ChromosomeCount.RelativeDelta` for subclone counts. `PendingExamples` emptied; 2 invalid examples classified in `InvalidExampleExpectations.cs`; 31 new unit tests (`Rules/CloneChecksTests.cs`, binder, parser, abnormality list). `dotnet test` 3831 total, 0 failed, 55 skipped (no ch. 11 skips left); rule coverage 87 implemented. Decisions (with the user at plan approval): cell count required only on mixed counts or reference lines; neoplastic clone checks skip `mos`/`chi`, `//` sides ordered separately; jumping-translocation detection; reorder fixes withheld when a reference would change; inherited changes in the abnormality list → T-070. No KB changes; no deviations from the plan. Docs: `docs/design/core.md`, `docs/decisions.md`, `CLAUDE.md`, `README.md`.
 
 ### T-033 — Parser + rules: FISH
-**Status:** todo
-**Description:** `ish` and `nuc ish` grammar and rules.
-**Acceptance:** Related KB examples pass.
+**Status:** done
+**Description:** Grammar, semantic model and rule checks for all ch. 13 in situ types: `ish`, `nuc ish`, `fib ish`, `rev ish`, `ish cgh`/`cgh` (scope decided with the user 2026-11-23); the types are added to the ISCN 2016 implemented types. Done after T-083 (restructuring of the parser/binder partials, inside this task).
+**Acceptance:** Related KB examples pass (valid clean, invalid report their rule or skip with a recorded reason, `corrected` forms are fix previews); the FISH types show as implemented in the desktop app; T-083's acceptance holds.
 **Notes:** From T-015: `ISH.*` rules in `kb/rules/2016/ch13/`. Remove the `PendingExamples` entry `46,XY ish 22q11.2(D22S75×2)` (missing period before ish, now `CORE.UNPARSED`) once the parser reports it under `ISH.COMBINED_WITH_KARYOTYPE`. The book leaves out breakpoints in many ish results (`ISH.BREAKPOINTS_OMITTED`, `needs_review`: resolve before writing that check); `mat` precedes the loci (§13.2 E24) but `dn` follows them (E49) — both valid (`KARYO.PARENTAL_ORIGIN` now applies to ish). Implemented karyotype rules (e.g. `STRUCT.BREAKPOINT_GROUPS`) may need `ish` in `applies_to` once ish segments are parsed; the §13.2 E22 ish misprint is filed under `ISH.STRUCTURAL_FORMAT` for now. `ISH.ABNORMAL_SIGNAL_COUNT` needs the neoplastic context (warning outside cancer). From T-016: nuc ish rules are `NUC_ISH.*` (`kb/rules/2016/ch13/13.03*.yaml`), plus `FIB_ISH.FORMAT`, `REV_ISH.FORMAT`, `CGH.FORMAT` and `ISH.PARTIAL_PAINT`; `ISH.LOCUS_*`, `ISH.SIGNAL_QUALIFIERS`, `ISH.CELL_LINES` and `KARYO.TRANSPLANT_CHIMERA` now also apply to nuc ish (`//` chimeras, E18–E21). `SYM.NO_OTHER_SPACE` lists the in situ spaces (after the technique words, around `con`/`sep`, before `amp`/`dim`/`enh`); the printed §13.3.1 E6 `) ×2` is its invalid example. `NUC_ISH.CELLS_SCORED` needs the neoplastic context; `NUC_ISH.CHROMOSOME_ORDER` needs locus chromosomes (only the detailed form gives them). The 5′/3′ prefixes are part of the locus name; `×12~>50` uses an unlisted `>`. Corpus `N-005` writes `5'KMT2A` with an ASCII apostrophe (typed form of ′?) — decide when the corpus labels are checked.
+**Outcome (2026-11-23):** All five ch. 13 types (`ish`, `nuc ish`, `fib ish`, `rev ish`, `ish cgh`/`cgh`) are implemented types of ISCN 2016 (scope decided with the user). T-083 was done first (see there). Grammar `src/CytoLex.Core/Syntax/FishGrammar.cs` + `LocusGrammar.cs` (probe names joined into one `TokenKind.Probe` token, typed `x` glued to a name read as ×, parenthesis groups classified by look-ahead; ish abnormalities reuse the karyotype grammar through `IAbnormalityLoci`); new syntax kinds `FishResult` … `FishCellCount`. Model `Semantics/FishNodes.cs` + `FishBinder.cs`, `Binder.BindFish`/`BindSegment`, `RuleContext.Fish`. Checks `Rules/Checks/FishAnalyses.cs`, `NucIshAnalyses.cs`, `FishRulesCheck.cs` (20 rules, level-1 fixes reproduce every corrected form); `SYM.NO_OTHER_SPACE` knows the in situ spaces, `BAND.GENOME_ASSEMBLY_ONLY` reads `SegmentModel`; the karyotype parser reports a missing period before an in situ result (`ISH.COMBINED_WITH_KARYOTYPE`, pending entry removed). Not checked: `ISH.LOCUS_ORDER_PTER_QTER`, `NUC_ISH.CHROMOSOME_ORDER` (probe positions, T-094), `ISH.SUBTEL_ABNORMAL` (no invalid example, T-095). Also fixed: composer crash on a same-band duplication (`dup(17)(p11.2p11.2)`, pre-existing). KB: §13.2 E22 lost its `corrected` form under `ROB.DICENTRIC_USE_DIC` (decided with the user); `kb samples` re-run. Tests: `FishParserTests`, `FishBinderTests`, `FishChecksTests` (incl. synthetic lab-shaped strings), desktop `IshSegment_IsValidated`; not-implemented samples switched to `rsa`; `dotnet test` 10017 total, 0 failed, 106 skipped. Docs: `docs/decisions.md`, `docs/design/core.md`, `CLAUDE.md`, `README.md`, `docs/research/cytogps-comparison.md`. Follow-ups: T-092, T-093, T-094, T-095.
 
 ### T-034 — Parser + rules: microarray
 **Status:** done
@@ -814,13 +819,14 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 **Notes:** Created 2026-11-21 from T-057 (user: no review for the pilot; drafts stay usable meanwhile). Best done after T-058, so the renderer's output can be reviewed alongside.
 
 ### T-083 — Refactor: remove hand-written partial classes (`Binder`, `Parser`)
-**Status:** todo
+**Status:** done
 **Description:** Apply the code standard "avoid partial classes" (`CLAUDE.md` → Code standards; decision 2026-11-22, T-058) to the existing hand-written splits:
 - `src/CytoLex.Core/Semantics/Binder.cs` + `Binder.Arr.cs` (public `Binder` and its nested `Run` class, both partial): e.g. a karyotype binder and an arr binder sharing a small binding context (KB, tree, issue/span/ref helpers), with `Binder` as the entry point.
 - `src/CytoLex.Core/Syntax/Parser.cs` + `Parser.Arr.cs`: e.g. the arr grammar as its own class over the shared token cursor/recovery helpers.
 Keep the public API (`Binder.Bind`, `Binder.BindArr`, `Parser.Parse`, `Parser.RuleIds`) unchanged. Out of scope: partials required by generators/frameworks (`[GeneratedRegex]` in `ContextInference`, `FixHelpers`, `KbCatalog`; CommunityToolkit view models; Avalonia `*.axaml.cs`).
 **Acceptance:** No hand-written `partial` class left in `src/` or `tests/` (generator/framework ones excepted); behaviour unchanged: `dotnet test` passes with the same counts (KB-example harness, parser/binder tests, golden translation tests), `dotnet format --verify-no-changes` passes.
-**Notes:** Created 2026-11-22 from T-058 (user). The T-058 translation renderer was already restructured this way (`RenderContext` + phrase classes in `src/CytoLex.Core/Translation/`), which can serve as the pattern.
+**Notes:** Created 2026-11-22 from T-058 (user). The T-058 translation renderer was already restructured this way (`RenderContext` + phrase classes in `src/CytoLex.Core/Translation/`), which can serve as the pattern. Done as step 1 of T-033 (decided with the user 2026-11-23).
+**Outcome (2026-11-23):** Done as step 1 of T-033. `Parser` is a non-partial facade over `KaryotypeGrammar` and `ArrGrammar` (later `FishGrammar`), which share one `TokenCursor` through `GrammarBase`; `Binder` is a non-partial facade over `KaryotypeBinder` and `ArrBinder` (later `FishBinder`), which share `BinderBase`. `Parser.Arr.cs` and `Binder.Arr.cs` removed; public API unchanged. Behaviour unchanged after the step: `dotnet test` 9516 total, 0 failed, 195 skipped (same as before); `dotnet format` clean. Remaining `partial`s are generator/framework ones only.
 
 ### T-048 — Decide CytoGPS integration mode and data policy
 **Status:** done
@@ -966,3 +972,26 @@ Deviations from the plan: no CLI (user); new label `severity-policy` and CytoLex
 **Description:** Implement the `rsa` and `seq` segment types (detected by their keyword, reported as not implemented): a grammar for rsa (`rsa(13,18)×2,(21)×3`, `rsa[GRCh38] 1p36.33(849466_2432509)×1`, locus/kit forms, `rsa(BCR::ABL1)pos`) and for seq (the ISCN-like part in the short or detailed system after `seq[build] `, then one HGVS-like description per line: `chrN:g.…`, `chrN:g.[…;…]`, `g.[chrA:…::chrB:…]`, `delins`, `inv`, `add`, non-template inserts), a semantic model, and checks for the error rules `RSA.FORMAT`, `RSA.KIT_OR_LOCUS`, `RSA.FUSION_RESULT`, `SEQ.FORMAT`, `SEQ.COMBINED_WITH_OTHER_METHODS`, `SEQ.HGVS_PORTION`, `SEQ.HGVS_DESCRIPTION_FORMS`, `SEQ.ABERRATION_ORDER`, `SEQ.JUNCTIONS`, `SEQ.SUPERNUMERARY_ADD`, the warning `SEQ.CHROMOSOME_ENDS`, and the rsa/seq parts of `GEN.GENOME_BUILD_REQUIRED`, `ARR.NUCLEOTIDE_FORMAT`, `ARR.ABERRATION_ORDER`; add the types to the 2016 profile's implemented types. Multi-line input: the desktop editor and the batch files (quoted CSV fields with line breaks in `BatchReader`, `kb samples`).
 **Acceptance:** every ch. 15/16 KB example passes the harness (valid clean, invalid examples report their rule, `corrected` forms are fix previews); corpus entries for both types; multi-line seq strings read from a CSV batch file.
 **Notes:** From T-019: the line break is the only separator between the parts of a seq result (a space would make stray spaces ambiguous); the info rules (`RSA.SCOPE`, `RSA.NORMAL_LOCI_OPTIONAL`, `SEQ.SCOPE`, `SEQ.THREE_PRIME_RULE`) need no check; `SEQ.BREAKPOINT_ORIENTATION` has `needs_review` (¶16 vs §16.3.7 E1): settle the reading before a check. HGVS fragments (`g.4delT`) of seq-only rules skip in the harness until seq is implemented.
+
+### T-092 — Abnormality list: in situ results
+**Status:** todo
+**Description:** Add FISH results to `EditionResult.CellLines`/`Abnormalities` (`AbnormalityList.cs` reads `KaryotypeModel`s only): ish abnormalities with their loci and status, normal-chromosome and nuc ish results with counts, positions and cells; show them in the desktop "Abnormalities" panel.
+**Acceptance:** every valid FISH KB example lists its results with spans; desktop panel shows them grouped by cell line.
+**Notes:** From T-033: the model is `FishModel` (`src/CytoLex.Core/Semantics/FishNodes.cs`); ish abnormalities are karyotype `Abnormality` nodes plus `FishGroup`s. Like T-072 for arr.
+
+### T-093 — Literal translation of in situ results
+**Status:** todo
+**Description:** Templates (`kb/translation/2016/templates.en.yaml`), golden entries and renderer support for ish, nuc ish, fib ish, rev ish and cgh results (now "not translated").
+**Acceptance:** golden entries for the ch. 13 book examples render exactly; `TranslationTests` cover FISH parts.
+**Notes:** From T-033. Draft wording until reviewed (T-082 pattern).
+
+### T-094 — Probe positions for locus and chromosome order in FISH
+**Status:** discussion
+**Description:** `ISH.LOCUS_ORDER_PTER_QTER` (loci from pter to qter) and `NUC_ISH.CHROMOSOME_ORDER` in the short form need the chromosome and position of each probe, which the strings don't carry and the KB doesn't have. Decide whether to add a probe/locus table (source, licence, versioning per genome build), check only what the string gives (detailed nuc ish bands, `wcp`/`pcp` numbers), or leave the rules unchecked.
+**Notes:** From T-033: both rules have no check; their invalid examples skip as "rule not implemented".
+
+### T-095 — Karyotype rules on ish abnormalities
+**Status:** discussion
+**Description:** The abnormalities of ish results are written in karyotype notation (`del(22)(q11.2q11.2)`, `t(9;22)(…)`), but karyotype rules (`STRUCT.BREAKPOINT_GROUPS`, `DEL.FORMAT`, `INV.FORMAT`, …) have `applies_to: [karyotype]`, so they are not checked in ish segments (T-033 note). Decide whether to extend their `applies_to` to `ish` (KB basis: §13.2 ¶2 "the symbol of the abnormality"), with which exceptions (breakpoints left out, `ISH.BREAKPOINTS_OMITTED`), and whether `ISH.SUBTEL_ABNORMAL` gets a check.
+**Notes:** From T-033: the §13.2 E22 breakpoint misprint is reported under `ISH.STRUCTURAL_FORMAT` meanwhile.
+

@@ -114,7 +114,7 @@ public sealed class Validator
             }
 
             var tree = profile.Parser.Parse(input, segment, isFragment);
-            SegmentModel model = segment.Type == NotationType.Arr ? profile.Binder.BindArr(tree) : profile.Binder.Bind(tree);
+            SegmentModel model = profile.Binder.BindSegment(tree);
             models.Add((segment, model));
             if (model is KaryotypeModel karyotype)
             {

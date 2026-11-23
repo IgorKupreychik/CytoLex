@@ -91,6 +91,9 @@ public sealed class RuleContext
     /// <summary>The model of an arr segment (T-034); <c>null</c> for other segments.</summary>
     public ArrModel? Arr => SegmentModel as ArrModel;
 
+    /// <summary>The model of an in situ segment (ish, nuc ish, fib ish, rev ish, cgh; T-033); <c>null</c> for other segments.</summary>
+    public FishModel? Fish => SegmentModel as FishModel;
+
     /// <summary>The karyotype model, or <c>null</c> for other segments.</summary>
     public KaryotypeModel? Karyotype => SegmentModel as KaryotypeModel;
 

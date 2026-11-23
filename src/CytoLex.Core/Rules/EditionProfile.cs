@@ -25,13 +25,13 @@ internal sealed record EditionProfile(
     ImmutableArray<(KbRule Rule, IRuleCheck Check)> Checks,
     Binder Binder);
 
-/// <summary>The editions the core has a profile for, and what each implements (pilot: ISCN 2016 karyotypes, T-021; arr, T-034).</summary>
+/// <summary>The editions the core has a profile for, and what each implements (pilot: ISCN 2016 karyotypes, T-021; arr, T-034; the in situ types, T-033).</summary>
 internal static class EditionProfiles
 {
     /// <summary>Implemented notation types per edition. An edition missing here (or from the KB) is <c>NotImplemented</c>.</summary>
     public static readonly FrozenDictionary<string, ImmutableHashSet<NotationType>> ImplementedTypes =
         new Dictionary<string, ImmutableHashSet<NotationType>>(StringComparer.Ordinal)
         {
-            ["2016"] = [NotationType.Karyotype, NotationType.Arr],
+            ["2016"] = [NotationType.Karyotype, NotationType.Arr, NotationType.Ish, NotationType.NucIsh, NotationType.FibIsh, NotationType.RevIsh, NotationType.Cgh],
         }.ToFrozenDictionary(StringComparer.Ordinal);
 }

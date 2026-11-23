@@ -140,7 +140,8 @@ internal sealed class WorkingChromosome
     public List<ComposedPiece> Slice(int from, int to) => [.. _entries[Math.Min(from, to)..Math.Max(from, to)].Select(e => e.Piece)];
 
     /// <summary>The links inside <see cref="Slice"/> (<c>true</c> = junction), one fewer than its pieces.</summary>
-    public List<bool> SliceLinks(int from, int to) => [.. _entries[(Math.Min(from, to) + 1)..Math.Max(from, to)].Select(e => e.JunctionBefore)];
+    public List<bool> SliceLinks(int from, int to) =>
+        Math.Min(from, to) + 1 >= Math.Max(from, to) ? [] : [.. _entries[(Math.Min(from, to) + 1)..Math.Max(from, to)].Select(e => e.JunctionBefore)];
 
     /// <summary>
     /// Finds the reunion between <paramref name="a"/> and <paramref name="b"/> (in either order): the boundary whose
