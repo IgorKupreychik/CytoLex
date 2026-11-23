@@ -30,6 +30,24 @@ quotes:
       The aberrant nucleotides are listed from pter to qter, consistent with the public
       databases of current genome builds on UCSC or Ensembl Genome Browsers
       (www.genome.ucsc.edu or www.ensembl.org).
+  - rule: ARR.POSITIONS_IN_BANDS
+    cite: {section: "14.2", page: 116, para: "¶3"}
+    text: >-
+      The aberrant nucleotides are listed from pter to qter, consistent with the public
+      databases of current genome builds on UCSC or Ensembl Genome Browsers
+      (www.genome.ucsc.edu or www.ensembl.org).
+  - rule: ARR.POSITIONS_IN_BANDS
+    cite: {section: "14.2", page: 118, para: "¶5"}
+    text: >-
+      Observations combined with banded chromosome analysis and microarrays can be expressed by
+      using the symbol arr followed by the genome build, a space and the chromosome region, band
+      or sub-band designation of the locus.
+  - rule: ARR.POSITIONS_IN_BANDS
+    cite: {section: "14.2", page: 118, para: "¶6"}
+    text: >-
+      Note that the conventional cytogenetic banding assignments are those derived from banded
+      chromosomes, while the array banding assignments are those derived from genome browsers.
+      These are not always concordant with each other.
   - rule: ARR.COPY_NUMBER
     cite: {section: "14.2", page: 120, example: E42}
     text: >-

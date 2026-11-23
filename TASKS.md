@@ -80,7 +80,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-068 | done | 1 | T-031 | Rules: ch. 9 symbol rules (split from T-031) |
 | T-069 | done | 2 | T-036 | Abnormality list: core API + desktop panel |
 | T-070 | todo | 3 | T-032, T-069 | Abnormality list: inherited changes of idem/sl/sdl clones (expandable reference, full form) |
-| T-071 | discussion | 2 | T-034 | Arr: nucleotide positions vs. bands of the stated build (KB rule, GRCh37-under-[GRCh38] book examples) |
+| T-071 | done | 2 | T-034 | Arr: nucleotide positions vs. bands of the stated build (KB rule, GRCh37-under-[GRCh38] book examples) |
 | T-072 | todo | 3 | T-034, T-069 | Abnormality list: arr aberrations (core API + desktop panel) |
 | T-073 | done | 2 | T-029 | Stray spaces inside a karyotype (`47,XY, +21`, `46,X Y`) are not reported: KB basis and fix |
 | T-074 | done | 2 | T-073, T-035 | Checks for `SYM.NO_OTHER_SPACE` and `SYM.LETTER_CASE` (stray spaces, letter case; level-1 fixes) |
@@ -97,6 +97,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-085 | todo | 3 | T-062 | Parser: report truncated input (missing `)`, trailing sign) under a KB rule instead of `CORE.UNPARSED` |
 | T-086 | todo | 3 | T-066 | Use `Abnormality.Composition`: detailed composition vs. its symbol (rule), translation and LGF read one shape |
 | T-087 | discussion | 3 | T-066 | Band compositions the KB doesn't define yet: insertion recombinants, `der(?)` with an insertion or hsr at an unknown site |
+| T-088 | todo | 2 | T-071, T-034 | Arr: check positions against the bands of the stated build (`ARR.POSITIONS_IN_BANDS`) |
 
 ---
 
@@ -591,6 +592,12 @@ Outcome (2026-11-18):
 **Acceptance:** decision recorded in `docs/decisions.md`; KB rule + composer change, or the cases documented as having no composition and removed from the pending table.
 **Notes:** Created 2026-11-23 from T-066.
 
+### T-088 — Arr: check positions against the bands of the stated build
+**Status:** todo
+**Description:** Implement `ARR.POSITIONS_IN_BANDS` (warning, decided in T-071): a `[KbRule]` check in `src/CytoLex.Core/Rules/Checks/` that reads each arr segment's span from `ArrModel` and the band coordinates of the stated build (GRCh37/GRCh38) from the runtime bundle. Short system: first position in the first band, last position in the last band (one band holds both); `pter`/`qter` = the chromosome ends; a position beyond the chromosome end is always a finding; detailed system: only the abnormal span `a_b×n`; `or` alternatives one by one; tolerance 0. Skip: no build, another build, book-only bands without coordinates, whole chromosomes/arms. One finding per segment naming what failed; when the segment fits the other build, the message says so. Level-3 fix (KB hint), no edit.
+**Acceptance:** the 9 invalid KB examples of `ARR.POSITIONS_IN_BANDS` fire and its 5 valid examples pass in the KB-example harness; every other arr KB example and corpus entry stays as it is, or its label is reviewed for the new warning (`tests/data/corpus/`); tests for the qter span, the detailed-system flanks, the "fits the other build" hint and each skip.
+**Notes:** Created 2026-11-23 from T-071.
+
 ## Desktop app (pilot)
 
 ### T-036 — App shell + single-string check
@@ -670,13 +677,13 @@ Outcome (2026-11-18):
 **Notes:** Created 2026-11-20 from T-032 (out of its scope, decided with the user at plan approval). 2026-11-21: scope extended from stakeholder feedback (user): expandable reference row, inherited entries with source links, full form per clone (options A+B+C). A plain-language explanation of the reference (option D) belongs to the translation (T-057/T-058); a clone tree view (option E) was not chosen. Open for planning: whether the inherited entries also go into the batch export (T-038 JSON/CSV).
 
 ### T-071 — Arr: nucleotide positions vs. bands of the stated build
-**Status:** discussion
+**Status:** done
 **Description:** T-034 checks the form of arr results but does not compare the nucleotide positions with the bands written before them, or with the genome build in brackets (the band data has GRCh37 and GRCh38 coordinates, `kb/bands/2016/bands.yaml`). No KB rule states that the positions must lie in the named bands; §14.2 ¶3 ("as in the current genome builds") and ¶6 (array bands come from the genome browsers) are the nearest text. Decide:
 - whether to add a rule (ID, citation, statement, severity: info, warning or error) and what it compares: start/end in the first/last band, a tolerance at band borders, a position beyond the chromosome end of the build;
 - how to treat the book examples that print GRCh37 positions under `[GRCh38]` (§14.2 E23/E24, E34, E40, E44, E45; kept valid as printed in T-017): flagged as warnings, listed as known misprints, or exempt;
 - whether a build-mismatch hint (positions fit the other build) is useful.
 **Acceptance:** Decision in `docs/decisions.md`; if a rule is added, it goes into the KB (with citation and approved paraphrase) and a follow-up `todo` task implements the check.
-**Notes:** Created 2026-11-20 from T-034 (deferred, decided with the user at plan approval). The misprinted bands found so far (§14.2 E27 18q22.33, §14.2.1 E4/E5 21q11.21) are `BAND.MUST_EXIST` invalid examples.
+**Notes:** Created 2026-11-20 from T-034 (deferred, decided with the user at plan approval). The misprinted bands found so far (§14.2 E27 18q22.33, §14.2.1 E4/E5 21q11.21) are `BAND.MUST_EXIST` invalid examples. **Outcome (2026-11-23, done):** decided with the user: new KB rule `ARR.POSITIONS_IN_BANDS` (warning, §14.2 ¶3/¶5/¶6, paraphrase approved; strict containment, tolerance 0, beyond-chromosome-end, detailed system = abnormal span only; level-3 fix with an "other build fits" hint). Measured: 10 printed `[GRCh38]` strings don't fit; 3 fit GRCh37 throughout (E34, §14.2.1 E4/E5, §14.2.2 E6), 5 mix the builds (E23/E24, E40, E44, E45, E49), which corrects the T-017 note. They are the rule's 9 invalid examples (E24 = E23); 5 valid examples. Files: `kb/rules/2016/ch14/14.02-examples-of-microarray-nomenclature.yaml` (new rule; `ARR.PTER_TO_QTER` note and `ARR.GENOME_BROWSER_BANDS` related updated), `kb/source-quotes/2016/ch14/14.02-…yaml` (3 quotes), `tests/CytoLex.Core.Tests/Parsing/InvalidExampleExpectations.cs` (9 entries, `[]`), `docs/decisions.md`. Follow-up: T-088 (the check).
 
 ### T-072 — Abnormality list: arr aberrations
 **Status:** todo

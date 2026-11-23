@@ -208,11 +208,110 @@ rules:
       paraphrase_checked: true
       needs_review: false
       note: >-
-        The invalid example is inferred. Several printed examples labelled [GRCh38] carry GRCh37
-        positions (E23, E24, E34, E40, E44, E45; some lie past the chromosome end in GRCh38).
-        Their format is correct and they stay valid as printed (decided with the user in T-017);
-        a position-vs-band or position-vs-build check (deferred from T-034 to T-071) must account for them.
-    related: [ARR.ABERRATION_ORDER, ARR.NUCLEOTIDE_FORMAT, ARR.REGION_FORMAT]
+        The invalid example is inferred. Several printed examples labelled [GRCh38] have
+        positions that don't fit the GRCh38 bands (E23, E24, E34, E40, E44, E45, E49). Their
+        order and format are correct, so they stay valid here (T-017); whether positions lie in
+        the bands of the stated build is ARR.POSITIONS_IN_BANDS (decided in T-071), which lists
+        them as its invalid examples.
+    related: [ARR.ABERRATION_ORDER, ARR.NUCLEOTIDE_FORMAT, ARR.REGION_FORMAT, ARR.POSITIONS_IN_BANDS]
+
+  - id: ARR.POSITIONS_IN_BANDS
+    title: Positions lie in the bands of the stated build
+    applies_to: [arr]
+    severity: warning
+    statement: >-
+      The nucleotide positions are those of the genome build named in brackets after arr, and
+      the bands are that build's genome-browser bands: the first position of the abnormal span
+      lies in the first band written and the last position in the last band (one band holds
+      both), and no position lies beyond the end of the chromosome in that build. pter and qter
+      stand for the chromosome ends. In the detailed system this applies to the abnormal span;
+      the flanking normal positions may lie outside.
+    cite:
+      - {section: "14.2", page: 116, para: "¶3"}
+      - {section: "14.2", page: 118, para: "¶5"}
+      - {section: "14.2", page: 118, para: "¶6"}
+    examples:
+      valid:
+        - text: "arr[GRCh38] 4q32.2q35.1(163146681_183022312)×1"
+          cite: {section: "14.2", page: 117, example: E10}
+        - text: "arr[GRCh38] 4q32.2q35.1(163002425×2,163146681_183022312×1,184322231×2)"
+          cite: {section: "14.2", page: 117, example: E10}
+          note: Only the abnormal span (163146681_183022312) has to lie in the bands.
+        - text: "arr[GRCh37] 20q13.2q13.33(51840606_62375085)×3,Yq11.23(26887746_27019505)×0"
+          cite: {section: "14.2", page: 119, example: E33}
+          note: The same positions as E34, here under the build they fit.
+        - text: "arr[GRCh38] 18p11.32q23(102328_79093443)×3"
+          cite: {section: "14.2", page: 120, example: E43}
+        - text: "arr[GRCh38] 11p15.5p15.4(2265338_6275434)×2 hmz c,19q13.33qter(49759500_58586384)×2 hmz"
+          cite: {section: "14.2.1", page: 121, example: E7}
+          note: A qter span only has to end within the chromosome.
+      invalid:
+        - text: "arr[GRCh38] 8q23.1q24.3(105171556_146201911)×3,15q26.2q26.3(96062102_100201136)×1"
+          cite: {section: "14.2", page: 118, example: E23}
+          why: >-
+            146201911 lies beyond the end of chromosome 8 in GRCh38; in GRCh37 it lies in 8q24.3,
+            but 105171556 is then in 8q22.3, not 8q23.1. The positions fit neither build (E24
+            repeats the result).
+        - text: "arr[GRCh38] 20q13.2q13.33(51840606_62375085)×3,Yq11.23(26887746_27019505)×0"
+          cite: {section: "14.2", page: 119, example: E34}
+          why: >-
+            The Yq11.23 positions are not in Yq11.23 in GRCh38; they fit GRCh37 (E33 prints the
+            same positions under [GRCh37]). The arr part of the combined string.
+        - text: "arr[GRCh38] 21q11.2q21.1(13461349_17308947)×4,21q22.3(46222759_46914885)×3"
+          cite: {section: "14.2", page: 120, example: E40}
+          why: >-
+            46914885 lies beyond the end of chromosome 21 in GRCh38; in GRCh37 13461349 is not in
+            21q11.2. The arr part of the combined string.
+        - text: "arr[GRCh38] 21q11.2q22.3(13531865_46914745)×3"
+          cite: {section: "14.2", page: 120, example: E44}
+          why: >-
+            46914745 lies beyond the end of chromosome 21 in GRCh38; in GRCh37 13531865 is not in
+            21q11.2.
+        - text: "arr[GRCh38] 18p11.32p11.21(102328_15079388)×1,18q22.3q23(69172132_79093443)×1"
+          cite: {section: "14.2", page: 120, example: E45}
+          why: >-
+            69172132 is in 18q22.2 in GRCh38, not 18q22.3; in GRCh37 79093443 lies beyond the end
+            of chromosome 18.
+        - text: "arr[GRCh38] (1–7)×1,(9–12)×1,13q12.11q14.2(19438807_48800573)×1,13q14.2(48986461_49176936)×0~1,13q14.2qter(49176999_115095706)×1,(15–20)×1,(22)×1,(X)×1"
+          cite: {section: "14.2", page: 121, example: E49}
+          why: >-
+            115095706 lies beyond the end of chromosome 13 in GRCh38; in GRCh37 19438807 is not
+            in 13q12.11.
+        - text: "arr[GRCh38] 15q11.2q26.3(23123715_101888908)×2 hmz pat,21q11.2q22.3(14595263_48084819)×2 hmz pat"
+          cite: {section: "14.2.1", page: 121, example: E4}
+          why: >-
+            48084819 lies beyond the end of chromosome 21 in GRCh38; the positions fit GRCh37.
+            Written with 21q11.2 (the printed 21q11.21 is a BAND.MUST_EXIST misprint).
+        - text: "arr[GRCh38] (15q11.2q26.3(23123715_101888908),21q11.2q22.3(14595263_48084819))×2 hmz pat"
+          cite: {section: "14.2.1", page: 121, example: E5}
+          why: >-
+            48084819 lies beyond the end of chromosome 21 in GRCh38; the positions fit GRCh37.
+            Written with 21q11.2, as in E4.
+        - text: "arr[GRCh38] (1)cth,6q25.1q27(149100000_170899992)×1,(13)cth"
+          cite: {section: "14.2.2", page: 122, example: E6}
+          why: 170899992 lies beyond the end of chromosome 6 in GRCh38; the positions fit GRCh37.
+    fix:
+      level: 3
+      hint: >-
+        Check that the build in brackets is the one the positions come from, and that the bands
+        are that build's bands for the first and last position.
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Inferred: the book does not state it outright; ¶3 ties the positions to the current
+        genome builds, ¶5 puts the build before the bands, ¶6 takes array bands from the genome
+        browsers. Severity warning because the rule is inferred and a well-formed string may
+        still be inconsistent (decided with the user in T-071). Every other printed arr string
+        fits its bands exactly, so there is no tolerance at band borders. The invalid examples
+        are the printed [GRCh38] strings whose positions don't fit (E24 repeats E23); they stay
+        valid examples of their other rules. Three fit GRCh37 throughout (E34, §14.2.1 E4/E5,
+        §14.2.2 E6); the others mix GRCh38 starts with GRCh37 ends, so no corrected form is
+        given and the fix is an explanation (the label or the bands could be the wrong part).
+        Not checkable, so not reported: no build, a build without band coordinates (only GRCh37
+        and GRCh38 have them), book-only bands without coordinates, whole chromosomes or arms
+        without positions.
+    related: [ARR.PTER_TO_QTER, ARR.GENOME_BROWSER_BANDS, GEN.GENOME_BUILD_REQUIRED, BAND.MUST_EXIST]
 
   - id: ARR.COPY_NUMBER
     title: Copy number after the region
@@ -442,4 +541,4 @@ rules:
       note: >-
         Severity info - an explanation. It backs the T-022 decision that genome-assembly-only
         band names give no note in arr strings (BAND.GENOME_ASSEMBLY_ONLY does not apply to arr).
-    related: [BAND.GENOME_ASSEMBLY_ONLY, BAND.MUST_EXIST]
+    related: [BAND.GENOME_ASSEMBLY_ONLY, BAND.MUST_EXIST, ARR.POSITIONS_IN_BANDS]
