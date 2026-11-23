@@ -1,0 +1,15 @@
+version: "2016"
+section: "13.2.2"
+quotes:
+  - rule: ISH.SUBTEL_NORMAL_SHORT
+    cite: {section: "13.2.2", page: 106, para: "¶1"}
+    text: >-
+      Subtelomeric FISH is usually performed in panels so that the 41 unique chromosome ends are
+      hybridized simultaneously. A short system is appropriate to describe a normal result after
+      using a subtelomeric FISH panel, for example:
+  - rule: ISH.SUBTEL_ABNORMAL
+    cite: {section: "13.2.2", page: 106, example: E3}
+    text: >-
+      The subtelomeric region of 13q is deleted and replaced with the subtelomeric region of 20p.
+      The designation pter and qter may be used instead of the distal bands. Alternatively, clone
+      names may be used.

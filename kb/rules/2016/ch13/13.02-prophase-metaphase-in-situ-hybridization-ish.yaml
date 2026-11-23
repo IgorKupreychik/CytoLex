@@ -1,0 +1,511 @@
+version: "2016"
+section: "13.2"
+rules:
+  - id: ISH.COMBINED_WITH_KARYOTYPE
+    title: Banded result, period, ish, space, ish result
+    applies_to: [general]
+    severity: error
+    statement: >-
+      When a standard (banded) cytogenetic result exists, it may be written first, followed by a
+      period (.), the symbol ish, a space and the ish results. Without a banded result, only the
+      ish result is given.
+    cite:
+      - {section: "13.2", page: 101, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XY.ish 22q11.2(D22S75×2)"
+          cite: {section: "13.2", page: 101, example: E1}
+        - text: "ish del(22)(q11.2q11.2)(D22S75–)"
+          cite: {section: "13.2", page: 101, example: E3}
+          note: No banded analysis was done; only the ish result is given.
+        - text: "46,XX,del(15)(q11.2q13).ish del(15)(q11.2q11.2)(SNRPN–,D15S10–)"
+          cite: {section: "13.2", page: 102, example: E8}
+      invalid:
+        - text: "46,XY ish 22q11.2(D22S75×2)"
+          why: The banded result and the ish result are joined by a period (.), not a space.
+          corrected: "46,XY.ish 22q11.2(D22S75×2)"
+        - text: "46,XY.ish22q11.2(D22S75×2)"
+          why: A space follows the symbol ish.
+          corrected: "46,XY.ish 22q11.2(D22S75×2)"
+    fix: {level: 1, kind: replace, hint: "Join the banded result and the ish result with a period and put a space after ish."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: Both invalid examples are inferred from §13.2 ¶1.
+    related: [ISH.CRYPTIC_NOT_IN_KARYOTYPE, ARR.COMBINED_WITH_OTHER_METHODS, SYM.SPACE_BETWEEN_SYMBOLS]
+
+  - id: ISH.LOCUS_DESIGNATION
+    title: Locus names in capitals; clone name preferred
+    applies_to: [ish]
+    severity: error
+    statement: >-
+      Loci are written in capital letters and never in italics, even gene symbols that are
+      usually italicized. The clone name is preferred; without one, the locus as named in the
+      UCSC or Ensembl genome browser is used, and without a locus the HUGO-approved gene name.
+      At the laboratory's discretion the probe name, clone name, accession number, gene name or
+      D-number may be used. Listed symbols keep their own form, such as wcp with its chromosome
+      (wcp4, wcpX) for a whole chromosome paint.
+    cite:
+      - {section: "13.2", page: 101, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XY.ish del(15)(q11.2q12)(D15S11+,SNRPN–,D15S10–,GABRB3+)"
+          cite: {section: "13.2", page: 102, example: E10}
+          note: D-numbers and gene names.
+        - text: "46,XX,add(4)(p16.3).ish dup(4)(p15.2p16.3)(RP11-1076P8+,WHS+,wcp4+)"
+          cite: {section: "13.2", page: 102, example: E13}
+          note: A BAC clone name, a region name and a whole chromosome paint.
+        - text: "46,X,r(X).ish r(X)(p22.3q21)(KAL+,DXZ1+,XIST+,DXZ4–)"
+          cite: {section: "13.2", page: 102, example: E15}
+          note: The book prints KAL in the string and KAL1 in the explanation; kept as printed.
+        - text: "46,XX,inv(16)(p13.1q22)[20].ish inv(16)(p13.1)(RP11-620P11+)(q22)(RP11-620P11+)[20]"
+          cite: {section: "13.2", page: 104, example: E36}
+        - text: "46,XX,t(2;17)(q32;q24)[20].ish t(2;17)(AC005181+;AC005181+)[20]"
+          cite: {section: "13.2", page: 104, example: E39}
+          note: An accession number.
+        - text: "46,XX,t(2;17)(q32;q24)[20].ish t(2;17)(CTD-3115L8+;RP11-959M22+)[20]"
+          cite: {section: "13.2", page: 104, example: E40}
+      invalid:
+        - text: "46,XX.ish del(22)(q11.2q11.2)(d22s75–)"
+          why: Locus designations are written in capital letters.
+          corrected: "46,XX.ish del(22)(q11.2q11.2)(D22S75–)"
+    fix: {level: 1, kind: replace, hint: "Write the locus designation in capital letters."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The invalid example is inferred from §13.2 ¶1. Which name is preferred (clone, browser
+        locus, gene) can't be checked from the string; a check can only judge the letter case
+        outside listed symbols (wcp) and the 5′/3′ prefixes of E35/E38.
+    related: [ISH.LOCUS_LIST, ISH.BANDS_FROM_UCSC, SYM.LETTER_CASE]
+
+  - id: ISH.LOCUS_LIST
+    title: Loci separated by commas; contig loci by a slant line; chromosomes by a semicolon
+    applies_to: [ish]
+    severity: error
+    statement: >-
+      The loci tested on one chromosome are separated by commas. The loci of a contig probe may
+      each be listed, joined by single slant lines (/). For a rearrangement of several
+      chromosomes, the loci of each chromosome form a group, the groups separated by semicolons
+      in the order of the chromosomes, as in the examples.
+    cite:
+      - {section: "13.2", page: 101, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XX,del(15)(q11.2q13).ish del(15)(q11.2q11.2)(SNRPN–,D15S10–)"
+          cite: {section: "13.2", page: 102, example: E8}
+        - text: "45,XY,der(14;21)(q10;q10).ish dic(14;21)(p11.2;p11.2)(D14Z1/D22Z1+;D13Z1/D21Z1+)"
+          cite: {section: "13.2", page: 103, example: E21}
+          note: Contig probes, one group per chromosome.
+        - text: "46,XX,t(9;22)(q34;q11.2)[20].ish t(9;22)(ABL1+,BCR+;BCR+,ABL1+)[20]"
+          cite: {section: "13.2", page: 104, example: E32}
+        - text: "46,XX,t(16;16)(p13.1;q22)[20].ish t(16;16)(3′CBFB+;3′CBFB–)[20]"
+          cite: {section: "13.2", page: 104, example: E38}
+      invalid:
+        - text: "46,XY.ish del(15)(q11.2q11.2)(SNRPN–D15S10–)"
+          why: The two loci must be separated by a comma.
+          corrected: "46,XY.ish del(15)(q11.2q11.2)(SNRPN–,D15S10–)"
+        - text: "46,XY.ish del(15)(q11.2q11.2)(SNRPN–;D15S10–)"
+          why: Both loci are on the one deleted chromosome 15; a semicolon only separates the loci of different chromosomes.
+          corrected: "46,XY.ish del(15)(q11.2q11.2)(SNRPN–,D15S10–)"
+    fix: {level: 1, kind: replace, hint: "Separate the loci of one chromosome with commas."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The semicolon between chromosomes is not stated in the prose; it is the form of every
+        multi-chromosome example (E21–E23, E28, E30–E32, E38–E40; §13.2.2 E2). Both invalid
+        examples are inferred.
+    related: [ISH.LOCUS_DESIGNATION, ISH.LOCUS_STATUS, STRUCT.BREAKPOINT_GROUPS]
+
+  - id: ISH.LOCUS_ORDER_PTER_QTER
+    title: Loci in order from pter to qter
+    applies_to: [ish]
+    severity: warning
+    statement: >-
+      The loci are listed in the order in which they lie on the chromosome described, from pter
+      to qter.
+    cite:
+      - {section: "13.2", page: 101, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XY.ish del(15)(q11.2q12)(D15S11+,SNRPN–,D15S10–,GABRB3+)"
+          cite: {section: "13.2", page: 102, example: E10}
+        - text: "46,XX.ish t(4;11)(p16.3;p15)(wcp11+,D4F26–,D4S96+,D4Z1+;D4F26+,wcp11+)"
+          cite: {section: "13.2", page: 103, example: E23}
+      invalid:
+        - text: "46,XY.ish del(15)(q11.2q12)(GABRB3+,D15S10–,SNRPN–,D15S11+)"
+          why: The loci are listed from qter to pter; D15S11 lies nearest pter and comes first.
+          corrected: "46,XY.ish del(15)(q11.2q12)(D15S11+,SNRPN–,D15S10–,GABRB3+)"
+    fix: {level: 3, hint: "List the loci in their order on the chromosome, from pter to qter."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity warning: the book says the loci "should be used in order". A check needs locus
+        positions, which the KB doesn't have; the invalid example is inferred from E10.
+    related: [ISH.LOCUS_LIST, ARR.PTER_TO_QTER]
+
+  - id: ISH.BANDS_FROM_UCSC
+    title: Locus bands from the current UCSC Genome Browser
+    applies_to: [ish]
+    severity: info
+    statement: >-
+      The band given for a locus follows the current UCSC Genome Browser.
+    cite:
+      - {section: "13.2", page: 101, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XY.ish 17p11.2(RAI1×2)"
+          cite: {section: "13.2", page: 102, example: E12}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info: the source of a band name can't be seen from the string. Genome-browser
+        band names outside the book's idiograms are handled by BAND.GENOME_ASSEMBLY_ONLY.
+    related: [BAND.GENOME_ASSEMBLY_ONLY, ARR.GENOME_BROWSER_BANDS]
+
+  - id: ISH.STRUCTURAL_FORMAT
+    title: "Abnormal chromosome: symbol, (chromosome), (breakpoints), (loci)"
+    applies_to: [ish]
+    severity: error
+    statement: >-
+      An ish result on a structurally abnormal chromosome is written as ish, a space, the symbol
+      of the abnormality (whether it was seen by banding and ish or by ish only), then in
+      separate parentheses the chromosome(s), the breakpoint(s) and the locus or loci tested.
+      Several abnormal chromosomes are separated by commas; a derivative with several
+      aberrations gives the loci after each aberration.
+    cite:
+      - {section: "13.2", page: 101, para: "¶2"}
+    examples:
+      valid:
+        - text: "ish del(22)(q11.2q11.2)(D22S75–)"
+          cite: {section: "13.2", page: 101, example: E3}
+        - text: "ish del(22)(q11.2q11.2)(D22S75–),del(22)(q11.2q11.2)(D22S75–)"
+          cite: {section: "13.2", page: 101, example: E4}
+        - text: "ish del(22)(q13.3q13.3)(ARSA–)"
+          cite: {section: "13.2", page: 101, example: E5}
+        - text: "46,XX.ish del(7)(q11.23q11.23)(ELN–)"
+          cite: {section: "13.2", page: 102, example: E7}
+        - text: "46,XY.ish del(15)(q11.2q11.2)(SNRPN–,D15S10–)"
+          cite: {section: "13.2", page: 102, example: E9}
+        - text: "46,XX,add(4)(q31).ish der(4)dup(4)(q31q34)(wcp4+)add(4)(q34)(wcp4–)"
+          cite: {section: "13.2", page: 102, example: E14}
+          note: Loci after each aberration of the derivative.
+        - text: "46,XX.ish der(X)t(X;Y)(p22.3;p11.3)(SRY+)"
+          cite: {section: "13.2", page: 102, example: E18}
+        - text: "46,XX.ish X(DXZ1×2),der(7)(q3?)(SRY+)"
+          cite: {section: "13.2", page: 103, example: E20}
+        - text: "46,XX.ish der(4)t(4;11)(p16.3;p15)mat(wcp11+,D4F26–,D4S96+,D4Z1+)"
+          cite: {section: "13.2", page: 103, example: E24}
+        - text: "45,XY,dic(14;21)(p11.2;p11.2).ish dic(14;21)(p11.2;p11.2)(D14Z1/D22Z1+;D13Z1/D21Z1+)"
+          cite: {section: "13.2", page: 103, example: E22}
+          note: Corrected form of the printed E22 (der → dic in the karyotype, see ROB.DICENTRIC_USE_DIC; one breakpoint group per chromosome in the ish part).
+        - text: "46,XX,t(9;22)(q34;q11.2)[20].ish der(9)t(9;22)del(9)(q34q34)(ABL1–,BCR+),der(22)t(9;22)(BCR+,ABL1+)[20]"
+          cite: {section: "13.2", page: 104, example: E33}
+        - text: "46,XX,t(9;22)(q34;q11.2)[20].ish der(9)t(9;22)del(9)(q34q34)(ASS1–,ABL1–,BCR+),der(22)t(9;22)(BCR+,ABL1+)[20]"
+          cite: {section: "13.2", page: 104, example: E34}
+        - text: "47,XY,+mar.ish add(17)(p12)(wcp17+,CMT1A+,D17Z1+)"
+          cite: {section: "13.2", page: 105, example: E44}
+        - text: "47,XX,+mar.ish add(16)(p or q)(wcp16+,D16Z1+)"
+          cite: {section: "13.2", page: 105, example: E45}
+      invalid:
+        - text: "ish del(22)(q11.2q11.2D22S75–)"
+          why: The loci go in their own parentheses after the breakpoints.
+          corrected: "ish del(22)(q11.2q11.2)(D22S75–)"
+        - text: "ish del(22)(D22S75–)(q11.2q11.2)"
+          why: The breakpoints come before the loci.
+          corrected: "ish del(22)(q11.2q11.2)(D22S75–)"
+        - text: "45,XY,dic(14;21)(p11.2;p11.2).ish dic(14;21)(p11.2p11.2)(D14Z1/D22Z1+;D13Z1/D21Z1+)"
+          cite: {section: "13.2", page: 103, example: E22}
+          why: >-
+            Misprint in the book: the breakpoints of dic(14;21) need one group per chromosome,
+            separated by a semicolon (STRUCT.BREAKPOINT_GROUPS; compare E21). The karyotype part is
+            shown with der corrected to dic (see ROB.DICENTRIC_USE_DIC).
+          corrected: "45,XY,dic(14;21)(p11.2;p11.2).ish dic(14;21)(p11.2;p11.2)(D14Z1/D22Z1+;D13Z1/D21Z1+)"
+    fix: {level: 1, kind: replace, hint: "Write the chromosome(s), the breakpoint(s) and the loci each in their own parentheses, in that order."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The first two invalid examples are inferred from §13.2 ¶2. The third is the printed E22
+        misprint; it is filed here and not under STRUCT.BREAKPOINT_GROUPS because that rule's
+        check runs on karyotype segments only, so the KB-example harness would expect it to fire
+        before the ish parser exists (T-033).
+    related: [ISH.LOCUS_STATUS, ISH.BREAKPOINTS_OMITTED, ISH.INVERSION_SEPARATE_BREAKPOINTS, STRUCT.BREAKPOINT_GROUPS]
+
+  - id: ISH.BREAKPOINTS_OMITTED
+    title: Breakpoints left out of the ish part in the book's examples
+    applies_to: [ish]
+    severity: info
+    statement: >-
+      Many book examples give an abnormal chromosome in the ish result without breakpoints,
+      followed directly by the loci: when the banded karyotype already states them (t(9;22),
+      ins(2)), or when they are not known (a marker identified as der(8)).
+    cite:
+      - {section: "13.2", page: 101, para: "¶2"}
+      - {section: "13.2", page: 103, example: E30}
+    examples:
+      valid:
+        - text: "46,X,+r.ish r(X)(wcpX+,DXZ1+)"
+          cite: {section: "13.2", page: 102, example: E16}
+        - text: "46,XX,ins(2)(p13q21q31).ish ins(2)(wcp2+)"
+          cite: {section: "13.2", page: 103, example: E26}
+        - text: "46,XY,ins(5;2)(p14;q32q22).ish ins(5;2)(wcp2+)"
+          cite: {section: "13.2", page: 103, example: E27}
+        - text: "46,XY,t(9;22)(q34;q11.2)[20].ish t(9;22)(ABL1–;BCR+,ABL1+)[20]"
+          cite: {section: "13.2", page: 103, example: E30}
+        - text: "47,XY,t(9;22)(q34;q11.2),+der(22)t(9;22)[20].ish t(9;22)(ABL1–;BCR+,ABL1+),der(22)(BCR+,ABL1+)[20]"
+          cite: {section: "13.2", page: 103, example: E31}
+        - text: "47,XY,+mar.ish der(8)(D8Z1+)"
+          cite: {section: "13.2", page: 104, example: E41}
+        - text: "47,XY,+mar.ish der(17)(wcp17+,D17Z1+)"
+          cite: {section: "13.2", page: 104, example: E42}
+        - text: "47,XX,+mar.ish der(18)t(18;19)(wcp18+,D18Z1+,wcp19+)"
+          cite: {section: "13.2", page: 104, example: E43}
+    review:
+      paraphrase_checked: true
+      needs_review: true
+      note: >-
+        Inferred from the examples (E16, E26, E27, E30–E32, E38–E43, E52; §13.2.2 E1): ¶2 asks
+        for the breakpoints, and no paragraph says when they may be left out. Severity info: the
+        rule records the examples' convention for T-033, it forbids nothing.
+    related: [ISH.STRUCTURAL_FORMAT]
+
+  - id: ISH.LOCUS_STATUS
+    title: + or – directly after each locus, inside its parentheses
+    applies_to: [ish]
+    severity: error
+    statement: >-
+      On an abnormal chromosome, the status of each locus follows the locus directly, inside the
+      same parentheses: + for present, – for absent.
+    cite:
+      - {section: "13.2", page: 101, para: "¶1"}
+      - {section: "13.2", page: 101, para: "¶2"}
+    examples:
+      valid:
+        - text: "46,XX.ish del(22)(q11.2q11.2)(D22S75–)"
+          cite: {section: "13.2", page: 101, example: E2}
+        - text: "46,XY.ish del(15)(q11.2q12)(D15S11+,SNRPN–,D15S10–,GABRB3+)"
+          cite: {section: "13.2", page: 102, example: E10}
+      invalid:
+        - text: "46,XX.ish del(22)(q11.2q11.2)(–D22S75)"
+          why: The status follows the locus; it doesn't precede it.
+          corrected: "46,XX.ish del(22)(q11.2q11.2)(D22S75–)"
+        - text: "46,XX.ish del(22)(q11.2q11.2)(D22S75)–"
+          why: The status goes inside the parentheses of the locus.
+          corrected: "46,XX.ish del(22)(q11.2q11.2)(D22S75–)"
+        - text: "46,XX.ish del(22)(q11.2q11.2)(D22S75)"
+          why: Each locus on an abnormal chromosome needs its status (+ or –).
+    fix: {level: 1, kind: reorder, hint: "Put + or – directly after the locus, inside its parentheses."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: All three invalid examples are inferred from §13.2 ¶1–¶2.
+    related: [ISH.STRUCTURAL_FORMAT, ISH.ABNORMAL_SIGNAL_COUNT, ISH.LOCUS_LIST]
+
+  - id: ISH.ABNORMAL_SIGNAL_COUNT
+    title: "Counted signals on an abnormal chromosome: repeated +; ×n in cancer"
+    applies_to: [ish]
+    severity: warning
+    statement: >-
+      When the signals on an abnormal chromosome can be counted, the count may be shown by
+      repeating the + sign (++ for two signals). In cancer the multiplication sign may be used
+      instead, with the number of signals; when the signals can be counted, the number should
+      be given.
+    cite:
+      - {section: "13.2", page: 101, para: "¶2"}
+      - {section: "13.2", page: 105, para: "¶4"}
+    examples:
+      valid:
+        - text: "46,XY.ish dup(17)(p11.2p11.2)(RAI1++)"
+          cite: {section: "13.2", page: 102, example: E11}
+          note: The one signal on the normal homologue is not written.
+        - text: "46,X,?i(Y)(p10).ish idic(Y)(q11)(DYZ3++,DYZ1–)"
+          cite: {section: "13.2", page: 102, example: E17}
+        - text: "ish dmin(MYCN×20~50)[20]"
+          cite: {section: "13.2", page: 105, example: E50}
+        - text: "ish ider(21)(q10)dup(21)(q22q22)(RUNX1×4)"
+          cite: {section: "13.2", page: 105, example: E51}
+      invalid:
+        - text: "46,XY.ish dup(17)(p11.2p11.2)(RAI1×2)"
+          why: Outside cancer, the signals on an abnormal chromosome are counted with repeated + signs; ×n there is the cancer exception (warning).
+          corrected: "46,XY.ish dup(17)(p11.2p11.2)(RAI1++)"
+    fix: {level: 1, kind: replace, hint: "Write the number of signals as repeated + signs."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity warning (decided with the user in T-015): ¶4 only says the exception "can occur
+        in cancer", so ×n elsewhere is flagged, not rejected. A check needs the neoplastic
+        context (dmin, ider and the clone markers point to it). The invalid example is inferred
+        from E11.
+    related: [ISH.LOCUS_STATUS, ISH.SIGNAL_QUALIFIERS, ISH.NORMAL_CHROMOSOME_FORMAT]
+
+  - id: ISH.NORMAL_CHROMOSOME_FORMAT
+    title: "Normal chromosome: band (no parentheses), then (locus×n)"
+    applies_to: [ish]
+    severity: error
+    statement: >-
+      An ish result on a normal chromosome is written as ish, a space, the chromosome, region,
+      band or sub-band of the locus or loci (not in parentheses), then in parentheses each locus
+      with a multiplication sign (×) and the number of signals seen. Several loci with the same
+      number of signals may share one count after the parentheses, as in (D4F26,D4S96)×2.
+    cite:
+      - {section: "13.2", page: 101, para: "¶3"}
+    examples:
+      valid:
+        - text: "46,XY.ish 22q11.2(D22S75×2)"
+          cite: {section: "13.2", page: 101, example: E1}
+        - text: "ish 22q11.2(HIRA×2),del(22)(q13.3)(ARSA–)"
+          cite: {section: "13.2", page: 101, example: E6}
+        - text: "46,XY.ish 17p11.2(RAI1×2)"
+          cite: {section: "13.2", page: 102, example: E12}
+        - text: "46,XX.ish X(DXZ1×2,SRY×0)"
+          cite: {section: "13.2", page: 102, example: E19}
+          note: ×0 for a locus that was tested and not found.
+        - text: "46,XY.ish 4p16.3(D4F26,D4S96)×2"
+          cite: {section: "13.2", page: 103, example: E25}
+          note: One count shared by both loci (the form §13.3.1 uses for nuc ish).
+      invalid:
+        - text: "46,XY.ish (22q11.2)(D22S75×2)"
+          why: On a normal chromosome the band designation is not in parentheses.
+          corrected: "46,XY.ish 22q11.2(D22S75×2)"
+        - text: "46,XY.ish 22q11.2(D22S75+)"
+          why: On a normal chromosome the number of signals is given with × and a number, not with + or –.
+    fix: {level: 3, hint: "Write the band without parentheses, then each locus with × and its number of signals in parentheses."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The shared count after the parentheses (E25) is not in ¶3; it is the book's own example
+        and the usual nuc ish form (§13.3.1). Both invalid examples are inferred from ¶3.
+    related: [ISH.STRUCTURAL_FORMAT, ISH.ABNORMAL_SIGNAL_COUNT]
+
+  - id: ISH.INVERSION_SEPARATE_BREAKPOINTS
+    title: Inversion loci after each breakpoint in its own parentheses
+    applies_to: [ish]
+    severity: error
+    statement: >-
+      When loci are reported at both breakpoints of an inversion, each breakpoint is written in
+      its own parentheses followed by the loci found there, so that the FISH result of each
+      breakpoint is clear.
+    cite:
+      - {section: "13.2", page: 103, example: E29}
+      - {section: "13.2", page: 104, example: E35}
+    examples:
+      valid:
+        - text: "46,XX.ish inv(21)(q11.2q22.1)(q11.2)(RUNX1+)(q22.1)(RUNX1–)"
+          cite: {section: "13.2", page: 103, example: E29}
+          note: Printed with the joined breakpoints (q11.2q22.1) before the separate ones, unlike E35–E37; kept as printed.
+        - text: "46,XX,inv(16)(p13.1q22)[20].ish inv(16)(p13.1)(5′CBFB+)(q22)(3′CBFB+)[20]"
+          cite: {section: "13.2", page: 104, example: E35}
+        - text: "46,XX,inv(16)(p13.1q22).ish inv(16)(p13.1)(MYH11+,CBFB+)(q22)(MYH11+,CBFB+)"
+          cite: {section: "13.2", page: 104, example: E37}
+      invalid:
+        - text: "46,XX,inv(16)(p13.1q22).ish inv(16)(p13.1q22)(MYH11+,CBFB+;MYH11+,CBFB+)"
+          why: The loci of each inversion breakpoint follow that breakpoint in its own parentheses.
+          corrected: "46,XX,inv(16)(p13.1q22).ish inv(16)(p13.1)(MYH11+,CBFB+)(q22)(MYH11+,CBFB+)"
+    fix: {level: 1, kind: replace, hint: "Write each inversion breakpoint in its own parentheses, followed by its loci."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        From the explanations of E29 and E35 ("the inversion breakpoints are in separate
+        parentheses to make the FISH information apparent"), which E36/E37 follow. The invalid
+        example is inferred.
+    related: [ISH.STRUCTURAL_FORMAT, INV.FORMAT]
+
+  - id: ISH.CELL_LINES
+    title: ish cell lines with cell numbers in square brackets
+    applies_to: [ish]
+    severity: error
+    statement: >-
+      When the ish result differs between cell lines, each line is written with its number of
+      cells (a count, not a percentage) in square brackets, the lines separated by a slant line
+      (/). An ish result that holds for every cell of a banded clone carries that clone's count.
+    cite:
+      - {section: "13.2", page: 105, example: E46}
+      - {section: "13.2", page: 105, example: E47}
+    examples:
+      valid:
+        - text: "mos 46,X,+r[15]/45,X[10].ish r(X)(wcpX+,DXZ1+)"
+          cite: {section: "13.2", page: 105, example: E46}
+          note: The number of cells, not the percentage, goes in square brackets.
+        - text: "46,X,+r.ish r(X)(wcpX+,DXZ1+)[15]/r(X)(wcpX+,DXZ1++)[10]"
+          cite: {section: "13.2", page: 105, example: E47}
+        - text: "mos 45,X[3]/46,XY[12].ish X(DXZ1×1,SRY×0)[32]/X(DXZ1×1),Y(SRY×1)[68]"
+          cite: {section: "13.2", page: 105, example: E48}
+        - text: "ish del(14)(q21.2q21.2)(RP11-453F20–)dn[6]/14q21.2(RP11-453F20×2)[4]"
+          cite: {section: "13.2", page: 105, example: E49}
+        - text: "46,XY,t(9;22)(q34;q11.2)[20].ish t(9;22)(ABL1–;BCR+,ABL1+)[20]"
+          cite: {section: "13.2", page: 103, example: E30}
+      invalid:
+        - text: "46,X,+r.ish r(X)(wcpX+,DXZ1+)[60%]/r(X)(wcpX+,DXZ1++)[40%]"
+          why: Square brackets hold the number of cells, not a percentage.
+    fix: {level: 3, hint: "Give the number of cells of each ish cell line in square brackets."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        From the examples E46–E49 and the E46 explanation; no paragraph states it. The invalid
+        example is inferred from the E46 explanation.
+    related: [CLONE.CELL_COUNT_REQUIRED, KARYO.CLONE_SEPARATOR]
+
+  - id: ISH.RELEVANT_RESULTS_ONLY
+    title: Only clinically relevant or informative loci need to be given
+    applies_to: [ish]
+    severity: info
+    statement: >-
+      Only the clinically relevant or informative results need to be written. After a probe
+      cocktail, the result may give the abnormal locus alone or also the normal control locus.
+    cite:
+      - {section: "13.2", page: 101, example: E6}
+    examples:
+      valid:
+        - text: "ish del(22)(q13.3q13.3)(ARSA–)"
+          cite: {section: "13.2", page: 101, example: E5}
+        - text: "ish 22q11.2(HIRA×2),del(22)(q13.3)(ARSA–)"
+          cite: {section: "13.2", page: 101, example: E6}
+          note: The same ARSA deletion with the HIRA control locus; both forms are correct.
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: Severity info, from the E6 explanation; it permits both forms and forbids nothing.
+    related: [ISH.NORMAL_CHROMOSOME_FORMAT, ISH.STRUCTURAL_FORMAT]
+
+  - id: ISH.SIGNAL_QUALIFIERS
+    title: amp, dim and enh after the locus, separated by a space
+    applies_to: [ish]
+    severity: error
+    statement: >-
+      When the signals are too many to count, the abbreviation amp (amplified) may be written
+      after the locus. A signal weaker or stronger than on the normal homologue is marked dim
+      (diminished) or enh (enhanced). The abbreviation follows the locus, separated from it by a
+      space.
+    cite:
+      - {section: "13.2", page: 105, para: "¶5"}
+      - {section: "13.2.1", page: 105, example: E1}
+      - {section: "3", page: 34, para: "¶2"}
+      - {section: "3", page: 35, para: "¶3"}
+    examples:
+      valid:
+        - text: "ish der(21)(RUNX1 amp)"
+          cite: {section: "13.2", page: 105, example: E52}
+        - text: "46,Y,del(X)(p11.2p11.4).ish del(X)(p11.2p11.4)(RP1-112K5 dim,RP11-265P11 dim)"
+          cite: {section: "13.2.1", page: 105, example: E1}
+        - text: "46,XX.ish 17p11.2(RAI1 enh)"
+          cite: {section: "13.2.1", page: 105, example: E2}
+      invalid:
+        - text: "46,XX.ish 17p11.2(RAI1enh)"
+          why: A space separates enh from the locus.
+          corrected: "46,XX.ish 17p11.2(RAI1 enh)"
+    fix: {level: 1, kind: insert, hint: "Insert a space between the locus and amp, dim or enh."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        §13.2.1 has examples only; dim and enh are defined in the ch. 3 symbol list. The space is
+        the printed form of all three examples. The invalid example is inferred.
+    related: [ISH.ABNORMAL_SIGNAL_COUNT, SYM.SPACE_BETWEEN_SYMBOLS]

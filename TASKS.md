@@ -24,7 +24,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-012 | done | 1 | T-008 | KB: ch. 9.1–9.2.10 (structural, part 1) |
 | T-013 | done | 1 | T-008 | KB: ch. 9.2.11–9.3 (structural, part 2 incl. translocations) |
 | T-014 | done | 2 | T-013 | KB: ch. 11 (neoplasia) |
-| T-015 | todo | 3 | T-013 | KB: ch. 13.1–13.2 (metaphase ish) |
+| T-015 | done | 3 | T-013 | KB: ch. 13.1–13.2 (metaphase ish) |
 | T-016 | todo | 3 | T-015 | KB: ch. 13.3–13.8 (nuc ish, fib/rev ish, cgh, painting) |
 | T-017 | done | 2 | T-013 | KB: ch. 14 (microarray) |
 | T-018 | todo | 3 | T-013 | KB: ch. 10 & 12 (breakage, meiotic) |
@@ -243,16 +243,16 @@ All KB tasks share these steps and criteria:
 **Outcome (2026-11-20):** Ploidy table (p.90, 48 cells) signed off before planning. 18 new rules + quotes in `kb/rules/2016/ch11/` and `kb/source-quotes/2016/ch11/` (8 section files, §11.1.1–11.3), new prefixes `CLONE` (11), `CP` (3), `PLOIDY` (2), plus `SEX.UNEVEN_PLOIDY_MALE` and `KARYO.CONSTITUTIONAL_ALWAYS_GIVEN`; all paraphrases approved by the user. `kb build` passes (160 rules, 262 quotes); `dotnet test` 3633 total, 0 failed. Decided with the user: Ploidy table as the info rule `PLOIDY.LEVELS`; `CLONE.MIN_CELLS` and `CLONE.ORDER_UNRELATED` are warnings (§11.1.6 E3 kept as an invalid warning form). Existing rules extended: `KARYO.CLONE_SEPARATOR`, `KARYO.CONSTITUTIONAL_C`, `MAR.CONSTITUTIONAL_C_SPACE`, `KARYO.ABNORMALITY_ORDER`, `NUM.PLOIDY_REFERENCE`, `KARYO.CLONE_ORDER_CONSTITUTIONAL`, `SYM.LISTED_ONLY`; `TRANSLOC.JUMPING` linked to `CLONE.ORDER_UNRELATED`. Deviations (decided with the user during the work): the §11.1.4 E7 idem form is an invalid example of `KARYO.ABNORMALITY_ORDER` (printed out of order); `SEX.ABNORMAL_SEX_CHROMOSOME_IN_LIST` gained a cited c-field exception (§11.3 E9, re-approved) with a one-line fix in `ChromosomeCount.cs` and a unit test; new test-side `KbExamples/PendingExamples.cs` skips 3 examples the parser can't read yet (handed to T-032); invalid examples classified in `InvalidExampleExpectations.cs`. Notes added to T-032; `docs/decisions.md`, `docs/extraction-review-2016.md`, `CLAUDE.md`, `README.md` updated.
 
 ### T-015 — KB: ch. 13.1–13.2 (metaphase ish)
-**Status:** todo
+**Status:** done
 **Description:** In situ hybridization introduction, `ish` notation, `dim`/`enh`, subtelomeric ish.
 **Acceptance:** Shared KB criteria.
-**Notes:**
+**Notes:** **Outcome (2026-11-23):** No sign-off needed. 17 new `ISH` rules + quotes in `kb/rules/2016/ch13/` and `kb/source-quotes/2016/ch13/` (§13.1, §13.2, §13.2.2; `dim`/`enh` of §13.2.1 share `ISH.SIGNAL_QUALIFIERS` with `amp`, so there is no §13.2.1 file); all paraphrases approved by the user. Severities: 10 error, 2 warning (`LOCUS_ORDER_PTER_QTER`, `ABNORMAL_SIGNAL_COUNT`: ×n outside cancer, decided with the user), 5 info (`CRYPTIC_NOT_IN_KARYOTYPE`, `BANDS_FROM_UCSC`, `BREAKPOINTS_OMITTED` with `needs_review`, `RELEVANT_RESULTS_ONLY`, `SUBTEL_NORMAL_SHORT`); `CRYPTIC_NOT_IN_KARYOTYPE` and `COMBINED_WITH_KARYOTYPE` are `general`. All 57 printed strings are KB examples (script-checked). Decided with the user: combined `46,XY.ish …` strings sit under their ish rule and `KbExampleDetectionTests` accepts any segment type; §13.2 E22 is a book inconsistency (karyotype der for a proven dicentric → invalid example of `ROB.DICENTRIC_USE_DIC`; its ish misprint `dic(14;21)(p11.2p11.2)` → invalid example of `ISH.STRUCTURAL_FORMAT`; valid examples use the fully corrected form); the inferred no-period example is in `PendingExamples` (T-033). Existing rules: `KARYO.PARENTAL_ORIGIN` applies to ish (E24, E49), `SYM.LISTED_ONLY` note. Results: `kb build` 197 rules / 319 quotes; `dotnet test` 8878 total, 0 failed, 76 skipped; `kb samples` re-run (new `other.txt`). Docs: `docs/decisions.md`, `docs/extraction-review-2016.md`, `tests/data/batch/README.md`; notes added to T-016 and T-033. Deviations from the plan: the E22 ish misprint is filed under `ISH.STRUCTURAL_FORMAT` instead of `STRUCT.BREAKPOINT_GROUPS` (harness/pending limits), E22's karyotype der/dic inconsistency was found during testing, no §13.2.1 file, and the extra info rule `ISH.RELEVANT_RESULTS_ONLY`.
 
 ### T-016 — KB: ch. 13.3–13.8
 **Status:** todo
 **Description:** `nuc ish` (signal numbers, relative positions, fusion and break-apart probes), `fib ish`, `rev ish`, `cgh`, multi-color and partial painting.
 **Acceptance:** Shared KB criteria.
-**Notes:** Before starting, person sign-off of the **Fibre diagram** (§13.4, p.112): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`. Drawn fibre symbols and nucleus diagrams (§13.3.2, pp.109–112) are not in the text: `needs_review`.
+**Notes:** Before starting, person sign-off of the **Fibre diagram** (§13.4, p.112): run `kb tables`, compare the images with the chunks, set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml`, then `kb extract`. Drawn fibre symbols and nucleus diagrams (§13.3.2, pp.109–112) are not in the text: `needs_review`. From T-015: the shared count after several loci, `(D4F26,D4S96)×2`, is already a valid form of `ISH.NORMAL_CHROMOSOME_FORMAT` (§13.2 E25) — cite §13.3.1 there if it states the rule; reuse the `ISH.*` locus rules (`LOCUS_DESIGNATION`, `LOCUS_LIST`, `SIGNAL_QUALIFIERS`) for nuc ish where the text applies them (extend `applies_to` rather than duplicating); `dim`/`enh` are also cited for §13.5.
 
 ### T-017 — KB: ch. 14 (microarray)
 **Status:** done
@@ -475,7 +475,7 @@ Outcome (2026-11-18): `Segmenter.Split` (top-level `.` followed by a letter sepa
 **Status:** todo
 **Description:** `ish` and `nuc ish` grammar and rules.
 **Acceptance:** Related KB examples pass.
-**Notes:**
+**Notes:** From T-015: `ISH.*` rules in `kb/rules/2016/ch13/`. Remove the `PendingExamples` entry `46,XY ish 22q11.2(D22S75×2)` (missing period before ish, now `CORE.UNPARSED`) once the parser reports it under `ISH.COMBINED_WITH_KARYOTYPE`. The book leaves out breakpoints in many ish results (`ISH.BREAKPOINTS_OMITTED`, `needs_review`: resolve before writing that check); `mat` precedes the loci (§13.2 E24) but `dn` follows them (E49) — both valid (`KARYO.PARENTAL_ORIGIN` now applies to ish). Implemented karyotype rules (e.g. `STRUCT.BREAKPOINT_GROUPS`) may need `ish` in `applies_to` once ish segments are parsed; the §13.2 E22 ish misprint is filed under `ISH.STRUCTURAL_FORMAT` for now. `ISH.ABNORMAL_SIGNAL_COUNT` needs the neoplastic context (warning outside cancer).
 
 ### T-034 — Parser + rules: microarray
 **Status:** done

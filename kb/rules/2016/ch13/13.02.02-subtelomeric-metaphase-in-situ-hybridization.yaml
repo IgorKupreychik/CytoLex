@@ -1,0 +1,51 @@
+version: "2016"
+section: "13.2.2"
+rules:
+  - id: ISH.SUBTEL_NORMAL_SHORT
+    title: Normal subtelomere panel in the short form subtel(41×2)
+    applies_to: [ish]
+    severity: info
+    statement: >-
+      Subtelomeric FISH is usually done as a panel covering the 41 unique chromosome ends at
+      once. A normal panel result may be written in a short form: subtel with the number of
+      probes and the number of signals, subtel(41×2).
+    cite:
+      - {section: "13.2.2", page: 106, para: "¶1"}
+    examples:
+      valid:
+        - text: "ish subtel(41×2)"
+          cite: {section: "13.2.2", page: 106, example: E1}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info: the book calls the short form "appropriate"; listing every subtelomeric
+        locus is not wrong.
+    related: [ISH.SUBTEL_ABNORMAL, ISH.NORMAL_CHROMOSOME_FORMAT]
+
+  - id: ISH.SUBTEL_ABNORMAL
+    title: "Abnormal subtelomere result: band with + or –, then the clones"
+    applies_to: [ish]
+    severity: error
+    statement: >-
+      An abnormal subtelomeric result gives, for each chromosome of the rearrangement, the
+      subtelomeric bands with their status (+ or –) in place of the breakpoints, then the clone
+      loci with their status in the same order. pter and qter may be written instead of the
+      distal bands, or the clone names may be given alone.
+    cite:
+      - {section: "13.2.2", page: 106, example: E2}
+      - {section: "13.2.2", page: 106, example: E3}
+    examples:
+      valid:
+        - text: "ish t(13;20)(q34–,p13+;p13–,q34+)(RP11-63L17–,RP5-1103G7+;RP5-1103G7–,RP11-63L17+)"
+          cite: {section: "13.2.2", page: 106, example: E2}
+          note: Line wrap after the comma joined without a space.
+        - text: "ish der(13)t(13;20)(q34–,p13+)(RP11-63L17–,RP5-1103G7+)"
+          cite: {section: "13.2.2", page: 106, example: E3}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        From the two examples and the E3 explanation (pter/qter, clone names); the pter/qter and
+        clone-only forms have no printed example.
+    related: [ISH.SUBTEL_NORMAL_SHORT, ISH.STRUCTURAL_FORMAT, ISH.LOCUS_LIST]

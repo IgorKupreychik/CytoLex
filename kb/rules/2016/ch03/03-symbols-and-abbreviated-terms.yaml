@@ -41,7 +41,9 @@ rules:
         ~); the numbered forms sdl1, sdl2 and sl2 are the listed sl/sdl with a number (§11.1.4
         ¶1, E7), and the ploidy terms n±, 2n–, 2n+ (§11.2 ¶2) are report terms, not notation.
         Ch. 14 (T-017): every symbol used is listed (arr, GRCh, [ ], _, ×, ~, amp, mos, hmz, htz,
-        mat, pat, inh, dn, c, cx, cth, or, qter, upd).
+        mat, pat, inh, dn, c, cx, cth, or, qter, upd). Ch. 13.1–13.2 (T-015): every symbol used
+        is listed (ish, wcp, amp, dim, enh, subtel, idic, ider, dmin, mos, mat, dn, ×, ~, /, or,
+        +, –); the 5′/3′ prefixes of E35/E38 (5′CBFB) belong to the locus names, not the notation.
 
   - id: SYM.SPACE_BETWEEN_SYMBOLS
     title: Space between combined symbols

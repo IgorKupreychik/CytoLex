@@ -1,0 +1,38 @@
+version: "2016"
+section: "13.1"
+rules:
+  - id: ISH.CRYPTIC_NOT_IN_KARYOTYPE
+    title: Cryptic FISH-only abnormalities stay out of the banded karyotype
+    applies_to: [general]
+    severity: info
+    statement: >-
+      An abnormality that FISH reveals but banding cannot show (a cryptic abnormality) is not
+      written in the banded karyotype; it appears only in the ish result. When FISH clarifies an
+      abnormality that, in retrospect, can be seen with banding, the banded karyotype may be
+      rewritten to reflect the FISH findings.
+    cite:
+      - {section: "13.1", page: 100, para: "¶3"}
+    examples:
+      valid:
+        - text: "46,XX.ish del(22)(q11.2q11.2)(D22S75–)"
+          cite: {section: "13.2", page: 101, example: E2}
+          note: The deletion is seen only by ish; the banded karyotype stays normal.
+        - text: "46,XX.ish t(4;11)(p16.3;p15)(wcp11+,D4F26–,D4S96+,D4Z1+;D4F26+,wcp11+)"
+          cite: {section: "13.2", page: 103, example: E23}
+          note: A cryptic translocation, given only in the ish result.
+        - text: "46,XX.ish ins(15;17)(q22;q21q21)(PML+,RARA+;RARA+)"
+          cite: {section: "13.2", page: 103, example: E28}
+          note: A cryptic insertion, given only in the ish result.
+        - text: "45,XY,dic(14;21)(p11.2;p11.2).ish dic(14;21)(p11.2;p11.2)(D14Z1/D22Z1+;D13Z1/D21Z1+)"
+          cite: {section: "13.2", page: 103, example: E22}
+          note: >-
+            The banded karyotype is rewritten after FISH (compare E21). Corrected form: the book
+            prints der(14;21) in the karyotype (see ROB.DICENTRIC_USE_DIC) and the misprint
+            dic(14;21)(p11.2p11.2) in the ish part (see ISH.STRUCTURAL_FORMAT).
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info: whether an abnormality is cryptic can't be seen from the string; the rule
+        explains what belongs in the banded part.
+    related: [ISH.COMBINED_WITH_KARYOTYPE]

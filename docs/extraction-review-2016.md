@@ -145,6 +145,11 @@ Person check (`review.human`): `ok` for Table 1, Table 2, Table 3, Table 4 and S
   sentence continues after an example list.
 - §12.1 p.93: the terminology list (`spm | Spermatogonial metaphase`, …) is labelled as an
   example (E1). Harmless; re-check when writing ch. 12 rules (T-018).
+- Ch. 13.1–13.2 (T-015): §13.2 E22, E31, E33, E34 and §13.2.2 E2 wrap inside parentheses or after
+  `,` and are joined with no space. §13.2 E22 prints `der(14;21)(p11.2;p11.2)` for a proven
+  dicentric (against §9.2.17.3 ¶4) and the ish misprint `dic(14;21)(p11.2p11.2)`; E15 prints `KAL`
+  where its explanation says KAL1 (kept); E29 repeats the joined inversion breakpoints (kept). See
+  `docs/decisions.md`, T-015. §13.2 ¶1–¶2 carry the "changed" bar (no layout loss).
 - Ch. 14 (T-017): several §14.2 examples print a space between `)` and `×n` (E1 second line,
   E14–E19 and others) and §14.2.1 E9's caption prints `(4– 6)`; KB examples drop these spaces.
   Long arr strings wrap inside parentheses or after `,` and are joined with no space. §14.2 E27

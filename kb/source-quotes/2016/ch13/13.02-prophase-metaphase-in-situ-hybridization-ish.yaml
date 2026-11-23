@@ -1,0 +1,121 @@
+version: "2016"
+section: "13.2"
+quotes:
+  - rule: ISH.COMBINED_WITH_KARYOTYPE
+    cite: {section: "13.2", page: 101, para: "¶1"}
+    text: >-
+      If a standard cytogenetic observation has been made, it may be given followed by a period
+      (.), the symbol ish, a space, and the ish results. If a standard cytogenetic observation
+      has not been made, the ish observations only are given.
+  - rule: ISH.LOCUS_DESIGNATION
+    cite: {section: "13.2", page: 101, para: "¶1"}
+    text: >-
+      The locus designations (in capital letters but not in italics) are separated by commas
+      and the status of each locus is given immediately after the locus designation. When
+      available, the clone name is preferred. If the clone name is not available, the locus
+      designated according to either the UCSC or Ensembl Genome Browsers (www.
+      genome.ucsc.edu/ and www.ensembl.org/) should be used
+  - rule: ISH.LOCUS_DESIGNATION
+    cite: {section: "13.2", page: 101, para: "¶1"}
+    text: >-
+      If no locus is available, the gene name can be used, according to HUGO-approved
+      nomenclature (www.hugo-international.org/). Although gene acronyms are usually
+      italicized, they should not be italicized in the nomenclature. Thus, at the discretion of
+      the investigator or laboratory director the probe name, clone name, accession number,
+      gene name, or D-number can be used.
+  - rule: ISH.LOCUS_LIST
+    cite: {section: "13.2", page: 101, para: "¶1"}
+    text: >-
+      The locus designations (in capital letters but not in italics) are separated by commas
+  - rule: ISH.LOCUS_LIST
+    cite: {section: "13.2", page: 101, para: "¶1"}
+    text: >-
+      When contig probes are used each locus may be listed, separated by single slant lines (/).
+  - rule: ISH.LOCUS_ORDER_PTER_QTER
+    cite: {section: "13.2", page: 101, para: "¶1"}
+    text: >-
+      should be used in order as they would appear on the chromosome being described from pter
+      to qter.
+  - rule: ISH.BANDS_FROM_UCSC
+    cite: {section: "13.2", page: 101, para: "¶1"}
+    text: >-
+      The band designation for the locus should be based on the current UCSC Genome Browser.
+  - rule: ISH.STRUCTURAL_FORMAT
+    cite: {section: "13.2", page: 101, para: "¶2"}
+    text: >-
+      Observations on structurally abnormal chromosomes are expressed by the symbol ish,
+      followed by a space and then the symbol for the structural abnormality (whether seen by
+      standard techniques and ish or only by ish), followed in separate parentheses by the
+      chromosome(s), the breakpoint(s), and the locus or loci for which probes were used.
+  - rule: ISH.BREAKPOINTS_OMITTED
+    cite: {section: "13.2", page: 101, para: "¶2"}
+    text: >-
+      followed in separate parentheses by the chromosome(s), the breakpoint(s), and the locus
+      or loci for which probes were used.
+  - rule: ISH.BREAKPOINTS_OMITTED
+    cite: {section: "13.2", page: 103, example: E30}
+    text: >-
+      A male karyotype with a t(9;22) that has been characterized by ish using a single-fusion
+      probe.
+  - rule: ISH.LOCUS_STATUS
+    cite: {section: "13.2", page: 101, para: "¶1"}
+    text: >-
+      the status of each locus is given immediately after the locus designation.
+  - rule: ISH.LOCUS_STATUS
+    cite: {section: "13.2", page: 101, para: "¶2"}
+    text: >-
+      Presence (+) or absence (–) is indicated within the same parentheses as the locus
+      designation.
+  - rule: ISH.ABNORMAL_SIGNAL_COUNT
+    cite: {section: "13.2", page: 101, para: "¶2"}
+    text: >-
+      When the number of signals on an abnormal chromosome can be counted, this may be
+      indicated by multiple “+” symbols.
+  - rule: ISH.ABNORMAL_SIGNAL_COUNT
+    cite: {section: "13.2", page: 105, para: "¶4"}
+    text: >-
+      An exception to using the multiplication sign can occur in cancer, as shown in these
+      examples below. When the number of signals can be counted, the number of signals should
+      be listed.
+  - rule: ISH.NORMAL_CHROMOSOME_FORMAT
+    cite: {section: "13.2", page: 101, para: "¶3"}
+    text: >-
+      Observations on normal chromosomes are expressed by the symbol ish followed by a space and
+      the chromosome, region, band, or sub-band designation of the locus or loci tested (not in
+      parentheses), followed in parentheses by the locus (loci) tested, a multiplication sign
+      (×) and the number of signals seen.
+  - rule: ISH.INVERSION_SEPARATE_BREAKPOINTS
+    cite: {section: "13.2", page: 103, example: E29}
+    text: >-
+      Note that the inversion breakpoints are in separate parentheses to make the FISH
+      information apparent.
+  - rule: ISH.INVERSION_SEPARATE_BREAKPOINTS
+    cite: {section: "13.2", page: 104, example: E35}
+    text: >-
+      Note in this and the following examples that the inversion breakpoints are in separate
+      parentheses to make the FISH information apparent.
+  - rule: ISH.CELL_LINES
+    cite: {section: "13.2", page: 105, example: E46}
+    text: >-
+      The number of cells, not percentage, is given in square brackets.
+  - rule: ISH.CELL_LINES
+    cite: {section: "13.2", page: 105, example: E47}
+    text: >-
+      Probe DXZ1, for the X alpha-satellite, showed the ring to be monocentric in some cells and
+      dicentric in other cells.
+  - rule: ISH.RELEVANT_RESULTS_ONLY
+    cite: {section: "13.2", page: 101, example: E6}
+    text: >-
+      Only the clinically relevant or informative results need to be in the karyotype. Both
+      examples describe a deletion of the ARSA locus after using a cocktail containing the ARSA
+      and HIRA loci. Either example is correct.
+  - rule: ISH.SIGNAL_QUALIFIERS
+    cite: {section: "13.2", page: 105, para: "¶5"}
+    text: >-
+      The abbreviation amp can be used if the number of signals cannot be enumerated.
+  - rule: ISH.SIGNAL_QUALIFIERS
+    cite: {section: "13.2.1", page: 105, example: E1}
+    text: >-
+      On the deleted chromosome, the signals of clones RP1-112K5 (Xp11.2) and RP11-265P11
+      (Xp11.4) are consistently less intense than on the normal homologue, indicating that they
+      are partially deleted and recognize the proximal and distal breakpoints respectively.

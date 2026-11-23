@@ -150,6 +150,7 @@ internal static class InvalidExampleExpectations
             ["45,XX,rob(13;21)(q10;q10)"] = [], // ROB.NOT_ACQUIRED
             ["45,XY,rob(14;21)(p11.2;p11.2)"] = [], // ROB.DICENTRIC_USE_DIC
             ["45,XY,der(14;21)(p11.2;p11.2)"] = [], // ROB.DICENTRIC_USE_DIC
+            ["45,XY,der(14;21)(p11.2;p11.2).ish dic(14;21)(p11.2p11.2)(D14Z1/D22Z1+;D13Z1/D21Z1+)"] = [], // ROB.DICENTRIC_USE_DIC (§13.2 E22; the ish segment is not parsed yet)
             ["46,XX,t(1;7)(p36.3;q11.2)[4]/46,XX,t(4;7)(q35;q11.2)[6]/46,XX,t(7;9)(q11.2;p24)[3]"] = [], // TRANSLOC.JUMPING
             ["44,XX,trc(9;12;4)(q34;p13q22;q31.2)"] = [], // TRC.FORMAT
             ["46,XX,trp(1)(q21;q32)"] = [], // TRP.FORMAT
@@ -174,6 +175,7 @@ internal static class InvalidExampleExpectations
             ["68<3n>,XY,–Y[10]"] = [], // SEX.UNEVEN_PLOIDY_MALE
             ["45,XY,–7[5]/46,idem,+8[6]/46,XY,t(9;22)(q34;q11.2)[3]/92,XXYY,t(9;22)×2[5]/93,XXYY,t(9;22)×2,+8[2]"] = [], // KARYO.ABNORMALITY_ORDER (§11.1.4 E7, printed)
             ["47,XY,+mar.arr[GRCh38] 1p12p11.2(117596421_121013236)×3 dn.ish r(1)(p13.1q11?)(D1Z1+)"] = [], // ARR.COMBINED_WITH_OTHER_METHODS
+            ["46,XY.ish22q11.2(D22S75×2)"] = [], // ISH.COMBINED_WITH_KARYOTYPE (fault in the ish segment, not parsed yet)
             // arr (T-034): the parser keeps these faults in the tree; the checks report them.
             ["arr (1–22,X)×2"] = [], // SYM.NO_SPACE_AT_PARENTHESIS
             ["arr[GRCh38] 6q21q6q25.1(113900000_149100000)×1"] = [], // ARR.REGION_FORMAT

@@ -1,4 +1,66 @@
+46,XX.ish der(4)t(4;11)(p16.3;p15)mat(wcp11+,D4F26–,D4S96+,D4Z1+)
+45,XY,der(14;21)(p11.2;p11.2).ish dic(14;21)(p11.2p11.2)(D14Z1/D22Z1+;D13Z1/D21Z1+)
+45,XY,dic(14;21)(p11.2;p11.2).ish dic(14;21)(p11.2p11.2)(D14Z1/D22Z1+;D13Z1/D21Z1+)
 46,XX,del(20)(q11.2q13.3)[1]/46,XX[19].nuc ish(D20S108×1)[40/200]
+46,XX.ish del(22)(q11.2q11.2)(D22S75–)
+46,XX.ish t(4;11)(p16.3;p15)(wcp11+,D4F26–,D4S96+,D4Z1+;D4F26+,wcp11+)
+46,XX.ish ins(15;17)(q22;q21q21)(PML+,RARA+;RARA+)
+45,XY,dic(14;21)(p11.2;p11.2).ish dic(14;21)(p11.2;p11.2)(D14Z1/D22Z1+;D13Z1/D21Z1+)
+46,XY.ish 22q11.2(D22S75×2)
+46,XX,del(15)(q11.2q13).ish del(15)(q11.2q11.2)(SNRPN–,D15S10–)
+46,XY.ish22q11.2(D22S75×2)
+46,XY.ish del(15)(q11.2q12)(D15S11+,SNRPN–,D15S10–,GABRB3+)
+46,XX,add(4)(p16.3).ish dup(4)(p15.2p16.3)(RP11-1076P8+,WHS+,wcp4+)
+46,X,r(X).ish r(X)(p22.3q21)(KAL+,DXZ1+,XIST+,DXZ4–)
+46,XX,inv(16)(p13.1q22)[20].ish inv(16)(p13.1)(RP11-620P11+)(q22)(RP11-620P11+)[20]
+46,XX,t(2;17)(q32;q24)[20].ish t(2;17)(AC005181+;AC005181+)[20]
+46,XX,t(2;17)(q32;q24)[20].ish t(2;17)(CTD-3115L8+;RP11-959M22+)[20]
+46,XX.ish del(22)(q11.2q11.2)(d22s75–)
+45,XY,der(14;21)(q10;q10).ish dic(14;21)(p11.2;p11.2)(D14Z1/D22Z1+;D13Z1/D21Z1+)
+46,XX,t(9;22)(q34;q11.2)[20].ish t(9;22)(ABL1+,BCR+;BCR+,ABL1+)[20]
+46,XX,t(16;16)(p13.1;q22)[20].ish t(16;16)(3′CBFB+;3′CBFB–)[20]
+46,XY.ish del(15)(q11.2q11.2)(SNRPN–D15S10–)
+46,XY.ish del(15)(q11.2q11.2)(SNRPN–,D15S10–)
+46,XY.ish del(15)(q11.2q11.2)(SNRPN–;D15S10–)
+46,XY.ish del(15)(q11.2q12)(GABRB3+,D15S10–,SNRPN–,D15S11+)
+46,XY.ish 17p11.2(RAI1×2)
+46,XX.ish del(7)(q11.23q11.23)(ELN–)
+46,XX,add(4)(q31).ish der(4)dup(4)(q31q34)(wcp4+)add(4)(q34)(wcp4–)
+46,XX.ish der(X)t(X;Y)(p22.3;p11.3)(SRY+)
+46,XX.ish X(DXZ1×2),der(7)(q3?)(SRY+)
+46,XX,t(9;22)(q34;q11.2)[20].ish der(9)t(9;22)del(9)(q34q34)(ABL1–,BCR+),der(22)t(9;22)(BCR+,ABL1+)[20]
+46,XX,t(9;22)(q34;q11.2)[20].ish der(9)t(9;22)del(9)(q34q34)(ASS1–,ABL1–,BCR+),der(22)t(9;22)(BCR+,ABL1+)[20]
+47,XY,+mar.ish add(17)(p12)(wcp17+,CMT1A+,D17Z1+)
+47,XX,+mar.ish add(16)(p or q)(wcp16+,D16Z1+)
+46,X,+r.ish r(X)(wcpX+,DXZ1+)
+46,XX,ins(2)(p13q21q31).ish ins(2)(wcp2+)
+46,XY,ins(5;2)(p14;q32q22).ish ins(5;2)(wcp2+)
+46,XY,t(9;22)(q34;q11.2)[20].ish t(9;22)(ABL1–;BCR+,ABL1+)[20]
+47,XY,t(9;22)(q34;q11.2),+der(22)t(9;22)[20].ish t(9;22)(ABL1–;BCR+,ABL1+),der(22)(BCR+,ABL1+)[20]
+47,XY,+mar.ish der(8)(D8Z1+)
+47,XY,+mar.ish der(17)(wcp17+,D17Z1+)
+47,XX,+mar.ish der(18)t(18;19)(wcp18+,D18Z1+,wcp19+)
+46,XX.ish del(22)(q11.2q11.2)(–D22S75)
+46,XX.ish del(22)(q11.2q11.2)(D22S75)–
+46,XX.ish del(22)(q11.2q11.2)(D22S75)
+46,XY.ish dup(17)(p11.2p11.2)(RAI1++)
+46,X,?i(Y)(p10).ish idic(Y)(q11)(DYZ3++,DYZ1–)
+46,XY.ish dup(17)(p11.2p11.2)(RAI1×2)
+46,XX.ish X(DXZ1×2,SRY×0)
+46,XY.ish 4p16.3(D4F26,D4S96)×2
+46,XY.ish (22q11.2)(D22S75×2)
+46,XY.ish 22q11.2(D22S75+)
+46,XX.ish inv(21)(q11.2q22.1)(q11.2)(RUNX1+)(q22.1)(RUNX1–)
+46,XX,inv(16)(p13.1q22)[20].ish inv(16)(p13.1)(5′CBFB+)(q22)(3′CBFB+)[20]
+46,XX,inv(16)(p13.1q22).ish inv(16)(p13.1)(MYH11+,CBFB+)(q22)(MYH11+,CBFB+)
+46,XX,inv(16)(p13.1q22).ish inv(16)(p13.1q22)(MYH11+,CBFB+;MYH11+,CBFB+)
+mos 46,X,+r[15]/45,X[10].ish r(X)(wcpX+,DXZ1+)
+46,X,+r.ish r(X)(wcpX+,DXZ1+)[15]/r(X)(wcpX+,DXZ1++)[10]
+mos 45,X[3]/46,XY[12].ish X(DXZ1×1,SRY×0)[32]/X(DXZ1×1),Y(SRY×1)[68]
+46,X,+r.ish r(X)(wcpX+,DXZ1+)[60%]/r(X)(wcpX+,DXZ1++)[40%]
+46,Y,del(X)(p11.2p11.4).ish del(X)(p11.2p11.4)(RP1-112K5 dim,RP11-265P11 dim)
+46,XX.ish 17p11.2(RAI1 enh)
+46,XX.ish 17p11.2(RAI1enh)
 47,XY,+mar.arr[GRCh38] 1p12p11.2(117596421_121013236)×3 dn
 47,XY,+mar.ish r(1)(p13.1q11?)(D1Z1+).arr[GRCh38] 1p12p11.2(117596421_121013236)×3 dn
 47,XY,+mar.arr[GRCh38] 1p12p11.2(117596421_121013236)×3 dn,15q25.1q26.3(78932946_100201136)×3 dn

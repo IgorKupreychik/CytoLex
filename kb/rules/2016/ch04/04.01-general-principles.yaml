@@ -534,7 +534,7 @@ rules:
 
   - id: KARYO.PARENTAL_ORIGIN
     title: inh / mat / pat / dn directly after the abnormality
-    applies_to: [karyotype]
+    applies_to: [karyotype, ish]
     severity: error
     statement: >-
       A known inherited abnormality may be marked inh; when the parent is known, mat (mother) or
@@ -551,12 +551,23 @@ rules:
           cite: {section: "4.1", page: 39, para: "¶13"}
         - text: "46,XY,t(5;6)(q34;q23)mat,inv(14)(q12q31)dn"
           cite: {section: "4.1", page: 39, para: "¶13"}
+        - text: "46,XX.ish der(4)t(4;11)(p16.3;p15)mat(wcp11+,D4F26–,D4S96+,D4Z1+)"
+          cite: {section: "13.2", page: 103, example: E24}
+          note: In an ish result mat stands after the breakpoints, before the loci.
+        - text: "ish del(14)(q21.2q21.2)(RP11-453F20–)dn[6]/14q21.2(RP11-453F20×2)[4]"
+          cite: {section: "13.2", page: 105, example: E49}
+          note: Here dn stands after the loci, before the cell count.
       invalid:
         - text: "46,XX,t(5;6)(q34;q23),mat"
           why: mat belongs to the translocation and follows it directly, not as a separate comma-separated item.
           corrected: "46,XX,t(5;6)(q34;q23)mat"
     fix: {level: 1, kind: delete, hint: Remove the comma (or space) between the abnormality and inh/mat/pat/dn.}
-    review: {paraphrase_checked: true, needs_review: false}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        T-015 added ish to applies_to with §13.2 E24 and E49. The two ish examples place the
+        term differently (mat before the loci, dn after them); the book states no rule for ish.
     related: [KARYO.DE_NOVO_SPACE, ARR.INHERITANCE_SPACING]
 
   - id: KARYO.DE_NOVO_SPACE

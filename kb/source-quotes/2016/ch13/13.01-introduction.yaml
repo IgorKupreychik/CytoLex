@@ -1,0 +1,10 @@
+version: "2016"
+section: "13.1"
+quotes:
+  - rule: ISH.CRYPTIC_NOT_IN_KARYOTYPE
+    cite: {section: "13.1", page: 100, para: "¶3"}
+    text: >-
+      If FISH further clarifies the karyotype and, in retrospect, the abnormality can be
+      visualized with banding, the karyotype may be re-written to reflect this new FISH
+      information. If the abnormality is cryptic and cannot be visualized by banding, the
+      abnormality should not be listed in the banded karyotype.

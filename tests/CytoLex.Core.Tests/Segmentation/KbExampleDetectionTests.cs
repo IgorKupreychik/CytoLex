@@ -3,7 +3,10 @@ using CytoLex.Core.Tests.KbExamples;
 
 namespace CytoLex.Core.Tests.Segmentation;
 
-/// <summary>T-026 acceptance: every KB example is split losslessly and its type is detected as its rule's <c>applies_to</c>.</summary>
+/// <summary>
+/// T-026 acceptance: every KB example is split losslessly and one of its segment types is its rule's <c>applies_to</c>
+/// (any segment since T-015: a combined string such as <c>46,XY.ish …</c> illustrates an ish rule).
+/// </summary>
 public class KbExampleDetectionTests
 {
     [Fact]
@@ -32,10 +35,10 @@ public class KbExampleDetectionTests
             }
 
             checkedCases++;
-            var type = Segmenter.Split(c.CheckedText)[0].Type.ToKbName();
-            if (!c.Rule.AppliesTo.Contains(type))
+            var types = Segmenter.Split(c.CheckedText).Select(s => s.Type.ToKbName()).Distinct(StringComparer.Ordinal).ToList();
+            if (!types.Any(c.Rule.AppliesTo.Contains))
             {
-                mismatches.Add($"{c.DisplayName}: detected {type}, rule applies to {string.Join(", ", c.Rule.AppliesTo)}");
+                mismatches.Add($"{c.DisplayName}: detected {string.Join(", ", types)}, rule applies to {string.Join(", ", c.Rule.AppliesTo)}");
             }
         }
 
@@ -44,16 +47,17 @@ public class KbExampleDetectionTests
     }
 
     [Fact]
-    public void KbExamples_CoverKaryotypeAndArr()
+    public void KbExamples_CoverKaryotypeIshAndArr()
     {
-        // The 2016 KB (ch. 2–9 so far) has whole-string examples of these types; the other types are
-        // covered by SegmenterTests until their chapters (T-015–T-019) add examples.
+        // The 2016 KB has whole-string examples of these types; the other types are covered by
+        // SegmenterTests until their chapters (T-016, T-018, T-019) add examples.
         var detected = KbCatalog.Default.Cases
             .Where(c => !c.IsFragment)
             .SelectMany(c => Segmenter.Split(c.CheckedText).Select(s => s.Type.ToKbName()))
             .ToHashSet(StringComparer.Ordinal);
 
         Assert.Contains("karyotype", detected);
+        Assert.Contains("ish", detected);
         Assert.Contains("arr", detected);
     }
 }
