@@ -1,0 +1,15 @@
+version: "2016"
+section: "10.2.2"
+quotes:
+  - rule: BREAKAGE.BANDED_NOMENCLATURE
+    cite: {section: "10", page: 81, para: "¶1"}
+    text: >-
+      This section provides a nomenclature for the chromatid and chromosome aberrations that may
+      be observed in, for example, constitutional chromosome breakage syndromes or following
+      clastogenic exposure.
+  - rule: BREAKAGE.BANDED_NOMENCLATURE
+    cite: {section: "10.2.2", page: 83, para: "¶1"}
+    text: >-
+      When banded preparations allow adequate identification of chromosome segments or
+      chromosome aberrations, the nomenclature system recommended throughout this book can be
+      used. When not, the observations can be described in words.

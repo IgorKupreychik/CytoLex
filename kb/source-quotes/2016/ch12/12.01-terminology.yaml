@@ -1,0 +1,80 @@
+version: "2016"
+section: "12.1"
+quotes:
+  - rule: MEIOSIS.CELL_FORMAT
+    cite: {section: "12.1", page: 92, para: "¶1"}
+    text: >-
+      The symbols PI, MI, AI, MII, and AII are used to indicate the stage of meiosis, namely,
+      prophase of the first division, first metaphase (including diakinesis), first anaphase,
+      second metaphase, and second anaphase. This is followed by the total count of separate
+      chromosomal elements. The sex chromosomes are then indicated by XY or XX when associated
+      and as X,Y when separate.
+  - rule: MEIOSIS.VALENT_DESIGNATION
+    cite: {section: "12.1", page: 92, para: "¶1"}
+    text: >-
+      Any additional, missing, or abnormal element follows, with that element specified within
+      parentheses and preceded by the Roman numeral I, II, III, or IV to indicate if it is a
+      univalent, bivalent, trivalent, or quadrivalent, respectively.
+  - rule: MEIOSIS.VALENT_DESIGNATION
+    cite: {section: "12.1", page: 93, para: "¶6"}
+    text: >-
+      Chromosomes participating in a bivalent or multivalent are specified within parentheses
+      after the Roman numeral that describes the bivalent (II) or the type of multivalent (III,
+      IV, etc.).
+  - rule: MEIOSIS.GAIN_LOSS_SIGNS
+    cite: {section: "12.1", page: 92, para: "¶1"}
+    text: >-
+      The absence of a particular element is indicated by a minus (–) sign. The plus (+) sign is
+      used in first metaphase only when the additional chromosome is not included in a
+      multivalent.
+  - rule: MEIOSIS.STANDARD_NOMENCLATURE
+    cite: {section: "12.1", page: 92, para: "¶1"}
+    text: >-
+      The chromosomes involved in a rearrangement are listed numerically within parentheses and
+      separated by a semicolon (;).
+  - rule: MEIOSIS.STANDARD_NOMENCLATURE
+    cite: {section: "12.1", page: 92, para: "¶2"}
+    text: >-
+      A more detailed description, for instance, of the chromosomal segments involved in a
+      rearrangement may be included within parentheses using the standard nomenclature, with
+      which this meiotic notation has been designed to conform.
+  - rule: MEIOSIS.STANDARD_NOMENCLATURE
+    cite: {section: "12.1", page: 93, para: "¶6"}
+    text: >-
+      It is assumed that a careful description of the mitotic karyotype of the subject will be
+      given separately.
+  - rule: MEIOSIS.SEX_AND_STAGE_SYMBOLS
+    cite: {section: "12.1", page: 92, para: "¶2"}
+    text: >-
+      When necessary, use of the symbols fem and mal is recommended for female and male,
+      respectively, and when a more detailed description of different premeiotic and meiotic
+      stages is required, the following symbols may be used:
+  - rule: MEIOSIS.CHIASMA_COUNT
+    cite: {section: "12.1", page: 93, para: "¶3"}
+    text: >-
+      The symbol xma is suggested for chiasma(ta). The total number of chiasmata in a cell can be
+      designated by placing this symbol, followed by an equal sign (=) and a two-digit number, in
+      parentheses, e.g., (xma=52). In the case of a meiotic cell with a low number of chiasmata,
+      a single digit should be preceded by a zero, e.g., (xma=09).
+  - rule: MEIOSIS.CHIASMA_COUNT
+    cite: {section: "12.1", page: 93, para: "¶4"}
+    text: >-
+      The number of chiasmata in a bivalent or multivalent or their arms may be indicated by a
+      single digit, e.g., (xma=4).
+  - rule: MEIOSIS.CHIASMA_LOCATION
+    cite: {section: "12.1", page: 93, para: "¶5"}
+    text: >-
+      Location of chiasmata can be indicated by the standard arm symbols p and q, supplemented by
+      prx for proximal, med for medial, dis for distal, and ter for terminal. The band or region
+      number can be used when such precise information is available.
+  - rule: MEIOSIS.MULTIVALENT_CHIASMATA
+    cite: {section: "12.1", page: 93, para: "¶6"}
+    text: >-
+      If the number of chiasmata within the multivalent is known, this is indicated within
+      parentheses in consecutive order, i.e., the number of chiasmata between the first and
+      second chromosome is given first, between the second and the third next, etc. The last
+      figure then indicates the number of chiasmata between the last and first chromosome. If
+      the number of chiasmata in non-interstitial and interstitial segments can be specified
+      separately, these should be represented by a plus (+) sign. The number of chiasmata in the
+      non-interstitial segment is written first, e.g., (xma=2+1), indicating two chiasmata in the
+      non-interstitial and one in the interstitial segment.

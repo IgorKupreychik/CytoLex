@@ -1,0 +1,27 @@
+version: "2016"
+section: "12.1.2"
+rules:
+  - id: MEIOSIS.PACHYTENE_BANDS
+    title: Pachytene chromomeres are named in the 850-band nomenclature
+    applies_to: [meiotic]
+    context: [meiotic]
+    severity: info
+    statement: >-
+      Pachytene bivalents are described with the band nomenclature of somatic chromosomes at the
+      850-band stage, which corresponds roughly to mid-pachytene: chromomeres take the numbers of
+      the Giemsa-positive bands and inter-chromomere regions those of the Giemsa-negative bands
+      (Fig. 10, chromomere idiogram of the 22 autosomal bivalents).
+    cite:
+      - {section: "12.1.2", page: 95, para: "¶2"}
+      - {section: "12.1.2", page: 96, float: "Fig. 10"}
+    examples:
+      valid: []
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info (T-056): names the band set used; a band name is checked against the bands
+        (BAND.MUST_EXIST) like any other. Fig. 10 is an image; the text and its caption state the
+        rule, so the drawing adds nothing the rule depends on. ¶1 and §12 (staining of meiotic
+        chromosomes) give no notation rule.
+    related: [BAND.MUST_EXIST]

@@ -1,0 +1,87 @@
+version: "2016"
+section: "10.1.1"
+rules:
+  - id: BREAKAGE.CHROMATID_ABERRATIONS
+    title: "Chromatid aberrations: cht, chtg, chtb, cht del, cht inv"
+    applies_to: [breakage]
+    severity: info
+    statement: >-
+      A chromatid (cht) aberration involves only one chromatid of a chromosome at a given locus.
+      A chromatid gap (chtg) is a non-staining region of one chromatid with minimal misalignment;
+      a chromatid break (chtb) is a discontinuity of one chromatid with clear misalignment. In
+      banded preparations a chromatid deletion (cht del, a banded sequence missing from one of
+      the two chromatids) and a chromatid inversion (cht inv, a banded sequence of one chromatid
+      reversed) can be recognized; both are subclasses of chromatid exchanges (chte).
+    cite:
+      - {section: "10.1.1", page: 81, para: "¶1"}
+      - {section: "10.1.1", page: 81, para: "¶2"}
+      - {section: "10.1.1", page: 81, para: "¶3"}
+      - {section: "10.1.2", page: 82, para: "¶1"}
+    examples:
+      valid:
+        - text: "chtg(4)(q25)"
+          cite: {section: "10.1.2", page: 82, example: E1}
+        - text: "chtb(4)(q25)"
+          cite: {section: "10.1.2", page: 82, example: E1}
+        - text: "cht del(1)(q12q25)"
+          cite: {section: "10.1.2", page: 82, example: E1}
+        - text: "cht inv(1)(q12q25)"
+          cite: {section: "10.1.2", page: 82, example: E1}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info (T-056): definitions of the symbols; whether a lesion is a gap or a break is
+        seen on the slide, not in the string. The location format is BREAKAGE.LOCATION_FORMAT.
+    related: [BREAKAGE.LOCATION_FORMAT, BREAKAGE.EXCHANGE_CONFIGURATION, BREAKAGE.CHROMOSOME_ABERRATIONS]
+
+  - id: BREAKAGE.EXCHANGE_CONFIGURATION
+    title: "Chromatid exchanges (chte): tr, qr, cx and the number of centromeres"
+    applies_to: [breakage]
+    severity: info
+    statement: >-
+      A chromatid exchange (chte) results from two or more chromatid lesions and the
+      rearrangement of chromatid material, between chromatids of different chromosomes
+      (interchange) or between or within chromatids of one chromosome (intrachange). For an
+      interchange it is usually enough to state the configuration: triradial (tr) with three
+      arms, quadriradial (qr) with four, complex (cx) with more than four; the number of
+      centromeres may follow in parentheses (1 cen, 2 cen). Exchanges may be classified further
+      as symmetrical or asymmetrical (the latter always leave an acentric fragment), complete or
+      incomplete, and an incomplete asymmetrical exchange as proximal or distal. Intra-arm events
+      include duplications, deletions, paracentric inversions and isochromatid breaks with sister
+      reunion. The terms are descriptive and imply nothing about how the aberration arose.
+    cite:
+      - {section: "10.1.1", page: 81, para: "¶4"}
+    examples:
+      valid:
+        - text: "chte(4;10)(q25;q22)"
+          cite: {section: "10.1.2", page: 82, example: E1}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info (T-056): classification terms for describing exchanges; the book prints no
+        string with tr, qr, cx or "(2 cen)", so their written form is not inferred here.
+    related: [BREAKAGE.CHROMATID_ABERRATIONS, BREAKAGE.LOCATION_FORMAT, BREAKAGE.SCORING]
+
+  - id: BREAKAGE.SISTER_CHROMATID_EXCHANGE
+    title: sce for sister chromatid exchange
+    applies_to: [breakage]
+    severity: info
+    statement: >-
+      A sister chromatid exchange, the interchange of homologous segments between the two
+      chromatids of one chromosome, is detectable only with special staining methods and can be
+      written with the symbol sce.
+    cite:
+      - {section: "10.1.1", page: 81, para: "¶5"}
+    examples:
+      valid:
+        - text: "sce(4)(q25q33)"
+          cite: {section: "10.1.2", page: 82, example: E1}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info (T-056): defines the symbol; the staining method can't be seen in the
+        string.
+    related: [BREAKAGE.LOCATION_FORMAT]

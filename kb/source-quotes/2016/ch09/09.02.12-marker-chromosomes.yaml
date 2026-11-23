@@ -10,6 +10,11 @@ quotes:
     cite: {section: "9.2.12", page: 70, para: "¶1"}
     text: >-
       In the description of a karyotype, the presence of a mar must be preceded by a plus sign (+).
+  - rule: MAR.PLUS_SIGN
+    cite: {section: "10.2.1", page: 83, para: "¶9"}
+    text: >-
+      A marker chromosome (mar) is a structurally rearranged chromosome in which no part can be
+      identified (see Section 9.2.12).
   - rule: MAR.NO_SIZE_MORPHOLOGY
     cite: {section: "9.2.12", page: 70, para: "¶1"}
     text: >-

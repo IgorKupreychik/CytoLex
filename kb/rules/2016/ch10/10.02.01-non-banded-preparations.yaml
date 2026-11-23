@@ -1,0 +1,116 @@
+version: "2016"
+section: "10.2.1"
+rules:
+  - id: BREAKAGE.CHROMOSOME_ABERRATIONS
+    title: "Chromosome aberrations: chr, chrg, chrb, chre"
+    applies_to: [breakage]
+    severity: info
+    statement: >-
+      A chromosome (chr) aberration involves both chromatids of a chromosome at the same locus.
+      A chromosome gap (chrg; also isolocus or isochromatid gap) is a non-staining region at the
+      same locus in both chromatids with minimal misalignment. A chromosome break (chrb; also
+      isolocus or isochromatid break) is a discontinuity at the same locus in both chromatids,
+      giving an acentric fragment and an abnormal monocentric chromosome; chrb is used only when
+      the morphology shows that the fragment comes from a single event, otherwise the fragment is
+      an acentric fragment (ace). A chromosome exchange (chre) results from two or more
+      chromosome lesions and the relocation of both chromatids to a new position on the same or
+      another chromosome; it is symmetrical (e.g. a reciprocal translocation) or asymmetrical
+      (e.g. a dicentric).
+    cite:
+      - {section: "10.2.1", page: 82, para: "¶1"}
+      - {section: "10.2.1", page: 82, para: "¶2"}
+      - {section: "10.2.1", page: 82, para: "¶3"}
+      - {section: "10.2.1", page: 82, para: "¶4"}
+    examples:
+      valid: []
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info (T-056): definitions; whether a fragment comes from a single event is seen
+        on the slide, not in the string. No chr string is printed; the location format of
+        §10.1.2 (BREAKAGE.LOCATION_FORMAT) is stated for chromatid aberrations only.
+    related: [BREAKAGE.CHROMATID_ABERRATIONS, BREAKAGE.MINUTE, ACE.NOT_IN_KARYOTYPE]
+
+  - id: BREAKAGE.MINUTE
+    title: min for minutes; clonal double minutes in tumours are dmin
+    applies_to: [breakage]
+    severity: info
+    statement: >-
+      A minute (min) is an acentric fragment smaller than the width of one chromatid, single or
+      double. Double minutes present clonally in tumour cells are written dmin (§9.2.12).
+    cite:
+      - {section: "10.2.1", page: 82, para: "¶5"}
+    examples:
+      valid: []
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info (T-056): definition; no string is printed. The dmin format is
+        DMIN.FORMAT.
+    related: [DMIN.FORMAT, BREAKAGE.CHROMOSOME_ABERRATIONS]
+
+  - id: BREAKAGE.PULVERIZATION
+    title: "pvz for pulverization; one pulverized chromosome as pvz(n)"
+    applies_to: [breakage]
+    severity: error
+    statement: >-
+      Pulverization (pvz) is a cell with chromatid and/or chromosome gaps and breaks, not usually
+      associated with exchanges, too numerous to count. When only some chromosomes are pulverized
+      and the rest look normal, the pulverized chromosome is given in parentheses after pvz
+      (pvz(1) is a pulverized chromosome 1).
+    cite:
+      - {section: "10.2.1", page: 82, para: "¶6"}
+    examples:
+      valid:
+        - text: "pvz(1)"
+          cite: {section: "10.2.1", page: 82, para: "¶6"}
+      invalid:
+        - text: "pvz1"
+          why: The pulverized chromosome is written in parentheses after pvz.
+          corrected: "pvz(1)"
+    fix: {level: 1, kind: insert, hint: "Put the chromosome in parentheses after pvz."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Format read from the inline example pvz(1). The invalid example is inferred.
+        Chromothripsis (cth), defined in the same paragraph, is used after microarray analysis:
+        ARR.CHROMOTHRIPSIS cites ¶6.
+    related: [BREAKAGE.CHROMOSOME_ABERRATIONS, BREAKAGE.PREMATURE_CONDENSATION, ARR.CHROMOTHRIPSIS]
+
+  - id: BREAKAGE.PREMATURE_CONDENSATION
+    title: pcc for premature chromosome condensation
+    applies_to: [breakage]
+    severity: info
+    statement: >-
+      Premature chromosome condensation (pcc) occurs when an interphase nucleus is induced to
+      enter mitosis early. It may involve a G1 or a G2 nucleus; the chromatin of S-phase nuclei
+      with pcc often looks pulverized.
+    cite:
+      - {section: "10.2.1", page: 83, para: "¶7"}
+    examples:
+      valid: []
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: "Severity info (T-056): definition of the term; no string is printed."
+    related: [BREAKAGE.PULVERIZATION, BREAKAGE.PREMATURE_CENTROMERE_DIVISION]
+
+  - id: BREAKAGE.PREMATURE_CENTROMERE_DIVISION
+    title: pcd for premature centromere division
+    applies_to: [breakage]
+    severity: info
+    statement: >-
+      Premature centromere division (pcd) may describe the premature separation of centromeres
+      in metaphase; it may affect one or more chromosomes in a fraction of the cells.
+    cite:
+      - {section: "10.2.1", page: 83, para: "¶8"}
+    examples:
+      valid: []
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: "Severity info (T-056): definition of the term; no string is printed."
+    related: [BREAKAGE.PREMATURE_CONDENSATION]

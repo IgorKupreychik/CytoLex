@@ -106,7 +106,7 @@ Person check (`review.human`): `ok` for Table 1, Table 2, Table 3, Table 4 and S
 | Table 4 unbalanced gametes | 4.3.2.2 | 44 | 4 columns, 16 rows | segregation pattern given on its first row only, as printed |
 | Ploidy table | 11.1.6 | 90 | 4 columns, 12 rows | no caption; §11.2 refers to it ("given above"). **Indentation (sub-levels) and bold (near-x levels) are lost** — the names carry the hierarchy (Near-/Hypo-/Hyper-) |
 | Symbols | 3 | 34–36 | 2 columns, 131 rows, one ¶ per page | was missing ` \| ` on wide rows; wrapped descriptions joined |
-| Aberration groups | 10.3 | 83 | 2 columns, 3 rows | was a ¶ of run-together words |
+| Aberration groups | 10.3 | 83 | 2 columns, 3 rows | was a ¶ of run-together words. **Signed off 2026-11-23 (T-018):** all 6 cells match |
 | Alignment figure | 16.2 | 126 | 4 columns, 6 rows | **shading (chr2 light, chrX dark), bold (reference) and italic (alternative alignment) carry meaning and are lost** |
 
 ### Figures and diagrams
@@ -144,7 +144,11 @@ Person check (`review.human`): `ok` for Table 1, Table 2, Table 3, Table 4 and S
 - §11.1.5 ¶4 p.88 ("then the composite karyotype will be") correctly starts in lower case: the
   sentence continues after an example list.
 - §12.1 p.93: the terminology list (`spm | Spermatogonial metaphase`, …) is labelled as an
-  example (E1). Harmless; re-check when writing ch. 12 rules (T-018).
+  example (E1). Harmless; re-check when writing ch. 12 rules (T-018). **Checked in T-018:** it
+  is cited as E1 by `MEIOSIS.SEX_AND_STAGE_SYMBOLS` for the stage symbols, and none of its
+  rows is used as a notation string. §12.1.1 E8's description prints its alternative location
+  forms with a space, `(xma=4) (pter,pprx,qmed,qdis)`, unlike E8 itself; the valid examples
+  use E8's prefix and no space.
 - Ch. 13.1–13.2 (T-015): §13.2 E22, E31, E33, E34 and §13.2.2 E2 wrap inside parentheses or after
   `,` and are joined with no space. §13.2 E22 prints `der(14;21)(p11.2;p11.2)` for a proven
   dicentric (against §9.2.17.3 ¶4) and the ish misprint `dic(14;21)(p11.2p11.2)`; E15 prints `KAL`
@@ -169,7 +173,6 @@ checked):
 |---|---|---|
 | 4.3.2, 4.3.2.2, 4.4 | 43–45 | the Fig. 8/9 diagrams the text depends on (Table 4, p.44: signed off 2026-11-17). **Checked in T-009 (2026-11-17):** the printed figures add no rule content beyond the text, so the ch. 4 rules say so in `review.note` and keep `needs_review: false` |
 | 7.2, 9.2.3, 9.2.17.1, 16.3.7 | 53, 61–65, 75–76, 129 | underlined homologues (U+0332 in the source text; validator behaviour is T-042). §7.2: `FRA.HOMOLOGUE_UNDERLINING` (T-010) and §9.2.3: `DER.HOMOLOGUE_UNDERLINING` (T-012) carry `needs_review`; the other §9.2.3 rules cite no underlined block. §9.2.17.1: `TRANSLOC.HOMOLOGUE_UNDERLINING` (T-013) holds E8/E10 and carries `needs_review`; `TRANSLOC.FORMAT`, `STRUCT.CHROMOSOME_ORDER` and `STRUCT.MULTI_CHROMOSOME_ORDER` cite ¶1, whose underlining only demonstrates the words "single underlining", and use no underlined example |
-| 10.3 | 83 | small table — until `review.human: ok` |
 | 11.1.6 / 11.2 (Ploidy table) | 90 | table; indentation and bold lost. **Signed off 2026-11-20 (T-014):** all 48 cells match; the lost hierarchy is carried by the names (Near-/Hypo-/Hyper-), so rules that encode it from the names need no `needs_review` for this. Encoded in `PLOIDY.LEVELS` (T-014, `needs_review: false`) |
 | 13.3.2, 13.3.2.4 | 109–112 | signal positions shown only in drawings. **Checked by the user 2026-11-23 (T-016):** the nucleus drawings illustrate the strings (con/sep, ● and ○ legends kept in the chunks) and add no notation rule, so `NUC_ISH.SIGNAL_POSITION_FORMAT` and `NUC_ISH.BREAK_APART_FORMS` keep `needs_review: false` |
 | 13.4 | 112 | fibre diagram symbols lost. **Labels signed off 2026-11-23 (T-016):** legend labels (D15S11, SNRPN, GABRB3) and `pter`/`qter` match; the drawn symbols, the fibre line and the gene-name italics are lost. The locus order the drawing shows is stated in the text by E1's note, so rules citing E1 need no `needs_review` for it |

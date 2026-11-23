@@ -9,10 +9,10 @@ public enum NotationType
     /// <summary>Karyotype (ch. 4–9, 11); the default when a segment has no technique keyword.</summary>
     Karyotype,
 
-    /// <summary>Chromosome breakage (ch. 10). Not detected yet: recognised by markers inside a karyotype-shaped segment (T-018).</summary>
+    /// <summary>Chromosome breakage (ch. 10): a segment that starts with a breakage symbol (<c>chtg(4)(q25)</c>, <c>pvz(1)</c>; T-018).</summary>
     Breakage,
 
-    /// <summary>Meiotic notation (ch. 12). Not detected yet (T-018).</summary>
+    /// <summary>Meiotic notation (ch. 12): a segment that starts with a meiotic stage or sex symbol (<c>MI,23,XY</c>, <c>fem dia,…</c>; T-018).</summary>
     Meiotic,
 
     /// <summary>Metaphase in situ hybridization, <c>ish</c> (§13.2).</summary>

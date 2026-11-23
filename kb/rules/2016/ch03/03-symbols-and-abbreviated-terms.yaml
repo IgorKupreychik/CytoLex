@@ -48,7 +48,11 @@ rules:
         dim, enh, pcp, ×, ~, /, //, [ ], +, ?, der, t, add, dup, inv, mar, r, qter); the 5′/3′
         prefixes of §13.3.2.4 again belong to the locus names. The ">" of ×12~>50 (§13.3.1 E4,
         "more than 50") is not listed in that meaning: the list has < > only as the angle
-        brackets around a ploidy level.
+        brackets around a ploidy level. Ch. 10 and 12 (T-018): every symbol used is listed (cht,
+        chr, g, b, e, del, inv, sce, tr, qr, cx, cen, ace, min, dmin, pvz, cth, pcc, pcd, r, dic,
+        der, mar; PI, MI, AI, MII, AII, I–IV, fem, mal, spm, oom, lep, zyg, pac, dip, dit, dia,
+        xma, =, prx, med, dis, ter, pter, qter, +, –); chtg, chtb, chte, chrg, chrb, chre and
+        pprx, qmed, qdis are written as listed symbols joined without a space, as printed.
 
   - id: SYM.SPACE_BETWEEN_SYMBOLS
     title: Space between combined symbols

@@ -14,3 +14,8 @@ quotes:
     text: >-
       Chromothripsis (cth) refers to complex patterns of alternating copy number changes
       (normal, gain, or loss) along a chromosome or chromosomal segment.
+  - rule: ARR.CHROMOTHRIPSIS
+    cite: {section: "10.2.1", page: 82, para: "¶6"}
+    text: >-
+      As these complex rearrangements cannot be visualized on banded or non-banded chromosomes,
+      this symbol is used after microarray analysis (see Section 14.2.2).

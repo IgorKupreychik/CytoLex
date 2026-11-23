@@ -35,6 +35,19 @@ public class SegmenterTests
         { "inv(2)", ["karyotype"] },
         { "arrangement", ["karyotype"] },
         { "ishx", ["karyotype"] },
+        { "chtg(4)(q25)", ["breakage"] },
+        { "chtb(4)(q25)", ["breakage"] },
+        { "chte(4;10)(q25;q22)", ["breakage"] },
+        { "cht del(1)(q12q25)", ["breakage"] },
+        { "sce(4)(q25q33)", ["breakage"] },
+        { "pvz(1)", ["breakage"] },
+        { "chtx(4)", ["karyotype"] },
+        { "MI,23,XY", ["meiotic"] },
+        { "MII,22,X,–16,+16cht,+16cht", ["meiotic"] },
+        { "fem dia,II(2,2)(xma=4)", ["meiotic"] },
+        { "mal MI,III(14,14q21q,21)(xma=3)", ["meiotic"] },
+        { "MIX", ["karyotype"] },
+        { "47,XY,+16cht", ["karyotype"] },
         { "", ["karyotype"] },
     };
 
@@ -75,6 +88,17 @@ public class SegmenterTests
         Assert.Equal(" nuc ish(D21S65×3)[200]", nuc.Span.Of(input));
         Assert.Equal("nuc ish", nuc.Keyword!.Value.Of(input));
         Assert.Equal(["vocab:symbols/nuc", "vocab:symbols/ish"], nuc.KeywordVocabRefs);
+    }
+
+    [Fact]
+    public void Split_BreakageKeyword_RefersToBothListedSymbols()
+    {
+        const string input = "chtg(4)(q25)";
+        var segment = Assert.Single(Segmenter.Split(input));
+
+        Assert.Equal(NotationType.Breakage, segment.Type);
+        Assert.Equal("chtg", segment.Keyword!.Value.Of(input));
+        Assert.Equal(["vocab:symbols/cht", "vocab:symbols/g"], segment.KeywordVocabRefs);
     }
 
     [Fact]

@@ -1,0 +1,16 @@
+version: "2016"
+section: "10.3"
+quotes:
+  - rule: BREAKAGE.SCORING
+    cite: {section: "10.3", page: 83, para: "¶1"}
+    text: >-
+      In the scoring of aberrations, the main types are chtg, chtb, chte, chrg, chrb, ace, min,
+      r, dic, tr, qr, der, and mar, and reports should, where possible, give the data under these
+      headings. It is recognized, however, that aberrations are frequently grouped to give
+      adequate numbers for statistical analysis or for some other reason. When this is done, it
+      should be indicated how the groupings relate to the aberrations listed above, e.g.:
+  - rule: BREAKAGE.SCORING
+    cite: {section: "10.3", page: 83, para: "¶3"}
+    text: >-
+      The data should not be presented as deduced breakages per cell but in such a manner that it
+      is possible to calculate the number of aberrations per cell.

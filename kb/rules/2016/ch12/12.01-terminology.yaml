@@ -1,0 +1,290 @@
+version: "2016"
+section: "12.1"
+rules:
+  - id: MEIOSIS.CELL_FORMAT
+    title: "Meiotic cell: stage, element count, sex chromosomes, then other elements"
+    applies_to: [meiotic]
+    context: [meiotic]
+    severity: error
+    statement: >-
+      A meiotic cell is written as the stage of meiosis (PI prophase I, MI first metaphase
+      including diakinesis, AI first anaphase, MII second metaphase, AII second anaphase),
+      followed by the total count of separate chromosomal elements, then the sex chromosomes (XY
+      or XX when associated, X,Y when separate), then any additional, missing or abnormal
+      element; the parts are separated by commas.
+    cite:
+      - {section: "12.1", page: 92, para: "¶1"}
+    examples:
+      valid:
+        - text: "MI,23,XY"
+          cite: {section: "12.1.1", page: 93, example: E1}
+        - text: "MI,24,X,Y"
+          cite: {section: "12.1.1", page: 93, example: E2}
+        - text: "MI,23,XY,III(21)"
+          cite: {section: "12.1.1", page: 93, example: E3}
+        - text: "MI,24,XY,+I(21)"
+          cite: {section: "12.1.1", page: 93, example: E4}
+        - text: "MI,22,XY,III(13q14q)"
+          cite: {section: "12.1.1", page: 93, example: E5}
+        - text: "MI,23,XY,(xma=52)"
+          cite: {section: "12.1.1", page: 94, example: E6}
+        - text: "MI,23,X,Y,III(13,13q14q,14)(xma=2,1),(xma=51)"
+          cite: {section: "12.1.1", page: 94, example: E10}
+        - text: "MI,24,X,Y,III(2,der(2),5)(xma=4),I(der(5)),(xma=51)"
+          cite: {section: "12.1.1", page: 94, example: E12}
+        - text: "MII,22,X,–16,+16cht,+16cht"
+          cite: {section: "12.1.1", page: 94, example: E13}
+      invalid:
+        - text: "MI,XY,23"
+          why: The count of separate elements comes before the sex chromosomes.
+          corrected: "MI,23,XY"
+    fix: {level: 1, kind: reorder, hint: "Write the stage, the element count, the sex chromosomes, then the other elements."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Whether the sex chromosomes are associated (XY) or separate (X,Y) is seen in the cell, not
+        in the string. The invalid example is inferred. E13 prints a minus sign (–16) and a
+        chromatid (16cht) as the extra element.
+    related: [MEIOSIS.VALENT_DESIGNATION, MEIOSIS.GAIN_LOSS_SIGNS, MEIOSIS.SEX_AND_STAGE_SYMBOLS, MEIOSIS.CHIASMA_COUNT]
+
+  - id: MEIOSIS.VALENT_DESIGNATION
+    title: "Uni-, bi-, tri- and quadrivalents: I, II, III, IV(chromosomes)"
+    applies_to: [meiotic]
+    context: [meiotic]
+    severity: error
+    statement: >-
+      An additional, missing or abnormal element, or a bivalent or multivalent that is
+      described, is written in parentheses after the Roman numeral I, II, III or IV for a
+      univalent, bivalent, trivalent or quadrivalent; the chromosomes taking part are listed in
+      the parentheses (III(21), II(2,2), III(14,14q21q,21), IV(2,der(2),5,der(5))).
+    cite:
+      - {section: "12.1", page: 92, para: "¶1"}
+      - {section: "12.1", page: 93, para: "¶6"}
+    examples:
+      valid:
+        - text: "MI,23,XY,III(21)"
+          cite: {section: "12.1.1", page: 93, example: E3}
+        - text: "MI,24,XY,+I(21)"
+          cite: {section: "12.1.1", page: 93, example: E4}
+        - text: "MI,22,XY,III(13q14q)"
+          cite: {section: "12.1.1", page: 93, example: E5}
+        - text: "fem dia,II(2,2)(xma=4)"
+          cite: {section: "12.1.1", page: 94, example: E7}
+        - text: "mal MI,III(14,14q21q,21)(xma=3)"
+          cite: {section: "12.1.1", page: 94, example: E9}
+        - text: "fem dia,IV(2,der(2),5,der(5))(xma=2+1,1,1+0,1)"
+          cite: {section: "12.1.1", page: 94, example: E11}
+        - text: "MI,24,X,Y,III(2,der(2),5)(xma=4),I(der(5)),(xma=51)"
+          cite: {section: "12.1.1", page: 94, example: E12}
+      invalid:
+        - text: "MI,23,XY,3(21)"
+          why: A trivalent is designated by the Roman numeral III, not an Arabic number.
+          corrected: "MI,23,XY,III(21)"
+    fix: {level: 1, kind: replace, hint: "Use the Roman numeral I, II, III or IV before the parentheses."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The invalid example is inferred. Reading of ¶1 "listed numerically within parentheses
+        and separated by a semicolon": see MEIOSIS.STANDARD_NOMENCLATURE.
+    related: [MEIOSIS.CELL_FORMAT, MEIOSIS.GAIN_LOSS_SIGNS, MEIOSIS.MULTIVALENT_CHIASMATA, MEIOSIS.STANDARD_NOMENCLATURE]
+
+  - id: MEIOSIS.GAIN_LOSS_SIGNS
+    title: "– for an absent element; + in MI only outside a multivalent"
+    applies_to: [meiotic]
+    context: [meiotic]
+    severity: error
+    statement: >-
+      The absence of an element is written with a minus sign (–). The plus sign (+) is used in
+      first metaphase only for an additional chromosome that is not part of a multivalent (an
+      extra chromosome 21 as a univalent is +I(21); three chromosomes 21 in a trivalent are
+      III(21)).
+    cite:
+      - {section: "12.1", page: 92, para: "¶1"}
+    examples:
+      valid:
+        - text: "MI,23,XY,III(21)"
+          cite: {section: "12.1.1", page: 93, example: E3}
+        - text: "MI,24,XY,+I(21)"
+          cite: {section: "12.1.1", page: 93, example: E4}
+        - text: "MII,22,X,–16,+16cht,+16cht"
+          cite: {section: "12.1.1", page: 94, example: E13}
+      invalid:
+        - text: "MI,23,XY,+III(21)"
+          why: In first metaphase the plus sign is not used for a chromosome included in a multivalent.
+          corrected: "MI,23,XY,III(21)"
+    fix: {level: 1, kind: delete, hint: "Remove the plus sign before a multivalent."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: The invalid example is inferred from E3 vs E4.
+    related: [MEIOSIS.CELL_FORMAT, MEIOSIS.VALENT_DESIGNATION]
+
+  - id: MEIOSIS.STANDARD_NOMENCLATURE
+    title: Rearrangements in the standard nomenclature; mitotic karyotype given separately
+    applies_to: [meiotic]
+    context: [meiotic]
+    severity: info
+    statement: >-
+      The meiotic notation is designed to conform to the standard nomenclature. A more detailed
+      description, such as the chromosome segments involved in a rearrangement, may be given in
+      parentheses in the standard nomenclature (der(2), 14q21q), with the chromosomes of a
+      rearrangement listed in numerical order and separated by a semicolon as usual; the members
+      of a bivalent or multivalent are separated by commas. The mitotic karyotype of the subject
+      is described separately.
+    cite:
+      - {section: "12.1", page: 92, para: "¶1"}
+      - {section: "12.1", page: 92, para: "¶2"}
+      - {section: "12.1", page: 93, para: "¶6"}
+    examples:
+      valid:
+        - text: "fem dia,IV(2,der(2),5,der(5))(xma=2+1,1,1+0,1)"
+          cite: {section: "12.1.1", page: 94, example: E11}
+        - text: "MI,24,X,Y,III(2,der(2),5)(xma=4),I(der(5)),(xma=51)"
+          cite: {section: "12.1.1", page: 94, example: E12}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info (T-056): the separate mitotic karyotype can't be seen in the string.
+        Reading of ¶1 (decided with the user, T-018): "listed numerically within parentheses and
+        separated by a semicolon (;)" is read as the standard rearrangement notation, because
+        every multivalent example separates its members with commas (E7, E9–E12).
+    related: [MEIOSIS.VALENT_DESIGNATION, STRUCT.CHROMOSOME_ORDER]
+
+  - id: MEIOSIS.SEX_AND_STAGE_SYMBOLS
+    title: "fem/mal and the detailed stage symbols (spm, oom, lep, zyg, pac, dip, dit, dia)"
+    applies_to: [meiotic]
+    context: [meiotic]
+    severity: info
+    statement: >-
+      When needed, fem (female) and mal (male) are recommended. For more detailed premeiotic and
+      meiotic stages the symbols spm (spermatogonial metaphase), oom (oogonial metaphase), lep
+      (leptotene), zyg (zygotene), pac (pachytene), dip (diplotene), dit (dictyotene) and dia
+      (diakinesis) may be used. In the examples, fem or mal is followed by a space and the stage
+      (fem dia, mal MI).
+    cite:
+      - {section: "12.1", page: 92, para: "¶2"}
+      - {section: "12.1", page: 93, example: E1}
+    examples:
+      valid:
+        - text: "fem dia,II(2,2)(xma=4)"
+          cite: {section: "12.1.1", page: 94, example: E7}
+        - text: "fem dia,II(2,2)(xma=4)(p=2,q=2)"
+          cite: {section: "12.1.1", page: 94, example: E8}
+        - text: "mal MI,III(14,14q21q,21)(xma=3)"
+          cite: {section: "12.1.1", page: 94, example: E9}
+        - text: "fem dia,IV(2,der(2),5,der(5))(xma=2+1,1,1+0,1)"
+          cite: {section: "12.1.1", page: 94, example: E11}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info (T-056): optional symbols ("is recommended", "may be used"). §12.1 E1 is the
+        printed list of stage symbols (labelled as an example by the extraction), not notation
+        strings. The examples with fem dia give no element count and no sex chromosomes.
+    related: [MEIOSIS.CELL_FORMAT]
+
+  - id: MEIOSIS.CHIASMA_COUNT
+    title: "xma: (xma=NN) per cell with two digits, one digit per valent or arm"
+    applies_to: [meiotic]
+    context: [meiotic]
+    severity: error
+    statement: >-
+      Chiasmata are written xma. The total number in a cell is given in parentheses as xma, an
+      equal sign and a two-digit number ((xma=52)); a single digit is preceded by a zero
+      ((xma=09)). The number in a bivalent or multivalent, or in their arms, is a single digit
+      ((xma=4)).
+    cite:
+      - {section: "12.1", page: 93, para: "¶3"}
+      - {section: "12.1", page: 93, para: "¶4"}
+    examples:
+      valid:
+        - text: "MI,23,XY,(xma=52)"
+          cite: {section: "12.1.1", page: 94, example: E6}
+        - text: "fem dia,II(2,2)(xma=4)"
+          cite: {section: "12.1.1", page: 94, example: E7}
+        - text: "MI,23,X,Y,III(13,13q14q,14)(xma=2,1),(xma=51)"
+          cite: {section: "12.1.1", page: 94, example: E10}
+        - text: "MI,24,X,Y,III(2,der(2),5)(xma=4),I(der(5)),(xma=51)"
+          cite: {section: "12.1.1", page: 94, example: E12}
+        - text: "MI,23,XY,(xma=09)"
+          note: Inferred from ¶3's inline form (xma=09) in the cell position of E6.
+      invalid:
+        - text: "MI,23,XY,(xma=9)"
+          why: The total number of chiasmata in a cell has two digits; a single digit is preceded by a zero.
+          corrected: "MI,23,XY,(xma=09)"
+    fix: {level: 1, kind: insert, hint: "Write the cell total with two digits, e.g. (xma=09)."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        The inline forms (xma=52), (xma=09) and (xma=4) of ¶3–4 are covered by E6, the inferred
+        cell string and E7. The invalid example is inferred.
+    related: [MEIOSIS.CHIASMA_LOCATION, MEIOSIS.MULTIVALENT_CHIASMATA, MEIOSIS.CELL_FORMAT]
+
+  - id: MEIOSIS.CHIASMA_LOCATION
+    title: "Location of chiasmata: p/q with prx, med, dis, ter, or bands/regions"
+    applies_to: [meiotic]
+    context: [meiotic]
+    severity: error
+    statement: >-
+      The location of chiasmata may be given in parentheses after the chiasma count, with the arm
+      symbols p and q, as counts per arm ((p=2,q=2)) or one entry per chiasma combined with prx
+      (proximal), med (medial), dis (distal) and ter (terminal) ((pter,pprx,qmed,qdis)), or with
+      the region or band number when known ((pter,p1,q2,qter)).
+    cite:
+      - {section: "12.1", page: 93, para: "¶5"}
+      - {section: "12.1.1", page: 94, example: E8}
+    examples:
+      valid:
+        - text: "fem dia,II(2,2)(xma=4)(p=2,q=2)"
+          cite: {section: "12.1.1", page: 94, example: E8}
+        - text: "fem dia,II(2,2)(xma=4)(pter,pprx,qmed,qdis)"
+          note: >-
+            E8's description, completed with E8's prefix; the description prints a space before
+            the second parenthesis, "(xma=4) (pter,pprx,qmed,qdis)" (book inconsistency: no space
+            in E8 itself).
+        - text: "fem dia,II(2,2)(xma=4)(pter,p1,q2,qter)"
+          note: E8's description, completed with E8's prefix (printed with a space, as above).
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Format read from E8 and its description. No invalid example: the book gives no faulty
+        form and the vocabulary of positions is open (band numbers).
+    related: [MEIOSIS.CHIASMA_COUNT, MEIOSIS.MULTIVALENT_CHIASMATA]
+
+  - id: MEIOSIS.MULTIVALENT_CHIASMATA
+    title: "Chiasmata of a multivalent in consecutive order; a+b for non-interstitial + interstitial"
+    applies_to: [meiotic]
+    context: [meiotic]
+    severity: error
+    statement: >-
+      When the chiasmata within a multivalent are known, their numbers are given in parentheses
+      in consecutive order, separated by commas: between the first and second chromosome, then
+      the second and third, and so on; the last figure is between the last and the first
+      chromosome. When the chiasmata of the non-interstitial and interstitial segments are known
+      separately, they are joined by a plus sign, the non-interstitial number first ((xma=2+1)).
+    cite:
+      - {section: "12.1", page: 93, para: "¶6"}
+    examples:
+      valid:
+        - text: "MI,23,X,Y,III(13,13q14q,14)(xma=2,1),(xma=51)"
+          cite: {section: "12.1.1", page: 94, example: E10}
+        - text: "fem dia,IV(2,der(2),5,der(5))(xma=2+1,1,1+0,1)"
+          cite: {section: "12.1.1", page: 94, example: E11}
+      invalid:
+        - text: "MI,23,X,Y,III(13,13q14q,14)(xma=2;1),(xma=51)"
+          why: The chiasma numbers of a multivalent are separated by commas.
+          corrected: "MI,23,X,Y,III(13,13q14q,14)(xma=2,1),(xma=51)"
+    fix: {level: 1, kind: replace, hint: "Separate the chiasma numbers of a multivalent with commas."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Comma separator read from E10 and E11. E10 gives two figures for a trivalent (none for
+        the last–first pair); E11 gives four for a quadrivalent, the last showing a ring shape. The invalid example
+        is inferred.
+    related: [MEIOSIS.CHIASMA_COUNT, MEIOSIS.VALENT_DESIGNATION]

@@ -1,0 +1,46 @@
+version: "2016"
+section: "10.1.1"
+quotes:
+  - rule: BREAKAGE.CHROMATID_ABERRATIONS
+    cite: {section: "10.1.1", page: 81, para: "¶1"}
+    text: >-
+      A chromatid (cht) aberration involves only one chromatid in a chromosome at a given locus.
+  - rule: BREAKAGE.CHROMATID_ABERRATIONS
+    cite: {section: "10.1.1", page: 81, para: "¶2"}
+    text: >-
+      A chromatid gap (chtg) is a non-staining region (achromatic lesion) of a single chromatid
+      in which there is minimal misalignment of the chromatid.
+  - rule: BREAKAGE.CHROMATID_ABERRATIONS
+    cite: {section: "10.1.1", page: 81, para: "¶3"}
+    text: >-
+      A chromatid break (chtb) is a discontinuity of a single chromatid in which there is a clear
+      misalignment of one of the chromatids.
+  - rule: BREAKAGE.CHROMATID_ABERRATIONS
+    cite: {section: "10.1.2", page: 82, para: "¶1"}
+    text: >-
+      Some chromatid aberrations can be defined more precisely or can be recognized with
+      certainty only in banded preparations; e.g., a chromatid deletion (cht del) is the absence
+      of a banded sequence from only one of the two chromatids of a single chromosome. A
+      chromatid inversion (cht inv) is the reversal of a banded sequence of only one of the two
+      chromatids of a single chromosome. Both are subclasses of chromatid exchanges (chte).
+  - rule: BREAKAGE.EXCHANGE_CONFIGURATION
+    cite: {section: "10.1.1", page: 81, para: "¶4"}
+    text: >-
+      A chromatid exchange (chte) is the result of two or more chromatid lesions and the
+      subsequent rearrangement of chromatid material. Exchanges may be between chromatids of
+      different chromosomes (interchanges) or between or within chromatids of one chromosome
+      (intrachanges). In the case of interchanges, it will generally be sufficient to indicate
+      whether the configuration is triradial (tr) when there are three arms to the pattern,
+      quadriradial (qr) when there are four, or complex (cx) when there are more than four. The
+      number of centromeres may be indicated within parentheses (1 cen, 2 cen, etc.).
+  - rule: BREAKAGE.EXCHANGE_CONFIGURATION
+    cite: {section: "10.1.1", page: 81, para: "¶4"}
+    text: >-
+      It should be noted that these terms are only descriptive and do not imply knowledge of the
+      origin of the aberrations.
+  - rule: BREAKAGE.SISTER_CHROMATID_EXCHANGE
+    cite: {section: "10.1.1", page: 81, para: "¶5"}
+    text: >-
+      Sister chromatid exchange, detectable only by special staining methods, results from the
+      interchange of homologous segments between two chromatids of one chromosome. The symbol sce
+      can be used to describe this event.

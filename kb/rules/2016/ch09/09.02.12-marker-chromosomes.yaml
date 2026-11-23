@@ -12,6 +12,7 @@ rules:
       (+1~5mar).
     cite:
       - {section: "9.2.12", page: 70, para: "¶1"}
+      - {section: "10.2.1", page: 83, para: "¶9"}
     examples:
       valid:
         - text: "47,XX,+mar"
@@ -129,7 +130,7 @@ rules:
       note: >-
         "More than one metaphase" and "not counted" are not checkable from the string alone (the
         count check is NUM.COUNT_MATCHES_CHANGES). Placement: ORDER.UNIDENTIFIED_LAST.
-    related: [ORDER.UNIDENTIFIED_LAST, NUM.COUNT_MATCHES_CHANGES, ACE.NOT_IN_KARYOTYPE]
+    related: [ORDER.UNIDENTIFIED_LAST, NUM.COUNT_MATCHES_CHANGES, ACE.NOT_IN_KARYOTYPE, BREAKAGE.MINUTE]
 
   - id: ACE.NOT_IN_KARYOTYPE
     title: Acentric fragments other than dmin are not in the karyotype
@@ -150,5 +151,5 @@ rules:
     review:
       paraphrase_checked: true
       needs_review: false
-      note: ace in breakage studies is chapter 10 (T-018).
-    related: [DMIN.FORMAT]
+      note: ace in breakage studies is chapter 10 (BREAKAGE.CHROMOSOME_ABERRATIONS, BREAKAGE.SCORING).
+    related: [DMIN.FORMAT, BREAKAGE.CHROMOSOME_ABERRATIONS]

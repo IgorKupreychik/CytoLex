@@ -49,14 +49,16 @@ public class KbExampleDetectionTests
     [Fact]
     public void KbExamples_CoverTheirNotationTypes()
     {
-        // The 2016 KB has whole-string examples of these types; the other types are covered by
-        // SegmenterTests until their chapters (T-018, T-019) add examples.
+        // The 2016 KB has whole-string examples of these types; rsa and seq are covered by
+        // SegmenterTests until their chapters (T-019) add examples.
         var detected = KbCatalog.Default.Cases
             .Where(c => !c.IsFragment)
             .SelectMany(c => Segmenter.Split(c.CheckedText).Select(s => s.Type.ToKbName()))
             .ToHashSet(StringComparer.Ordinal);
 
         Assert.Contains("karyotype", detected);
+        Assert.Contains("breakage", detected);
+        Assert.Contains("meiotic", detected);
         Assert.Contains("ish", detected);
         Assert.Contains("nuc_ish", detected);
         Assert.Contains("fib_ish", detected);

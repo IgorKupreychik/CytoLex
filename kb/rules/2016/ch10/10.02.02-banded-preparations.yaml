@@ -1,0 +1,25 @@
+version: "2016"
+section: "10.2.2"
+rules:
+  - id: BREAKAGE.BANDED_NOMENCLATURE
+    title: Banded breakage studies use the standard nomenclature, otherwise words
+    applies_to: [breakage]
+    severity: info
+    statement: >-
+      The breakage nomenclature covers chromatid and chromosome aberrations seen, for example, in
+      constitutional breakage syndromes or after clastogenic exposure, on non-banded and on
+      banded preparations. When banding identifies the chromosome segments or aberrations well
+      enough, the standard nomenclature of this book is used; when it does not, the observations
+      can be described in words.
+    cite:
+      - {section: "10", page: 81, para: "¶1"}
+      - {section: "10.2.2", page: 83, para: "¶1"}
+    examples:
+      valid: []
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info (T-056): states when the standard nomenclature applies; the quality of the
+        banding can't be seen in the string.
+    related: [BREAKAGE.LOCATION_FORMAT, BREAKAGE.SCORING]

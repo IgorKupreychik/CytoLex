@@ -15,6 +15,15 @@ public static class Segmenter
     /// against the embedded vocab. Two-word keywords accept any (or no) spaces or tabs between the words,
     /// so <c>nucish</c> is still detected; spacing is checked by the parser's rules. Chromosomal CGH is
     /// printed <c>ish cgh</c> (§13.6, p.113), so that pair is a cgh segment, not an ish one.
+    /// <para>
+    /// Breakage and meiotic notation (T-018) are detected by their leading symbol in the same way. Breakage
+    /// (ch. 10, §10.1.2 E1, §10.2.1 ¶6): <c>chtg</c>/<c>chtb</c>/<c>chte</c> and <c>chrg</c>/<c>chrb</c>/<c>chre</c> are the
+    /// listed <c>cht</c>/<c>chr</c> + <c>g</c>/<c>b</c>/<c>e</c> written together; <c>cht</c> alone starts <c>cht del</c>/<c>cht inv</c>;
+    /// <c>sce</c>, <c>pvz</c>. Meiotic (ch. 12, §12.1 ¶1–2, §12.1.1): the stages <c>PI</c>, <c>MI</c>, <c>AI</c>, <c>MII</c>,
+    /// <c>AII</c>, the sexes <c>fem</c>/<c>mal</c> (<c>fem dia</c>, <c>mal MI</c>) and the detailed stages. The "no letter
+    /// after the keyword" check keeps <c>MI</c> from matching <c>MII</c> and <c>cht</c> from matching <c>chtg</c>. The same
+    /// symbols inside a karyotype segment (<c>+16cht</c>) stay parser constructs.
+    /// </para>
     /// </summary>
     internal static readonly ImmutableArray<(ImmutableArray<string> Words, NotationType Type)> Keywords =
     [
@@ -27,6 +36,30 @@ public static class Segmenter
         (["arr"], NotationType.Arr),
         (["rsa"], NotationType.Rsa),
         (["seq"], NotationType.Seq),
+        (["cht", "g"], NotationType.Breakage),
+        (["cht", "b"], NotationType.Breakage),
+        (["cht", "e"], NotationType.Breakage),
+        (["chr", "g"], NotationType.Breakage),
+        (["chr", "b"], NotationType.Breakage),
+        (["chr", "e"], NotationType.Breakage),
+        (["cht"], NotationType.Breakage),
+        (["sce"], NotationType.Breakage),
+        (["pvz"], NotationType.Breakage),
+        (["MII"], NotationType.Meiotic),
+        (["AII"], NotationType.Meiotic),
+        (["PI"], NotationType.Meiotic),
+        (["MI"], NotationType.Meiotic),
+        (["AI"], NotationType.Meiotic),
+        (["fem"], NotationType.Meiotic),
+        (["mal"], NotationType.Meiotic),
+        (["spm"], NotationType.Meiotic),
+        (["oom"], NotationType.Meiotic),
+        (["lep"], NotationType.Meiotic),
+        (["zyg"], NotationType.Meiotic),
+        (["pac"], NotationType.Meiotic),
+        (["dip"], NotationType.Meiotic),
+        (["dit"], NotationType.Meiotic),
+        (["dia"], NotationType.Meiotic),
     ];
 
     /// <summary>

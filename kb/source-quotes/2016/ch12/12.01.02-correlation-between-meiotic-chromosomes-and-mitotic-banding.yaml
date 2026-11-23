@@ -1,0 +1,12 @@
+version: "2016"
+section: "12.1.2"
+quotes:
+  - rule: MEIOSIS.PACHYTENE_BANDS
+    cite: {section: "12.1.2", page: 95, para: "¶2"}
+    text: >-
+      Figure 10 is an idiogram of the 22 autosomal bivalents from pachytene spermatocytes
+      employing the nomenclature of the somatic chromosome banding patterns using the 850-band
+      stage nomenclature because this stage of contraction corresponds approximately to
+      mid-pachytene of spermatocyte meiosis. The chromomeres are given the numbers of
+      Giemsa-positive bands and inter-chromomere regions are given the numbers of
+      Giemsa-negative bands.

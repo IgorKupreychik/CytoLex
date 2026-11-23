@@ -5,6 +5,37 @@ nuc ish(DXZ1×2)[400]//
 nuc ish(DXZ1×2)[50]//(DXZ1,DYZ3)×1[350]
 nuc ish(DXZ1×2)[50]//(DXZ1,DYZ3)×1[300]/(DXZ1×1)[10]
 ish del(14)(q21.2q21.2)(RP11-453F20–)dn[6]/14q21.2(RP11-453F20×2)[4]
+chtg(4)(q25)
+chtb(4)(q25)
+cht del(1)(q12q25)
+cht inv(1)(q12q25)
+chte(4;10)(q25;q22)
+sce(4)(q25q33)
+chtg(4q25)
+chte(4,10)(q25,q22)
+pvz(1)
+pvz1
+MI,23,XY
+MI,24,X,Y
+MI,23,XY,III(21)
+MI,24,XY,+I(21)
+MI,22,XY,III(13q14q)
+MI,23,XY,(xma=52)
+MI,23,X,Y,III(13,13q14q,14)(xma=2,1),(xma=51)
+MI,24,X,Y,III(2,der(2),5)(xma=4),I(der(5)),(xma=51)
+MII,22,X,–16,+16cht,+16cht
+MI,XY,23
+fem dia,II(2,2)(xma=4)
+mal MI,III(14,14q21q,21)(xma=3)
+fem dia,IV(2,der(2),5,der(5))(xma=2+1,1,1+0,1)
+MI,23,XY,3(21)
+MI,23,XY,+III(21)
+fem dia,II(2,2)(xma=4)(p=2,q=2)
+MI,23,XY,(xma=09)
+MI,23,XY,(xma=9)
+fem dia,II(2,2)(xma=4)(pter,pprx,qmed,qdis)
+fem dia,II(2,2)(xma=4)(pter,p1,q2,qter)
+MI,23,X,Y,III(13,13q14q,14)(xma=2;1),(xma=51)
 ish del(22)(q11.2q11.2)(D22S75–)
 nuc ish(DXZ1×2,DYZ3×1,D18Z1×3),(RB1,D21S259/D21S341/D21S342)×3
 nuc ish(3′IGH×2,5′IGH×3)(3′IGH con 5′IGH×1)[210/237]

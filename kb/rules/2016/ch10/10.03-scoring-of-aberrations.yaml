@@ -1,0 +1,28 @@
+version: "2016"
+section: "10.3"
+rules:
+  - id: BREAKAGE.SCORING
+    title: Scoring of aberrations - main types, stated groupings, aberrations per cell
+    applies_to: [breakage]
+    severity: info
+    statement: >-
+      Aberration data are reported where possible under the main types chtg, chtb, chte, chrg,
+      chrb, ace, min, r, dic, tr, qr, der and mar. When aberrations are grouped (for statistics
+      or another reason), the report states how each group relates to these types, e.g.
+      chromatid aberrations = chtg, chtb, chte; fragments (= deletions) = chrb, ace, min;
+      asymmetric aberrations = ace, dic, r. Data are not given as deduced breakages per cell but
+      so that the number of aberrations per cell can be calculated.
+    cite:
+      - {section: "10.3", page: 83, para: "¶1"}
+      - {section: "10.3", page: 83, para: "¶2"}
+      - {section: "10.3", page: 83, para: "¶3"}
+    examples:
+      valid: []
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Severity info (T-056): rules for reporting scored data, which can't be seen in a single
+        string. The groups in ¶2 are the book's example table "Aberration groups" (signed off
+        2026-11-23, T-018).
+    related: [BREAKAGE.CHROMATID_ABERRATIONS, BREAKAGE.CHROMOSOME_ABERRATIONS, BREAKAGE.EXCHANGE_CONFIGURATION]

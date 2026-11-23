@@ -1,0 +1,55 @@
+version: "2016"
+section: "10.2.1"
+quotes:
+  - rule: BREAKAGE.CHROMOSOME_ABERRATIONS
+    cite: {section: "10.2.1", page: 82, para: "¶1"}
+    text: >-
+      A chromosome (chr) aberration involves both chromatids of a single chromosome at the same
+      locus.
+  - rule: BREAKAGE.CHROMOSOME_ABERRATIONS
+    cite: {section: "10.2.1", page: 82, para: "¶2"}
+    text: >-
+      A chromosome gap (chrg) is a non-staining region (achromatic lesion) at the same locus in
+      both chromatids of a single chromosome in which there is minimal misalignment of the
+      chromatids. The term chromosome gap is synonymous with isolocus gap and isochromatid gap.
+  - rule: BREAKAGE.CHROMOSOME_ABERRATIONS
+    cite: {section: "10.2.1", page: 82, para: "¶3"}
+    text: >-
+      A chromosome break (chrb) is a discontinuity at the same locus in both chromatids of a
+      single chromosome, giving rise to an acentric fragment and an abnormal monocentric
+      chromosome. This fragment is therefore a particular type of acentric fragment (ace), and
+      chrb should be used only when the morphology indicates that the fragment is the result of a
+      single event.
+  - rule: BREAKAGE.CHROMOSOME_ABERRATIONS
+    cite: {section: "10.2.1", page: 82, para: "¶4"}
+    text: >-
+      A chromosome exchange (chre) is the result of two or more chromosome lesions and the
+      subsequent relocation of both chromatids of a single chromosome to a new position on the
+      same or on another chromosome. It may be symmetrical (e.g., reciprocal translocation) or
+      asymmetrical (e.g., dicentric formation).
+  - rule: BREAKAGE.MINUTE
+    cite: {section: "10.2.1", page: 82, para: "¶5"}
+    text: >-
+      A minute (min) is an acentric fragment smaller than the width of a single chromatid. It may
+      be single or double. In the special situation when double minutes are present clonally in
+      tumor cells, the symbol dmin is used; see Section 9.2.12.
+  - rule: BREAKAGE.PULVERIZATION
+    cite: {section: "10.2.1", page: 82, para: "¶6"}
+    text: >-
+      Pulverization (pvz) indicates a situation where a cell contains both chromatid and/or
+      chromosome gaps and breaks which are not normally associated with exchanges and are present
+      in such numbers that they cannot be enumerated. Occasionally, one or more chromosomes in a
+      cell are pulverized while the remaining chromosomes are of normal morphology; e.g., pvz(1)
+      is a pulverized chromosome 1.
+  - rule: BREAKAGE.PREMATURE_CONDENSATION
+    cite: {section: "10.2.1", page: 83, para: "¶7"}
+    text: >-
+      Premature chromosome condensation (pcc) occurs when an interphase nucleus is prematurely
+      induced to enter mitosis. A pcc may involve a G1 or a G2 nucleus. The chromatin of S-phase
+      nuclei undergoing pcc often appears to be pulverized.
+  - rule: BREAKAGE.PREMATURE_CENTROMERE_DIVISION
+    cite: {section: "10.2.1", page: 83, para: "¶8"}
+    text: >-
+      The term premature centromere division (pcd) may be used to describe premature separation
+      of centromeres in metaphase. The pcd may affect one or more chromosomes in a fraction of the
+      cells.

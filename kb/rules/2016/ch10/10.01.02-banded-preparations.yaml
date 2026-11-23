@@ -1,0 +1,45 @@
+version: "2016"
+section: "10.1.2"
+rules:
+  - id: BREAKAGE.LOCATION_FORMAT
+    title: "Location of a breakage aberration: symbol(chromosome)(band)"
+    applies_to: [breakage]
+    severity: error
+    statement: >-
+      When the location of an aberration is to be given, the aberration symbol is followed by the
+      chromosome in parentheses and the band designation in a second set of parentheses, as in
+      the standard nomenclature: one band for a gap or break (chtg(4)(q25)), the two bands of a
+      segment (cht del(1)(q12q25)), and for an exchange between chromosomes the chromosomes and
+      their bands each separated by a semicolon (chte(4;10)(q25;q22)).
+    cite:
+      - {section: "10.1.2", page: 82, para: "¶2"}
+      - {section: "10.1.2", page: 82, example: E1}
+    examples:
+      valid:
+        - text: "chtg(4)(q25)"
+          cite: {section: "10.1.2", page: 82, example: E1}
+        - text: "chtb(4)(q25)"
+          cite: {section: "10.1.2", page: 82, example: E1}
+        - text: "chte(4;10)(q25;q22)"
+          cite: {section: "10.1.2", page: 82, example: E1}
+        - text: "cht del(1)(q12q25)"
+          cite: {section: "10.1.2", page: 82, example: E1}
+        - text: "cht inv(1)(q12q25)"
+          cite: {section: "10.1.2", page: 82, example: E1}
+        - text: "sce(4)(q25q33)"
+          cite: {section: "10.1.2", page: 82, example: E1}
+      invalid:
+        - text: "chtg(4q25)"
+          why: The chromosome and the band go in two separate sets of parentheses.
+          corrected: "chtg(4)(q25)"
+        - text: "chte(4,10)(q25,q22)"
+          why: The chromosomes and their bands are separated by a semicolon, as in the standard nomenclature.
+          corrected: "chte(4;10)(q25;q22)"
+    fix: {level: 1, kind: replace, hint: "Write symbol(chromosome)(band), with a semicolon between chromosomes and between their bands."}
+    review:
+      paraphrase_checked: true
+      needs_review: false
+      note: >-
+        Format read from ¶2 ("followed by the band designation") and E1. The location is optional
+        (¶2 "where it is desired"). The invalid examples are inferred.
+    related: [BREAKAGE.CHROMATID_ABERRATIONS, BREAKAGE.EXCHANGE_CONFIGURATION, BREAKAGE.SISTER_CHROMATID_EXCHANGE]

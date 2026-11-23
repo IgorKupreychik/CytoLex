@@ -1,0 +1,8 @@
+version: "2016"
+section: "10.1.2"
+quotes:
+  - rule: BREAKAGE.LOCATION_FORMAT
+    cite: {section: "10.1.2", page: 82, para: "¶2"}
+    text: >-
+      Where it is desired to specify the location of a chromatid aberration, the appropriate
+      symbol can be followed by the band designation.

@@ -23,10 +23,12 @@ COLUMNS = ("id", "iscn", "type", "kb_rule", "kb_kind", "cite")
 # (tests/CytoLex.Core.Tests/KbExamples/KbCatalog.cs).
 _WHOLE_STRING_START = re.compile(
     r"^(?:\d+(?:[,~<(XY]|$)|//"
-    r"|(?:mos|chi|end|ish|nuc ish|fib ish|rev ish|cgh|arr|rsa|seq)(?![A-Za-z]))"
+    r"|(?:mos|chi|end|ish|nuc ish|fib ish|rev ish|cgh|arr|rsa|seq"
+    r"|ch[tr][gbe]|cht|sce|pvz|MII|AII|PI|MI|AI|fem|mal|spm|oom|lep|zyg|pac|dip|dit|dia)"
+    r"(?![A-Za-z]))"
 )
 
-# Technique keywords, longest first (src/CytoLex.Core/Segmentation/Segmenter.cs).
+# Technique keywords, longest first, in the order of src/CytoLex.Core/Segmentation/Segmenter.cs.
 _KEYWORDS = (
     (("nuc", "ish"), "nuc_ish"),
     (("fib", "ish"), "fib_ish"),
@@ -37,6 +39,15 @@ _KEYWORDS = (
     (("arr",), "arr"),
     (("rsa",), "rsa"),
     (("seq",), "seq"),
+    # Breakage and meiotic notation by their leading symbol (T-018).
+    *((("cht", x), "breakage") for x in ("g", "b", "e")),
+    *((("chr", x), "breakage") for x in ("g", "b", "e")),
+    *(((w,), "breakage") for w in ("cht", "sce", "pvz")),
+    *(
+        ((w,), "meiotic")
+        for w in ("MII", "AII", "PI", "MI", "AI", "fem", "mal")
+        + ("spm", "oom", "lep", "zyg", "pac", "dip", "dit", "dia")
+    ),
 )
 
 

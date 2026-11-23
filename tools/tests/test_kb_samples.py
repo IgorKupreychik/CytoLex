@@ -118,3 +118,10 @@ def test_fragments_and_segment_types():
     assert segment_types("//nuc ish(DXZ1,DYZ3)×1[400]") == ["nuc_ish"]
     assert segment_types("//46,XX[20]") == ["karyotype"]
     assert segment_types("//ishx") == ["karyotype"]
+    # breakage and meiotic notation by their leading symbol (T-018)
+    assert segment_types("chtg(4)(q25)") == ["breakage"]
+    assert segment_types("cht del(1)(q12q25)") == ["breakage"]
+    assert segment_types("MII,22,X,–16,+16cht,+16cht") == ["meiotic"]
+    assert segment_types("fem dia,II(2,2)(xma=4)") == ["meiotic"]
+    assert segment_types("chtgx") == ["karyotype"]
+    assert not is_fragment("MI,23,XY") and not is_fragment("pvz(1)")

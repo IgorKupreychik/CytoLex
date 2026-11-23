@@ -132,7 +132,7 @@ tables:
   # §10.3: groups of aberrations for scoring (a two-column list after "e.g.:").
   - id: Aberration groups
     kind: paragraph
-    review: {image: ok, human: pending, fallback: none}
+    review: {image: ok, human: ok, fallback: none}
     regions:
       - book_page: 83
         top: 415
