@@ -8,13 +8,15 @@ using CytoLex.Core.Text;
 using CytoLex.Core.Validation;
 using CytoLex.Desktop.Highlighting;
 using CytoLex.Desktop.Rules;
+using CytoLex.External;
 
 namespace CytoLex.Desktop.ViewModels;
 
 /// <summary>
 /// The single-string check (T-036): validates <see cref="Input"/> on every change in the edition picked in the selector, or in
 /// every known edition (T-037), and exposes the context plus one <see cref="EditionPanelViewModel"/> per edition (verdict,
-/// segments, diagnostics, abnormalities by cell line (T-069), literal translation (T-059), editor highlights).
+/// segments, diagnostics, abnormalities by cell line (T-069), literal translation (T-059), editor highlights). The optional
+/// CytoGPS tab (T-081, <see cref="CytoGps"/>) sits after the edition tabs; it only reads the input and never changes them.
 /// </summary>
 public partial class MainWindowViewModel : ObservableObject
 {
@@ -47,7 +49,20 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// <summary>The view model over <paramref name="validator"/> with the rule browser over <paramref name="ruleDatabasePath"/>.</summary>
     public MainWindowViewModel(Validator? validator, string ruleDatabasePath)
+        : this(validator, ruleDatabasePath, null, null)
     {
+    }
+
+    /// <summary>
+    /// The view model with the CytoGPS tab (T-081) over <paramref name="externalChecker"/>; <c>null</c> = not configured,
+    /// with <paramref name="externalSetupError"/> as the reason.
+    /// </summary>
+    public MainWindowViewModel(Validator? validator, string ruleDatabasePath, IExternalChecker? externalChecker, string? externalSetupError)
+    {
+        CytoGps = new CytoGpsPanelViewModel(
+            externalChecker,
+            externalChecker is null ? externalSetupError ?? "no setup (see config/local.yaml → cytogps)." : null,
+            CytoLexVerdict);
         try
         {
             _validator = validator ?? Validator.Default;
@@ -242,6 +257,46 @@ public partial class MainWindowViewModel : ObservableObject
     /// <summary>One panel per validated edition (one tab each).</summary>
     public ObservableCollection<EditionPanelViewModel> Panels { get; } = [];
 
+    /// <summary>The CytoGPS tab (T-081): optional, on demand, never blocks CytoLex.</summary>
+    public CytoGpsPanelViewModel CytoGps { get; }
+
+    /// <summary>The result tabs: <see cref="Panels"/>, then <see cref="CytoGps"/> (T-081).</summary>
+    public ObservableCollection<IResultTab> ResultTabs { get; } = [];
+
+    /// <summary>
+    /// The result tab shown. An edition tab sets <see cref="SelectedPanel"/>; the CytoGPS tab keeps it, so the editor still
+    /// draws that edition's highlights.
+    /// </summary>
+    [ObservableProperty]
+    public partial IResultTab? SelectedResultTab { get; set; }
+
+    /// <summary>Whether the CytoGPS tab is shown.</summary>
+    public bool IsCytoGpsTabSelected => SelectedResultTab is CytoGpsPanelViewModel;
+
+    partial void OnSelectedResultTabChanged(IResultTab? value)
+    {
+        if (value is EditionPanelViewModel panel)
+        {
+            SelectedPanel = panel;
+        }
+
+        OnPropertyChanged(nameof(IsCytoGpsTabSelected));
+    }
+
+    // The CytoLex verdict of the agreement badge: from the shown report when it has the edition, else one extra validation.
+    private bool? CytoLexVerdict(string input, string edition)
+    {
+        var result = Report is { } report && string.Equals(report.Input, input, StringComparison.Ordinal)
+            ? report.Results.FirstOrDefault(r => r.Edition == edition)
+            : null;
+        if (result is null && _validator is not null && _validator.ImplementedEditions.Contains(edition))
+        {
+            result = _validator.Validate(input, new ValidationOptions { Editions = EditionSelection.One(edition) }).Results.FirstOrDefault();
+        }
+
+        return result is { Status: EditionStatus.Implemented } ? result.Validity.IsValid : null;
+    }
+
     /// <summary>The panel (tab) shown; the editor draws its highlights.</summary>
     [ObservableProperty]
     public partial EditionPanelViewModel? SelectedPanel { get; set; }
@@ -330,6 +385,11 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         HoverSpan = null;
+        if (SelectedResultTab is not CytoGpsPanelViewModel)
+        {
+            SelectedResultTab = value;
+        }
+
         OnPropertyChanged(nameof(Highlights));
     }
 
@@ -347,7 +407,10 @@ public partial class MainWindowViewModel : ObservableObject
         // Keep the shown tab across re-validation ("All editions" while typing).
         var previous = SelectedPanel?.Edition;
         var sideTab = SelectedPanel?.SelectedSideTab ?? EditionPanelViewModel.AbnormalitiesTab; // and the right-hand tab (T-059)
+        var cytoGpsShown = SelectedResultTab is CytoGpsPanelViewModel; // and the CytoGPS tab (T-081)
+        SelectedResultTab = null;
         SelectedPanel = null;
+        ResultTabs.Clear();
         Panels.Clear();
         Report = null;
         if (_validator is null)
@@ -367,6 +430,7 @@ public partial class MainWindowViewModel : ObservableObject
             HasResult = false;
             Placeholder = "Enter an ISCN string.";
             ContextText = string.Empty;
+            CytoGps.SetInput(string.Empty);
             return;
         }
 
@@ -385,9 +449,22 @@ public partial class MainWindowViewModel : ObservableObject
         HasResult = true;
         Placeholder = string.Empty;
         ContextText = ContextOf(input, report.Context);
+        foreach (var panel in Panels)
+        {
+            ResultTabs.Add(panel);
+        }
+
+        ResultTabs.Add(CytoGps);
         SelectedPanel = Panels.FirstOrDefault(p => p.Edition == previous)
             ?? Panels.FirstOrDefault(p => p.IsImplemented)
             ?? Panels.FirstOrDefault();
+        if (cytoGpsShown)
+        {
+            SelectedResultTab = CytoGps;
+        }
+
+        // After the CytoLex results are complete: CytoGPS only reads the input (a new input cancels its running check).
+        CytoGps.SetInput(input);
     }
 
     internal static string ContextOf(string input, ContextInfo context)

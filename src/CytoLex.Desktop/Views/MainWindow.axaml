@@ -4,6 +4,7 @@
         xmlns:vm="using:CytoLex.Desktop.ViewModels"
         xmlns:rules="using:CytoLex.Desktop.Rules"
         xmlns:hl="using:CytoLex.Desktop.Highlighting"
+        xmlns:ext="using:CytoLex.External"
         x:Class="CytoLex.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="CytoLex"
@@ -46,16 +47,22 @@
     <TextBlock DockPanel.Dock="Top" Text="{Binding ContextText}" Margin="0,10,0,6" Opacity="0.8" TextWrapping="Wrap"
                IsVisible="{Binding HasResult}" />
 
-    <!-- One tab per edition (T-037) -->
-    <TabControl x:Name="EditionTabs" ItemsSource="{Binding Panels}" SelectedItem="{Binding SelectedPanel}"
+    <!-- One tab per edition (T-037), then the optional CytoGPS tab (T-081) -->
+    <TabControl x:Name="EditionTabs" ItemsSource="{Binding ResultTabs}" SelectedItem="{Binding SelectedResultTab}"
                 IsVisible="{Binding HasResult}" Padding="0,6,0,0">
       <TabControl.ItemTemplate>
-        <DataTemplate x:DataType="vm:EditionPanelViewModel">
+        <DataTemplate x:DataType="vm:IResultTab">
           <TextBlock Text="{Binding Header}" FontSize="14"
                      Classes.valid="{Binding IsValid}" Classes.invalid="{Binding IsInvalid}" Classes.notimpl="{Binding IsNotImplemented}" />
         </DataTemplate>
       </TabControl.ItemTemplate>
+      <!-- Content by type: the templates below -->
       <TabControl.ContentTemplate>
+        <DataTemplate x:DataType="vm:IResultTab">
+          <ContentControl Content="{Binding}" />
+        </DataTemplate>
+      </TabControl.ContentTemplate>
+      <TabControl.DataTemplates>
         <DataTemplate x:DataType="vm:EditionPanelViewModel">
           <DockPanel>
             <!-- Edition summary: verdict, counts, segments -->
@@ -297,7 +304,63 @@
             </Grid>
           </DockPanel>
         </DataTemplate>
-      </TabControl.ContentTemplate>
+
+        <!-- CytoGPS (T-081): on demand, in the background; its result never changes the edition tabs -->
+        <DataTemplate x:DataType="vm:CytoGpsPanelViewModel">
+          <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="0,6,14,8" Spacing="8">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Content="Check with CytoGPS" Command="{Binding CheckCommand}"
+                        ToolTip.Tip="Runs the local CytoGPS build on this string (ISCN 2016; one Java process per check)" />
+                <Button Content="Cancel" Command="{Binding CancelCommand}" IsVisible="{Binding IsRunning}" />
+                <CheckBox Content="Check automatically after typing" IsChecked="{Binding IsAutoCheck}"
+                          IsEnabled="{Binding IsConfigured}" VerticalAlignment="Center"
+                          ToolTip.Tip="Starts a check after a short pause in typing; a new input cancels the running check" />
+              </StackPanel>
+              <TextBlock Text="{Binding StateText}" FontWeight="SemiBold" FontSize="15" TextWrapping="Wrap"
+                         Classes.valid="{Binding IsValid}" Classes.invalid="{Binding IsInvalid}" Classes.notimpl="{Binding IsNotImplemented}" />
+              <TextBlock Text="{x:Static vm:CytoGpsPanelViewModel.SetupPointer}" IsVisible="{Binding IsNotConfigured}"
+                         Opacity="0.8" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding ProgressText}" IsVisible="{Binding IsRunning}" Opacity="0.7" FontSize="12" TextWrapping="Wrap" />
+              <Border Classes="banner" IsVisible="{Binding IsUnsupported}">
+                <TextBlock Text="{Binding UnsupportedText}" TextWrapping="Wrap" FontSize="13" />
+              </Border>
+              <Border Classes="agreement" Classes.agree="{Binding IsAgreeing}" Classes.disagree="{Binding IsDisagreeing}"
+                      IsVisible="{Binding HasAgreement}" HorizontalAlignment="Left">
+                <TextBlock Text="{Binding AgreementText}" FontWeight="SemiBold" TextWrapping="Wrap" />
+              </Border>
+              <SelectableTextBlock Text="{Binding FailureText}" IsVisible="{Binding HasFailure}" Foreground="#D13438"
+                                   TextWrapping="Wrap" FontFamily="Cascadia Mono,Consolas,monospace" FontSize="12" />
+              <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding HasToolStatus}">
+                <TextBlock Text="CytoGPS status" Opacity="0.7" Width="130" />
+                <SelectableTextBlock Text="{Binding ToolStatus}" TextWrapping="Wrap" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding HasSentInput}">
+                <TextBlock Text="Sent as" Opacity="0.7" Width="130" VerticalAlignment="Center"
+                           ToolTip.Tip="The string as sent to CytoGPS: printed symbols in their typed ASCII forms" />
+                <SelectableTextBlock Text="{Binding SentInput}" FontFamily="Cascadia Mono,Consolas,monospace" FontSize="14" TextWrapping="Wrap" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding HasRevisedInput}">
+                <TextBlock Text="Repaired by CytoGPS" Opacity="0.7" Width="130" VerticalAlignment="Center" />
+                <SelectableTextBlock Text="{Binding RevisedInput}" FontFamily="Cascadia Mono,Consolas,monospace" FontSize="14" TextWrapping="Wrap" />
+              </StackPanel>
+              <TextBlock Text="Messages" FontWeight="SemiBold" IsVisible="{Binding HasMessages}" Margin="0,4,0,0" />
+              <ItemsControl ItemsSource="{Binding Messages}" IsVisible="{Binding HasMessages}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="ext:ExternalMessage">
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,4">
+                      <Border Classes="tag" VerticalAlignment="Top">
+                        <TextBlock Text="{Binding Kind}" FontSize="11" />
+                      </Border>
+                      <SelectableTextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="13" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </ScrollViewer>
+        </DataTemplate>
+      </TabControl.DataTemplates>
     </TabControl>
   </DockPanel>
   </TabItem>
@@ -769,6 +832,22 @@
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="Padding" Value="4,2" />
       <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <!-- CytoGPS agreement badge (T-081) -->
+    <Style Selector="Border.agreement">
+      <Setter Property="Background" Value="#20808080" />
+      <Setter Property="BorderBrush" Value="#808080" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Padding" Value="8,4" />
+    </Style>
+    <Style Selector="Border.agreement.agree">
+      <Setter Property="Background" Value="#20107C10" />
+      <Setter Property="BorderBrush" Value="#107C10" />
+    </Style>
+    <Style Selector="Border.agreement.disagree">
+      <Setter Property="Background" Value="#33CA5010" />
+      <Setter Property="BorderBrush" Value="#CA5010" />
     </Style>
     <Style Selector="Border.part:pointerover">
       <Setter Property="Background" Value="#200078D4" />

@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using CytoLex.Desktop.ExternalCheckers;
+using CytoLex.Desktop.Rules;
 using CytoLex.Desktop.ViewModels;
 using CytoLex.Desktop.Views;
 
@@ -14,7 +16,9 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow { DataContext = new MainWindowViewModel() };
+            // The CytoGPS tab (T-081) is optional: a missing or broken setup only shows its reason in that tab.
+            var (checker, setupError) = CytoGpsSetup.TryCreate();
+            desktop.MainWindow = new MainWindow { DataContext = new MainWindowViewModel(null, RuleStore.DefaultPath, checker, setupError) };
         }
 
         base.OnFrameworkInitializationCompleted();

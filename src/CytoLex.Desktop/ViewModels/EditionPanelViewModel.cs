@@ -11,7 +11,7 @@ namespace CytoLex.Desktop.ViewModels;
 /// The result of one edition (T-037): verdict, counts, segment notes, diagnostics, abnormalities and editor highlights.
 /// One tab of the results area; a single-edition check has one panel, "All editions" one per known edition.
 /// </summary>
-public partial class EditionPanelViewModel : ObservableObject
+public partial class EditionPanelViewModel : ObservableObject, IResultTab
 {
     public EditionPanelViewModel(ValidationReport report, EditionResult result, ApplyFixHandler? applyFix = null)
         : this(report, result, applyFix, CoordinateBuild.Grch38, null)

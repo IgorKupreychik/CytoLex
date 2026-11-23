@@ -90,7 +90,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-078 | todo | 3 | T-050, T-069 | Desktop: ideogram view of loss/gain/fusion per band and clone |
 | T-079 | todo | 3 | T-050, T-038 | Export in CytoGPS's JSON result format (RCytoGPS-compatible) |
 | T-080 | discussion | 3 | T-075 | Optional lenient mode (stray spaces, letter case as warnings) |
-| T-081 | todo | 2 | T-049, T-036 | Desktop: CytoGPS panel in the single-string check (optional, never blocks CytoLex) |
+| T-081 | done | 2 | T-049, T-036 | Desktop: CytoGPS panel in the single-string check (optional, never blocks CytoLex) |
 | T-082 | todo | 3 | T-057 | Review the translation templates and golden file (ISCN 2016) |
 | T-083 | todo | 3 | – | Refactor: remove hand-written partial classes (`Binder`, `Parser`) per the code standard |
 | T-084 | todo | 3 | T-059 | Rule browser: bands (band table in `kb.sqlite`, band links of the translation open it) |
@@ -98,6 +98,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-086 | todo | 3 | T-066 | Use `Abnormality.Composition`: detailed composition vs. its symbol (rule), translation and LGF read one shape |
 | T-087 | discussion | 3 | T-066 | Band compositions the KB doesn't define yet: insertion recombinants, `der(?)` with an insertion or hsr at an unknown site |
 | T-088 | todo | 2 | T-071, T-034 | Arr: check positions against the bands of the stated build (`ARR.POSITIONS_IN_BANDS`) |
+| T-089 | todo | 3 | T-081 | Desktop: settings view to set up external checkers (CytoGPS paths, cache, timeout) instead of editing `config/local.yaml` by hand |
 
 ---
 
@@ -718,6 +719,24 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 **Acceptance:** Decision in `docs/decisions.md`; if a severity changes, the rule's `severity` and review note are updated in the KB (then `kb build`, `dotnet build`).
 **Notes:** Created 2026-11-20 from T-073. T-047 findings (`docs/research/cytogps.md` §4, §5.1, §8): CytoGPS strips all whitespace before parsing and matches keywords case-insensitively, so every listed space/case string is accepted silently (`Success`), with no report or normalisation notice.
 
+### T-089 — Desktop: settings view for the external checkers
+**Status:** todo
+**Description:** A settings view in the desktop app, opened from the CytoGPS tab ("Set up…" next to the not-configured reason) and from the main window, that edits the `cytogps` section of `config/local.yaml`. Today that section can only be edited by hand, and the app has to be restarted.
+- **Fields:** `source_dir`, `java_home` and `javax_json_jar` with folder/file pickers; `disk_cache` (with the data-policy note: synthetic/book strings only, T-048); `timeout_seconds`.
+- **Checking the setup:** each field shows whether it's OK, using the adapter's own checks (`CytoGpsBuild.TryResolve` / `CheckAvailability`: missing folder, no `bin/javac`, wrong jar SHA-1). Nothing is started while you type. A "Test" button runs one book string through CytoGPS (this compiles it on the first run) and shows the result or the adapter's message.
+- **Environment variables:** a key overridden by an environment variable `CYTOLEX_CYTOGPS_<KEY>` is shown as read-only, with the variable's name, since editing the file would have no effect.
+- **Saving:**
+  - Writes only the `cytogps` section of `config/local.yaml`. It keeps the other sections (`iscn_pdf`, which the Python tools read) and the comments, and creates the file from `config/local.example.yaml` when it's missing.
+  - Saves are atomic (temp file + rename), with LF line endings.
+  - After a save, the CytoGPS tab picks up the new checker without a restart. A check that is still running keeps its old settings until it ends.
+- **Rules:** CytoLex validation never depends on this view or the file, same as T-081. No network access.
+**Open question (decide in the plan):** where the settings live when the app doesn't run from a repo checkout (`RepoLocator` finds no `CytoLex.slnx`): a per-user file (e.g. `%APPDATA%/CytoLex/settings.yaml`) that `config/local.yaml` overrides, or repo checkouts only for the pilot.
+**Acceptance:**
+- View-model tests on a temp repo root covering: load, the per-field checks with a fake setup, env-override read-only, saving that keeps the other sections and the comments (byte-compare apart from the edited keys), and creating the file from the template.
+- After a save, the CytoGPS tab switches from not configured to ready without a restart.
+- Checked by hand against the local CytoGPS build.
+**Notes:** Created 2026-11-23 (user request after T-081). YamlDotNet's representation model drops comments, so the save edits the lines of the `cytogps` block instead of re-serializing the whole file.
+
 ## External comparison (CytoGPS)
 
 ### T-047 — Research CytoGPS
@@ -764,7 +783,7 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 **Notes:** Created 2026-11-20 from the CytoGPS comparison (T-047). Depends on T-075: if the two rules become warnings anyway, lenient mode may not be needed.
 
 ### T-081 — Desktop: CytoGPS panel in the single-string check
-**Status:** todo
+**Status:** done
 **Description:** Show CytoGPS's result next to CytoLex's in the single-string check, using the T-049 adapter: a "CytoGPS" tab beside the edition tabs with its verdict, raw status, messages, repaired string, the string as sent (ASCII typed forms) and an agreement badge against the CytoLex 2016 verdict. Notation CytoGPS doesn't cover (ish, arr, detailed system; `docs/research/cytogps.md` §4) is shown as "not supported by CytoGPS", not as a disagreement. CytoGPS runs on demand ("Check with CytoGPS" button, optionally automatic after a typing pause), not on every keystroke (one JVM per run).
 **CytoGPS is optional and must never block CytoLex:**
 - CytoLex validation, highlights, fixes and every other tab work exactly as without CytoGPS, whether CytoGPS is configured or not.
@@ -773,6 +792,20 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 - A failure (compile error, crash, timeout, unreadable output) shows the adapter's message in the tab only; nothing throws into the app.
 **Acceptance:** View-model tests with a fake checker: not configured, success (valid/invalid), failure, timeout/cancel, input changed while running, unsupported notation; CytoLex results are identical with and without a checker. Checked by hand against the local CytoGPS build on book strings.
 **Notes:** Created 2026-11-21 (user request during T-049). Can be built before T-051; the agreement badge here is a plain verdict comparison, and T-051's comparison engine can replace it later. 2026-11-21 (T-051): use `CytoGpsCoverage.Unsupported` for "not supported by CytoGPS" (`src/CytoLex.External/Comparison/`).
+**Outcome (2026-11-23):** a "CytoGPS" tab after the edition tabs of the single-string check.
+- `src/CytoLex.Desktop/ViewModels/CytoGpsPanelViewModel.cs`:
+  - Runs on demand ("Check with CytoGPS"), or after a 1.5 s typing pause when "Check automatically after typing" is on (off by default).
+  - Runs in the background (`Task.Run`) with a Cancel button. A new input cancels the run, and a stale result is dropped.
+  - Shows the verdict, raw status, messages, the repaired string and the string as sent.
+  - Agreement badge: T-051's `Agreement` against the CytoLex verdict in the checker's edition (2016). When 2016 isn't shown, it is computed with one extra validation.
+  - `CytoGpsCoverage.Unsupported` → "not supported by CytoGPS", not compared (CytoGPS's own result is still shown).
+  - Not configured → "CytoGPS not configured: …" plus a pointer to the README. Failures and exceptions stay in the tab.
+- Tabs: `MainWindowViewModel.ResultTabs`/`SelectedResultTab` hold the edition panels plus `CytoGps`; headers come from the new `IResultTab`, content from per-type `DataTemplates`. The CytoGPS tab keeps `SelectedPanel`, so the editor keeps that edition's highlights. `Panels`/`SelectedPanel` are unchanged.
+- The checker comes from `ExternalCheckers/CytoGpsSetup.TryCreate()` in `App` (never throws). The window cancels a running check on close. The Desktop project now references `CytoLex.External`.
+- Tests: `tests/CytoLex.Desktop.Tests/CytoGpsPanelTests.cs`, 21 tests with a fake checker. They cover not configured, valid/invalid, disagreement, failure, a throwing checker, timeout, cancel, input changed while running, same input kept, unsupported arr/detailed system, auto-check on/off, identical CytoLex results with and without a checker, and tab selection.
+- `dotnet test`: 8,589 total, 0 failed, 54 skipped. `dotnet format` is clean. The user checked it by hand against the local CytoGPS build.
+- Docs: `CLAUDE.md`, `README.md`, `docs/research/cytogps-comparison.md`.
+- No deviations from the plan.
 
 ### T-082 — Review the translation templates and golden file (ISCN 2016)
 **Status:** todo

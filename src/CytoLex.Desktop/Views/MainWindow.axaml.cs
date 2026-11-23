@@ -40,6 +40,13 @@ public partial class MainWindow : Window
         Input.TextArea.TextView.PointerExited += OnEditorPointerExited;
     }
 
+    /// <summary>Stops a running CytoGPS check (T-081) with the window.</summary>
+    protected override void OnClosed(EventArgs e)
+    {
+        _viewModel?.CytoGps.Cancel();
+        base.OnClosed(e);
+    }
+
     protected override void OnDataContextChanged(EventArgs e)
     {
         base.OnDataContextChanged(e);

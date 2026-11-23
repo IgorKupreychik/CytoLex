@@ -33,6 +33,12 @@
 
   <ItemGroup>
     <ProjectReference Include="../CytoLex.Core/CytoLex.Core.csproj" />
+    <!-- Optional CytoGPS tab of the single-string check (T-081). -->
+    <ProjectReference Include="../CytoLex.External/CytoLex.External.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="CytoLex.Desktop.Tests" />
   </ItemGroup>
 
   <Target Name="CheckKbDatabase" BeforeTargets="BeforeBuild">
