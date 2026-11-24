@@ -106,7 +106,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-095 | discussion | 4 | T-033 | Apply karyotype rules (STRUCT.*, symbol formats) to the abnormalities of ish results? |
 | T-096 | done | 2 | T-074, T-035 | Autocorrection: core + KB flag `fix.auto` (meaning-preserving level-1 fixes applied automatically, original kept) |
 | T-097 | todo | 2 | T-096, T-098, T-038 | Autocorrection: desktop (checkbox, corrected line, highlights on the original) + batch tab |
-| T-098 | todo | 2 | T-037, T-059, T-081 | Desktop: single-string layout redesign (edition verdict strip + full-width view tabs) |
+| T-098 | done | 2 | T-037, T-059, T-081 | Desktop: single-string layout redesign (edition verdict strip + full-width view tabs) |
 | T-099 | todo | 4 | T-098 | Desktop: pin a view tab to a side pane |
 | T-100 | discussion | 4 | T-072, T-092 | Link one event across techniques in combined strings (karyotype + ish + arr) |
 | T-101 | todo | 3 | T-098, T-033, T-034 | Locus list from the string + desktop "Map" view (ideograms) |
@@ -1028,7 +1028,7 @@ Outcome (2026-11-24): KB `fix.auto` (schema: level 1 only; `kb/README.md`) set o
 **Notes:** Created 2026-11-24 (user). Lands in the redesigned layout (T-098).
 
 ### T-098 — Desktop: single-string layout redesign
-**Status:** todo
+**Status:** done
 **Description:** The right-hand column (Abnormalities | Translation) is cramped, and every view is repeated inside each edition tab. New layout (option "B", decided with the user 2026-11-24):
 - Editor row (book examples; the Autocorrect checkbox comes with T-097), then the corrected line (T-097).
 - An edition chip strip: one chip per edition with its verdict (`2016 ✗ 2 errors`, `2020 n/a`); clicking selects the edition. It replaces the edition result tabs; the edition selector still chooses which editions are validated.
@@ -1036,7 +1036,7 @@ Outcome (2026-11-24): KB `fix.auto` (schema: level 1 only; `kb/README.md`) set o
 - Editor ↔ view links unchanged: hover and selection between the editor and the abnormality/translation cards, diagnostic selection, rule links, highlights of the selected edition.
 - Touches `MainWindow.axaml`, `MainWindowViewModel` (`ResultTabs`/`SelectedResultTab` → editions + views), `EditionPanelViewModel`, `IResultTab`, `CytoGpsPanelViewModel` (no longer an edition-like tab).
 **Acceptance:** view-model tests updated (edition selection, view selection kept when the edition changes, CytoGPS tab, hover/selection links); checked by hand with a karyotype, an arr and a combined string.
-**Notes:** Created 2026-11-24 (user). Pinning a view to a side pane is T-099.
+**Notes:** Created 2026-11-24 (user). Pinning a view to a side pane is T-099. Done 2026-11-24: edition chip strip (`Panels`/`SelectedPanel`, `EditionPanelViewModel.ChipText`/`ChipTip`, e.g. `2016 ✗ 2 errors`, `2020 n/a`) and full-width view tabs (`MainWindowViewModel.SelectedView`/`SelectedViewIndex`, enum `ResultView`: Diagnostics | Abnormalities | Translation | CytoGps; kept across edition, selector, input and Apply changes; a translation diagnostic link switches to Diagnostics; tab headers with counts via `DiagnosticsHeader`/`AbnormalitiesHeader`; not-implemented editions show `NotImplementedText`). Removed `IResultTab`, `ResultTabs`/`SelectedResultTab`/`IsCytoGpsTabSelected`, `SelectedSideTab`; `CytoGpsPanelViewModel` is a plain view. Files: `MainWindow.axaml` (chip `ListBox.chips` + `TabControl#ViewTabs`, side-tab styles dropped), `MainWindowViewModel.cs`, `EditionPanelViewModel.cs`, `CytoGpsPanelViewModel.cs`; tests `LayoutTests.cs` (new) + updated `MainWindowViewModelTests`, `TranslationViewTests`, `CytoGpsPanelTests` (152 desktop tests pass); docs `CLAUDE.md`, `README.md`, `docs/decisions.md` (T-059 layout superseded). Checked by hand (user). No deviations from the plan.
 
 ### T-099 — Desktop: pin a view tab to a side pane
 **Status:** todo

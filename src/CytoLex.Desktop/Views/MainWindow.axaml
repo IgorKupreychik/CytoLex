@@ -47,266 +47,258 @@
     <TextBlock DockPanel.Dock="Top" Text="{Binding ContextText}" Margin="0,10,0,6" Opacity="0.8" TextWrapping="Wrap"
                IsVisible="{Binding HasResult}" />
 
-    <!-- One tab per edition (T-037), then the optional CytoGPS tab (T-081) -->
-    <TabControl x:Name="EditionTabs" ItemsSource="{Binding ResultTabs}" SelectedItem="{Binding SelectedResultTab}"
-                IsVisible="{Binding HasResult}" Padding="0,6,0,0">
-      <TabControl.ItemTemplate>
-        <DataTemplate x:DataType="vm:IResultTab">
-          <TextBlock Text="{Binding Header}" FontSize="14"
+    <!-- Edition chips (T-098): one per validated edition with its verdict; the selected one drives the views and the highlights -->
+    <ListBox DockPanel.Dock="Top" Classes="chips" ItemsSource="{Binding Panels}" SelectedItem="{Binding SelectedPanel}"
+             IsVisible="{Binding HasResult}" Margin="0,0,0,4">
+      <ListBox.ItemsPanel>
+        <ItemsPanelTemplate>
+          <WrapPanel />
+        </ItemsPanelTemplate>
+      </ListBox.ItemsPanel>
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="vm:EditionPanelViewModel">
+          <TextBlock Text="{Binding ChipText}" FontSize="14" ToolTip.Tip="{Binding ChipTip}"
                      Classes.valid="{Binding IsValid}" Classes.invalid="{Binding IsInvalid}" Classes.notimpl="{Binding IsNotImplemented}" />
         </DataTemplate>
-      </TabControl.ItemTemplate>
-      <!-- Content by type: the templates below -->
-      <TabControl.ContentTemplate>
-        <DataTemplate x:DataType="vm:IResultTab">
-          <ContentControl Content="{Binding}" />
-        </DataTemplate>
-      </TabControl.ContentTemplate>
-      <TabControl.DataTemplates>
-        <DataTemplate x:DataType="vm:EditionPanelViewModel">
-          <DockPanel>
-            <!-- Edition summary: verdict, counts, segments -->
-            <StackPanel DockPanel.Dock="Top" Margin="0,4,0,10" Spacing="4">
-              <StackPanel Orientation="Horizontal" Spacing="16">
-                <TextBlock Text="{Binding ValidityText}" FontWeight="SemiBold" FontSize="15"
-                           Classes.valid="{Binding IsValid}" Classes.invalid="{Binding IsInvalid}" Classes.notimpl="{Binding IsNotImplemented}" />
-                <TextBlock Text="{Binding CountsText}" VerticalAlignment="Center" Opacity="0.8" />
-              </StackPanel>
-              <!-- Fix all (T-040): one previewed round of every applicable fix -->
-              <Border IsVisible="{Binding HasFixAll}" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Padding="6,4">
-                <Grid ColumnDefinitions="Auto,*">
-                  <Button Grid.Column="0" Content="{Binding FixAll.Header}" Command="{Binding FixAll.ApplyCommand}"
-                          ToolTip.Tip="{Binding FixAll.Tip}" Padding="10,2" Margin="0,0,10,0" VerticalAlignment="Center" />
-                  <ItemsControl Grid.Column="1" ItemsSource="{Binding FixAll.DiffParts}" VerticalAlignment="Center"
-                                ItemTemplate="{StaticResource DiffPartTemplate}">
-                    <ItemsControl.ItemsPanel>
-                      <ItemsPanelTemplate>
-                        <WrapPanel />
-                      </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                  </ItemsControl>
-                </Grid>
-              </Border>
-              <ItemsControl ItemsSource="{Binding Segments}">
-                <ItemsControl.ItemsPanel>
-                  <ItemsPanelTemplate>
-                    <WrapPanel />
-                  </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="vm:SegmentItemViewModel">
-                    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
-                      <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="{Binding Type}" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" />
-                        <TextBlock Text="{Binding Note}" IsVisible="{Binding HasNote}" FontStyle="Italic" Opacity="0.7" />
-                      </StackPanel>
-                    </Border>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-            </StackPanel>
+      </ListBox.ItemTemplate>
+    </ListBox>
 
-            <Grid ColumnDefinitions="3*,Auto,2*" IsVisible="{Binding IsImplemented}">
-            <!-- Diagnostics: a full-height panel whose header lines up with the tab strip on the right -->
-            <Border Grid.Column="0" Classes="panel">
-            <DockPanel>
-            <Border DockPanel.Dock="Top" Classes="panelheader">
-              <TextBlock Text="{Binding DiagnosticsHeader}" />
+    <!-- Full-width view tabs of the selected edition (T-098): Diagnostics (default) | Abnormalities | Translation | CytoGPS -->
+    <TabControl x:Name="ViewTabs" SelectedIndex="{Binding SelectedViewIndex}" IsVisible="{Binding HasResult}" Padding="0,6,0,0">
+      <TabItem Header="{Binding SelectedPanel.DiagnosticsHeader, FallbackValue=Diagnostics}">
+        <DockPanel DataContext="{Binding SelectedPanel}" x:DataType="vm:EditionPanelViewModel">
+          <StackPanel DockPanel.Dock="Top" Margin="0,4,0,10" Spacing="4">
+            <StackPanel Orientation="Horizontal" Spacing="16">
+              <TextBlock Text="{Binding ValidityText}" FontWeight="SemiBold" FontSize="15"
+                         Classes.valid="{Binding IsValid}" Classes.invalid="{Binding IsInvalid}" Classes.notimpl="{Binding IsNotImplemented}" />
+              <TextBlock Text="{Binding CountsText}" VerticalAlignment="Center" Opacity="0.8" />
+            </StackPanel>
+            <!-- Fix all (T-040): one previewed round of every applicable fix -->
+            <Border IsVisible="{Binding HasFixAll}" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Padding="6,4">
+              <Grid ColumnDefinitions="Auto,*">
+                <Button Grid.Column="0" Content="{Binding FixAll.Header}" Command="{Binding FixAll.ApplyCommand}"
+                        ToolTip.Tip="{Binding FixAll.Tip}" Padding="10,2" Margin="0,0,10,0" VerticalAlignment="Center" />
+                <ItemsControl Grid.Column="1" ItemsSource="{Binding FixAll.DiffParts}" VerticalAlignment="Center"
+                              ItemTemplate="{StaticResource DiffPartTemplate}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <WrapPanel />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                </ItemsControl>
+              </Grid>
             </Border>
-            <TextBlock DockPanel.Dock="Top" Text="No findings." IsVisible="{Binding !HasDiagnostics}" Margin="10,6" Opacity="0.6" />
-            <ListBox ItemsSource="{Binding Diagnostics}" SelectedItem="{Binding SelectedDiagnostic}" Background="Transparent">
-              <ListBox.ItemTemplate>
-                <DataTemplate x:DataType="vm:DiagnosticItemViewModel">
-                  <Grid ColumnDefinitions="Auto,*" Margin="0,2">
-                    <Border Grid.Column="0" Background="{Binding SeverityBrush}" CornerRadius="3" Padding="6,1"
-                            VerticalAlignment="Top" Margin="0,0,10,0" MinWidth="64">
-                      <TextBlock Text="{Binding SeverityLabel}" Foreground="White" HorizontalAlignment="Center" />
-                    </Border>
-                    <StackPanel Grid.Column="1" Spacing="2">
-                      <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="{Binding Message}" FontWeight="SemiBold" TextWrapping="Wrap" />
-                        <TextBlock Text="{Binding Location}" FontFamily="Cascadia Mono,Consolas,monospace" Opacity="0.7" />
-                      </StackPanel>
-                      <!-- Rule ID: a link to the rule browser for KB rules (T-039), plain text for core codes -->
-                      <Button Classes="link" Content="{Binding RuleId}" IsVisible="{Binding HasKbRule}" Click="OnOpenRuleClick"
-                              ToolTip.Tip="Open the rule in the rule browser" />
-                      <TextBlock Text="{Binding RuleId}" IsVisible="{Binding IsCoreCode}"
-                                 FontFamily="Cascadia Mono,Consolas,monospace" FontSize="12" Opacity="0.7" />
-                      <TextBlock Text="{Binding Detail}" IsVisible="{Binding HasDetail}" TextWrapping="Wrap" />
-                      <TextBlock Text="{Binding Condition}" IsVisible="{Binding HasCondition}" TextWrapping="Wrap" FontStyle="Italic" />
-                      <TextBlock Text="{Binding Review}" IsVisible="{Binding HasReview}" TextWrapping="Wrap" FontStyle="Italic" Opacity="0.8" />
-                      <!-- Fixes (T-040): a level-1 fix as a before/after diff with Apply; an explanation as text -->
-                      <ItemsControl ItemsSource="{Binding Fixes}">
+            <ItemsControl ItemsSource="{Binding Segments}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:SegmentItemViewModel">
+                  <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <TextBlock Text="{Binding Type}" FontWeight="SemiBold" />
+                      <TextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" />
+                      <TextBlock Text="{Binding Note}" IsVisible="{Binding HasNote}" FontStyle="Italic" Opacity="0.7" />
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+          <Border Classes="panel" IsVisible="{Binding IsImplemented}">
+          <DockPanel>
+          <TextBlock DockPanel.Dock="Top" Text="No findings." IsVisible="{Binding !HasDiagnostics}" Margin="10,6" Opacity="0.6" />
+          <ListBox ItemsSource="{Binding Diagnostics}" SelectedItem="{Binding SelectedDiagnostic}" Background="Transparent">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:DiagnosticItemViewModel">
+                <Grid ColumnDefinitions="Auto,*" Margin="0,2">
+                  <Border Grid.Column="0" Background="{Binding SeverityBrush}" CornerRadius="3" Padding="6,1"
+                          VerticalAlignment="Top" Margin="0,0,10,0" MinWidth="64">
+                    <TextBlock Text="{Binding SeverityLabel}" Foreground="White" HorizontalAlignment="Center" />
+                  </Border>
+                  <StackPanel Grid.Column="1" Spacing="2">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                      <TextBlock Text="{Binding Message}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                      <TextBlock Text="{Binding Location}" FontFamily="Cascadia Mono,Consolas,monospace" Opacity="0.7" />
+                    </StackPanel>
+                    <!-- Rule ID: a link to the rule browser for KB rules (T-039), plain text for core codes -->
+                    <Button Classes="link" Content="{Binding RuleId}" IsVisible="{Binding HasKbRule}" Click="OnOpenRuleClick"
+                            ToolTip.Tip="Open the rule in the rule browser" />
+                    <TextBlock Text="{Binding RuleId}" IsVisible="{Binding IsCoreCode}"
+                               FontFamily="Cascadia Mono,Consolas,monospace" FontSize="12" Opacity="0.7" />
+                    <TextBlock Text="{Binding Detail}" IsVisible="{Binding HasDetail}" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding Condition}" IsVisible="{Binding HasCondition}" TextWrapping="Wrap" FontStyle="Italic" />
+                    <TextBlock Text="{Binding Review}" IsVisible="{Binding HasReview}" TextWrapping="Wrap" FontStyle="Italic" Opacity="0.8" />
+                    <!-- Fixes (T-040): a level-1 fix as a before/after diff with Apply; an explanation as text -->
+                    <ItemsControl ItemsSource="{Binding Fixes}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:FixItemViewModel">
+                          <StackPanel Spacing="2" Margin="0,2,0,0">
+                            <TextBlock Text="{Binding Label}" TextWrapping="Wrap" Opacity="0.9" />
+                            <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsEdit}">
+                              <Button Grid.Column="0" Content="Apply" Command="{Binding ApplyCommand}" IsVisible="{Binding CanApply}"
+                                      Padding="10,1" Margin="0,0,8,0" VerticalAlignment="Center"
+                                      ToolTip.Tip="{Binding Preview, StringFormat='Change the input to: {0}'}" />
+                              <ItemsControl Grid.Column="1" ItemsSource="{Binding DiffParts}" VerticalAlignment="Center"
+                                            ItemTemplate="{StaticResource DiffPartTemplate}">
+                                <ItemsControl.ItemsPanel>
+                                  <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                  </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                              </ItemsControl>
+                            </Grid>
+                          </StackPanel>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Text="{Binding Citations}" IsVisible="{Binding HasCitations}" TextWrapping="Wrap" FontSize="12" Opacity="0.7" />
+                  </StackPanel>
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          </DockPanel>
+          </Border>
+        </DockPanel>
+      </TabItem>
+      <TabItem Header="{Binding SelectedPanel.AbnormalitiesHeader, FallbackValue=Abnormalities}">
+        <Panel DataContext="{Binding SelectedPanel}" x:DataType="vm:EditionPanelViewModel">
+          <TextBlock Text="{Binding NotImplementedText}" IsVisible="{Binding IsNotImplemented}" Opacity="0.6" Margin="0,6" />
+          <DockPanel IsVisible="{Binding IsImplemented}" Margin="0,6,0,0">
+            <TextBlock DockPanel.Dock="Top" Text="No karyotype cell lines." Opacity="0.6"
+                       IsVisible="{Binding !HasCellLines}" />
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+              <ItemsControl ItemsSource="{Binding CellLineGroups}" Margin="0,0,14,8">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:CellLineGroupViewModel">
+                    <StackPanel Spacing="4" Margin="0,0,0,10">
+                      <TextBlock Text="{Binding Header}" FontWeight="SemiBold" Opacity="0.85" TextWrapping="Wrap" />
+                      <ItemsControl ItemsSource="{Binding Items}">
                         <ItemsControl.ItemTemplate>
-                          <DataTemplate x:DataType="vm:FixItemViewModel">
-                            <StackPanel Spacing="2" Margin="0,2,0,0">
-                              <TextBlock Text="{Binding Label}" TextWrapping="Wrap" Opacity="0.9" />
-                              <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsEdit}">
-                                <Button Grid.Column="0" Content="Apply" Command="{Binding ApplyCommand}" IsVisible="{Binding CanApply}"
-                                        Padding="10,1" Margin="0,0,8,0" VerticalAlignment="Center"
-                                        ToolTip.Tip="{Binding Preview, StringFormat='Change the input to: {0}'}" />
-                                <ItemsControl Grid.Column="1" ItemsSource="{Binding DiffParts}" VerticalAlignment="Center"
-                                              ItemTemplate="{StaticResource DiffPartTemplate}">
+                          <DataTemplate x:DataType="vm:AbnormalityItemViewModel">
+                            <Border Classes="card" Opacity="{Binding Opacity}"
+                                    Tapped="OnSpanItemTapped" PointerEntered="OnCardPointerEntered" PointerExited="OnCardPointerExited">
+                              <StackPanel Spacing="4">
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                  <Border Grid.Column="0" Background="{Binding KindBrush}" CornerRadius="3" Padding="6,1"
+                                          VerticalAlignment="Center" Margin="0,0,8,0">
+                                    <TextBlock Text="{Binding KindLabel}" Foreground="White" FontSize="12" />
+                                  </Border>
+                                  <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" TextWrapping="Wrap" />
+                                    <TextBlock Text="{Binding ShortForm}" IsVisible="{Binding ShowShortForm}" Opacity="0.65"
+                                               FontFamily="Cascadia Mono,Consolas,monospace" />
+                                  </StackPanel>
+                                  <Ellipse Grid.Column="2" Width="10" Height="10" Fill="{Binding DiagnosticsBrush}"
+                                           IsVisible="{Binding HasDiagnostics}" VerticalAlignment="Center"
+                                           ToolTip.Tip="{Binding DiagnosticsTip}" />
+                                </Grid>
+                                <TextBlock Text="{Binding Detailed}" IsVisible="{Binding ShowDetailed}" Opacity="0.65" TextWrapping="Wrap"
+                                           FontFamily="Cascadia Mono,Consolas,monospace"
+                                           ToolTip.Tip="Detailed system: the band composition from the short-arm end (ISCN §4.3.2)" />
+                                <ItemsControl ItemsSource="{Binding Tags}">
                                   <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                       <WrapPanel />
                                     </ItemsPanelTemplate>
                                   </ItemsControl.ItemsPanel>
+                                  <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                      <Border Classes="tag">
+                                        <TextBlock Text="{Binding}" FontSize="11" />
+                                      </Border>
+                                    </DataTemplate>
+                                  </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                              </Grid>
-                            </StackPanel>
+                                <ItemsControl ItemsSource="{Binding Flags}" IsVisible="{Binding HasFlags}">
+                                  <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                      <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                  </ItemsControl.ItemsPanel>
+                                  <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:FlagViewModel">
+                                      <Border Classes="flag" ToolTip.Tip="{Binding Tip}">
+                                        <TextBlock Text="{Binding Glyph}" FontSize="11" FontWeight="SemiBold" />
+                                      </Border>
+                                    </DataTemplate>
+                                  </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <Expander Header="{Binding PartsHeader}" IsVisible="{Binding HasParts}" Padding="4">
+                                  <ItemsControl ItemsSource="{Binding Parts}">
+                                    <ItemsControl.ItemTemplate>
+                                      <DataTemplate x:DataType="vm:AbnormalityPartViewModel">
+                                        <Border Classes="part" Tapped="OnSpanItemTapped">
+                                          <StackPanel Spacing="2">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                              <TextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" />
+                                              <TextBlock Text="{Binding ShortForm}" Opacity="0.65" FontFamily="Cascadia Mono,Consolas,monospace" />
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding TagsText}" FontSize="11" Opacity="0.7" TextWrapping="Wrap" />
+                                          </StackPanel>
+                                        </Border>
+                                      </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                  </ItemsControl>
+                                </Expander>
+                              </StackPanel>
+                            </Border>
                           </DataTemplate>
                         </ItemsControl.ItemTemplate>
                       </ItemsControl>
-                      <TextBlock Text="{Binding Citations}" IsVisible="{Binding HasCitations}" TextWrapping="Wrap" FontSize="12" Opacity="0.7" />
                     </StackPanel>
-                  </Grid>
-                </DataTemplate>
-              </ListBox.ItemTemplate>
-            </ListBox>
-            </DockPanel>
-            </Border>
-
-            <GridSplitter Grid.Column="1" Width="6" Background="Transparent" ResizeDirection="Columns" />
-
-            <!-- Right-hand tabs (T-059): abnormalities (T-069, default) | literal translation; the same full-height panel -->
-            <Border Grid.Column="2" Classes="panel">
-            <TabControl Classes="side" SelectedIndex="{Binding SelectedSideTab}">
-            <TabItem Header="Abnormalities">
-            <DockPanel>
-              <TextBlock DockPanel.Dock="Top" Text="No karyotype cell lines." Opacity="0.6"
-                         IsVisible="{Binding !HasCellLines}" />
-              <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-                <ItemsControl ItemsSource="{Binding CellLineGroups}" Margin="0,0,14,8">
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:CellLineGroupViewModel">
-                      <StackPanel Spacing="4" Margin="0,0,0,10">
-                        <TextBlock Text="{Binding Header}" FontWeight="SemiBold" Opacity="0.85" TextWrapping="Wrap" />
-                        <ItemsControl ItemsSource="{Binding Items}">
-                          <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:AbnormalityItemViewModel">
-                              <Border Classes="card" Opacity="{Binding Opacity}"
-                                      Tapped="OnSpanItemTapped" PointerEntered="OnCardPointerEntered" PointerExited="OnCardPointerExited">
-                                <StackPanel Spacing="4">
-                                  <Grid ColumnDefinitions="Auto,*,Auto">
-                                    <Border Grid.Column="0" Background="{Binding KindBrush}" CornerRadius="3" Padding="6,1"
-                                            VerticalAlignment="Center" Margin="0,0,8,0">
-                                      <TextBlock Text="{Binding KindLabel}" Foreground="White" FontSize="12" />
-                                    </Border>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                      <TextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" TextWrapping="Wrap" />
-                                      <TextBlock Text="{Binding ShortForm}" IsVisible="{Binding ShowShortForm}" Opacity="0.65"
-                                                 FontFamily="Cascadia Mono,Consolas,monospace" />
-                                    </StackPanel>
-                                    <Ellipse Grid.Column="2" Width="10" Height="10" Fill="{Binding DiagnosticsBrush}"
-                                             IsVisible="{Binding HasDiagnostics}" VerticalAlignment="Center"
-                                             ToolTip.Tip="{Binding DiagnosticsTip}" />
-                                  </Grid>
-                                  <TextBlock Text="{Binding Detailed}" IsVisible="{Binding ShowDetailed}" Opacity="0.65" TextWrapping="Wrap"
-                                             FontFamily="Cascadia Mono,Consolas,monospace"
-                                             ToolTip.Tip="Detailed system: the band composition from the short-arm end (ISCN §4.3.2)" />
-                                  <ItemsControl ItemsSource="{Binding Tags}">
-                                    <ItemsControl.ItemsPanel>
-                                      <ItemsPanelTemplate>
-                                        <WrapPanel />
-                                      </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                      <DataTemplate x:DataType="x:String">
-                                        <Border Classes="tag">
-                                          <TextBlock Text="{Binding}" FontSize="11" />
-                                        </Border>
-                                      </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                  </ItemsControl>
-                                  <ItemsControl ItemsSource="{Binding Flags}" IsVisible="{Binding HasFlags}">
-                                    <ItemsControl.ItemsPanel>
-                                      <ItemsPanelTemplate>
-                                        <WrapPanel />
-                                      </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                      <DataTemplate x:DataType="vm:FlagViewModel">
-                                        <Border Classes="flag" ToolTip.Tip="{Binding Tip}">
-                                          <TextBlock Text="{Binding Glyph}" FontSize="11" FontWeight="SemiBold" />
-                                        </Border>
-                                      </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                  </ItemsControl>
-                                  <Expander Header="{Binding PartsHeader}" IsVisible="{Binding HasParts}" Padding="4">
-                                    <ItemsControl ItemsSource="{Binding Parts}">
-                                      <ItemsControl.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:AbnormalityPartViewModel">
-                                          <Border Classes="part" Tapped="OnSpanItemTapped">
-                                            <StackPanel Spacing="2">
-                                              <StackPanel Orientation="Horizontal" Spacing="8">
-                                                <TextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" />
-                                                <TextBlock Text="{Binding ShortForm}" Opacity="0.65" FontFamily="Cascadia Mono,Consolas,monospace" />
-                                              </StackPanel>
-                                              <TextBlock Text="{Binding TagsText}" FontSize="11" Opacity="0.7" TextWrapping="Wrap" />
-                                            </StackPanel>
-                                          </Border>
-                                        </DataTemplate>
-                                      </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                  </Expander>
-                                </StackPanel>
-                              </Border>
-                            </DataTemplate>
-                          </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                      </StackPanel>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </ScrollViewer>
-            </DockPanel>
-            </TabItem>
-            <TabItem Header="Translation">
-            <DockPanel>
-              <!-- Options shared by every edition: coordinates toggle + build -->
-              <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,6">
-                <CheckBox Content="Genomic coordinates" FontSize="13"
-                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowCoordinates}"
-                          ToolTip.Tip="Approximate base-pair positions of the named bands on the reference genome and segment sizes (NCBI/UCSC band data; band edges are estimates)" />
-                <ComboBox FontSize="13" MinWidth="100"
-                          IsEnabled="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowCoordinates}"
-                          ItemsSource="{x:Static vm:MainWindowViewModel.CoordinateBuilds}"
-                          SelectedItem="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SelectedCoordinateBuild}"
-                          ToolTip.Tip="Genome build of the coordinates">
-                  <ComboBox.ItemTemplate>
-                    <DataTemplate x:DataType="vm:CoordinateBuildChoice">
-                      <TextBlock Text="{Binding Label}" />
-                    </DataTemplate>
-                  </ComboBox.ItemTemplate>
-                </ComboBox>
-              </StackPanel>
-              <TextBlock DockPanel.Dock="Top" Text="No translation for this edition." Opacity="0.6" FontSize="13"
-                         IsVisible="{Binding !HasTranslation}" />
-              <ScrollViewer HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding HasTranslation}">
-                <StackPanel Spacing="6" Margin="0,0,14,8" DataContext="{Binding Translation}" x:DataType="vm:TranslationViewModel">
-                  <Border Classes="banner" IsVisible="{Binding HasBanner}">
-                    <TextBlock Text="{Binding Banner}" FontWeight="SemiBold" TextWrapping="Wrap" FontSize="13" />
-                  </Border>
-                  <TextBlock Text="{Binding DraftNote}" IsVisible="{Binding HasDraftNote}" FontSize="11" FontStyle="Italic"
-                             Opacity="0.65" TextWrapping="Wrap" ToolTip.Tip="The wording is reviewed in task T-082" />
-                  <TextBlock Text="{Binding ReadingBasisText}" IsVisible="{Binding HasReadingBasisText}" FontSize="12"
-                             Opacity="0.75" TextWrapping="Wrap" />
-                  <ContentControl Content="{Binding Summary}" ContentTemplate="{StaticResource TranslationItemTemplate}" />
-                  <ItemsControl ItemsSource="{Binding Items}" ItemTemplate="{StaticResource TranslationItemTemplate}" />
-                </StackPanel>
-              </ScrollViewer>
-            </DockPanel>
-            </TabItem>
-            </TabControl>
-            </Border>
-            </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
           </DockPanel>
-        </DataTemplate>
-
-        <!-- CytoGPS (T-081): on demand, in the background; its result never changes the edition tabs -->
-        <DataTemplate x:DataType="vm:CytoGpsPanelViewModel">
+        </Panel>
+      </TabItem>
+      <TabItem Header="Translation">
+        <Panel DataContext="{Binding SelectedPanel}" x:DataType="vm:EditionPanelViewModel">
+          <TextBlock Text="{Binding NotImplementedText}" IsVisible="{Binding IsNotImplemented}" Opacity="0.6" Margin="0,6" />
+          <DockPanel IsVisible="{Binding IsImplemented}" Margin="0,6,0,0">
+            <!-- Options shared by every edition: coordinates toggle + build -->
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,6">
+              <CheckBox Content="Genomic coordinates" FontSize="13"
+                        IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowCoordinates}"
+                        ToolTip.Tip="Approximate base-pair positions of the named bands on the reference genome and segment sizes (NCBI/UCSC band data; band edges are estimates)" />
+              <ComboBox FontSize="13" MinWidth="100"
+                        IsEnabled="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowCoordinates}"
+                        ItemsSource="{x:Static vm:MainWindowViewModel.CoordinateBuilds}"
+                        SelectedItem="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SelectedCoordinateBuild}"
+                        ToolTip.Tip="Genome build of the coordinates">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:CoordinateBuildChoice">
+                    <TextBlock Text="{Binding Label}" />
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+            </StackPanel>
+            <TextBlock DockPanel.Dock="Top" Text="No translation for this edition." Opacity="0.6" FontSize="13"
+                       IsVisible="{Binding !HasTranslation}" />
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding HasTranslation}">
+              <StackPanel Spacing="6" Margin="0,0,14,8" DataContext="{Binding Translation}" x:DataType="vm:TranslationViewModel">
+                <Border Classes="banner" IsVisible="{Binding HasBanner}">
+                  <TextBlock Text="{Binding Banner}" FontWeight="SemiBold" TextWrapping="Wrap" FontSize="13" />
+                </Border>
+                <TextBlock Text="{Binding DraftNote}" IsVisible="{Binding HasDraftNote}" FontSize="11" FontStyle="Italic"
+                           Opacity="0.65" TextWrapping="Wrap" ToolTip.Tip="The wording is reviewed in task T-082" />
+                <TextBlock Text="{Binding ReadingBasisText}" IsVisible="{Binding HasReadingBasisText}" FontSize="12"
+                           Opacity="0.75" TextWrapping="Wrap" />
+                <ContentControl Content="{Binding Summary}" ContentTemplate="{StaticResource TranslationItemTemplate}" />
+                <ItemsControl ItemsSource="{Binding Items}" ItemTemplate="{StaticResource TranslationItemTemplate}" />
+              </StackPanel>
+            </ScrollViewer>
+          </DockPanel>
+        </Panel>
+      </TabItem>
+      <!-- CytoGPS (T-081): on demand, in the background; its result never changes the CytoLex views -->
+      <TabItem Header="{Binding CytoGps.Header}">
+        <Panel DataContext="{Binding CytoGps}" x:DataType="vm:CytoGpsPanelViewModel">
           <ScrollViewer HorizontalScrollBarVisibility="Disabled">
             <StackPanel Margin="0,6,14,8" Spacing="8">
               <StackPanel Orientation="Horizontal" Spacing="8">
@@ -359,8 +351,8 @@
               </ItemsControl>
             </StackPanel>
           </ScrollViewer>
-        </DataTemplate>
-      </TabControl.DataTemplates>
+        </Panel>
+      </TabItem>
     </TabControl>
   </DockPanel>
   </TabItem>
@@ -777,24 +769,27 @@
       <Setter Property="CornerRadius" Value="4" />
       <Setter Property="ClipToBounds" Value="True" />
     </Style>
-    <Style Selector="Border.panelheader">
-      <Setter Property="Height" Value="36" />
-      <Setter Property="Padding" Value="12,0" />
-      <Setter Property="BorderBrush" Value="#40808080" />
-      <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <!-- Edition chips (T-098) -->
+    <Style Selector="ListBox.chips">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" />
     </Style>
-    <Style Selector="Border.panelheader > TextBlock">
-      <Setter Property="FontSize" Value="14" />
-      <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="VerticalAlignment" Value="Center" />
+    <Style Selector="ListBox.chips > ListBoxItem">
+      <Setter Property="Padding" Value="10,3" />
+      <Setter Property="Margin" Value="0,0,6,0" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="BorderBrush" Value="#60808080" />
+      <Setter Property="BorderThickness" Value="1" />
     </Style>
-    <Style Selector="TabControl.side">
-      <Setter Property="Padding" Value="8,8,8,0" />
+    <Style Selector="ListBox.chips > ListBoxItem:selected">
+      <Setter Property="BorderBrush" Value="#0078D4" />
+      <Setter Property="BorderThickness" Value="2" />
     </Style>
-    <Style Selector="TabControl.side > TabItem">
-      <Setter Property="FontSize" Value="14" />
+    <!-- View tabs (T-098) -->
+    <Style Selector="TabControl#ViewTabs > TabItem">
+      <Setter Property="FontSize" Value="15" />
       <Setter Property="MinHeight" Value="36" />
-      <Setter Property="Height" Value="36" />
       <Setter Property="Padding" Value="12,0" />
     </Style>
     <!-- Translation (T-059): the part at the mouse in the editor, the summary card, the partial-translation banner -->

@@ -122,11 +122,11 @@ public class CytoGpsPanelTests
     }
 
     [Fact]
-    public void NotConfigured_MainWindow_CytoGpsTabLastWithReason()
+    public void NotConfigured_MainWindow_CytoGpsViewWithReason()
     {
         var vm = new MainWindowViewModel { Input = _valid };
-        Assert.Same(vm.CytoGps, vm.ResultTabs[^1]);
-        Assert.Equal(vm.Panels.Count + 1, vm.ResultTabs.Count);
+        Assert.Equal(ResultView.CytoGps, Enum.GetValues<ResultView>()[^1]); // the last view tab
+        Assert.DoesNotContain(vm.Panels, p => p.ChipText.StartsWith("CytoGPS", StringComparison.Ordinal));
         Assert.Equal(CytoGpsState.NotConfigured, vm.CytoGps.State);
         Assert.StartsWith("CytoGPS not configured: ", vm.CytoGps.StateText, StringComparison.Ordinal);
     }
@@ -387,30 +387,30 @@ public class CytoGpsPanelTests
 
     private static string Describe(MainWindowViewModel vm) => string.Join(
         "\n",
-        vm.Panels.Select(p => $"{p.Header}|{p.ValidityText}|{p.CountsText}|"
+        vm.Panels.Select(p => $"{p.ChipText}|{p.ValidityText}|{p.CountsText}|"
             + string.Join(";", p.Diagnostics.Select(d => $"{d.RuleId}@{d.Location}:{d.Message}"))));
 
     [Fact]
-    public void CytoGpsTab_StaysSelectedAcrossRevalidation_AndEditorKeepsEditionHighlights()
+    public void CytoGpsView_StaysSelectedAcrossRevalidation_AndEditorKeepsEditionHighlights()
     {
         var checker = new FakeChecker { Immediate = s => Answer(s, ExternalVerdict.Valid, "VALID") };
         var vm = new MainWindowViewModel(null, Rules.RuleStore.DefaultPath, checker, null) { Input = _invalid };
         var panel = vm.SelectedPanel;
-        Assert.Same(panel, vm.SelectedResultTab);
+        Assert.NotNull(panel);
         Assert.NotEmpty(vm.Highlights);
 
-        vm.SelectedResultTab = vm.CytoGps;
-        Assert.True(vm.IsCytoGpsTabSelected);
+        vm.SelectedViewIndex = (int)ResultView.CytoGps;
+        Assert.True(vm.IsCytoGpsViewSelected);
         Assert.Same(panel, vm.SelectedPanel);
         Assert.NotEmpty(vm.Highlights);
 
         vm.Input = "46XY";
-        Assert.Same(vm.CytoGps, vm.SelectedResultTab);
+        Assert.Equal(ResultView.CytoGps, vm.SelectedView);
         Assert.NotNull(vm.SelectedPanel);
         Assert.NotEmpty(vm.Highlights);
 
-        vm.SelectedResultTab = vm.Panels[0];
-        Assert.Same(vm.Panels[0], vm.SelectedPanel);
-        Assert.False(vm.IsCytoGpsTabSelected);
+        vm.SelectedView = ResultView.Diagnostics;
+        Assert.False(vm.IsCytoGpsViewSelected);
+        Assert.Equal((int)ResultView.Diagnostics, vm.SelectedViewIndex);
     }
 }

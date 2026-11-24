@@ -26,7 +26,7 @@ public class MainWindowViewModelTests
         Assert.Same(panel, vm.SelectedPanel);
         Assert.True(panel.IsValid);
         Assert.Equal("Valid in ISCN 2016", panel.ValidityText);
-        Assert.Equal("ISCN 2016 ✓ valid", panel.Header);
+        Assert.Equal("2016 ✓ valid", panel.ChipText);
         var segment = Assert.Single(panel.Segments);
         Assert.Equal("karyotype", segment.Type);
         Assert.Null(segment.Note);
@@ -41,7 +41,7 @@ public class MainWindowViewModelTests
         var panel = vm.SelectedPanel!;
         Assert.False(panel.IsValid);
         Assert.True(panel.IsInvalid);
-        Assert.Equal("ISCN 2016 ✗ not valid", panel.Header);
+        Assert.StartsWith("2016 ✗ ", panel.ChipText, StringComparison.Ordinal);
         Assert.StartsWith("Not valid in ISCN 2016", panel.ValidityText, StringComparison.Ordinal);
         var item = Assert.Single(panel.Diagnostics, d => d.RuleId == "KARYO.COUNT_SEX_ORDER");
         Assert.Equal("error", item.SeverityLabel);
@@ -126,7 +126,7 @@ public class MainWindowViewModelTests
         Assert.False(panel.IsValid);
         Assert.False(panel.IsInvalid);
         Assert.Equal("ISCN 2020: not implemented", panel.ValidityText);
-        Assert.Equal("ISCN 2020 · not implemented", panel.Header);
+        Assert.Equal("2020 n/a", panel.ChipText);
         Assert.Empty(panel.CountsText);
         Assert.Empty(panel.Diagnostics);
         Assert.Empty(panel.CellLineGroups);

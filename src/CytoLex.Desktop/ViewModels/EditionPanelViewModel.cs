@@ -9,9 +9,10 @@ namespace CytoLex.Desktop.ViewModels;
 
 /// <summary>
 /// The result of one edition (T-037): verdict, counts, segment notes, diagnostics, abnormalities and editor highlights.
-/// One tab of the results area; a single-edition check has one panel, "All editions" one per known edition.
+/// One chip of the edition strip (T-098); the view tabs (Diagnostics, Abnormalities, Translation) show the selected panel.
+/// A single-edition check has one panel, "All editions" one per known edition.
 /// </summary>
-public partial class EditionPanelViewModel : ObservableObject, IResultTab
+public partial class EditionPanelViewModel : ObservableObject
 {
     public EditionPanelViewModel(ValidationReport report, EditionResult result, ApplyFixHandler? applyFix = null)
         : this(report, result, applyFix, CoordinateBuild.Grch38, null)
@@ -35,10 +36,9 @@ public partial class EditionPanelViewModel : ObservableObject, IResultTab
         IsNotImplemented = result.Status == EditionStatus.NotImplemented;
         IsValid = !IsNotImplemented && result.Validity.IsValid;
         ValidityText = VerdictOf(result, report.Context);
-        Header = IsNotImplemented ? $"ISCN {Edition} · not implemented"
-            : IsValid ? $"ISCN {Edition} ✓ valid"
-            : $"ISCN {Edition} ✗ not valid";
+        ChipText = ChipOf(Edition, IsNotImplemented, IsValid, result.Counts.Errors);
         CountsText = IsNotImplemented ? string.Empty : CountsOf(result.Counts);
+        ChipTip = CountsText.Length == 0 ? ValidityText : $"{ValidityText} · {CountsText}";
 
         Segments = [.. report.Segments.Select(s => SegmentItemViewModel.From(input, s, result.Segments.FirstOrDefault(r => r.Segment.Index == s.Index)))];
         Diagnostics = [.. result.Diagnostics.Select((d, i) => new DiagnosticItemViewModel(input, d, i, result.Edition, applyFix))];
@@ -61,16 +61,6 @@ public partial class EditionPanelViewModel : ObservableObject, IResultTab
     /// <summary>Whether there is a translation to show.</summary>
     public bool HasTranslation => Translation is not null;
 
-    /// <summary>The right-hand tab: <see cref="AbnormalitiesTab"/> (default) or <see cref="TranslationTab"/>.</summary>
-    [ObservableProperty]
-    public partial int SelectedSideTab { get; set; }
-
-    /// <summary>The translation tab of the right-hand column.</summary>
-    public const int TranslationTab = 1;
-
-    /// <summary>The abnormalities tab of the right-hand column.</summary>
-    public const int AbnormalitiesTab = 0;
-
     /// <summary>Selects diagnostic <paramref name="index"/> (into <c>EditionResult.Diagnostics</c>) in the list: a translation part's diagnostic link.</summary>
     public void SelectDiagnostic(int index)
     {
@@ -92,8 +82,11 @@ public partial class EditionPanelViewModel : ObservableObject, IResultTab
     /// <summary>The edition, e.g. <c>2016</c>.</summary>
     public string Edition { get; }
 
-    /// <summary>The tab header: <c>ISCN 2016 ✓ valid</c>, <c>ISCN 2016 ✗ not valid</c> or <c>ISCN 2020 · not implemented</c>.</summary>
-    public string Header { get; }
+    /// <summary>The edition chip (T-098): <c>2016 ✓ valid</c>, <c>2016 ✗ 2 errors</c> or <c>2020 n/a</c>.</summary>
+    public string ChipText { get; }
+
+    /// <summary>The chip's tooltip: the verdict and the counts.</summary>
+    public string ChipTip { get; }
 
     /// <summary>The verdict, e.g. <c>Valid in ISCN 2016 as constitutional only</c> or <c>ISCN 2020: not implemented</c>.</summary>
     public string ValidityText { get; }
@@ -137,6 +130,12 @@ public partial class EditionPanelViewModel : ObservableObject, IResultTab
     /// <summary>Whether there are cell lines to show in the abnormalities panel.</summary>
     public bool HasCellLines => CellLineGroups.Count > 0;
 
+    /// <summary>The header of the abnormalities view: <c>Abnormalities</c> or <c>Abnormalities (2)</c> (cards over every cell line).</summary>
+    public string AbnormalitiesHeader => CellLineGroups.Sum(g => g.Items.Length) is var n and > 0 ? $"Abnormalities ({n})" : "Abnormalities";
+
+    /// <summary>Shown in a view of a not-implemented edition, e.g. <c>ISCN 2020 is not implemented.</c></summary>
+    public string NotImplementedText => $"ISCN {Edition} is not implemented.";
+
     /// <summary>The editor highlights of this edition's result.</summary>
     public ImmutableArray<Highlight> Highlights { get; }
 
@@ -159,6 +158,13 @@ public partial class EditionPanelViewModel : ObservableObject, IResultTab
                 : $"Valid in ISCN {result.Edition}";
         return v.IsComplete ? text : text + " (as far as implemented)";
     }
+
+    internal static string ChipOf(string edition, bool notImplemented, bool valid, int errors) =>
+        notImplemented ? $"{edition} n/a"
+        : valid ? $"{edition} ✓ valid"
+        : errors == 1 ? $"{edition} ✗ 1 error"
+        : errors > 1 ? $"{edition} ✗ {errors} errors"
+        : $"{edition} ✗ not valid";
 
     private static string CountsOf(SeverityCounts c)
     {

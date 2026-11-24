@@ -31,13 +31,13 @@ public sealed class TranslationViewTests
     }
 
     [Fact]
-    public void AbnormalitiesTab_IsTheDefault_TranslationKeptAcrossTyping()
+    public void DiagnosticsView_IsTheDefault_TranslationKeptAcrossTyping()
     {
         var vm = new MainWindowViewModel { Input = "46,XY,del(5)(q13q33)" };
-        Assert.Equal(EditionPanelViewModel.AbnormalitiesTab, vm.SelectedPanel!.SelectedSideTab);
-        vm.SelectedPanel.SelectedSideTab = EditionPanelViewModel.TranslationTab; // the user clicks "Translation"
+        Assert.Equal(ResultView.Diagnostics, vm.SelectedView);
+        vm.SelectedViewIndex = (int)ResultView.Translation; // the user clicks "Translation"
         vm.Input = "46,XY,del(5)(q13q34)";
-        Assert.Equal(EditionPanelViewModel.TranslationTab, vm.SelectedPanel!.SelectedSideTab);
+        Assert.Equal(ResultView.Translation, vm.SelectedView);
     }
 
     [Fact]

@@ -32,13 +32,13 @@ public enum CytoGpsState
 }
 
 /// <summary>
-/// The CytoGPS tab of the single-string check (T-081): runs the external checker (the T-049 adapter) on demand, or
+/// The CytoGPS view of the single-string check (T-081; a view tab since T-098): runs the external checker (the T-049 adapter) on demand, or
 /// automatically after a typing pause, in the background, and shows its verdict, raw status, messages, the repaired string,
 /// the string as sent and an agreement badge against the CytoLex verdict in the checker's edition. CytoGPS is optional:
 /// nothing here feeds back into CytoLex, nothing throws into the app, a new input cancels the running check and a result
 /// for an older input is never shown.
 /// </summary>
-public partial class CytoGpsPanelViewModel : ObservableObject, IResultTab
+public partial class CytoGpsPanelViewModel : ObservableObject
 {
     /// <summary>The default typing pause before an automatic check.</summary>
     public static readonly TimeSpan DefaultAutoDelay = TimeSpan.FromSeconds(1.5);
@@ -192,7 +192,7 @@ public partial class CytoGpsPanelViewModel : ObservableObject, IResultTab
     [ObservableProperty]
     public partial bool IsAutoCheck { get; set; }
 
-    /// <summary>The tab header.</summary>
+    /// <summary>The view tab header, e.g. <c>CytoGPS ✓ valid</c>.</summary>
     public string Header => State switch
     {
         CytoGpsState.NotConfigured => $"{Name} · not configured",
@@ -324,7 +324,7 @@ public partial class CytoGpsPanelViewModel : ObservableObject, IResultTab
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            // The adapter never throws for tool problems; anything else still stays in this tab.
+            // The adapter never throws for tool problems; anything else still stays in this view.
             if (_run == run)
             {
                 ShowFailure($"{Name} check failed: {ex.Message}");

@@ -15,8 +15,9 @@ namespace CytoLex.Desktop.ViewModels;
 /// <summary>
 /// The single-string check (T-036): validates <see cref="Input"/> on every change in the edition picked in the selector, or in
 /// every known edition (T-037), and exposes the context plus one <see cref="EditionPanelViewModel"/> per edition (verdict,
-/// segments, diagnostics, abnormalities by cell line (T-069), literal translation (T-059), editor highlights). The optional
-/// CytoGPS tab (T-081, <see cref="CytoGps"/>) sits after the edition tabs; it only reads the input and never changes them.
+/// segments, diagnostics, abnormalities by cell line (T-069), literal translation (T-059), editor highlights). Layout (T-098):
+/// the editions are a chip strip (<see cref="Panels"/>, <see cref="SelectedPanel"/>) and the views of the selected edition are
+/// full-width tabs (<see cref="SelectedView"/>); the optional CytoGPS view (T-081, <see cref="CytoGps"/>) only reads the input.
 /// </summary>
 public partial class MainWindowViewModel : ObservableObject
 {
@@ -254,34 +255,35 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     public partial string ContextText { get; set; } = string.Empty;
 
-    /// <summary>One panel per validated edition (one tab each).</summary>
+    /// <summary>One panel per validated edition: the chips of the edition strip (T-098).</summary>
     public ObservableCollection<EditionPanelViewModel> Panels { get; } = [];
 
-    /// <summary>The CytoGPS tab (T-081): optional, on demand, never blocks CytoLex.</summary>
+    /// <summary>The CytoGPS view (T-081): optional, on demand, never blocks CytoLex.</summary>
     public CytoGpsPanelViewModel CytoGps { get; }
 
-    /// <summary>The result tabs: <see cref="Panels"/>, then <see cref="CytoGps"/> (T-081).</summary>
-    public ObservableCollection<IResultTab> ResultTabs { get; } = [];
-
     /// <summary>
-    /// The result tab shown. An edition tab sets <see cref="SelectedPanel"/>; the CytoGPS tab keeps it, so the editor still
-    /// draws that edition's highlights.
+    /// The view tab shown (T-098; <see cref="ResultView.Diagnostics"/> by default). It is kept when the edition, the edition
+    /// selector or the input changes; the CytoGPS view keeps <see cref="SelectedPanel"/>, so the editor still draws its highlights.
     /// </summary>
     [ObservableProperty]
-    public partial IResultTab? SelectedResultTab { get; set; }
+    [NotifyPropertyChangedFor(nameof(SelectedViewIndex), nameof(IsCytoGpsViewSelected))]
+    public partial ResultView SelectedView { get; set; }
 
-    /// <summary>Whether the CytoGPS tab is shown.</summary>
-    public bool IsCytoGpsTabSelected => SelectedResultTab is CytoGpsPanelViewModel;
-
-    partial void OnSelectedResultTabChanged(IResultTab? value)
+    /// <summary><see cref="SelectedView"/> as the index of the view tab control.</summary>
+    public int SelectedViewIndex
     {
-        if (value is EditionPanelViewModel panel)
+        get => (int)SelectedView;
+        set
         {
-            SelectedPanel = panel;
+            if (Enum.IsDefined((ResultView)value))
+            {
+                SelectedView = (ResultView)value;
+            }
         }
-
-        OnPropertyChanged(nameof(IsCytoGpsTabSelected));
     }
+
+    /// <summary>Whether the CytoGPS view is shown.</summary>
+    public bool IsCytoGpsViewSelected => SelectedView == ResultView.CytoGps;
 
     // The CytoLex verdict of the agreement badge: from the shown report when it has the edition, else one extra validation.
     private bool? CytoLexVerdict(string input, string edition)
@@ -297,7 +299,7 @@ public partial class MainWindowViewModel : ObservableObject
         return result is { Status: EditionStatus.Implemented } ? result.Validity.IsValid : null;
     }
 
-    /// <summary>The panel (tab) shown; the editor draws its highlights.</summary>
+    /// <summary>The selected edition chip; the views show it and the editor draws its highlights.</summary>
     [ObservableProperty]
     public partial EditionPanelViewModel? SelectedPanel { get; set; }
 
@@ -385,11 +387,6 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         HoverSpan = null;
-        if (SelectedResultTab is not CytoGpsPanelViewModel)
-        {
-            SelectedResultTab = value;
-        }
-
         OnPropertyChanged(nameof(Highlights));
     }
 
@@ -397,6 +394,8 @@ public partial class MainWindowViewModel : ObservableObject
     {
         if (e.PropertyName == nameof(EditionPanelViewModel.SelectedDiagnostic) && sender is EditionPanelViewModel { SelectedDiagnostic: { } item })
         {
+            // A translation part's diagnostic link selects it from another view: show it (T-098).
+            SelectedView = ResultView.Diagnostics;
             SelectSpan(item.Span);
         }
     }
@@ -404,13 +403,9 @@ public partial class MainWindowViewModel : ObservableObject
     /// <summary>Validates <see cref="Input"/> in the selected edition(s) and rebuilds the panels.</summary>
     public void Validate()
     {
-        // Keep the shown tab across re-validation ("All editions" while typing).
+        // Keep the selected edition across re-validation ("All editions" while typing); the view (T-098) is never reset.
         var previous = SelectedPanel?.Edition;
-        var sideTab = SelectedPanel?.SelectedSideTab ?? EditionPanelViewModel.AbnormalitiesTab; // and the right-hand tab (T-059)
-        var cytoGpsShown = SelectedResultTab is CytoGpsPanelViewModel; // and the CytoGPS tab (T-081)
-        SelectedResultTab = null;
         SelectedPanel = null;
-        ResultTabs.Clear();
         Panels.Clear();
         Report = null;
         if (_validator is null)
@@ -440,28 +435,15 @@ public partial class MainWindowViewModel : ObservableObject
         Report = report;
         foreach (var result in report.Results)
         {
-            Panels.Add(new EditionPanelViewModel(report, result, ApplyFix, SelectedCoordinateBuild.Build, (edition, r) => OpenKbEntry(edition, r))
-            {
-                SelectedSideTab = sideTab,
-            });
+            Panels.Add(new EditionPanelViewModel(report, result, ApplyFix, SelectedCoordinateBuild.Build, (edition, r) => OpenKbEntry(edition, r)));
         }
 
         HasResult = true;
         Placeholder = string.Empty;
         ContextText = ContextOf(input, report.Context);
-        foreach (var panel in Panels)
-        {
-            ResultTabs.Add(panel);
-        }
-
-        ResultTabs.Add(CytoGps);
         SelectedPanel = Panels.FirstOrDefault(p => p.Edition == previous)
             ?? Panels.FirstOrDefault(p => p.IsImplemented)
             ?? Panels.FirstOrDefault();
-        if (cytoGpsShown)
-        {
-            SelectedResultTab = CytoGps;
-        }
 
         // After the CytoLex results are complete: CytoGPS only reads the input (a new input cancels its running check).
         CytoGps.SetInput(input);
@@ -486,6 +468,22 @@ public partial class MainWindowViewModel : ObservableObject
             ? $"Context: unknown, the markers contradict each other{markers}"
             : "Context: unknown (no markers); context-dependent findings are shown per context";
     }
+}
+
+/// <summary>The view tabs of the single-string check (T-098), in tab order; later views (Map, T-101) are added here.</summary>
+public enum ResultView
+{
+    /// <summary>Verdict, Fix all, segments and diagnostics with fixes (the default).</summary>
+    Diagnostics,
+
+    /// <summary>The abnormalities by cell line (T-069).</summary>
+    Abnormalities,
+
+    /// <summary>The literal translation (T-059).</summary>
+    Translation,
+
+    /// <summary>The optional CytoGPS check (T-081).</summary>
+    CytoGps,
 }
 
 /// <summary>An entry of the genome build selector of the translation coordinates (T-059).</summary>
