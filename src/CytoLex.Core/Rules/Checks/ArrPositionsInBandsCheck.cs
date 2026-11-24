@@ -51,7 +51,7 @@ internal sealed class ArrPositionsInBandsCheck : IRuleCheck
     }
 
     /// <summary>Every reading of a region with positions: the main one and each <c>or</c> reading paired with its positions.</summary>
-    private static IEnumerable<ArrReading> Readings(ArrModel model)
+    internal static IEnumerable<ArrReading> Readings(ArrModel model)
     {
         foreach (var region in model.Aberrations.Where(a => !a.IsWholeChromosomes).SelectMany(a => a.Regions))
         {
@@ -174,8 +174,24 @@ internal static class ArrPositionFit
         return holding.FirstOrDefault(b => Shape(b) == shape);
     }
 
-    private static string Shape(Band band) =>
-        new([.. band.Name[(band.Chromosome.Length + 1)..].Select(c => c == '.' ? '.' : '9')]);
+    /// <summary>
+    /// The band of <paramref name="chromosome"/> holding <paramref name="position"/> in <paramref name="build"/> whose
+    /// number has the written number's form (<c>22.33</c> → <c>21.33</c>), else the deepest one whose form the written
+    /// one extends (<c>11.21</c> → <c>11.2</c>); <c>null</c> when none (T-041 band suggestions).
+    /// </summary>
+    internal static Band? HoldingBand(BandSet bands, string chromosome, string number, long position, string build)
+    {
+        var shape = Shape(number);
+        var holding = bands.Bands
+            .Where(b => b.Chromosome == chromosome && Range(b, build) is { } r && position >= r.Start && position <= r.End)
+            .ToList();
+        return holding.FirstOrDefault(b => Shape(b) == shape)
+            ?? holding.Where(b => shape.StartsWith(Shape(b), StringComparison.Ordinal)).MaxBy(b => b.Name.Length);
+    }
+
+    private static string Shape(Band band) => Shape(band.Name[(band.Chromosome.Length + 1)..]);
+
+    private static string Shape(string number) => new([.. number.Select(c => c == '.' ? '.' : '9')]);
 
     private static string N(long value) => value.ToString(CultureInfo.InvariantCulture);
 

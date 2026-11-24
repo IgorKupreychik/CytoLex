@@ -50,7 +50,10 @@ Decisions made during planning (2026-11-16) and later `discussion` tasks. Each n
 
 ## Fix suggestions
 - **Pilot:** level 1 (deterministic fix, shown as a before/after diff with an "Apply" button) and level 3 (plain-language explanation with citation when no single fix exists).
-- **Later:** level 2, "did you mean" (typos, nearest band) — T-041.
+- **Level 2, "did you mean" (T-041, as built 2026-11-24):** 1–3 options for an unlisted word (`SYM.LISTED_ONLY`) and for a band name the edition doesn't have (`BAND.MUST_EXIST`), shown before the level-3 explanation, which stays. Each option is a `Fix` with `Level = Suggestion`, one replace edit and a preview; it is applied only when the user clicks Apply, never by "Fix all" or autocorrection (both take level-1 fixes only, `Fix.IsEdit`), and highlighting ignores it (the span is underlined as for an explanation).
+  - **Which rules:** decided in code, not by a KB flag (user, 2026-11-24): suggestions are not validation logic, and their candidates come from KB data only (the ch. 3 vocabulary, the band set). The KB `fix.level` of both rules stays 3. Rejected for now: `fix.suggest` in the rule schema (like `fix.auto`); revisit if more rules need options.
+  - **Symbols:** listed abbreviations whose meaning's first word starts with the written word (`trans` → `t`, Translocation; `deletion` → `del`), then near typos of that word (`inversoin`), then typos of the token (optimal string alignment distance ≤1 for words up to 4 letters, ≤2 longer: `dl` → `del`). Each candidate is checked by re-parsing the segment with it: kept only when the parser reports fewer faults and none at the word, so the option fits its position (`dl(5)` → `del`, not `dn`). Unrelated words (`qwzx`) get none.
+  - **Bands:** on the written chromosome: (arr only) the band of the written form that holds the region's position in the stated build (`18q22.33` → `18q21.33`, the KB's corrected examples); the nearest bands of the same form within the same band or arm (`9q35` → `9q34`, `9q34.4` → `9q34.3`); the nearest enclosing band (`21q11.29` → `21q11.2`); the same number on the other arm (`9p34` → `9q34`). Karyotype and in situ strings get only bands of the book's idiograms.
 - **Highlighting:** wrong range underlined; missing text shown as an insertion marker with grey expected text; extra text struck through.
 - Fixes are per version.
 

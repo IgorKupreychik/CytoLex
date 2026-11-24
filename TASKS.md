@@ -50,7 +50,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-038 | done | 2 | T-036 | Desktop: batch validation + export |
 | T-039 | done | 2 | T-036, T-005 | Desktop: rule browser |
 | T-040 | done | 2 | T-036, T-035 | Desktop: fix UI (diff view, Apply → re-validate) |
-| T-041 | todo | 3 | T-035 | Level 2 "did you mean" suggestions |
+| T-041 | done | 3 | T-035 | Level 2 "did you mean" suggestions |
 | T-042 | todo | 3 | T-027 | Handling of underlined homologue notation |
 | T-043 | discussion | 5 | – | Copyright cleanup before any public deployment |
 | T-044 | todo | 5 | T-028 | Web service wrapping the core library + browser page |
@@ -900,10 +900,10 @@ Deviations from the plan: no CLI (user); new label `severity-policy` and CytoLex
 ## Later
 
 ### T-041 — Level 2 "did you mean" suggestions
-**Status:** todo
+**Status:** done
 **Description:** Suggestions for symbol typos (`dl` → `del`, `trans` → `t`) and nearest existing band (`9q35` → `9q34`?). Shown as 1–3 options, never applied automatically.
 **Acceptance:** Suggestions appear for a test set of typos; nothing is auto-applied.
-**Notes:**
+**Notes:** Done 2026-11-24. `Fix` level 2 (`FixLevel.Suggestion`, `Fix.IsSuggestion`/`HasEdits`; `IsEdit` stays level 1 only, so fix all, autocorrection and highlights ignore options): 1–3 options per diagnostic before the level-3 explanation, from `SuggestionProposal`s (`RuleFinding.Suggestions`, `DiagnosticFactory.WithSuggestions`, `MaxSuggestions = 3`). `SYM.LISTED_ONLY`: `src/CytoLex.Core/Validation/Suggestions/SymbolSuggester.cs` (vocab abbreviations by meaning prefix, near meaning typo, or token typo by OSA distance; each verified by re-parsing the segment), wired in `Validator.Run`. `BAND.MUST_EXIST`: `src/CytoLex.Core/Rules/Checks/BandSuggestions.cs` (arr position band via `ArrPositionFit.HoldingBand`, nearest same-form siblings, enclosing band, other arm; book bands only outside arr). Desktop: `FixItemViewModel` shows options as diff + Apply. Tests: `tests/CytoLex.Core.Tests/Validation/SuggestionTests.cs` (15-typo test set, KB arr corrected forms, never auto-applied), `FixUiTests`, `HighlightBuilderTests`; `FixTests.NoSingleFix_GivesExplanationWithCitations` now allows options before the explanation. Deviation from the task text: the rules are chosen in code, not by a KB flag (user decision, `docs/decisions.md` → Fix suggestions).
 
 ### T-042 — Underlined homologue notation
 **Status:** todo

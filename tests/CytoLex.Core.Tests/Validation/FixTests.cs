@@ -119,7 +119,9 @@ public class FixTests
     {
         var d = Only(Validate(input), ruleId);
 
-        var fix = Assert.Single(d.Fixes);
+        // "Did you mean" options (T-041: 9q35 → 9q34) come before the explanation, which is always last.
+        var fix = d.Fixes[^1];
+        Assert.All(d.Fixes.Take(d.Fixes.Length - 1), f => Assert.True(f.IsSuggestion));
         Assert.Equal(FixLevel.Explanation, fix.Level);
         Assert.Null(fix.Kind);
         Assert.Empty(fix.Edits);

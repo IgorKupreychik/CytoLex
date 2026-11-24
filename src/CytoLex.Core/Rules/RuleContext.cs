@@ -38,6 +38,9 @@ public sealed record RuleFinding(
 {
     /// <summary>The edits the check proposes (T-035); empty = no deterministic fix for this finding.</summary>
     public ImmutableArray<FixProposal> Fixes { get; init; } = [];
+
+    /// <summary>"Did you mean" options for this finding (level 2, T-041), best first; at most three are kept.</summary>
+    public ImmutableArray<SuggestionProposal> Suggestions { get; init; } = [];
 }
 
 /// <summary>What a check sees of one segment in one edition, and where it reports (docs/design/core.md §7.2).</summary>
@@ -126,6 +129,7 @@ public sealed class RuleContext
     /// <param name="contexts">The contexts the finding applies to, when the check itself knows (e.g. <c>47,XXX</c>); default = the rule's KB contexts.</param>
     /// <param name="cannotVerify">The string alone cannot show whether the rule is met: reported as info.</param>
     /// <param name="fixes">The edits proposed for this finding (T-035); default = none (the engine gives an explanation).</param>
+    /// <param name="suggestions">"Did you mean" options (level 2, T-041), best first; default = none.</param>
     public void Report(
         TextSpan span,
         string? detail = null,
@@ -133,7 +137,8 @@ public sealed class RuleContext
         Certainty certainty = Certainty.Certain,
         ImmutableArray<SampleContext> contexts = default,
         bool cannotVerify = false,
-        ImmutableArray<FixProposal> fixes = default) =>
+        ImmutableArray<FixProposal> fixes = default,
+        ImmutableArray<SuggestionProposal> suggestions = default) =>
         _findings.Add(new RuleFinding(
             span,
             detail,
@@ -143,6 +148,7 @@ public sealed class RuleContext
             cannotVerify)
         {
             Fixes = fixes.IsDefault ? [] : fixes,
+            Suggestions = suggestions.IsDefault ? [] : suggestions,
         });
 
     /// <summary>Reports a finding with one proposed fix (T-035); <c>null</c> = none (the engine gives an explanation).</summary>

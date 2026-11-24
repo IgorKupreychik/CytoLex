@@ -292,7 +292,7 @@ sealed record Validity(bool IsValid, ImmutableArray<SampleContext> ValidContexts
 ```csharp
 sealed record TextEdit(TextSpan Span, string NewText);   // insert = zero-length span; delete = empty NewText
 sealed record Fix(
-    FixLevel Level,              // 1 = deterministic edit, 3 = explanation only (level 2 "did you mean": T-041)
+    FixLevel Level,              // 1 = deterministic edit, 2 = "did you mean" option (T-041), 3 = explanation only
     FixKind? Kind,               // replace | insert | delete | reorder (from the KB fix.kind)
     ImmutableArray<TextEdit> Edits,   // non-overlapping, against the original input; empty for level 3
     string Description,          // from the KB fix hint (+ arguments)
@@ -315,6 +315,8 @@ sealed record Fix(
   - `Fixer.Apply(input, fix | edits)` (rejects overlapping or out-of-range edits) and `Fixer.ApplyAll(input, editionResult, context?)` (first context-matching or context-free level-1 fix per diagnostic, in span order, skipping conflicting ones → `FixAllResult(Text, Applied, Skipped)`). Insertions at the same point conflict.
   - **New text keeps the user's symbols:** arrows, joins and signs are copied from the input; a new multiplication sign is the typed `x` when the input writes copies that way and never `×` (`FixHelpers.Multiply`).
 - **As built (T-040):** `FixDiff.Build(input, edits | fix)` → `DiffPart(Kind: Same | Removed | Added, Text)` runs, built from the edits (no generic diff): each edit is trimmed by the prefix/suffix its old and new text share, adjacent runs of one kind merge; Same + Removed = the input, Same + Added = `Fixer.Apply`. The desktop app shows a level-1 fix as this diff with **Apply** (input := `Preview`, then re-validate; Ctrl+Z undoes) and "Fix all" as one previewed `ApplyAll` round for the effective context (offered for ≥2 fixes; context-dependent fixes are left out while the context is unknown). Acceptance (`FixToValidTests`): repeated fix all (≤5 rounds) on every whole-string invalid KB example ends valid, or stops with only explanation-only errors the input already had; fragments lose their own rule's finding; the counts go to `build/review/fix-coverage.md`.
+
+- **As built (T-041) — level 2, "did you mean":** a check passes options as `SuggestionProposal(Edit, Description)` in `RuleContext.Report(…, suggestions:)` (`RuleFinding.Suggestions`); the validator adds them for parser findings through `DiagnosticFactory.WithSuggestions`. `DiagnosticFactory` turns each into `Fix(Level: Suggestion, Kind: Replace, [edit], description, null, preview, citations)`, at most 3 (`MaxSuggestions`), ordered level 1 → level 2 → level 3 (the explanation stays). `Fix.IsSuggestion`; `Fix.HasEdits` = edits + preview at any level; `Fix.IsEdit` stays level 1 only, so `Fixer.ApplyAll`, autocorrection and highlighting ignore options. Sources: `Validation/Suggestions/SymbolSuggester.cs` (`SYM.LISTED_ONLY`: vocab abbreviations by meaning prefix or typo distance, each verified by re-parsing the segment) and `Rules/Checks/BandSuggestions.cs` (`BAND.MUST_EXIST`: arr position → `ArrPositionFit.HoldingBand`, nearest same-form siblings, enclosing band, other arm). The desktop shows an option like a level-1 fix (diff + Apply, label "Suggestion: Did you mean …"); it is not part of "Fix all".
 
 ## 11. Hooks for the literal translation (T-054, T-058)
 The core model guarantees what the renderer needs; the renderer itself is T-058.

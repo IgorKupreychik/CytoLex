@@ -62,7 +62,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
 | **Feedback** | | | |
 | Book citation per finding | ❌ | ✅ | |
 | Exact error position highlighted | ◐ (token only) | ✅ (character range in the editor) | |
-| Automatic corrections | ◐ (brackets/slants: revised string) | ✅ one-click fixes with preview, "Fix all", explanation when no single fix exists | 🗓 "did you mean" suggestions (T-041) |
+| Automatic corrections | ◐ (brackets/slants: revised string) | ✅ one-click fixes with preview, "Fix all", explanation when no single fix exists; "did you mean" options for unknown symbols and bands (T-041) | |
 | Severity levels (error / warning / info) | ❌ | ✅ | |
 | Constitutional vs. acquired context | ❌ | ✅ | |
 | Plain-language translation of a string | ❌ | ◐ core library: summary + one sentence per part, with KB links, both readings when the context is unknown, partial translation of strings with errors, optional GRCh37/38 coordinates (T-058; tested against all 398 expected translations; draft wording until T-082); desktop translation view with hover ↔ span, KB links and coordinates (T-059) | 🗓 wording review (T-082) |

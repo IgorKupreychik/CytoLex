@@ -108,7 +108,8 @@ internal static class DiagnosticFactory
     /// The fixes of a finding (docs/design/core.md §10, T-035): one level-1 fix per proposal when the KB rule's fix is
     /// level 1 (kind and hint from the KB, preview = the edits applied); otherwise, or when the check proposes no edit, a
     /// level-3 explanation (statement, hint and rendered citations). A proposal for a context the known effective context
-    /// excludes is dropped.
+    /// excludes is dropped. "Did you mean" options of the finding (T-041) come after the level-1 fixes and before the
+    /// explanation, which a finding with options keeps.
     /// </summary>
     private static ImmutableArray<Fix> Fixes(KbRule rule, string input, RuleFinding f, ContextCondition? condition, SampleContext? effective)
     {
@@ -134,7 +135,34 @@ internal static class DiagnosticFactory
             }
         }
 
-        return level1.Count > 0 ? [.. level1] : [Explanation(rule)];
+        var suggestions = f.Suggestions.IsDefaultOrEmpty
+            ? []
+            : f.Suggestions.Take(MaxSuggestions).Select(s => Suggestion(rule, input, s)).ToList();
+        return level1.Count > 0 ? [.. level1, .. suggestions] : [.. suggestions, Explanation(rule)];
+    }
+
+    /// <summary>The most "did you mean" options one diagnostic shows (T-041).</summary>
+    public const int MaxSuggestions = 3;
+
+    /// <summary>A level-2 "did you mean" fix of <paramref name="rule"/> (T-041): one replace, with its preview.</summary>
+    public static Fix Suggestion(KbRule rule, string input, SuggestionProposal s) =>
+        new(FixLevel.Suggestion, FixKind.Replace, [s.Edit], s.Description, null, Fixer.Apply(input, [s.Edit]), rule.Citations);
+
+    /// <summary>
+    /// Adds "did you mean" options to a diagnostic that has none yet (T-041): before its explanation, after any level-1
+    /// fix; at most <see cref="MaxSuggestions"/> in total.
+    /// </summary>
+    public static Diagnostic WithSuggestions(Diagnostic d, KbRule rule, string input, IEnumerable<SuggestionProposal> suggestions)
+    {
+        var added = suggestions.Take(MaxSuggestions).Select(s => Suggestion(rule, input, s)).ToList();
+        if (added.Count == 0)
+        {
+            return d;
+        }
+
+        var level1 = d.Fixes.Where(x => x.Level == FixLevel.Deterministic);
+        var rest = d.Fixes.Where(x => x.Level != FixLevel.Deterministic);
+        return d with { Fixes = [.. level1, .. added, .. rest] };
     }
 
     /// <summary>

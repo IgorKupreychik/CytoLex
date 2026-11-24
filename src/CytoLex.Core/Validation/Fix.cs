@@ -60,7 +60,24 @@ public sealed record Fix(
 {
     /// <summary>Whether the fix edits the text (level 1) rather than only explaining.</summary>
     public bool IsEdit => Level == FixLevel.Deterministic && !Edits.IsDefaultOrEmpty;
+
+    /// <summary>
+    /// Whether the fix is a "did you mean" option (level 2, T-041): an edit the user may apply by hand. Never part of
+    /// fix all or autocorrection, which take <see cref="IsEdit"/> fixes only.
+    /// </summary>
+    public bool IsSuggestion => Level == FixLevel.Suggestion && !Edits.IsDefaultOrEmpty;
+
+    /// <summary>Whether the fix carries edits and a preview (level 1 or a level-2 suggestion).</summary>
+    public bool HasEdits => !Edits.IsDefaultOrEmpty && Preview is not null;
 }
+
+/// <summary>
+/// A "did you mean" option for a finding (level 2, T-041): one replace edit against the whole input and the wording
+/// shown for it (<c>Did you mean 'del' (Deletion)?</c>).
+/// </summary>
+/// <param name="Edit">The replace edit.</param>
+/// <param name="Description">The wording of the option.</param>
+public sealed record SuggestionProposal(TextEdit Edit, string Description);
 
 /// <summary>
 /// What a check or the parser proposes for one finding: only the edits (and, for a context-dependent finding, the

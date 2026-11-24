@@ -9,6 +9,7 @@ using CytoLex.Core.Segmentation;
 using CytoLex.Core.Semantics;
 using CytoLex.Core.Syntax;
 using CytoLex.Core.Translation;
+using CytoLex.Core.Validation.Suggestions;
 
 namespace CytoLex.Core.Validation;
 
@@ -120,6 +121,7 @@ public sealed class Validator
         var models = new List<(Segment Segment, SegmentModel? Model)>();
         var segmentResults = ImmutableArray.CreateBuilder<SegmentResult>();
         var abnormalities = new AbnormalityList(input);
+        SymbolSuggester? suggester = null;
         foreach (var segment in segments)
         {
             if (!profile.ImplementedTypes.Contains(segment.Type))
@@ -145,7 +147,22 @@ public sealed class Validator
                 abnormalities.Add(segment.Index, fish); // T-092
             }
 
-            diagnostics.AddRange(tree.Diagnostics.Select(d => DiagnosticFactory.FromSyntax(profile.Kb, input, d, context.Effective)).OfType<Diagnostic>());
+            foreach (var d in tree.Diagnostics)
+            {
+                if (DiagnosticFactory.FromSyntax(profile.Kb, input, d, context.Effective) is not { } diagnostic)
+                {
+                    continue;
+                }
+
+                if (d.RuleId == Parser.ListedOnly && profile.Kb.Rule(d.RuleId) is { } listedOnly)
+                {
+                    // "Did you mean" options for an unlisted word (level 2, T-041).
+                    suggester ??= new SymbolSuggester(profile.Kb, profile.Parser);
+                    diagnostic = DiagnosticFactory.WithSuggestions(diagnostic, listedOnly, input, suggester.Suggest(input, segment, isFragment, d.Span));
+                }
+
+                diagnostics.Add(diagnostic);
+            }
 
             foreach (var (rule, check) in profile.Checks.Where(c => c.Rule.AppliesToType(segment.Type)))
             {

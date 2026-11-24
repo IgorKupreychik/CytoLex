@@ -13,7 +13,8 @@ namespace CytoLex.Desktop.ViewModels;
 public delegate void ApplyFixHandler(string newText, string description);
 
 /// <summary>
-/// One fix of a diagnostic (T-040): a level-1 fix as a before/after diff with an Apply button, or an explanation as text.
+/// One fix of a diagnostic (T-040): a level-1 fix or a level-2 "did you mean" option (T-041) as a before/after diff with
+/// an Apply button, or an explanation as text. Options are applied only by the user's click.
 /// </summary>
 public sealed partial class FixItemViewModel
 {
@@ -43,7 +44,7 @@ public sealed partial class FixItemViewModel
             _ => $"Suggestion{context}: {fix.Description}",
         };
 
-        IsEdit = fix.IsEdit && fix.Preview is not null;
+        IsEdit = (fix.IsEdit || fix.IsSuggestion) && fix.HasEdits;
         if (IsEdit)
         {
             var target = text.Target(fix.Edits);
@@ -66,8 +67,11 @@ public sealed partial class FixItemViewModel
     /// <summary><c>Fix (if acquired): …</c>, <c>Explanation: …</c> or <c>Suggestion: …</c>.</summary>
     public string Label { get; }
 
-    /// <summary>Whether the fix edits the text (a level-1 fix with a preview): shows a diff and an Apply button.</summary>
+    /// <summary>Whether the fix edits the text (a level-1 fix or a level-2 option with a preview): shows a diff and an Apply button.</summary>
     public bool IsEdit { get; }
+
+    /// <summary>Whether the fix is a "did you mean" option (level 2, T-041).</summary>
+    public bool IsSuggestion => Fix.IsSuggestion;
 
     /// <summary>The corrected input; <c>null</c> for an explanation.</summary>
     public string? Preview { get; }

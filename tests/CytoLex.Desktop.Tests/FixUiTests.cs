@@ -112,4 +112,35 @@ public class FixUiTests
         Assert.False(fix.CanApply);
         Assert.NotEmpty(fix.DiffParts);
     }
+
+    [Fact]
+    public void Suggestions_ShownAsDiffsWithApply_BeforeTheExplanation_NotInFixAll()
+    {
+        var vm = new MainWindowViewModel { Input = "46,XX,dl(5)(q13q33)" };
+        var panel = vm.SelectedPanel!;
+        var fixes = panel.Diagnostics.Single(d => d.RuleId == "SYM.LISTED_ONLY").Fixes;
+
+        var first = fixes[0];
+        Assert.True(first.IsSuggestion);
+        Assert.True(first.IsEdit);
+        Assert.True(first.CanApply);
+        Assert.Equal("Suggestion: Did you mean 'del' (Deletion)?", first.Label);
+        Assert.Equal("46,XX,d[+e]l(5)(q13q33)", Render(first.DiffParts));
+        Assert.StartsWith("Explanation: ", fixes[^1].Label, StringComparison.Ordinal);
+        Assert.False(panel.HasFixAll);
+
+        first.ApplyCommand.Execute(null);
+
+        Assert.Equal("46,XX,del(5)(q13q33)", vm.Input);
+        Assert.DoesNotContain(vm.SelectedPanel!.Diagnostics, d => d.RuleId == "SYM.LISTED_ONLY");
+    }
+
+    [Fact]
+    public void BandSuggestion_ReplacesOnlyTheBand()
+    {
+        var vm = new MainWindowViewModel { Input = "46,XY,del(9)(q35)" };
+        var first = vm.SelectedPanel!.Diagnostics.Single(d => d.RuleId == "BAND.MUST_EXIST").Fixes[0];
+        Assert.Equal("Suggestion: Did you mean 9q34?", first.Label);
+        Assert.Equal("46,XY,del(9)(q3[-5][+4])", Render(first.DiffParts));
+    }
 }

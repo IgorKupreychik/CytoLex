@@ -158,4 +158,15 @@ public class HighlightBuilderTests
 
         return texts;
     }
+
+    [Fact]
+    public void SuggestionOnly_UnderlinesDiagnosticSpan()
+    {
+        var (_, result, highlights) = Run("46,XY,del(9)(q35)");
+        var d = Assert.Single(result.Diagnostics, d => d.RuleId == "BAND.MUST_EXIST");
+        Assert.Contains(d.Fixes, f => f.IsSuggestion);
+        var h = Assert.Single(highlights, h => h.DiagnosticIndex == result.Diagnostics.IndexOf(d));
+        Assert.Equal(HighlightKind.Underline, h.Kind);
+        Assert.Equal(d.Span, h.Span);
+    }
 }

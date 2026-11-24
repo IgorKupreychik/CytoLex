@@ -164,7 +164,7 @@
                     <TextBlock Text="{Binding Detail}" IsVisible="{Binding HasDetail}" TextWrapping="Wrap" />
                     <TextBlock Text="{Binding Condition}" IsVisible="{Binding HasCondition}" TextWrapping="Wrap" FontStyle="Italic" />
                     <TextBlock Text="{Binding Review}" IsVisible="{Binding HasReview}" TextWrapping="Wrap" FontStyle="Italic" Opacity="0.8" />
-                    <!-- Fixes (T-040): a level-1 fix as a before/after diff with Apply; an explanation as text -->
+                    <!-- Fixes (T-040): a level-1 fix or a "did you mean" option (T-041) as a before/after diff with Apply; an explanation as text -->
                     <ItemsControl ItemsSource="{Binding Fixes}">
                       <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="vm:FixItemViewModel">
