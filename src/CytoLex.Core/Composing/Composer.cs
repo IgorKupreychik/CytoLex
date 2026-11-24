@@ -22,27 +22,38 @@ internal sealed class Composer(Func<string, bool> hasRule)
     private const string _shortAndDetailed = "STRUCT.SHORT_AND_DETAILED_SYSTEMS";
     private const string _detailed = "STRUCT.DETAILED_SYSTEM";
 
-    /// <summary>The composition of <paramref name="a"/>, or <c>null</c> when it has none.</summary>
-    public AbnormalityComposition? Compose(Abnormality a)
+    /// <summary>
+    /// The composition of <paramref name="a"/>, or <c>null</c> with the reason (<see cref="CompositionGap"/>) when it has none.
+    /// </summary>
+    public (AbnormalityComposition? Composition, CompositionGap? Gap) Compose(Abnormality a)
     {
         ArgumentNullException.ThrowIfNull(a);
-        if (a.IsPartial || a.Parts.IsEmpty || a.Kind is null || WithoutComposition.Contains(a.Kind))
+        if (a.Parts.IsEmpty || a.Kind is null || WithoutComposition.Contains(a.Kind))
         {
-            return null;
+            return (null, new CompositionGap(CompositionGapKind.NoComposition));
+        }
+
+        if (a.IsPartial)
+        {
+            return (null, new CompositionGap(CompositionGapKind.Partial));
         }
 
         var rules = new List<string>();
         List<ComposedChromosome>? products;
+        CompositionGap? gap = null;
         CompositionSource source;
         if (a.Parts.Any(p => p.IsDetailed))
         {
             products = Written(a);
             source = CompositionSource.Written;
             rules.Add(_detailed);
+            gap = new CompositionGap(CompositionGapKind.Uncertain);
         }
         else
         {
-            products = a.Kind is "der" or "rec" or "ider" ? Derivative(a, rules) : a.Parts.Length == 1 ? Single(a.Parts[0], rules) : null;
+            products = a.Kind is "der" or "rec" or "ider"
+                ? Derivative(a, rules, out gap)
+                : a.Parts.Length == 1 ? Single(a.Parts[0], rules, out gap) : null;
             source = CompositionSource.Computed;
             rules.Insert(0, _shortAndDetailed);
             rules.Add(Orientation.Rule);
@@ -50,14 +61,14 @@ internal sealed class Composer(Func<string, bool> hasRule)
 
         if (products is not { Count: > 0 })
         {
-            return null;
+            return (null, gap ?? new CompositionGap(CompositionGapKind.Unsupported));
         }
 
-        return new AbnormalityComposition(
+        return (new AbnormalityComposition(
             [.. products],
             source,
             Format(a, products),
-            [.. rules.Distinct(StringComparer.Ordinal).Where(hasRule).Select(KbRef.Rule)]);
+            [.. rules.Distinct(StringComparer.Ordinal).Where(hasRule).Select(KbRef.Rule)]), null);
     }
 
     // ── Detailed system ──────────────────────────────────────────────────────────────────────────
@@ -80,13 +91,36 @@ internal sealed class Composer(Func<string, bool> hasRule)
 
     // ── One rearrangement ────────────────────────────────────────────────────────────────────────
 
-    private static List<ComposedChromosome>? Single(AbnormalityPart part, List<string> rules)
+    private static List<ComposedChromosome>? Single(AbnormalityPart part, List<string> rules, out CompositionGap? gap)
     {
-        if (Groups(part) is not { Count: > 0 } groups || part.Head is not { } head)
+        gap = null;
+        if (part.Head is null)
         {
             return null;
         }
 
+        if (Groups(part) is not { Count: > 0 } groups)
+        {
+            gap = new CompositionGap(CompositionGapKind.Uncertain);
+            return null;
+        }
+
+        return FromGroups([.. part.Symbols.Select(s => s.Symbol)], groups, rules);
+    }
+
+    /// <summary>
+    /// What one short-system rearrangement makes of its breakpoint groups: the symbol words (<c>psu dic</c>, <c>trc r</c>;
+    /// the last is the type) applied to the groups as points. Used by the binder and to check a detailed composition
+    /// against its symbol (<c>STRUCT.DETAILED_MATCHES_SYMBOL</c>); <c>null</c> when the type or shape has no composition.
+    /// </summary>
+    internal static List<ComposedChromosome>? FromGroups(IReadOnlyList<string> symbols, List<Group> groups, List<string> rules)
+    {
+        if (symbols.Count == 0 || groups.Count == 0)
+        {
+            return null;
+        }
+
+        var head = symbols[^1];
         var c = groups[0].Chromosome;
         switch (head)
         {
@@ -119,7 +153,7 @@ internal sealed class Composer(Func<string, bool> hasRule)
                 return Insertion(groups);
             case "dic":
                 rules.Add("DIC.FORMAT");
-                if (part.Symbols.Any(s => s.Symbol == "psu"))
+                if (symbols.Contains("psu"))
                 {
                     rules.Add("DIC.PSEUDODICENTRIC_ORDER");
                 }
@@ -130,7 +164,7 @@ internal sealed class Composer(Func<string, bool> hasRule)
                 return Join(c, Rearrangements.CentricSide(g1, endsAtBand: true), Rearrangements.Segment(g2, proximalLeft: true), Rearrangements.CentricSide(g3, endsAtBand: false));
             case "r":
                 rules.Add("RING.FORMAT");
-                if (part.Symbols.Length > 1)
+                if (symbols.Count > 1)
                 {
                     rules.Add("RING.DIC_TRC_ORDER");
                 }
@@ -309,8 +343,9 @@ internal sealed class Composer(Func<string, bool> hasRule)
     /// <c>ider</c> ends with the isochromosome of one arm (<c>DER.ISODERIVATIVE</c>); <c>der(?)</c> starts from the
     /// unknown chromosome with its centromere (<c>DER.UNKNOWN_CENTROMERE</c>).
     /// </summary>
-    private static List<ComposedChromosome>? Derivative(Abnormality a, List<string> rules)
+    private static List<ComposedChromosome>? Derivative(Abnormality a, List<string> rules, out CompositionGap? gap)
     {
+        gap = null;
         var head = a.Parts[0];
         var chromosomes = head.Chromosomes.Select(ChromosomeId.Of).ToList();
         rules.AddRange(head.Head switch
@@ -320,7 +355,13 @@ internal sealed class Composer(Func<string, bool> hasRule)
             _ => ["DER.CENTROMERE_CHROMOSOME", "DER.DEFINITION"],
         });
 
-        if (Groups(head) is not { } headGroups || chromosomes.Count is 0 or > 2)
+        if (Groups(head) is not { } headGroups || a.Parts.Skip(1).Any(p => !p.Groups.IsEmpty && Groups(p) is null))
+        {
+            gap = new CompositionGap(CompositionGapKind.Uncertain);
+            return null;
+        }
+
+        if (chromosomes.Count is 0 or > 2)
         {
             return null;
         }
@@ -377,6 +418,14 @@ internal sealed class Composer(Func<string, bool> hasRule)
                 rules.Add("RING.FORMAT");
                 rules.Add("RING.MONOCENTRIC_AS_DER");
                 return i == a.Parts.Length - 1 && Ring(groups, unknownCentric: w.HasUnknownCentric) is { } ring ? [ring] : null;
+            }
+
+            if (Applies(part.Head) && !Placeable(w, part.Head!, groups))
+            {
+                // Only an aberration of the derivative's own chromosome is a placement fault; one between other chromosomes
+                // records their history (§11.3 E10: der(9)t(9;11)(p22;q23)t(11;12)(p13;q22)c) and has no defined shape.
+                gap = groups.Any(g => chromosomes.Contains(g.Chromosome)) ? new CompositionGap(CompositionGapKind.Unplaceable, i) : null;
+                return null;
             }
 
             if (!Apply(w, part.Head, groups, pendingCentric, rules))
@@ -451,6 +500,28 @@ internal sealed class Composer(Func<string, bool> hasRule)
                 return false;
         }
     }
+
+    /// <summary>The aberration types <see cref="Apply"/> knows.</summary>
+    private static bool Applies(string? head) => head is "t" or "del" or "add" or "inv" or "dup" or "trp" or "qdp" or "hsr" or "ins";
+
+    /// <summary>
+    /// Whether the chromosome being built still has the place an aberration acts on: a translocation or insertion needs
+    /// one of its groups on it (where <see cref="Receive"/> and <see cref="Insert"/> look), the other types every band.
+    /// </summary>
+    /// <remarks>An unknown partner on the unknown chromosome of a der(?) is not a placement fault but an undefined shape (T-087).</remarks>
+    private static bool Placeable(WorkingChromosome w, string head, List<Group> groups) => (w.HasUnknownCentric && groups.Any(g => g.IsUnknown)) || head switch
+    {
+        "t" => groups.Any(g => !g.IsUnknown && g.Points.Length is 1 or 2 && w.Contains(g.First))
+            || (w.HasUnknownCentric && groups is [{ IsUnknown: true }, { IsUnknown: false }]),
+        "ins" => groups switch
+        {
+            [{ Points: [var site, _, _] }] => w.Contains(site),
+            [var receiving, var donor] => (!receiving.IsUnknown && receiving.Points is [var site] && w.Contains(site))
+                || (!donor.IsUnknown && donor.Points.Length == 2 && w.Contains(donor.First)),
+            _ => true,
+        },
+        _ => groups.SelectMany(g => g.Points).Where(p => p.Kind == PointKind.Band).All(w.Contains),
+    };
 
     private static bool Receive(WorkingChromosome w, List<Group> groups, HashSet<ChromosomeId> pendingCentric)
     {

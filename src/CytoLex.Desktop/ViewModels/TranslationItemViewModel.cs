@@ -128,6 +128,7 @@ public sealed partial class TranslationItemViewModel : ObservableObject, ISpanIt
         IsTranslated = item.IsTranslated;
         IsDraft = item.IsDraft;
         (ConstitutionalReading, AcquiredReading) = ReadingsOf(item.Readings);
+        Composition = item.Composition;
         _coordinates = item.Coordinates;
         var bands = item.Coordinates?.Bands.ToDictionary(b => b.Band, StringComparer.Ordinal);
         Links = [.. item.Links.Select(l => new KbLinkViewModel(l, l.Ref.Kind == KbRefKind.Band ? bands?.GetValueOrDefault(l.Ref.Id) : null, build, openKbRef))];
@@ -191,6 +192,12 @@ public sealed partial class TranslationItemViewModel : ObservableObject, ISpanIt
 
     /// <summary>Whether both readings are shown.</summary>
     public bool HasReadings => ConstitutionalReading is not null;
+
+    /// <summary>The band composition the short system defines (T-086: <c>Band composition: …</c>); <c>null</c> for the summary, detailed-system parts and parts without one.</summary>
+    public string? Composition { get; }
+
+    /// <summary>Whether the composition line is shown (muted, under the sentence).</summary>
+    public bool HasComposition => Composition is not null;
 
     /// <summary>The KB links, in first-seen order.</summary>
     public ImmutableArray<KbLinkViewModel> Links { get; }

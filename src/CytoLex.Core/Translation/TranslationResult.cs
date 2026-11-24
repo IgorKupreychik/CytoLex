@@ -64,6 +64,10 @@ public sealed record TranslationSummary(string Text, ContextReadings? Readings, 
 /// <param name="IsDraft">Built from a template not yet reviewed (T-082).</param>
 /// <param name="DiagnosticIndices">The indices (into <c>EditionResult.Diagnostics</c>) of the diagnostics inside the part.</param>
 /// <param name="Coordinates">The optional genomic detail; <c>null</c> unless requested.</param>
+/// <param name="Composition">
+/// The band composition the short system defines for the part, in words (T-086: <c>Band composition: the segment from …</c>);
+/// <c>null</c> for parts written in the detailed system (the sentence gives it), and parts without a composition.
+/// </param>
 public sealed record TranslationItem(
     TextSpan Span,
     string Text,
@@ -73,7 +77,8 @@ public sealed record TranslationItem(
     bool IsTranslated,
     bool IsDraft,
     ImmutableArray<int> DiagnosticIndices,
-    ItemCoordinates? Coordinates);
+    ItemCoordinates? Coordinates,
+    string? Composition = null);
 
 /// <summary>
 /// The literal translation of a string in one edition (decisions → Literal translation, T-054; docs/design/core.md §11):

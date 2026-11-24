@@ -14,6 +14,7 @@ internal sealed class KaryotypeRenderer
     private readonly RenderContext _ctx;
     private readonly HeaderRenderer _header;
     private readonly ItemRenderer _items;
+    private readonly CompositionLine _compositionLine;
 
     public KaryotypeRenderer(TemplateSet templates, SampleContext? context, string input)
     {
@@ -25,6 +26,14 @@ internal sealed class KaryotypeRenderer
         var derivatives = new DerivativeDescriber(_ctx, chromosomes, bands, composition, symbols);
         _header = new HeaderRenderer(_ctx);
         _items = new ItemRenderer(_ctx, bands, composition, symbols, derivatives);
+        _compositionLine = new CompositionLine(_ctx, chromosomes, composition);
+    }
+
+    /// <summary>The composition line of an item (T-086), or <c>null</c> when it has no computed composition.</summary>
+    public string? CompositionLine(KaryotypeItem item)
+    {
+        var line = _ctx.Render(() => _compositionLine.Line(item) ?? string.Empty).Text;
+        return line.Length > 0 ? line : null;
     }
 
     /// <summary>Whether any phrase rendered so far came from a template not yet reviewed (T-082).</summary>

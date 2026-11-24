@@ -257,10 +257,19 @@ rules:
       - {section: "9.2.3", page: 65, para: "¶15"}
     examples:
       valid: []
+      invalid:
+        - text: "46,XX,der(1)t(1;3)(p22;q13.1)t(1;5)(p32;q31)"
+          why: >-
+            After t(1;3)(p22;q13.1) the derivative no longer has 1p32, so the second translocation
+            acts on a derivative in a new rearrangement; the short system can't describe it, the
+            detailed system can.
+    fix: {level: 3, hint: "Write the derivative in the detailed system (its band composition), e.g. der(1)(5qter→5q31::…)."}
     review:
       paraphrase_checked: true
       needs_review: false
       note: >-
         Severity info (T-056): rearrangements the short system can't express fail its format rules;
-        "illustrated and described in words" can't be checked from a string.
+        "illustrated and described in words" can't be checked from a string. T-086: reported when
+        a short-system derivative's aberration names a band the derivative no longer has after the
+        aberrations before it (the composer can't place it); the invalid example is synthetic.
     related: [DER.UNBALANCED_USE_DER, STRUCT.DETAILED_SYSTEM, STRUCT.SHORT_AND_DETAILED_SYSTEMS]

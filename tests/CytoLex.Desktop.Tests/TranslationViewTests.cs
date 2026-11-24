@@ -30,6 +30,21 @@ public sealed class TranslationViewTests
         Assert.True(checkedCount > 200, $"only {checkedCount} book examples checked");
     }
 
+    /// <summary>T-086: a short-system part shows its band composition under the sentence; a detailed-system part and the summary don't.</summary>
+    [Fact]
+    public void CompositionLine_ShownForShortSystemParts()
+    {
+        var vm = new MainWindowViewModel { Input = "46,XX,der(9)t(9;22)(q34;q11.2)" };
+        var t = vm.SelectedPanel!.Translation!;
+        var item = Assert.Single(t.Items);
+        Assert.True(item.HasComposition);
+        Assert.StartsWith("Band composition: the segment from the end of the short arm of chromosome 9 to 9q34", item.Composition, StringComparison.Ordinal);
+        Assert.False(t.Summary.HasComposition);
+
+        vm.Input = "46,XX,der(9)(9pter→9q34::22q11.2→22qter)";
+        Assert.False(Assert.Single(vm.SelectedPanel!.Translation!.Items).HasComposition);
+    }
+
     [Fact]
     public void DiagnosticsView_IsTheDefault_TranslationKeptAcrossTyping()
     {

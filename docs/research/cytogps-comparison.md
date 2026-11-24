@@ -68,7 +68,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
 | Plain-language translation of a string | ❌ | ◐ core library: summary + one sentence per part, with KB links, both readings when the context is unknown, partial translation of strings with errors, optional GRCh37/38 coordinates (T-058; tested against all 398 expected translations; draft wording until T-082); desktop translation view with hover ↔ span, KB links and coordinates (T-059) | 🗓 wording review (T-082) |
 | Rule browser (search the rules, examples) | ❌ | ✅ rules and symbols/banding codes (T-039, T-059) | |
 | Abnormality list per cell line | ◐ (clone list with cell counts) | ✅ | |
-| Derivative written out in the detailed system | ✅ | ✅ computed from the short form for every rearrangement type, shown in the abnormality list (T-066; equal to the book on 87 of its 89 short/detailed pairs, the 2 others `der(?)` with an insertion at an unknown site) | |
+| Derivative written out in the detailed system | ✅ | ✅ computed from the short form for every rearrangement type, shown in the abnormality list (T-066; equal to the book on 87 of its 89 short/detailed pairs, the 2 others `der(?)` with an insertion at an unknown site); a detailed composition is checked against its symbol (`STRUCT.DETAILED_MATCHES_SYMBOL`, T-086) | |
 | **Analysis output** | | | |
 | Loss–Gain–Fusion per band | ✅ (916 bands, JSON/CSV) | ❌ | 🗓 T-050 (deferred, priority 3) |
 | Aggregate statistics over a batch | ✅ (per-band loss/gain/fusion share, aggregate LGF table) | ◐ (summary per edition and rule) | 🗓 per-band statistics and aggregate LGF table (T-077) |

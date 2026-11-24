@@ -959,6 +959,11 @@ templates:
         text: "{chromosome} is made up of {segments}"
       - when: fragment
         text: "Band composition: {segments}"
+      # T-086: the composition line of a short-system part (TranslationItem.Composition)
+      - when: line
+        text: "Band composition: {segments}."
+      - when: line_products
+        text: "Band compositions: {segments}."
     review: {checked: false}
   - construct: break_reunion
     key: "vocab:symbols/colon, double (::)"

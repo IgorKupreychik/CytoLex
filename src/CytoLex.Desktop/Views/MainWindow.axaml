@@ -960,6 +960,8 @@
             <SelectableTextBlock Text="{Binding ConstitutionalReading}" TextWrapping="Wrap" FontSize="13" />
             <SelectableTextBlock Text="{Binding AcquiredReading}" TextWrapping="Wrap" FontSize="13" />
           </StackPanel>
+          <SelectableTextBlock Text="{Binding Composition}" IsVisible="{Binding HasComposition}" TextWrapping="Wrap"
+                               FontSize="13" Opacity="0.7" />
           <ItemsControl ItemsSource="{Binding Diagnostics}" IsVisible="{Binding HasDiagnostics}">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>

@@ -10,3 +10,16 @@ quotes:
       the last parentheses, instead of only the breakpoints. It is acceptable to combine the
       short system (4.3.1) and the detailed system for designating complex karyotypes,
       especially to describe acquired chromosomal abnormalities.
+  - rule: STRUCT.DETAILED_MATCHES_SYMBOL
+    cite: {section: "4.3.2", page: 42, para: "¶1"}
+    text: >-
+      Structurally altered chromosomes are defined by their band composition. The conventions
+      used in the short system are retained in the detailed system, except that an abbreviated
+      description of the band composition of the rearranged chromosome(s) is specified within
+      the last parentheses, instead of only the breakpoints.
+  - rule: STRUCT.DETAILED_MATCHES_SYMBOL
+    cite: {section: "4.3", page: 40, para: "¶1"}
+    text: >-
+      Because of the conventions built into this system, the band composition of the abnormal
+      chromosomes can readily be inferred from the information provided in the symbolic
+      description.

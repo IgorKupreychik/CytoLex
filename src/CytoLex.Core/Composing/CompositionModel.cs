@@ -211,6 +211,33 @@ public enum CompositionSource
     Written,
 }
 
+/// <summary>Why an abnormality has no <see cref="AbnormalityComposition"/> (T-086).</summary>
+public enum CompositionGapKind
+{
+    /// <summary>The symbol has no band composition (<c>mar</c>, <c>dmin</c>, <c>fra</c>, <c>idem</c>, …).</summary>
+    NoComposition,
+
+    /// <summary>A partial abnormality (<c>der(1)t(1;3)</c> without the rest, a book fragment).</summary>
+    Partial,
+
+    /// <summary>A breakpoint is uncertain (<c>q2?3</c>, <c>~</c>, <c>or</c>) or missing, or a chromosome is not given.</summary>
+    Uncertain,
+
+    /// <summary>The type or shape has no defined composition yet (insertion recombinants, T-087).</summary>
+    Unsupported,
+
+    /// <summary>
+    /// An aberration of a derivative names a band the chromosome being built no longer has after the earlier
+    /// aberrations: the short system can't describe it (<c>DER.COMPLEX_USE_DETAILED</c>, §9.2.3 ¶15).
+    /// </summary>
+    Unplaceable,
+}
+
+/// <summary>Why an abnormality has no composition, with the part (index into <c>Abnormality.Parts</c>) that could not be placed.</summary>
+/// <param name="Kind">The reason.</param>
+/// <param name="Part">For <see cref="CompositionGapKind.Unplaceable"/>: the aberration that names the missing band.</param>
+public sealed record CompositionGap(CompositionGapKind Kind, int? Part = null);
+
 /// <summary>
 /// The band composition of an abnormality (T-066): one <see cref="ComposedChromosome"/> per abnormal chromosome it
 /// describes (<c>t(2;5)</c> → der(2) and der(5), in the order of the chromosome list; <c>ins(5;2)</c> → two; others one).

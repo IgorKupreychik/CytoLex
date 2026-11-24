@@ -78,6 +78,10 @@ internal static class InvalidExampleExpectations
             ["46,XX,der(5)(2pter→2q21::5q31→5qter)"] = [], // DER.CENTROMERE_CHROMOSOME
             ["46,XX,der(1)t(1;3)(p32;q21),t(1;11)(q25;q13)"] = [], // DER.ABERRATIONS_NO_COMMA
             ["46,XX,der(1)t(1;11)(q25;q13)t(1;3)(p32;q21)"] = [], // DER.ABERRATION_ORDER
+            ["46,XX,der(1)t(1;3)(p22;q13.1)t(1;5)(p32;q31)"] = [], // DER.COMPLEX_USE_DETAILED (T-086)
+            ["46,XY,inv(3)(pter→p13::p13→q21::q21→qter)"] = [], // STRUCT.DETAILED_MATCHES_SYMBOL (T-086)
+            ["46,XX,del(5)(pter→q33::q13→qter)"] = [], // STRUCT.DETAILED_MATCHES_SYMBOL
+            ["46,XX,dup(1)(pter→q22::q25→qter)"] = [], // STRUCT.DETAILED_MATCHES_SYMBOL
             ["46,XX,rec(2),dup(2p),inv(2)(p21q31)mat"] = [], // REC.FORMAT
             ["45,XX,–21?"] = [("UNCERTAIN.QUESTIONABLE_ITEM", "?", 9)], // UNCERTAIN.QUESTIONABLE_ITEM
             ["46,XX,add(19)(p13orq13)"] = [], // UNCERTAIN.OR_ALTERNATIVE

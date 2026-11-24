@@ -24,3 +24,48 @@ rules:
         depend on the diagram: Fig. 8 only labels the chromosome ends A–D used in Table 4's
         "Schematic segregants" column, which the KB does not encode.
     related: [STRUCT.SHORT_AND_DETAILED_SYSTEMS, STRUCT.DETAILED_SYMBOLS, STRUCT.COMPOSITION_ORDER]
+
+  - id: STRUCT.DETAILED_MATCHES_SYMBOL
+    title: The band composition is the one the rearrangement symbol defines
+    applies_to: [karyotype]
+    severity: error
+    statement: >-
+      The rearrangement symbol and the way breakpoints are specified are the same in the short and
+      the detailed system, and the band composition of an abnormal chromosome follows from the
+      symbol and its breakpoints by the short system's conventions. A band composition written in
+      the detailed system must therefore be the one its symbol defines for its breakpoints: an
+      inversion reverses the segment between its breaks, a deletion loses the segment beyond or
+      between them, a duplication repeats it, and a translocation exchanges the segments distal
+      to its breaks.
+    cite:
+      - {section: "4.3", page: 40, para: "¶1"}
+      - {section: "4.3.2", page: 42, para: "¶1"}
+    examples:
+      valid:
+        - text: "46,XY,inv(3)(pter→p13::q21→p13::q21→qter)"
+          cite: {section: "9.2.10", page: 70, example: E3}
+        - text: "46,XX,del(5)(pter→q13::q33→qter)"
+          cite: {section: "9.2.2", page: 60, example: E2}
+        - text: "46,XX,dup(1)(pter→q25::q22→qter)"
+          cite: {section: "9.2.5", page: 67, example: E1}
+        - text: "46,XX,i(17)(qter→q10::q10→qter)"
+          cite: {section: "9.2.11", page: 70, example: E1}
+        - text: "46,XY,t(2;5)(2pter→2q21::5q31→5qter;5pter→5q31::2q21→2qter)"
+          cite: {section: "9.2.17.1", page: 75, example: E1}
+      invalid:
+        - text: "46,XY,inv(3)(pter→p13::p13→q21::q21→qter)"
+          why: The segment between p13 and q21 is not reversed, so the composition is not an inversion (inv(3)(p13q21) gives pter→p13::q21→p13::q21→qter).
+        - text: "46,XX,del(5)(pter→q33::q13→qter)"
+          why: The segment q13→q33 is written twice instead of being lost; del(5)(q13q33) gives pter→q13::q33→qter.
+        - text: "46,XX,dup(1)(pter→q22::q25→qter)"
+          why: The segment between q22 and q25 is lost, not repeated; dup(1)(q22q25) gives pter→q25::q22→qter.
+    fix: {level: 3, hint: "Write the composition the symbol defines for its breakpoints, or use the symbol (e.g. der) that describes the composition."}
+    review:
+      paraphrase_checked: false
+      needs_review: false
+      note: >-
+        T-086. The book states no explicit prohibition; the rule follows from §4.3 ¶1 (the band
+        composition "can readily be inferred" from the symbol and its breakpoints, and the notation
+        is common to both systems) and §4.3.2 ¶1 (the short system's conventions are retained).
+        Invalid examples are synthetic variants of the cited book examples.
+    related: [STRUCT.DETAILED_SYSTEM, STRUCT.SHORT_AND_DETAILED_SYSTEMS, STRUCT.COMPOSITION_ORDER]

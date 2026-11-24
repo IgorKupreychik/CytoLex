@@ -449,7 +449,8 @@ internal sealed class KaryotypeBinder(IEditionKb kb, SyntaxTree tree) : BinderBa
             Issues = IssuesOf(node),
             Kb = Refs(VocabOf(signTokens), questioned ? Rules(QuestionableItem) : []),
         };
-        return abnormality with { Composition = _composer.Compose(abnormality) };
+        var (composition, gap) = _composer.Compose(abnormality);
+        return abnormality with { Composition = composition, CompositionGap = gap };
     }
 
     private AbnormalityPart BindPart(SyntaxNode node)

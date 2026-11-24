@@ -113,17 +113,32 @@ public class CompositionTypeTests
     }
 
     [Theory]
-    [InlineData("47,XX,+mar")] // no composition: markers, minutes, fragile sites, uniparental disomy
-    [InlineData("47,XX,+mar1")]
-    [InlineData("46,XX,4dmin")]
-    [InlineData("46,XX,fra(10)(q25.2)")]
-    [InlineData("46,XX,del(5)(q2?3)")] // uncertain breakpoints
-    [InlineData("46,XX,del(5)(q13~q21)")]
-    [InlineData("46,XX,t(1;3)(p32 or p34;q21)")]
-    [InlineData("46,XX,der(1)t(1;3)(p32;q21)t(5;7)(q11;p13)")] // an aberration that doesn't touch the derivative
-    [InlineData("46,XX,rec(21)del(21)ins(21)(p13q22.2q22.3)pat")] // insertion recombinants: no rule defines the crossover product
-    [InlineData("47,XX,+der(?)t(?;9)(?;p13)ins(?;7)(?;q11.2q32)")] // insertion into the unknown chromosome
-    public void NoComposition(string text) => Assert.Null(First(text).Composition);
+    [InlineData("47,XX,+mar", CompositionGapKind.NoComposition)] // no composition: markers, minutes, fragile sites, uniparental disomy
+    [InlineData("47,XX,+mar1", CompositionGapKind.NoComposition)]
+    [InlineData("46,XX,4dmin", CompositionGapKind.NoComposition)]
+    [InlineData("46,XX,fra(10)(q25.2)", CompositionGapKind.NoComposition)]
+    [InlineData("46,XX,del(5)(q2?3)", CompositionGapKind.Uncertain)] // uncertain breakpoints
+    [InlineData("46,XX,del(5)(q13~q21)", CompositionGapKind.Uncertain)]
+    [InlineData("46,XX,t(1;3)(p32 or p34;q21)", CompositionGapKind.Uncertain)]
+    [InlineData("46,XX,der(1)t(1;3)(p22;q13.1)t(1;5)(p32;q31)", CompositionGapKind.Unplaceable)] // 1p32 lost by the first translocation (T-086)
+    [InlineData("46,XX,der(1)t(1;3)(p32;q21)t(5;7)(q11;p13)", CompositionGapKind.Unsupported)] // an aberration of other chromosomes: their history, no defined shape
+    [InlineData("46,XX,der(1)t(1;3)(p32;q21)del(1)(p34)", CompositionGapKind.Unplaceable)]
+    [InlineData("46,XX,der(1)t(1;3)(p32;q21)del(1)(p2?2)", CompositionGapKind.Uncertain)]
+    [InlineData("46,XX,rec(21)del(21)ins(21)(p13q22.2q22.3)pat", CompositionGapKind.Unsupported)] // insertion recombinants: no rule defines the crossover product
+    [InlineData("47,XX,+der(?)t(?;9)(?;p13)ins(?;7)(?;q11.2q32)", CompositionGapKind.Unsupported)] // insertion into the unknown chromosome (T-087)
+    public void NoComposition(string text, CompositionGapKind gap)
+    {
+        var a = First(text);
+        Assert.Null(a.Composition);
+        Assert.Equal(gap, a.CompositionGap?.Kind);
+    }
+
+    [Fact]
+    public void UnplaceableGap_NamesTheAberration() =>
+        Assert.Equal(new CompositionGap(CompositionGapKind.Unplaceable, 2), First("46,XX,der(1)t(1;3)(p22;q13.1)t(1;5)(p32;q31)").CompositionGap);
+
+    [Fact]
+    public void Composed_HasNoGap() => Assert.Null(First("46,XX,der(1)t(1;3)(p32;q21)t(1;11)(q25;q13)").CompositionGap);
 
     [Fact]
     public void PartialAbnormality_HasNoComposition()
@@ -131,6 +146,7 @@ public class CompositionTypeTests
         var a = First("46,XX,del(5)(q13");
         Assert.True(a.IsPartial);
         Assert.Null(a.Composition);
+        Assert.Equal(CompositionGapKind.Partial, a.CompositionGap?.Kind);
     }
 
     /// <summary>The symbols without a composition are listed (and documented) in one place.</summary>

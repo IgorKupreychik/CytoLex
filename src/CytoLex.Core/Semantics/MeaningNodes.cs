@@ -307,6 +307,9 @@ public sealed record Abnormality : SuffixedItem
     /// </summary>
     public Composing.AbnormalityComposition? Composition { get; init; }
 
+    /// <summary>Why <see cref="Composition"/> is <c>null</c> (T-086); <c>null</c> when there is a composition.</summary>
+    public Composing.CompositionGap? CompositionGap { get; init; }
+
     public override IEnumerable<MeaningNode> Children() => Join([LeadingCount], Parts, SuffixNodes);
 }
 

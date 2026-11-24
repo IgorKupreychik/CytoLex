@@ -78,7 +78,8 @@ internal static class TranslationBuilder
                     true,
                     sentence.IsDraft,
                     inside,
-                    includeCoordinates ? Coordinates(kb, nodes) : null));
+                    includeCoordinates ? Coordinates(kb, nodes) : null,
+                    RenderCompositionLine(renderer, nodes)));
             }
         }
 
@@ -109,6 +110,19 @@ internal static class TranslationBuilder
         catch (Exception ex) when (ex is IndexOutOfRangeException or ArgumentException or InvalidOperationException or NullReferenceException)
         {
             return renderer.RenderFailed();
+        }
+    }
+
+    /// <summary>The composition line of a one-item part (T-086); a renderer gap leaves it out.</summary>
+    private static string? RenderCompositionLine(KaryotypeRenderer renderer, IReadOnlyList<MeaningNode> nodes)
+    {
+        try
+        {
+            return nodes is [KaryotypeItem item] ? renderer.CompositionLine(item) : null;
+        }
+        catch (Exception ex) when (ex is IndexOutOfRangeException or ArgumentException or InvalidOperationException or NullReferenceException)
+        {
+            return null;
         }
     }
 
