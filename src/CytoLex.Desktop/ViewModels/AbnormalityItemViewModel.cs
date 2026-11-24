@@ -1,7 +1,9 @@
 using System.Collections.Immutable;
 using System.Globalization;
+using System.Text;
 using Avalonia.Media;
 using Avalonia.Media.Immutable;
+using CytoLex.Core.Segmentation;
 using CytoLex.Core.Semantics;
 using CytoLex.Core.Text;
 using CytoLex.Core.Validation;
@@ -47,6 +49,10 @@ public sealed class AbnormalityItemViewModel : ISpanItem
     private static readonly IImmutableSolidColorBrush _arrCopyNumber = Brush(0x3B, 0x5B, 0x78);
     private static readonly IImmutableSolidColorBrush _arrOther = Brush(0x6B, 0x4E, 0x2E);
 
+    // In situ results (T-092): one neutral colour for region results; normal results are grey and muted.
+    private static readonly IImmutableSolidColorBrush _inSitu = Brush(0x2E, 0x6B, 0x5E);
+    private static readonly IImmutableSolidColorBrush _normal = Brush(0x7A, 0x7A, 0x7A);
+
     public AbnormalityItemViewModel(AbnormalityEntry entry, ImmutableArray<Diagnostic> diagnostics)
     {
         ArgumentNullException.ThrowIfNull(entry);
@@ -60,6 +66,7 @@ public sealed class AbnormalityItemViewModel : ISpanItem
         KindBrush = KindBrushOf(entry);
         Tags = entry.Arr is { } arr ? ArrTagsOf(entry, arr) : TagsOf(entry.Chromosomes, entry.Breakpoints);
         PositionsText = entry.Arr is { } a ? PositionsOf(a) : null;
+        LociText = entry.InSitu is { } s ? LociOf(s) : null;
         Flags = FlagsOf(entry);
         Parts = entry.Kind == AbnormalityKind.Alternatives
             ? [.. entry.Readings.Select(r => new AbnormalityPartViewModel(r.Span, r.Text, r.ShortForm, TagsOf(r.Chromosomes, r.Breakpoints)))]
@@ -114,6 +121,18 @@ public sealed class AbnormalityItemViewModel : ISpanItem
     /// <summary>Whether there are positions to show.</summary>
     public bool HasPositions => PositionsText is not null;
 
+    /// <summary>
+    /// The loci of an in situ result (T-092), one part per locus group: <c>ABL1×2, BCR×2 · ABL1 con BCR×1</c> (a shared
+    /// count is given to each locus of its group; a signal position group as written); <c>null</c> without loci.
+    /// </summary>
+    public string? LociText { get; }
+
+    /// <summary>Whether there are loci to show.</summary>
+    public bool HasLoci => LociText is not null;
+
+    /// <summary>A normal in situ result (T-092): shown muted with a "normal" flag.</summary>
+    public bool IsNormal => Entry.InSitu?.IsNormal ?? false;
+
     /// <summary>Flag glyphs.</summary>
     public ImmutableArray<FlagViewModel> Flags { get; }
 
@@ -133,7 +152,7 @@ public sealed class AbnormalityItemViewModel : ISpanItem
     public bool IsPartial => Entry.Flags.IsPartial;
 
     /// <summary>The card opacity.</summary>
-    public double Opacity => IsPartial ? 0.5 : 1.0;
+    public double Opacity => IsPartial ? 0.5 : IsNormal ? 0.6 : 1.0;
 
     /// <summary>The worst severity of the diagnostics inside the span; <c>null</c> without diagnostics.</summary>
     public IBrush? DiagnosticsBrush { get; }
@@ -153,11 +172,14 @@ public sealed class AbnormalityItemViewModel : ISpanItem
         AbnormalityKind.Alternatives => "or",
         AbnormalityKind.CloneReference => "clone",
         AbnormalityKind.ArrResult => entry.Arr?.CopyText ?? "arr",
+        AbnormalityKind.InSituRegion => entry.InSitu is { } s ? NotationLabel(s.Notation) : "ish",
         _ => "?",
     };
 
     private static IBrush KindBrushOf(AbnormalityEntry entry) => entry.Kind switch
     {
+        _ when entry.InSitu?.IsNormal ?? false => _normal,
+        AbnormalityKind.InSituRegion => _inSitu,
         AbnormalityKind.ArrResult => entry.Arr?.Kind is ArrResultKind.CopyNumber or null ? _arrCopyNumber : _arrOther,
         AbnormalityKind.Gain => _gain,
         AbnormalityKind.Loss => _loss,
@@ -225,10 +247,85 @@ public sealed class AbnormalityItemViewModel : ISpanItem
         return p.CopyText is { } copy ? text + " " + copy : text;
     }
 
+    /// <summary>The keyword of an in situ notation: <c>ish</c>, <c>nuc ish</c>, <c>fib ish</c>, <c>rev ish</c>, <c>cgh</c>.</summary>
+    internal static string NotationLabel(NotationType notation) => notation switch
+    {
+        NotationType.NucIsh => "nuc ish",
+        NotationType.FibIsh => "fib ish",
+        NotationType.RevIsh => "rev ish",
+        NotationType.Cgh => "cgh",
+        _ => "ish",
+    };
+
+    /// <summary>The loci line of an in situ result; <c>null</c> when it has no loci.</summary>
+    internal static string? LociOf(InSituResultSummary inSitu)
+    {
+        var groups = inSitu.Groups.Where(g => !g.Loci.IsEmpty).Select(GroupText).ToList();
+        return groups.Count == 0 ? null : string.Join(" · ", groups);
+    }
+
+    private static string GroupText(LocusGroupSummary group)
+    {
+        var text = new StringBuilder();
+        for (var i = 0; i < group.Loci.Length; i++)
+        {
+            var locus = group.Loci[i];
+            text.Append(locus.Name).Append(locus.Status);
+            if ((locus.CountText ?? (group.IsPosition ? null : group.SharedCount)) is { } count)
+            {
+                text.Append('×').Append(count);
+            }
+
+            foreach (var q in locus.Qualifiers)
+            {
+                text.Append(' ').Append(q);
+            }
+
+            if (i < group.Separators.Length)
+            {
+                text.Append(group.Separators[i] switch
+                {
+                    "," => ", ",
+                    ";" => "; ",
+                    "/" => "/",
+                    "" => " ",
+                    var word => $" {word} ",
+                });
+            }
+        }
+
+        if (group.IsPosition && group.SharedCount is { } shared)
+        {
+            text.Append('×').Append(shared);
+        }
+
+        foreach (var q in group.Qualifiers)
+        {
+            text.Append(' ').Append(q);
+        }
+
+        return text.ToString();
+    }
+
     internal static ImmutableArray<FlagViewModel> FlagsOf(AbnormalityEntry entry)
     {
         var f = entry.Flags;
         var flags = ImmutableArray.CreateBuilder<FlagViewModel>();
+        if (entry.InSitu is { } inSitu)
+        {
+            if (inSitu.IsNormal)
+            {
+                flags.Add(new("normal", $"Normal result ({inSitu.NormalRule})"));
+            }
+
+            if (inSitu.Cells is { } cells)
+            {
+                flags.Add(new($"[{cells.Text}]", cells.Total is null
+                    ? $"Cells with this result ([{cells.Text}])"
+                    : $"Cells with this result over the cells scored ([{cells.Text}])"));
+            }
+        }
+
         if (entry.Arr is { } arr)
         {
             if (arr.Proportion is { } proportion)
@@ -302,10 +399,14 @@ public sealed record CellLineGroupViewModel(string Header, ImmutableArray<Abnorm
     {
         ArgumentNullException.ThrowIfNull(result);
         var many = result.CellLines.Count(l => l.Technique == SegmentTechnique.Karyotype) > 1;
+        var inSituLines = result.CellLines.Where(l => l.Technique == SegmentTechnique.InSitu)
+            .GroupBy(l => l.SegmentIndex)
+            .ToDictionary(g => g.Key, g => g.Count());
         var groups = ImmutableArray.CreateBuilder<CellLineGroupViewModel>();
         var donor = false;
         int? segment = null;
         var number = 0;
+        var inSituNumber = 0;
         foreach (var line in result.CellLines)
         {
             if (line.Technique == SegmentTechnique.Arr)
@@ -314,9 +415,11 @@ public sealed record CellLineGroupViewModel(string Header, ImmutableArray<Abnorm
                 continue;
             }
 
-            number++;
-            // Transplant chimera: the cell lines before // are the recipient's, those after it the donor's.
-            donor = segment == line.SegmentIndex && (donor || line.SeparatorBefore == CellLineSeparator.DoubleSlash);
+            // Transplant chimera: the cell lines before // are the recipient's, those after it the donor's (an in situ
+            // segment may start with //: donor cells only, §13.3.1 E19).
+            var sameSegment = segment == line.SegmentIndex;
+            donor = (sameSegment && donor) || line.SeparatorBefore == CellLineSeparator.DoubleSlash;
+            inSituNumber = sameSegment ? inSituNumber + 1 : 1;
             segment = line.SegmentIndex;
             var relation = line.Relation switch
             {
@@ -325,7 +428,17 @@ public sealed record CellLineGroupViewModel(string Header, ImmutableArray<Abnorm
                 CellLineRelation.Transplant => donor ? "donor" : "recipient",
                 _ => null,
             };
-            groups.Add(new CellLineGroupViewModel(HeaderOf(line, many ? number : null, relation), Cards(result, line)));
+            var cards = Cards(result, line);
+            if (line.Technique == SegmentTechnique.InSitu)
+            {
+                int? numbered = inSituLines[line.SegmentIndex] > 1 ? inSituNumber : null;
+                var cells = cards.IsEmpty ? null : cards[^1].Entry.InSitu?.Cells?.Text;
+                groups.Add(new CellLineGroupViewModel(InSituHeaderOf(line, numbered, relation, cells), cards));
+                continue;
+            }
+
+            number++;
+            groups.Add(new CellLineGroupViewModel(HeaderOf(line, many ? number : null, relation), cards));
         }
 
         return groups.ToImmutable();
@@ -333,6 +446,29 @@ public sealed record CellLineGroupViewModel(string Header, ImmutableArray<Abnorm
 
     private static ImmutableArray<AbnormalityItemViewModel> Cards(EditionResult result, CellLineSummary line) =>
         [.. result.Abnormalities.Where(a => a.CellLine == line.Index).Select(a => new AbnormalityItemViewModel(a, result.Diagnostics))];
+
+    /// <summary>The header of an in situ cell line (T-092): <c>In situ (nuc ish) · cell line 2 (donor) · [50/400] · 1 result</c>.</summary>
+    /// <param name="line">The cell line.</param>
+    /// <param name="number">Its number in its segment (1-based); <c>null</c> when the segment has one cell line.</param>
+    /// <param name="relation"><c>mos</c>, <c>chi</c>, <c>recipient</c> or <c>donor</c>.</param>
+    /// <param name="cells">The cells after the line's last result, as written.</param>
+    internal static string InSituHeaderOf(CellLineSummary line, int? number, string? relation, string? cells)
+    {
+        var parts = new List<string> { $"In situ ({AbnormalityItemViewModel.NotationLabel(line.Notation ?? NotationType.Ish)})" };
+        if (number is not null || relation is not null)
+        {
+            var title = number is { } n ? $"cell line {n}" : "cell line";
+            parts.Add(relation is null ? title : $"{title} ({relation})");
+        }
+
+        if (cells is not null)
+        {
+            parts.Add($"[{cells}]");
+        }
+
+        parts.Add(line.AbnormalityCount == 1 ? "1 result" : $"{line.AbnormalityCount} results");
+        return string.Join(" · ", parts);
+    }
 
     /// <summary>The header of an arr group (T-072): <c>Microarray (arr) · GRCh38 · 3 results</c>.</summary>
     internal static string ArrHeaderOf(CellLineSummary line)

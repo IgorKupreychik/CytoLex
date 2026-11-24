@@ -168,7 +168,7 @@
         <Panel DataContext="{Binding SelectedPanel}" x:DataType="vm:EditionPanelViewModel">
           <TextBlock Text="{Binding NotImplementedText}" IsVisible="{Binding IsNotImplemented}" Opacity="0.6" Margin="0,6" />
           <DockPanel IsVisible="{Binding IsImplemented}" Margin="0,6,0,0">
-            <TextBlock DockPanel.Dock="Top" Text="No karyotype cell lines or array results." Opacity="0.6"
+            <TextBlock DockPanel.Dock="Top" Text="No karyotype cell lines, in situ or array results." Opacity="0.6"
                        IsVisible="{Binding !HasCellLines}" />
             <ScrollViewer HorizontalScrollBarVisibility="Disabled">
               <ItemsControl ItemsSource="{Binding CellLineGroups}" Margin="0,0,14,8">
@@ -202,6 +202,9 @@
                                 <TextBlock Text="{Binding PositionsText}" IsVisible="{Binding HasPositions}" Opacity="0.65" TextWrapping="Wrap"
                                            FontFamily="Cascadia Mono,Consolas,monospace"
                                            ToolTip.Tip="Nucleotide positions in the stated genome build (ISCN §14.2)" />
+                                <TextBlock Text="{Binding LociText}" IsVisible="{Binding HasLoci}" Opacity="0.65" TextWrapping="Wrap"
+                                           FontFamily="Cascadia Mono,Consolas,monospace"
+                                           ToolTip.Tip="Loci with their status and signal counts (ISCN §13.2–13.3)" />
                                 <ItemsControl ItemsSource="{Binding Tags}">
                                   <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>

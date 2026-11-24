@@ -1,14 +1,15 @@
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Text;
+using CytoLex.Core.Segmentation;
 using CytoLex.Core.Semantics;
 using CytoLex.Core.Text;
 
 namespace CytoLex.Core.Validation;
 
 /// <summary>
-/// Flattens the semantic model of karyotype and arr segments into <see cref="EditionResult.CellLines"/> and
-/// <see cref="EditionResult.Abnormalities"/> (docs/design/core.md §9, T-069, T-072).
+/// Flattens the semantic model of karyotype, in situ and arr segments into <see cref="EditionResult.CellLines"/> and
+/// <see cref="EditionResult.Abnormalities"/> (docs/design/core.md §9, T-069, T-072, T-092).
 /// </summary>
 internal sealed class AbnormalityList(string input)
 {
@@ -83,6 +84,85 @@ internal sealed class AbnormalityList(string input)
             null,
             SegmentTechnique.Arr,
             build));
+    }
+
+    /// <summary>
+    /// Adds the cell lines of one in situ segment (T-092): one group per cell line, one entry per comma-separated result
+    /// (an ish abnormality keeps its karyotype entry, a region result is <see cref="AbnormalityKind.InSituRegion"/>),
+    /// each with its <see cref="InSituResultSummary"/>; skipped text goes to the line it follows.
+    /// </summary>
+    public void Add(int segmentIndex, FishModel model)
+    {
+        var lines = model.CellLines;
+        // Skipped text belongs to the last line that starts before it (the first line when none does; -1 without lines).
+        var unbound = model.Unbound.ToLookup(u => lines.IsEmpty ? -1 : Math.Max(0, lines.Count(l => l.Span.Start <= u.Span.Start) - 1));
+        if (lines.IsEmpty)
+        {
+            AddFishLine(segmentIndex, model, null, model.Span, CellLineSeparator.None, unbound[-1]);
+            return;
+        }
+
+        for (var i = 0; i < lines.Length; i++)
+        {
+            var separator = i == 0 && model.StartsWithDoubleSlash ? CellLineSeparator.DoubleSlash : lines[i].Separator;
+            AddFishLine(segmentIndex, model, lines[i], lines[i].Span, separator, unbound[i]);
+        }
+    }
+
+    private void AddFishLine(int segmentIndex, FishModel model, FishCellLine? line, TextSpan span, CellLineSeparator separator, IEnumerable<UnboundItem> unbound)
+    {
+        var lineIndex = _cellLines.Count;
+        var before = _entries.Count;
+        var nodes = (line?.Items ?? []).Cast<MeaningNode>().Concat(unbound).OrderBy(n => n.Span.Start);
+        foreach (var node in nodes)
+        {
+            var index = _entries.Count;
+            _entries.Add(node switch
+            {
+                FishItem item => FishEntry(item, model.Type, lineIndex, index),
+                UnboundItem u => Basic(u, lineIndex, index, AbnormalityKind.Unrecognised, u.Text, Flags(u, null, false, false)),
+                _ => throw new InvalidOperationException("unreachable"),
+            });
+        }
+
+        _cellLines.Add(new CellLineSummary(
+            lineIndex,
+            segmentIndex,
+            span,
+            span.Of(input),
+            separator,
+            model.Relation,
+            null,
+            null,
+            line?.Cells?.Count,
+            false,
+            line?.IsPartial ?? model.IsPartial,
+            _entries.Count - before,
+            null,
+            SegmentTechnique.InSitu,
+            null,
+            model.Type));
+    }
+
+    private AbnormalityEntry FishEntry(FishItem item, NotationType notation, int lineIndex, int index)
+    {
+        var inSitu = InSituEntries.Summary(input, item, notation);
+        var partial = InSituEntries.Partial(item);
+        var entry = item switch
+        {
+            { Region: { } region } => InSituEntries.Region(input, item, region, lineIndex, index),
+            { Abnormality: { } abnormality } when Entry(abnormality, lineIndex, index) is { } e => e with
+            {
+                Span = item.Span,
+                Text = item.Span.Of(input),
+                Kb = [.. e.Kb.Concat(item.LocusGroups.SelectMany(g => g.DescendantsAndSelf()).SelectMany(n => n.Kb)).Distinct()],
+            },
+            _ => new AbnormalityEntry(
+                index, lineIndex, item.Span, item.Span.Of(input), AbnormalityKind.Unrecognised, GainLoss.None, null, null, [], [],
+                InSituEntries.WithoutCells(input, item), [], [], new AbnormalityFlags(partial, false, false, false, false, null, null, null), [], item.Kb),
+        };
+
+        return entry with { InSitu = inSitu, Flags = entry.Flags with { IsPartial = entry.Flags.IsPartial || partial } };
     }
 
     /// <summary>The cell lines and the entries, with the diagnostics inside each entry's span linked.</summary>

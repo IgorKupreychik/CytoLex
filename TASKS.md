@@ -100,8 +100,8 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-089 | todo | 3 | T-081 | Desktop: settings view to set up external checkers (CytoGPS paths, cache, timeout) instead of editing `config/local.yaml` by hand |
 | T-090 | todo | 5 | T-018 | Parser + rules: breakage (ch. 10) and meiotic (ch. 12) notation |
 | T-091 | todo | 5 | T-019 | Parser + rules: region-specific assays (`rsa`, ch. 15) and sequence-based notation (`seq`, ch. 16), incl. multi-line input |
-| T-092 | todo | 2 | T-033, T-069, T-098 | Abnormality list: in situ results (core API + desktop panel) |
-| T-093 | todo | 4 | T-033, T-058 | Literal translation of in situ results (templates, golden entries, renderer) |
+| T-092 | done | 2 | T-033, T-069, T-098 | Abnormality list: in situ results (core API + desktop panel) |
+| T-093 | todo | 3 | T-033, T-058 | Literal translation of in situ results (templates, golden entries, renderer) |
 | T-094 | done | 4 | T-033 | Probe positions for locus and chromosome order in FISH (`ISH.LOCUS_ORDER_PTER_QTER`, `NUC_ISH.CHROMOSOME_ORDER`) |
 | T-095 | discussion | 4 | T-033 | Apply karyotype rules (STRUCT.*, symbol formats) to the abnormalities of ish results? |
 | T-096 | done | 2 | T-074, T-035 | Autocorrection: core + KB flag `fix.auto` (meaning-preserving level-1 fixes applied automatically, original kept) |
@@ -113,6 +113,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-102 | todo | 3 | T-033 | Probe table: people-editable CSV with review flags, HGNC/NCBI pre-fill, `kb build` checks |
 | T-103 | todo | 3 | T-101, T-102 | Use the probe table: probe loci with "unreviewed" badges; locus/chromosome order checks (T-094) |
 | T-104 | discussion | 3 | T-069, T-101 | Disease/condition associations from abnormalities: intended use, sources, format, review |
+| T-105 | todo | 3 | T-034, T-058 | Literal translation of microarray results (templates, golden entries, renderer) |
 
 ---
 
@@ -983,16 +984,16 @@ Deviations from the plan: no CLI (user); new label `severity-policy` and CytoLex
 **Notes:** From T-019: the line break is the only separator between the parts of a seq result (a space would make stray spaces ambiguous); the info rules (`RSA.SCOPE`, `RSA.NORMAL_LOCI_OPTIONAL`, `SEQ.SCOPE`, `SEQ.THREE_PRIME_RULE`) need no check; `SEQ.BREAKPOINT_ORIENTATION` has `needs_review` (¶16 vs §16.3.7 E1): settle the reading before a check. HGVS fragments (`g.4delT`) of seq-only rules skip in the harness until seq is implemented.
 
 ### T-092 — Abnormality list: in situ results
-**Status:** todo
+**Status:** done
 **Description:** Add FISH results to `EditionResult.CellLines`/`Abnormalities` (`AbnormalityList.cs` reads `KaryotypeModel`s only): ish abnormalities with their loci and status, normal-chromosome and nuc ish results with counts, positions and cells; show them in the desktop "Abnormalities" panel.
 **Acceptance:** every valid FISH KB example lists its results with spans; desktop panel shows them grouped by cell line.
-**Notes:** From T-033: the model is `FishModel` (`src/CytoLex.Core/Semantics/FishNodes.cs`); ish abnormalities are karyotype `Abnormality` nodes plus `FishGroup`s. Like T-072 for arr. 2026-11-24 (feature discussion, user): priority 3 → 2; depends on T-098 too. Normal ish/nuc ish results (e.g. `nuc ish(D21Z1×2)[200]`) are listed as well, shown muted with a "normal" tag, so the list mirrors the string. One group per segment; cross-technique linking is T-100. Probe positions (map) are T-101/T-103.
+**Notes:** From T-033: the model is `FishModel` (`src/CytoLex.Core/Semantics/FishNodes.cs`); ish abnormalities are karyotype `Abnormality` nodes plus `FishGroup`s. Like T-072 for arr. 2026-11-24 (feature discussion, user): priority 3 → 2; depends on T-098 too. Normal ish/nuc ish results (e.g. `nuc ish(D21Z1×2)[200]`) are listed as well, shown muted with a "normal" tag, so the list mirrors the string. One group per segment; cross-technique linking is T-100. Probe positions (map) are T-101/T-103. **Outcome (2026-11-24):** decided with the user at plan approval: only normal results are marked, never abnormal ones (ish normal-chromosome form → `ISH.NORMAL_CHROMOSOME_FORMAT`, `subtel(41×2)` → `ISH.SUBTEL_NORMAL_SHORT`, nuc ish results with every locus ×2 and no status/position/qualifier → the `NUC_ISH.ABNORMAL_OVER_TOTAL` test, moved to `src/CytoLex.Core/Semantics/FishNormal.cs` and shared with that check). Core: `SegmentTechnique.InSitu`, `CellLineSummary.Notation`; one group per cell line of an in situ segment (leading `//` → `SeparatorBefore` `DoubleSlash`; no cell lines → one empty group); one `AbnormalityEntry` per `FishItem` (span = whole result with cells); ish abnormalities keep their karyotype entry, region results are `AbnormalityKind.InSituRegion`; `AbnormalityEntry.InSitu` = `InSituResultSummary` (notation, `LocusGroupSummary`/`LocusSummary`, `InSituCellsSummary`, `IsNormal`, `NormalRule`); built by `src/CytoLex.Core/Validation/InSituEntries.cs` + `AbnormalityList.Add(FishModel)`, wired in `Validator.Run`. Desktop: "In situ (nuc ish) · cell line 2 (donor) · [300] · 1 result" headers, notation chip for region results, loci line (`ABL1×2, BCR×2 · ABL1 con BCR×1`), cells and "normal" flags, normal cards grey and muted (0.6). Tests: `tests/CytoLex.Core.Tests/Validation/InSituAbnormalityListTests.cs` (162 FISH KB examples + spot checks + JSON), `AbnormalityListTests.IshSegment_OwnGroup`, desktop `AbnormalityPanelTests` (3 tests new/updated). `dotnet test`: 11,374 total, 0 failed, 106 skipped; `dotnet format` clean. Docs: `docs/design/core.md` §9, `docs/decisions.md`, `CLAUDE.md`, `README.md`, `docs/research/cytogps-comparison.md`. Deviation: one group per cell line instead of per segment (acceptance "grouped by cell line"; logged in `docs/decisions.md`). Follow-up: T-105 (arr translation) created; T-093 priority 4 → 3.
 
 ### T-093 — Literal translation of in situ results
 **Status:** todo
 **Description:** Templates (`kb/translation/2016/templates.en.yaml`), golden entries and renderer support for ish, nuc ish, fib ish, rev ish and cgh results (now "not translated").
 **Acceptance:** golden entries for the ch. 13 book examples render exactly; `TranslationTests` cover FISH parts.
-**Notes:** From T-033. Draft wording until reviewed (T-082 pattern).
+**Notes:** From T-033. Draft wording until reviewed (T-082 pattern). 2026-11-24 (user): priority 4 → 3. Microarray counterpart: T-105.
 
 ### T-094 — Probe positions for locus and chromosome order in FISH
 **Status:** done
@@ -1083,3 +1084,9 @@ Outcome (2026-11-24): KB `fix.auto` (schema: level 1 only; `kb/README.md`) set o
 - **Display:** an "Associations" view (T-098) with citations, unreviewed badges and the disclaimer.
 **Acceptance:** Decision in `docs/decisions.md`; follow-up `todo` tasks.
 **Notes:** Created 2026-11-24 (user). The framing (associations vs. diagnosis) is left open for this discussion (user).
+
+### T-105 — Literal translation of microarray results
+**Status:** todo
+**Description:** Templates (`kb/translation/2016/templates.en.yaml`), golden entries and renderer support for `arr` results (now "not translated": `TranslationBuilder` renders `KaryotypeModel`s only): genome build, regions with bands and positions, whole chromosomes and region groups, copy number, `amp`/`cx`/`cth`, proportion, zygosity, origin (`mat`/`pat`/`dn`), `mos`, and arr combined with a karyotype or in situ result.
+**Acceptance:** golden entries for the ch. 14 book examples render exactly; `TranslationTests` cover arr parts.
+**Notes:** Created 2026-11-24 (user), counterpart of T-093 for ch. 14. Open at planning: whether a copy number is worded as written ("one copy") or as a gain/loss, which depends on the sex and ploidy and has no KB rule (T-072 shows it as written; suggested default). Draft wording until reviewed (T-082 pattern).

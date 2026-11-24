@@ -126,10 +126,6 @@ internal static partial class NucIshAnalyses
     }
 
     /// <summary>Every locus of the line shows two signals, with no position or qualifier.</summary>
-    private static bool IsNormal(FishCellLine line)
-    {
-        var groups = line.Items.Select(i => i.Region).OfType<FishRegion>().SelectMany(r => r.Groups).ToList();
-        return groups.Count > 0 && groups.All(g => !g.IsPosition && g.Qualifiers.IsEmpty && g.Loci.All(l =>
-            l.Qualifiers.IsEmpty && l.Status.Length == 0 && (l.Count ?? g.SharedCount) is { Low: 2, High: null }));
-    }
+    private static bool IsNormal(FishCellLine line) =>
+        FishNormal.AllTwoSignals(line.Items.Select(i => i.Region).OfType<FishRegion>().SelectMany(r => r.Groups));
 }

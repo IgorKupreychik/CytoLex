@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using CytoLex.Core.Segmentation;
 using CytoLex.Core.Semantics;
 using CytoLex.Core.Text;
 
@@ -30,6 +31,12 @@ public enum AbnormalityKind
 
     /// <summary>A microarray result (ch. 14, T-072): regions or a chromosome group with a copy number, in <see cref="AbnormalityEntry.Arr"/>.</summary>
     ArrResult,
+
+    /// <summary>
+    /// An in situ result led by a chromosome, a band or only loci (ch. 13, T-092): <c>22q11.2(D22S75×2)</c>,
+    /// <c>(ABL1,BCR)×2(ABL1 con BCR×1)</c>, <c>15q</c>; details in <see cref="AbnormalityEntry.InSitu"/>.
+    /// </summary>
+    InSituRegion,
 }
 
 /// <summary>The technique of a group in <see cref="EditionResult.CellLines"/> (T-072).</summary>
@@ -40,7 +47,75 @@ public enum SegmentTechnique
 
     /// <summary>A microarray (<c>arr</c>) segment: one group per segment.</summary>
     Arr,
+
+    /// <summary>A cell line of an in situ segment (<c>ish</c>, <c>nuc ish</c>, <c>fib ish</c>, <c>rev ish</c>, <c>cgh</c>; T-092).</summary>
+    InSitu,
 }
+
+/// <summary>One locus of an in situ result (T-092).</summary>
+/// <param name="Span">The locus (name, status, count and qualifiers) in the whole input.</param>
+/// <param name="Name">The name as written (<c>D22S75</c>, <c>5′CBFB</c>, <c>wcp11</c>).</param>
+/// <param name="Status">The status signs (<c>+</c>, <c>–</c>, <c>++</c>; leading signs included); empty when none.</param>
+/// <param name="CountText">The signal count as written without <c>×</c> (<c>2</c>, <c>4~5</c>); <c>null</c> when none.</param>
+/// <param name="CountLow">The count, or the low end of a range.</param>
+/// <param name="CountHigh">The high end of a range.</param>
+/// <param name="IsOpenEnded">An open-ended range (<c>~&gt;50</c>).</param>
+/// <param name="Qualifiers"><c>amp</c>, <c>dim</c>, <c>enh</c>.</param>
+public sealed record LocusSummary(
+    TextSpan Span,
+    string Name,
+    string Status,
+    string? CountText,
+    int? CountLow,
+    int? CountHigh,
+    bool IsOpenEnded,
+    ImmutableArray<string> Qualifiers);
+
+/// <summary>Loci in one pair of parentheses and what follows it (T-092): <c>(ABL1,BCR)×2</c>, <c>(ABL1 con BCR×1)</c>.</summary>
+/// <param name="Span">The group in the whole input.</param>
+/// <param name="Text">The group as written.</param>
+/// <param name="Loci">The loci, in input order.</param>
+/// <param name="Separators">The separator after each locus but the last (<c>,</c>, <c>;</c>, <c>/</c>, <c>con</c>, <c>sep</c>; empty when none is written).</param>
+/// <param name="IsPosition">A signal position group (loci joined by <c>con</c>/<c>sep</c>, §13.3.2).</param>
+/// <param name="SharedCount">The count after the closing parenthesis, shared by the loci, without <c>×</c>.</param>
+/// <param name="Qualifiers">Qualifiers after the closing parenthesis (<c>amp</c>).</param>
+/// <param name="Breakpoints">Breakpoints written inside the parentheses before the loci.</param>
+public sealed record LocusGroupSummary(
+    TextSpan Span,
+    string Text,
+    ImmutableArray<LocusSummary> Loci,
+    ImmutableArray<string> Separators,
+    bool IsPosition,
+    string? SharedCount,
+    ImmutableArray<string> Qualifiers,
+    ImmutableArray<BreakpointSummary> Breakpoints);
+
+/// <summary>The cells of an in situ result (T-092): <c>[20]</c>, <c>[100/400]</c>, <c>[60%]</c>.</summary>
+/// <param name="Text">The text inside the brackets.</param>
+/// <param name="Count">The number of cells (the abnormal ones in <c>[100/400]</c>).</param>
+/// <param name="Total">The number of cells scored.</param>
+/// <param name="IsPercentage">Written as a percentage.</param>
+public sealed record InSituCellsSummary(string Text, int? Count, int? Total, bool IsPercentage);
+
+/// <summary>
+/// The in situ details of an entry of an in situ cell line (T-092): the notation, the locus groups, the cells and
+/// whether the result is normal. Only normal results are marked; an unmarked result is not read as abnormal.
+/// </summary>
+/// <param name="Notation"><see cref="NotationType.Ish"/>, <see cref="NotationType.NucIsh"/>, <see cref="NotationType.FibIsh"/>, <see cref="NotationType.RevIsh"/> or <see cref="NotationType.Cgh"/>.</param>
+/// <param name="Groups">The locus groups, in input order.</param>
+/// <param name="Cells">The cells after the result, if written.</param>
+/// <param name="IsNormal">
+/// A normal result: an ish result in the normal-chromosome form (ISH.NORMAL_CHROMOSOME_FORMAT), <c>subtel(41×2)</c>
+/// (ISH.SUBTEL_NORMAL_SHORT), or a nuc ish result whose loci all show two signals with no position or qualifier
+/// (the test of NUC_ISH.ABNORMAL_OVER_TOTAL).
+/// </param>
+/// <param name="NormalRule">The KB rule <paramref name="IsNormal"/> rests on; <c>null</c> when not normal.</param>
+public sealed record InSituResultSummary(
+    NotationType Notation,
+    ImmutableArray<LocusGroupSummary> Groups,
+    InSituCellsSummary? Cells,
+    bool IsNormal,
+    string? NormalRule);
 
 /// <summary>A nucleotide position or span of an arr region (T-072).</summary>
 /// <param name="Span">The position(s) in the whole input.</param>
@@ -116,6 +191,7 @@ public sealed record ArrResultSummary(
 /// <param name="BasedOn">The index (in <see cref="EditionResult.CellLines"/>) of the clone this line refers to with <c>idem</c>/<c>sl</c>/<c>sdl</c> (T-032).</param>
 /// <param name="Technique">A karyotype cell line, or a whole arr segment (T-072: count, sex and cells are then <c>null</c>).</param>
 /// <param name="Build">The genome build of an arr segment (<c>GRCh38</c>).</param>
+/// <param name="Notation">The notation of an in situ cell line (T-092); <c>null</c> otherwise. Its <paramref name="Cells"/> are those after its last result.</param>
 public sealed record CellLineSummary(
     int Index,
     int SegmentIndex,
@@ -131,7 +207,8 @@ public sealed record CellLineSummary(
     int AbnormalityCount,
     int? BasedOn = null,
     SegmentTechnique Technique = SegmentTechnique.Karyotype,
-    string? Build = null);
+    string? Build = null,
+    NotationType? Notation = null);
 
 /// <summary>A breakpoint of an abnormality.</summary>
 /// <param name="Span">The breakpoint in the whole input.</param>
@@ -217,6 +294,7 @@ public sealed record AbnormalityFlags(
 /// system or as written; <c>null</c> without a band composition (<see cref="Semantics.Abnormality.Composition"/>).
 /// </param>
 /// <param name="Arr">The microarray details of an <see cref="AbnormalityKind.ArrResult"/> (T-072); <c>null</c> otherwise.</param>
+/// <param name="InSitu">The in situ details of an entry of an in situ cell line (T-092): loci, cells, normal; <c>null</c> otherwise.</param>
 public sealed record AbnormalityEntry(
     int Index,
     int CellLine,
@@ -235,4 +313,5 @@ public sealed record AbnormalityEntry(
     ImmutableArray<int> Diagnostics,
     ImmutableArray<KbRef> Kb,
     string? Detailed = null,
-    ArrResultSummary? Arr = null);
+    ArrResultSummary? Arr = null,
+    InSituResultSummary? InSitu = null);

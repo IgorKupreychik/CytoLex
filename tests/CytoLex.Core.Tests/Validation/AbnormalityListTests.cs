@@ -207,11 +207,12 @@ public class AbnormalityListTests
     }
 
     [Fact]
-    public void IshSegment_NoEntries()
+    public void IshSegment_OwnGroup()
     {
+        // T-092: the ish result is listed in its own group after the karyotype cell line.
         var result = Result("46,XX.ish 5p15.2(D5S23×2)");
-        Assert.Single(result.CellLines);
-        Assert.Empty(result.Abnormalities);
+        Assert.Equal([SegmentTechnique.Karyotype, SegmentTechnique.InSitu], result.CellLines.Select(c => c.Technique));
+        Assert.Equal(1, Assert.Single(result.Abnormalities).CellLine);
     }
 
     [Fact]

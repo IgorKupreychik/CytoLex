@@ -140,6 +140,10 @@ public sealed class Validator
             {
                 abnormalities.Add(segment.Index, arr); // T-072
             }
+            else if (model is FishModel fish)
+            {
+                abnormalities.Add(segment.Index, fish); // T-092
+            }
 
             diagnostics.AddRange(tree.Diagnostics.Select(d => DiagnosticFactory.FromSyntax(profile.Kb, input, d, context.Effective)).OfType<Diagnostic>());
 
