@@ -71,6 +71,8 @@ public sealed record AgreementMatrix(
 /// it and every error rule is one the checker doesn't check (<see cref="IExternalCoverage.DoesNotCheck"/>);
 /// <see cref="TriageLabel.SeverityPolicy"/> when the checker alone rejects it and CytoLex has warnings or infos.
 /// </param>
+/// <param name="CytoLexAutoCorrected">CytoLex is valid only after autocorrection (compared with autocorrection on).</param>
+/// <param name="CytoLexCorrected">The string CytoLex autocorrected to, if it changed.</param>
 public sealed record ComparisonItem(
     BatchItem Item,
     bool? CytoLexValid,
@@ -81,7 +83,9 @@ public sealed record ComparisonItem(
     Agreement Agreement,
     string? Reason,
     TriageEntry? Triage,
-    TriageLabel? SuggestedLabel)
+    TriageLabel? SuggestedLabel,
+    bool CytoLexAutoCorrected = false,
+    string? CytoLexCorrected = null)
 {
     /// <summary>Whether CytoLex and the checker disagree on the string.</summary>
     public bool IsDisagreement => Agreement is Agreement.OnlyCytoLexInvalid or Agreement.OnlyCheckerInvalid;
@@ -95,6 +99,7 @@ public sealed record ComparisonItem(
 /// <param name="Matrix">The agreement matrix.</param>
 /// <param name="Items">One item per input, in input order.</param>
 /// <param name="StaleTriage">Triage entries whose string is not a disagreement in this batch (empty unless the checker ran).</param>
+/// <param name="AutoCorrect">Whether CytoLex autocorrected first (a string valid after autocorrection counts as valid).</param>
 public sealed record ComparisonResult(
     string Checker,
     string Edition,
@@ -102,7 +107,29 @@ public sealed record ComparisonResult(
     string? CheckerMessage,
     AgreementMatrix Matrix,
     ImmutableArray<ComparisonItem> Items,
-    ImmutableArray<TriageEntry> StaleTriage);
+    ImmutableArray<TriageEntry> StaleTriage,
+    bool AutoCorrect = false)
+{
+    /// <summary>
+    /// This comparison matched with another triage file (after a label was edited): the triage entries, suggested labels
+    /// and stale entries are recomputed; nothing is run again.
+    /// </summary>
+    /// <param name="triage">The triage file, for the same checker and edition.</param>
+    /// <param name="coverage">The checker's coverage, for the suggested labels.</param>
+    /// <exception cref="ArgumentException"><paramref name="triage"/> is for another checker or edition.</exception>
+    public ComparisonResult WithTriage(TriageFile triage, IExternalCoverage coverage)
+    {
+        ArgumentNullException.ThrowIfNull(triage);
+        ArgumentNullException.ThrowIfNull(coverage);
+        ComparisonEngine.CheckTriage(triage, Checker, Edition);
+        var items = ImmutableArray.CreateRange(Items, i => ComparisonEngine.Triage(i, triage, coverage));
+        return this with
+        {
+            Items = items,
+            StaleTriage = CheckerStatus == ExternalBatchStatus.Completed ? ComparisonEngine.Stale(triage, items) : [],
+        };
+    }
+}
 
 /// <summary>
 /// Compares CytoLex's verdicts with an external checker's on a batch (T-051): only in the checker's edition, with the
@@ -112,6 +139,18 @@ public sealed record ComparisonResult(
 public static class ComparisonEngine
 {
     /// <summary>Runs CytoLex and the checker on <paramref name="items"/> and compares their verdicts.</summary>
+    /// <param name="items">The batch.</param>
+    /// <param name="validator">CytoLex.</param>
+    /// <param name="checker">The external checker.</param>
+    /// <param name="coverage">What the checker can read and check.</param>
+    /// <param name="triage">The triage labels (none when omitted).</param>
+    /// <param name="progress">Text progress (start, then the checker's own messages).</param>
+    /// <param name="validated">The number of strings CytoLex has validated so far.</param>
+    /// <param name="autoCorrect">
+    /// Whether CytoLex autocorrects first (T-096): a string valid after autocorrection counts as valid. The checker always
+    /// gets the string as written.
+    /// </param>
+    /// <param name="cancellationToken">Cancels both runs.</param>
     /// <exception cref="ArgumentException"><paramref name="triage"/> is for another checker or edition.</exception>
     /// <exception cref="OperationCanceledException"><paramref name="cancellationToken"/> was cancelled.</exception>
     public static async Task<ComparisonResult> CompareAsync(
@@ -121,6 +160,8 @@ public static class ComparisonEngine
         IExternalCoverage coverage,
         TriageFile? triage = null,
         IProgress<string>? progress = null,
+        IProgress<int>? validated = null,
+        bool autoCorrect = false,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(items);
@@ -128,16 +169,11 @@ public static class ComparisonEngine
         ArgumentNullException.ThrowIfNull(checker);
         ArgumentNullException.ThrowIfNull(coverage);
         triage ??= TriageFile.Empty(checker.Name, checker.Edition);
-        if (!string.Equals(triage.Checker, checker.Name, StringComparison.Ordinal)
-            || !string.Equals(triage.Edition, checker.Edition, StringComparison.Ordinal))
-        {
-            throw new ArgumentException(
-                $"The triage file is for {triage.Checker} {triage.Edition}, not {checker.Name} {checker.Edition}.", nameof(triage));
-        }
+        CheckTriage(triage, checker.Name, checker.Edition);
 
         progress?.Report($"CytoLex and {checker.Name}: {items.Count} strings (ISCN {checker.Edition})");
-        var options = new ValidationOptions { Editions = EditionSelection.One(checker.Edition) };
-        var cytoLexTask = BatchRunner.RunAsync(validator, items, options, cancellationToken: cancellationToken);
+        var options = new ValidationOptions { Editions = EditionSelection.One(checker.Edition), AutoCorrect = autoCorrect };
+        var cytoLexTask = BatchRunner.RunAsync(validator, items, options, validated, cancellationToken);
         var externalTask = checker.CheckAsync([.. items.Select(i => i.Input)], progress, cancellationToken);
         var cytoLex = await cytoLexTask.ConfigureAwait(false);
         var external = await externalTask.ConfigureAwait(false);
@@ -147,7 +183,7 @@ public static class ComparisonEngine
             ? Stale(triage, compared)
             : [];
         return new ComparisonResult(checker.Name, checker.Edition, external.Status, external.Message,
-            AgreementMatrix.Of(compared), compared, stale);
+            AgreementMatrix.Of(compared), compared, stale, autoCorrect);
     }
 
     internal static ImmutableArray<ComparisonItem> Classify(
@@ -182,18 +218,36 @@ public static class ComparisonEngine
                         _ => (Agreement.NotCompared, external.Message ?? ext.ToolStatus),
                     };
 
-            var disagreement = agreement is Agreement.OnlyCytoLexInvalid or Agreement.OnlyCheckerInvalid;
-            var entry = disagreement ? triage.Find(items[i].Input) : null;
-            TriageLabel? suggested = !disagreement || entry is not null ? null
-                : agreement == Agreement.OnlyCytoLexInvalid && !errors.IsEmpty && errors.All(coverage.DoesNotCheck)
-                    ? TriageLabel.CheckerLimitation
-                    : agreement == Agreement.OnlyCheckerInvalid && !notes.IsEmpty
-                        ? TriageLabel.SeverityPolicy
-                        : null;
-            result.Add(new ComparisonItem(items[i], valid, edition.Validity.IsComplete, errors, notes, ext, agreement, reason, entry, suggested));
+            var auto = edition.AutoCorrection is { IsChanged: true } a ? a : null;
+            var item = new ComparisonItem(items[i], valid, edition.Validity.IsComplete, errors, notes, ext, agreement, reason, null, null,
+                auto is not null && valid == true, auto?.Corrected);
+            result.Add(Triage(item, triage, coverage));
         }
 
         return result.MoveToImmutable();
+    }
+
+    internal static void CheckTriage(TriageFile triage, string checker, string edition)
+    {
+        if (!string.Equals(triage.Checker, checker, StringComparison.Ordinal)
+            || !string.Equals(triage.Edition, edition, StringComparison.Ordinal))
+        {
+            throw new ArgumentException(
+                $"The triage file is for {triage.Checker} {triage.Edition}, not {checker} {edition}.", nameof(triage));
+        }
+    }
+
+    /// <summary>The item with its triage entry, or a suggested label for an untriaged disagreement.</summary>
+    internal static ComparisonItem Triage(ComparisonItem item, TriageFile triage, IExternalCoverage coverage)
+    {
+        var entry = item.IsDisagreement ? triage.Find(item.Item.Input) : null;
+        TriageLabel? suggested = !item.IsDisagreement || entry is not null ? null
+            : item.Agreement == Agreement.OnlyCytoLexInvalid && !item.CytoLexErrors.IsEmpty && item.CytoLexErrors.All(coverage.DoesNotCheck)
+                ? TriageLabel.CheckerLimitation
+                : item.Agreement == Agreement.OnlyCheckerInvalid && !item.CytoLexNotes.IsEmpty
+                    ? TriageLabel.SeverityPolicy
+                    : null;
+        return item with { Triage = entry, SuggestedLabel = suggested };
     }
 
     private static ImmutableArray<string> RuleIds(EditionResult edition, bool error) =>
@@ -204,7 +258,7 @@ public static class ComparisonEngine
             .Distinct(StringComparer.Ordinal),
     ];
 
-    private static ImmutableArray<TriageEntry> Stale(TriageFile triage, ImmutableArray<ComparisonItem> items)
+    internal static ImmutableArray<TriageEntry> Stale(TriageFile triage, ImmutableArray<ComparisonItem> items)
     {
         var disagreeing = items.Where(i => i.IsDisagreement).Select(i => i.Item.Input).ToHashSet(StringComparer.Ordinal);
         return [.. triage.Entries.Where(e => !disagreeing.Contains(e.Iscn))];

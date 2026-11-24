@@ -15,26 +15,6 @@ entries:
     label: checker-limitation
     confirmed: true
     note: "CytoLex: SYM.SPACE_BEFORE_CHROMOSOME_COUNT, SEX.ACQUIRED_GAIN_LOSS; book invalid example of SYM.SPACE_BEFORE_CHROMOSOME_COUNT; CytoGPS: Success"
-  - iscn: "46,XX,del (5)(q13q33)"
-    label: checker-limitation
-    confirmed: true
-    note: "CytoLex: SYM.NO_SPACE_AT_PARENTHESIS; book invalid example of SYM.NO_SPACE_AT_PARENTHESIS; CytoGPS: Success"
-  - iscn: "47,XY, +21"
-    label: checker-limitation
-    confirmed: true
-    note: "CytoLex: SYM.NO_OTHER_SPACE; book invalid example of SYM.NO_OTHER_SPACE; CytoGPS: Success"
-  - iscn: "46,X Y,dup(1)(q21q32)"
-    label: checker-limitation
-    confirmed: true
-    note: "CytoLex: SYM.NO_OTHER_SPACE; book invalid example of SYM.NO_OTHER_SPACE; CytoGPS: Success"
-  - iscn: "46,xy"
-    label: checker-limitation
-    confirmed: true
-    note: "CytoLex: SYM.LETTER_CASE; book invalid example of SYM.LETTER_CASE; CytoGPS: Success"
-  - iscn: "46,XX,Del(5)(q13q33)"
-    label: checker-limitation
-    confirmed: true
-    note: "CytoLex: SYM.LETTER_CASE; book invalid example of SYM.LETTER_CASE; CytoGPS: Success"
   - iscn: "46,XX,del(6)(q13q23)X2"
     label: checker-limitation
     confirmed: true
@@ -99,10 +79,6 @@ entries:
     label: checker-limitation
     confirmed: true
     note: "book valid example of KARYO.ENDOREDUPLICATION; book corrected example of KARYO.ENDOREDUPLICATION; CytoGPS can't read it (Nonfixable grammar error)"
-  - iscn: "47,XXY c,t(9;22)(q34;q11.2)[20]"
-    label: checker-limitation
-    confirmed: true
-    note: "CytoLex: SYM.NO_OTHER_SPACE; book invalid example of KARYO.CONSTITUTIONAL_C; CytoGPS: Success"
   - iscn: "46,XX,der(5)mat"
     label: checker-limitation
     confirmed: true

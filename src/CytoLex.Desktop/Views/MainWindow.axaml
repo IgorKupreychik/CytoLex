@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ae="using:AvaloniaEdit"
+        xmlns:cmp="using:CytoLex.External.Comparison"
         xmlns:vm="using:CytoLex.Desktop.ViewModels"
         xmlns:rules="using:CytoLex.Desktop.Rules"
         xmlns:hl="using:CytoLex.Desktop.Highlighting"
@@ -433,6 +434,50 @@
       <ProgressBar DockPanel.Dock="Top" Minimum="0" Maximum="{Binding ProgressMax}" Value="{Binding Progress}"
                    IsVisible="{Binding IsRunning}" Margin="0,0,0,8" />
       <TextBlock DockPanel.Dock="Top" Text="{Binding Status}" Opacity="0.8" TextWrapping="Wrap" Margin="0,0,0,6" />
+      <!-- Comparison with CytoGPS (T-052): never blocks the batch; says why CytoGPS results are missing -->
+      <Border DockPanel.Dock="Top" DataContext="{Binding Comparison}" x:DataType="vm:ComparisonViewModel"
+              BorderBrush="Gray" BorderThickness="0,1,0,1" Padding="0,6" Margin="0,0,0,8">
+        <StackPanel Spacing="4">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="{Binding CompareText}" Command="{Binding CompareCommand}"
+                    ToolTip.Tip="Runs CytoLex and CytoGPS on the loaded strings in the CytoGPS edition and compares their verdicts; with Autocorrect ticked, strings valid after autocorrection count as valid for CytoLex (CytoGPS gets them as written)" />
+            <Button Content="Cancel" Command="{Binding CompareCancelCommand}" IsVisible="{Binding IsRunning}" />
+            <Button Content="Export report…" Click="OnExportComparisonReport" IsEnabled="{Binding HasResult}"
+                    ToolTip.Tip="Markdown, CSV, triage draft and KB-example draft into a folder" />
+          </StackPanel>
+          <!-- Triage file on its own row so its buttons stay visible in a narrow window -->
+          <Grid ColumnDefinitions="Auto,Auto,Auto,*">
+            <Button Grid.Column="0" Content="Open triage…" Click="OnOpenTriage" />
+            <Button Grid.Column="1" Content="Save triage" Click="OnSaveTriage" IsEnabled="{Binding IsTriageDirty}" Margin="8,0,0,0"
+                    ToolTip.Tip="Writes the triage file to its path (Save as… for a new file)" />
+            <Button Grid.Column="2" Content="Save triage as…" Click="OnSaveTriageAs" Margin="8,0,0,0" />
+            <TextBlock Grid.Column="3" Text="{Binding TriageText}" VerticalAlignment="Center" Margin="12,0,0,0"
+                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding TriagePath}" />
+          </Grid>
+          <ProgressBar Minimum="0" Maximum="{Binding ProgressMax}" Value="{Binding Progress}" IsVisible="{Binding IsRunning}" />
+          <TextBlock Text="{Binding ProgressText}" Opacity="0.7" IsVisible="{Binding IsRunning}" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding StatusText}" Opacity="0.8" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding TriageError}" Classes="invalid" IsVisible="{Binding HasTriageError}" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding MatrixText}" FontWeight="SemiBold" IsVisible="{Binding HasResult}" TextWrapping="Wrap" />
+          <Expander Header="Stale triage entries (no longer a disagreement in this batch)" IsVisible="{Binding HasStaleTriage}">
+            <ScrollViewer MaxHeight="140">
+              <ItemsControl ItemsSource="{Binding StaleTriage}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="cmp:TriageEntry">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <Button Content="Remove" Padding="6,0"
+                              Command="{Binding $parent[ItemsControl].((vm:ComparisonViewModel)DataContext).RemoveStaleCommand}"
+                              CommandParameter="{Binding}" />
+                      <TextBlock Text="{Binding Iscn}" FontFamily="Cascadia Mono,Consolas,monospace" VerticalAlignment="Center" />
+                      <TextBlock Text="{Binding Note}" Opacity="0.7" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+          </Expander>
+        </StackPanel>
+      </Border>
       <Expander DockPanel.Dock="Top" Header="Reader warnings" IsVisible="{Binding HasWarnings}" Margin="0,0,0,6">
         <ScrollViewer MaxHeight="120">
           <ItemsControl ItemsSource="{Binding Warnings}">
@@ -469,7 +514,7 @@
       </StackPanel>
 
       <!-- Table header -->
-      <Grid DockPanel.Dock="Top" ColumnDefinitions="60,90,2*,Auto,Auto,*" Margin="4,0,4,2" IsVisible="{Binding HasResult}">
+      <Grid DockPanel.Dock="Top" ColumnDefinitions="60,90,2*,Auto,Auto,Auto,*" Margin="4,0,4,2" IsVisible="{Binding HasResult}">
         <TextBlock Grid.Column="0" Text="Line" FontWeight="SemiBold" />
         <TextBlock Grid.Column="1" Text="ID" FontWeight="SemiBold" />
         <TextBlock Grid.Column="2" Text="ISCN string" FontWeight="SemiBold" />
@@ -486,15 +531,53 @@
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <TextBlock Grid.Column="5" Text="First problem" FontWeight="SemiBold" Margin="8,0,0,0" />
+        <StackPanel Grid.Column="5" Orientation="Horizontal" IsVisible="{Binding Comparison.HasResult}">
+          <TextBlock Text="CytoGPS" Width="100" FontWeight="SemiBold" ToolTip.Tip="Agreement with CytoGPS (ISCN 2016; with autocorrection when Autocorrect is ticked)" />
+          <TextBlock Text="Triage" Width="150" FontWeight="SemiBold" />
+        </StackPanel>
+        <TextBlock Grid.Column="6" Text="First problem" FontWeight="SemiBold" Margin="8,0,0,0" />
       </Grid>
+
+      <!-- Comparison detail of the selected row (T-052): CytoLex | CytoGPS, triage editor -->
+      <Border DockPanel.Dock="Bottom" BorderBrush="Gray" BorderThickness="0,1,0,0" Padding="0,6,0,0" Margin="0,6,0,0"
+              IsVisible="{Binding SelectedRow.Comparison.HasItem, FallbackValue=False}">
+        <StackPanel Spacing="6" DataContext="{Binding SelectedRow.Comparison}" x:DataType="vm:ComparisonRowViewModel">
+          <TextBlock Text="{Binding AgreementTip}" FontWeight="SemiBold" TextWrapping="Wrap" />
+          <Grid ColumnDefinitions="*,16,*">
+            <StackPanel Grid.Column="0" Spacing="2">
+              <TextBlock Text="{Binding CytoLexText}" FontWeight="SemiBold" TextWrapping="Wrap" />
+              <SelectableTextBlock Text="{Binding CytoLexRules}" TextWrapping="Wrap" Opacity="0.85" />
+            </StackPanel>
+            <StackPanel Grid.Column="2" Spacing="2">
+              <TextBlock Text="{Binding CheckerText}" FontWeight="SemiBold" TextWrapping="Wrap" />
+              <SelectableTextBlock Text="{Binding CheckerDetails}" TextWrapping="Wrap" Opacity="0.85"
+                                   FontFamily="Cascadia Mono,Consolas,monospace" />
+            </StackPanel>
+          </Grid>
+          <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsDisagreement}">
+            <TextBlock Text="Triage:" VerticalAlignment="Center" FontWeight="SemiBold" />
+            <ComboBox ItemsSource="{x:Static vm:ComparisonRowViewModel.Labels}" SelectedItem="{Binding EditLabel}" MinWidth="170"
+                      PlaceholderText="label">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:TriageLabelChoice">
+                  <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <CheckBox Content="Confirmed" IsChecked="{Binding EditConfirmed}" ToolTip.Tip="A person checked the label" />
+            <TextBox Text="{Binding EditNote}" Width="420" PlaceholderText="Note (why the tools disagree)" />
+            <Button Content="Apply" Command="{Binding ApplyTriageCommand}" ToolTip.Tip="Writes the entry into the triage file (then Save)" />
+            <Button Content="Remove" Command="{Binding RemoveTriageCommand}" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
 
       <!-- Rows (virtualised) -->
       <ListBox x:Name="BatchRows" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}"
                IsVisible="{Binding HasResult}" DoubleTapped="OnBatchRowDoubleTapped">
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="vm:BatchRowViewModel">
-            <Grid ColumnDefinitions="60,90,2*,Auto,Auto,*">
+            <Grid ColumnDefinitions="60,90,2*,Auto,Auto,Auto,*">
               <TextBlock Grid.Column="0" Text="{Binding Line}" Opacity="0.7" />
               <TextBlock Grid.Column="1" Text="{Binding Id}" Opacity="0.7" TextTrimming="CharacterEllipsis" />
               <TextBlock Grid.Column="2" Text="{Binding Input}" FontFamily="Cascadia Mono,Consolas,monospace"
@@ -515,7 +598,14 @@
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
-              <TextBlock Grid.Column="5" Text="{Binding FirstProblem}" TextTrimming="CharacterEllipsis"
+              <StackPanel Grid.Column="5" Orientation="Horizontal"
+                          IsVisible="{Binding $parent[ListBox].((vm:BatchViewModel)DataContext).Comparison.HasResult}">
+                <TextBlock Text="{Binding Comparison.AgreementText}" Width="100" ToolTip.Tip="{Binding Comparison.AgreementTip}"
+                           Classes.valid="{Binding Comparison.IsAgreement}" Classes.invalid="{Binding Comparison.IsDisagreement}" />
+                <TextBlock Text="{Binding Comparison.TriageText}" Width="150" TextTrimming="CharacterEllipsis"
+                           ToolTip.Tip="{Binding Comparison.Item.Triage.Note}" />
+              </StackPanel>
+              <TextBlock Grid.Column="6" Text="{Binding FirstProblem}" TextTrimming="CharacterEllipsis"
                          ToolTip.Tip="{Binding FirstProblem}" Margin="8,0,0,0" Opacity="0.85" />
             </Grid>
           </DataTemplate>

@@ -83,7 +83,12 @@ public partial class MainWindowViewModel : ObservableObject
             Status = "The knowledge base could not be loaded: " + ex.Message;
         }
 
-        Batch = new BatchViewModel(_validator, EditionChoices, SelectedEditionChoice, OpenInSingleCheck);
+        var comparison = new ComparisonViewModel(
+            _validator,
+            externalChecker,
+            externalChecker is null ? externalSetupError ?? "no setup (see config/local.yaml → cytogps)." : null,
+            ComparisonViewModel.DefaultTriagePath());
+        Batch = new BatchViewModel(_validator, EditionChoices, SelectedEditionChoice, OpenInSingleCheck, comparison);
         Rules = new RuleBrowserViewModel(ruleDatabasePath, SelectedEditionChoice?.Edition, CheckExample);
         Validate();
     }
@@ -339,11 +344,14 @@ public partial class MainWindowViewModel : ObservableObject
             : null;
         if (result is null && _validator is not null && _validator.ImplementedEditions.Contains(edition))
         {
-            result = _validator.Validate(input, new ValidationOptions { Editions = EditionSelection.One(edition) }).Results.FirstOrDefault();
+            result = _validator.Validate(input, new ValidationOptions { Editions = EditionSelection.One(edition), AutoCorrect = AutoCorrect })
+                .Results.FirstOrDefault();
         }
 
-        // As written (T-097): CytoGPS reads the typed string, as the comparison engine (T-051) compares it.
-        return result is { Status: EditionStatus.Implemented } ? result.Verdict == EditionVerdict.Valid : null;
+        // Follows the Autocorrect checkbox (T-052): valid after autocorrection counts as valid; unticked = as written.
+        return result is { Status: EditionStatus.Implemented }
+            ? result.Verdict is EditionVerdict.Valid || (AutoCorrect && result.Verdict is EditionVerdict.ValidAfterAutoCorrection)
+            : null;
     }
 
     /// <summary>The selected edition chip; the views show it and the editor draws its highlights.</summary>
@@ -494,6 +502,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         // After the CytoLex results are complete: CytoGPS only reads the input (a new input cancels its running check).
         CytoGps.SetInput(input);
+        CytoGps.RefreshAgreement();
     }
 
     internal static string ContextOf(string input, ContextInfo context)

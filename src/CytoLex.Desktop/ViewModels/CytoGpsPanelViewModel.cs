@@ -400,6 +400,18 @@ public partial class CytoGpsPanelViewModel : ObservableObject
         State = CytoGpsState.Failed;
     }
 
+    /// <summary>
+    /// Compares the shown result with CytoLex's verdict again (the input is the same, but the verdict changed, e.g. the
+    /// Autocorrect checkbox was toggled).
+    /// </summary>
+    public void RefreshAgreement()
+    {
+        if (State == CytoGpsState.Done && Verdict is { } verdict)
+        {
+            (AgreementKind, AgreementText) = Compare(verdict, _input);
+        }
+    }
+
     private (Agreement, string) Compare(ExternalVerdict verdict, string input)
     {
         if (UnsupportedReason is { } reason)

@@ -79,4 +79,56 @@ public sealed class TriageFileTests
         Assert.Equal("CytoGPS", file.Checker);
         Assert.Equal("2016", file.Edition);
     }
+
+    [Fact]
+    public void CommittedTriageFile_RoundTripsByteForByte_WithItsHeader()
+    {
+        var path = Path.Combine(AppContext.BaseDirectory, "data", "comparison", "cytogps-2016-triage.yaml");
+        var text = File.ReadAllText(path);
+        var file = TriageFile.Load(path);
+
+        Assert.NotEmpty(file.Header);
+        Assert.All(file.Header, l => Assert.StartsWith("#", l, StringComparison.Ordinal));
+        Assert.Equal(text, file.ToYaml());
+    }
+
+    [Fact]
+    public void With_ReplacesInPlaceOrAppends_AndWithoutRemoves()
+    {
+        var file = TriageFile.Parse("# head\nformat: cytolex-triage\nversion: 1\nchecker: \"CytoGPS\"\nedition: \"2016\"\nentries:\n"
+            + "  - iscn: \"a\"\n    label: our-bug\n  - iscn: \"b\"\n    label: our-bug\n");
+
+        var replaced = file.With(new TriageEntry("a", TriageLabel.SeverityPolicy, true, "n", null, null));
+        Assert.Equal(["a", "b"], replaced.Entries.Select(e => e.Iscn));
+        Assert.Equal(TriageLabel.SeverityPolicy, replaced.Find("a")?.Label);
+        Assert.Equal(["# head"], replaced.Header);
+
+        var appended = replaced.With(new TriageEntry("c", TriageLabel.OurBug, false, null, null, null));
+        Assert.Equal(["a", "b", "c"], appended.Entries.Select(e => e.Iscn));
+
+        var removed = appended.Without("b");
+        Assert.Equal(["a", "c"], removed.Entries.Select(e => e.Iscn));
+        Assert.Null(removed.Find("b"));
+        Assert.Same(removed, removed.Without("zzz"));
+        Assert.StartsWith("# head\nformat:", removed.ToYaml(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Save_WritesLfWithoutBom()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"cytolex-triage-{Guid.NewGuid():N}.yaml");
+        try
+        {
+            var file = TriageFile.Empty("CytoGPS", "2016").With(new TriageEntry("46,XY", TriageLabel.OurBug, true, "x", null, null));
+            file.Save(path);
+            var bytes = File.ReadAllBytes(path);
+            Assert.NotEqual(0xEF, bytes[0]);
+            Assert.DoesNotContain((byte)'\r', bytes);
+            Assert.Equal(file.Entries.Select(e => e with { Line = 0 }), TriageFile.Load(path).Entries.Select(e => e with { Line = 0 }));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
 }

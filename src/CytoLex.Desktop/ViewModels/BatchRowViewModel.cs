@@ -7,10 +7,11 @@ namespace CytoLex.Desktop.ViewModels;
 /// <summary>One string of the batch table (T-038): where it came from, one verdict cell per edition and its first problem.</summary>
 public sealed class BatchRowViewModel
 {
-    public BatchRowViewModel(BatchItemResult result)
+    public BatchRowViewModel(BatchItemResult result, ComparisonViewModel? comparison = null)
     {
         ArgumentNullException.ThrowIfNull(result);
         Result = result;
+        Comparison = comparison is null ? null : new ComparisonRowViewModel(comparison);
         Line = result.Item.Line;
         Id = result.Item.Id ?? string.Empty;
         Input = result.Item.Input.ReplaceLineEndings(" ");
@@ -36,6 +37,9 @@ public sealed class BatchRowViewModel
             CorrectedTip = $"ISCN {corrected.Edition}: " + string.Join("; ", auto.Corrections.Select(c => $"{c.RuleId} {Highlighting.HighlightBuilder.ChangeOf(c)}"));
         }
     }
+
+    /// <summary>The comparison with the external checker (T-052); <c>null</c> without a comparison view.</summary>
+    public ComparisonRowViewModel? Comparison { get; }
 
     /// <summary>Whether autocorrection changed the string in an implemented edition (T-097).</summary>
     public bool IsAutoCorrected { get; }

@@ -113,6 +113,78 @@ public sealed class ComparisonEngineTests
     }
 
     [Fact]
+    public async Task WithTriage_RecomputesTriageSuggestionsAndStale_WithoutRunningAgain()
+    {
+        var checker = Checker();
+        var result = await Compare(Items(_bothValid, _order), checker);
+        Assert.Equal(TriageLabel.CheckerLimitation, result.Items[1].SuggestedLabel);
+
+        var triage = TriageFile.Empty("CytoGPS", "2016")
+            .With(new TriageEntry(_order, TriageLabel.OurBug, true, null, null, null))
+            .With(new TriageEntry(_bothValid, TriageLabel.OurBug, true, null, null, null));
+        var retriaged = result.WithTriage(triage, CytoGpsCoverage.Instance);
+
+        Assert.Equal(1, checker.Calls);
+        Assert.Equal(TriageLabel.OurBug, retriaged.Items[1].Triage?.Label);
+        Assert.Null(retriaged.Items[1].SuggestedLabel);
+        Assert.Equal(_bothValid, Assert.Single(retriaged.StaleTriage).Iscn);
+        Assert.Equal(result.Matrix, retriaged.Matrix);
+
+        var back = retriaged.WithTriage(TriageFile.Empty("CytoGPS", "2016"), CytoGpsCoverage.Instance);
+        Assert.Equal(TriageLabel.CheckerLimitation, back.Items[1].SuggestedLabel);
+        Assert.Empty(back.StaleTriage);
+        Assert.Throws<ArgumentException>(() => result.WithTriage(TriageFile.Empty("Other", "2016"), CytoGpsCoverage.Instance));
+    }
+
+    [Fact]
+    public async Task AutoCorrect_CountsValidAfterAutocorrectionAsValid_CheckerGetsTheStringAsWritten()
+    {
+        const string cased = "46,xy";
+        var checker = Checker();
+        var asWritten = await Compare(Items(cased), checker);
+        Assert.False(asWritten.AutoCorrect);
+        Assert.Equal(Agreement.OnlyCytoLexInvalid, asWritten.Items[0].Agreement);
+        Assert.False(asWritten.Items[0].CytoLexAutoCorrected);
+        Assert.Contains("- CytoLex: as written", ComparisonReport.Markdown(asWritten), StringComparison.Ordinal);
+
+        var corrected = await ComparisonEngine.CompareAsync(Items(cased), Validator.Default, checker, CytoGpsCoverage.Instance,
+            autoCorrect: true, cancellationToken: Ct);
+        Assert.True(corrected.AutoCorrect);
+        var item = corrected.Items[0];
+        Assert.Equal(Agreement.BothValid, item.Agreement);
+        Assert.True(item.CytoLexAutoCorrected);
+        Assert.Equal("46,XY", item.CytoLexCorrected);
+        Assert.Equal(cased, item.External.Input);
+        Assert.Contains("- CytoLex: with autocorrection (T-096): valid after autocorrection counts as valid (1 strings)",
+            ComparisonReport.Markdown(corrected), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task ReportsValidatedCount()
+    {
+        var counts = new List<int>();
+        var validated = new SyncProgress(counts);
+        await ComparisonEngine.CompareAsync(Items(_bothValid, _order, _band), Validator.Default, Checker(), CytoGpsCoverage.Instance,
+            validated: validated, cancellationToken: Ct);
+
+        lock (counts)
+        {
+            Assert.Equal(3, counts.Max());
+        }
+    }
+
+    private sealed class SyncProgress(List<int> counts) : IProgress<int>
+    {
+        public void Report(int value)
+        {
+            lock (counts)
+            {
+                counts.Add(value);
+            }
+        }
+    }
+
+    [Fact]
     public async Task TriageForAnotherChecker_Throws()
     {
         var triage = TriageFile.Empty("Other", "2016");

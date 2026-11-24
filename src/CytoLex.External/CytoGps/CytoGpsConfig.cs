@@ -98,8 +98,9 @@ public sealed record CytoGpsConfig(
 }
 
 /// <summary>Finds the CytoLex repo root: the nearest directory above the app with <c>CytoLex.slnx</c>.</summary>
-internal static class RepoLocator
+public static class RepoLocator
 {
+    /// <summary>The repo root above <paramref name="start"/> (default: the app directory), or <c>null</c>.</summary>
     public static string? Find(string? start = null)
     {
         for (var dir = new DirectoryInfo(start ?? AppContext.BaseDirectory); dir is not null; dir = dir.Parent)

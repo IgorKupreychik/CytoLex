@@ -61,7 +61,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-049 | done | 2 | T-028, T-048 | `ExternalChecker` interface + CytoGPS adapter |
 | T-050 | todo | 5 | T-031 | LGF computation in the core library |
 | T-051 | done | 2 | T-049 | Comparison engine + report (no CLI) |
-| T-052 | todo | 3 | T-051, T-038 | Desktop: comparison view |
+| T-052 | done | 3 | T-051, T-038 | Desktop: comparison view |
 | T-053 | done | 1 | T-003 | Accept ASCII `-`/`x`/`->` for printed `–`/`×`/`→`? |
 | T-054 | done | 2 | T-021 | Literal translation of ISCN strings into plain language: scope, style, architecture |
 | T-055 | done | 2 | T-007 | Tooling: LF line endings for committed generated files (CRLF checkout breaks the ideograms test) |
@@ -892,10 +892,10 @@ Tests: 31 new unit tests (fake checker + real validator) in `tests/CytoLex.Exter
 Deviations from the plan: no CLI (user); new label `severity-policy` and CytoLex warnings/infos in the report, added after the first run (user); the triage file was filled from the first run's results.
 
 ### T-052 — Desktop: comparison view
-**Status:** todo
+**Status:** done
 **Description:** Batch table with per-row agreement status, filters (e.g. disagreements only), side-by-side detail and triage; an LGF difference view only once T-050 exists.
 **Acceptance:** Works on a sample batch, using the comparison engine.
-**Notes:** 2026-11-21: like T-081, CytoGPS must never block CytoLex: when it is not configured, fails or is slow, the Batch tab and its CytoLex results work as before, and the comparison view shows why CytoGPS results are missing. 2026-11-21 (T-051): build on `ComparisonEngine.CompareAsync` (per-string `Agreement`, `AgreementMatrix`, reasons for not supported/not compared), `TriageFile` (labels, stale entries) and `ComparisonReport` (CSV/Markdown/draft exports) in `src/CytoLex.External/Comparison/`.
+**Notes:** 2026-11-21: like T-081, CytoGPS must never block CytoLex: when it is not configured, fails or is slow, the Batch tab and its CytoLex results work as before, and the comparison view shows why CytoGPS results are missing. 2026-11-21 (T-051): build on `ComparisonEngine.CompareAsync` (per-string `Agreement`, `AgreementMatrix`, reasons for not supported/not compared), `TriageFile` (labels, stale entries) and `ComparisonReport` (CSV/Markdown/draft exports) in `src/CytoLex.External/Comparison/`. 2026-11-24 — outcome (done): the comparison lives in the Batch tab (user): `src/CytoLex.Desktop/ViewModels/ComparisonViewModel.cs` (compare bar with progress/cancel, matrix line, triage file open/save/save as, stale entries with Remove, report export to a folder; not configured/failed → status says why, batch results untouched) and `ComparisonRowViewModel.cs` (Agreement and Triage columns, side-by-side CytoLex | CytoGPS detail, triage editor: label, confirmed, note); `BatchFilter.Disagreements`/`Untriaged`; triage controls on their own row (the Save buttons were cut off in a one-row layout). Triage is edited in the app and saved to the YAML (user), by default the committed `tests/data/comparison/cytogps-2016-triage.yaml`. Engine: `TriageFile.Header` (leading comments kept; committed file round-trips byte for byte), `With`/`Without`/`Save`; `ComparisonResult.WithTriage` (re-match without a re-run); `CompareAsync` gains `validated` progress and `autoCorrect`; `RepoLocator` public. Deviation from the plan (user, same day): instead of always "as written", CytoLex's verdict follows the Autocorrect checkbox: valid after autocorrection counts as valid (`ComparisonItem.CytoLexAutoCorrected`/`CytoLexCorrected`, `ComparisonResult.AutoCorrect`, report line); the single-string CytoGPS badge follows its checkbox too (`CytoGpsPanelViewModel.RefreshAgreement`), replacing the T-097 as-written rule (docs/decisions.md). Tests: `tests/CytoLex.Desktop.Tests/ComparisonViewModelTests.cs` (fake checker on the KB sample batch + a real-CytoGPS run on `karyotype.txt` that skips when not configured), `CytoGpsPanelTests.Agreement_FollowsTheAutocorrectCheckbox`, engine/triage tests in `tests/CytoLex.External.Tests/Comparison/`. No LGF view (T-050).
 
 ## Later
 

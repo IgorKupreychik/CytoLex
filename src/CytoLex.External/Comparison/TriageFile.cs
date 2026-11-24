@@ -53,11 +53,16 @@ public sealed class TriageFile
     private readonly Dictionary<string, TriageEntry> _byIscn;
 
     /// <summary>Creates a triage file; the first entry wins for a repeated string.</summary>
-    public TriageFile(string checker, string edition, ImmutableArray<TriageEntry> entries)
+    /// <param name="checker">The checker the labels are for.</param>
+    /// <param name="edition">The ISCN edition.</param>
+    /// <param name="entries">The entries, in file order.</param>
+    /// <param name="header">The comment lines above the YAML (each starting with <c>#</c>), kept when the file is saved.</param>
+    public TriageFile(string checker, string edition, ImmutableArray<TriageEntry> entries, ImmutableArray<string> header = default)
     {
         Checker = checker;
         Edition = edition;
         Entries = entries;
+        Header = header.IsDefault ? [] : header;
         _byIscn = entries.GroupBy(e => e.Iscn, StringComparer.Ordinal).ToDictionary(g => g.Key, g => g.First(), StringComparer.Ordinal);
     }
 
@@ -70,6 +75,9 @@ public sealed class TriageFile
     /// <summary>The entries, in file order.</summary>
     public ImmutableArray<TriageEntry> Entries { get; }
 
+    /// <summary>The comment lines at the top of the file (each starting with <c>#</c>), written back by <see cref="ToYaml"/>.</summary>
+    public ImmutableArray<string> Header { get; }
+
     /// <summary>The <c>format</c> value of a triage file.</summary>
     public const string Format = "cytolex-triage";
 
@@ -81,6 +89,35 @@ public sealed class TriageFile
 
     /// <summary>The entry for a string, if any.</summary>
     public TriageEntry? Find(string iscn) => _byIscn.GetValueOrDefault(iscn);
+
+    /// <summary>
+    /// This file with <paramref name="entry"/> in place of the entry for the same string (same position), or appended
+    /// when the string has no entry yet.
+    /// </summary>
+    public TriageFile With(TriageEntry entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        var index = -1;
+        for (var i = 0; i < Entries.Length && index < 0; i++)
+        {
+            if (string.Equals(Entries[i].Iscn, entry.Iscn, StringComparison.Ordinal))
+            {
+                index = i;
+            }
+        }
+
+        var entries = index >= 0 ? Entries.SetItem(index, entry) : Entries.Add(entry);
+        return new TriageFile(Checker, Edition, entries, Header);
+    }
+
+    /// <summary>This file without the entry for <paramref name="iscn"/> (the same file when there is none).</summary>
+    public TriageFile Without(string iscn) =>
+        Find(iscn) is null
+            ? this
+            : new TriageFile(Checker, Edition, [.. Entries.Where(e => !string.Equals(e.Iscn, iscn, StringComparison.Ordinal))], Header);
+
+    /// <summary>Writes the file to <paramref name="path"/> (UTF-8 without BOM, LF).</summary>
+    public void Save(string path) => File.WriteAllText(path, ToYaml(), new UTF8Encoding(false));
 
     /// <summary>The YAML name of a label.</summary>
     public static string LabelName(TriageLabel label) => label switch
@@ -215,13 +252,25 @@ public sealed class TriageFile
             }
         }
 
-        return new TriageFile(checker, edition, entries.ToImmutable());
+        return new TriageFile(checker, edition, entries.ToImmutable(), LeadingComments(yaml));
     }
 
-    /// <summary>Writes the file as YAML (LF, stable key order).</summary>
+    private static ImmutableArray<string> LeadingComments(string yaml) =>
+    [
+        .. yaml.Split('\n')
+            .TakeWhile(l => l.StartsWith('#'))
+            .Select(l => l.TrimEnd()),
+    ];
+
+    /// <summary>Writes the file as YAML (LF, stable key order), after its <see cref="Header"/> comments.</summary>
     public string ToYaml()
     {
         var sb = new StringBuilder();
+        foreach (var line in Header)
+        {
+            sb.Append(line).Append('\n');
+        }
+
         sb.Append("format: ").Append(Format).Append('\n');
         sb.Append("version: ").Append(Version.ToString(System.Globalization.CultureInfo.InvariantCulture)).Append('\n');
         sb.Append("checker: ").Append(Yaml.Quote(Checker)).Append('\n');

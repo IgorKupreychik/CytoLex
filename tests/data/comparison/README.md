@@ -36,3 +36,7 @@ The loader rejects unknown keys or labels, a duplicate `iscn`, and `expected` wi
 3. Review each draft entry, set its label and `confirmed: true`, and copy it into the triage file here.
 4. Entries listed as **stale** in the report no longer disagree (e.g. after a fix); remove them.
 5. Confirmed entries with `expected` + `kb_rule` are written to `build/review/comparison/cytogps-2016-kb-examples-draft.yaml`. Paste them into `kb/rules/` by hand with a citation, then run `kb check` and `kb build`. Nothing edits the KB automatically.
+
+## Triage in the desktop app (T-052)
+
+The desktop Batch tab can do the same: open a batch (e.g. `tests/data/batch/2016/all.csv`), Run, then "Compare with CytoGPS". The committed triage file is opened by default; filter "Disagrees with CytoGPS, not triaged", pick a row, set label, confirmed and note, Apply, and Save (the header comments and the other entries are kept; `expected`/`kb_rule` of an existing entry are kept, they are edited by hand). Stale entries are listed with a Remove button. "Export report…" writes the same four report files as the opt-in test into a folder you pick. Review the `git diff` of the triage file before committing it.

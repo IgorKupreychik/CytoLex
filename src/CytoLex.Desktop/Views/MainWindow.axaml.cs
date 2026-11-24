@@ -42,10 +42,11 @@ public partial class MainWindow : Window
         Input.TextArea.TextView.PointerExited += OnEditorPointerExited;
     }
 
-    /// <summary>Stops a running CytoGPS check (T-081) with the window.</summary>
+    /// <summary>Stops a running CytoGPS check (T-081) and batch comparison (T-052) with the window.</summary>
     protected override void OnClosed(EventArgs e)
     {
         _viewModel?.CytoGps.Cancel();
+        _viewModel?.Batch.Comparison.CancelRun();
         base.OnClosed(e);
     }
 
@@ -351,6 +352,84 @@ public partial class MainWindow : Window
         if (file?.TryGetLocalPath() is { } path)
         {
             await _viewModel.Batch.ExportAsync(path);
+        }
+    }
+
+    // Batch comparison with CytoGPS (T-052): triage file and report pickers.
+    private static readonly FilePickerFileType _triage = new("Triage file (*.yaml)") { Patterns = ["*.yaml", "*.yml"] };
+
+    private async void OnOpenTriage(object? sender, RoutedEventArgs e)
+    {
+        if (_viewModel is null)
+        {
+            return;
+        }
+
+        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Open a triage file",
+            AllowMultiple = false,
+            FileTypeFilter = [_triage, FilePickerFileTypes.All],
+        });
+        if (files.Count > 0 && files[0].TryGetLocalPath() is { } path)
+        {
+            _viewModel.Batch.Comparison.OpenTriage(path);
+        }
+    }
+
+    private void OnSaveTriage(object? sender, RoutedEventArgs e)
+    {
+        if (_viewModel?.Batch.Comparison is not { } comparison)
+        {
+            return;
+        }
+
+        if (comparison.HasTriagePath)
+        {
+            comparison.SaveTriage();
+        }
+        else
+        {
+            OnSaveTriageAs(sender, e);
+        }
+    }
+
+    private async void OnSaveTriageAs(object? sender, RoutedEventArgs e)
+    {
+        if (_viewModel?.Batch.Comparison is not { } comparison)
+        {
+            return;
+        }
+
+        var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Save the triage file",
+            SuggestedFileName = comparison.TriagePath is { } p ? Path.GetFileName(p) : $"{comparison.CheckerName.ToLowerInvariant()}-{comparison.Edition}-triage.yaml",
+            DefaultExtension = "yaml",
+            FileTypeChoices = [_triage],
+            ShowOverwritePrompt = true,
+        });
+        if (file?.TryGetLocalPath() is { } path)
+        {
+            comparison.SaveTriageAs(path);
+        }
+    }
+
+    private async void OnExportComparisonReport(object? sender, RoutedEventArgs e)
+    {
+        if (_viewModel?.Batch.Comparison is not { HasResult: true } comparison)
+        {
+            return;
+        }
+
+        var folders = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = "Folder for the comparison report",
+            AllowMultiple = false,
+        });
+        if (folders.Count > 0 && folders[0].TryGetLocalPath() is { } directory)
+        {
+            await comparison.ExportReportAsync(directory);
         }
     }
 

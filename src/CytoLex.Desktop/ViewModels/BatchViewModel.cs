@@ -24,6 +24,12 @@ public enum BatchFilter
 
     /// <summary>Autocorrection changed the string in at least one edition (T-097).</summary>
     AutoCorrected,
+
+    /// <summary>CytoLex and the external checker disagree (T-052).</summary>
+    Disagreements,
+
+    /// <summary>A disagreement without a confirmed triage entry (T-052).</summary>
+    Untriaged,
 }
 
 /// <summary>An entry of the batch filter box.</summary>
@@ -37,6 +43,7 @@ public sealed record BatchFilterChoice(BatchFilter Filter, string Label)
 /// Batch validation (T-038): loads a text/CSV/TSV file (<see cref="BatchReader"/>), validates every string in the chosen
 /// edition(s) off the UI thread with progress and cancel (<see cref="BatchRunner"/>), shows a summary per edition and a
 /// filterable table, exports to CSV/JSON (<see cref="BatchExport"/>), and opens a row in the single-string check.
+/// <see cref="Comparison"/> compares the batch with CytoGPS (T-052) without touching the CytoLex result.
 /// File pickers live in the view; this class takes local paths.
 /// </summary>
 public partial class BatchViewModel : ObservableObject
@@ -50,10 +57,18 @@ public partial class BatchViewModel : ObservableObject
     /// <param name="editionChoices">The edition selector entries (shared with the single-string check).</param>
     /// <param name="defaultChoice">The entry selected at start.</param>
     /// <param name="openInSingleCheck">Opens a string in the single-string check, in the given edition choice.</param>
-    public BatchViewModel(Validator? validator, IReadOnlyList<EditionChoice> editionChoices, EditionChoice? defaultChoice, Action<string, EditionChoice?>? openInSingleCheck)
+    /// <param name="comparison">The comparison with the external checker (T-052); default: not configured.</param>
+    public BatchViewModel(
+        Validator? validator,
+        IReadOnlyList<EditionChoice> editionChoices,
+        EditionChoice? defaultChoice,
+        Action<string, EditionChoice?>? openInSingleCheck,
+        ComparisonViewModel? comparison = null)
     {
         ArgumentNullException.ThrowIfNull(editionChoices);
         _validator = validator;
+        Comparison = comparison ?? new ComparisonViewModel(validator, null, "no setup.", null);
+        Comparison.AutoCorrect = AutoCorrect;
         _openInSingleCheck = openInSingleCheck;
         EditionChoices = editionChoices;
         SelectedEditionChoice = defaultChoice;
@@ -69,7 +84,12 @@ public partial class BatchViewModel : ObservableObject
         new(BatchFilter.Valid, "Valid"),
         new(BatchFilter.Incomplete, "Valid as far as implemented / partly validated"),
         new(BatchFilter.AutoCorrected, "Autocorrected"),
+        new(BatchFilter.Disagreements, "Disagrees with CytoGPS"),
+        new(BatchFilter.Untriaged, "Disagrees with CytoGPS, not triaged"),
     ];
+
+    /// <summary>The comparison with the external checker (T-052).</summary>
+    public ComparisonViewModel Comparison { get; }
 
     /// <summary>Whether the strings are autocorrected (T-097; on by default); changing it drops the result (run again).</summary>
     [ObservableProperty]
@@ -125,6 +145,10 @@ public partial class BatchViewModel : ObservableObject
 
     /// <summary>Whether there is a result to show.</summary>
     public bool HasResult => Result is not null;
+
+    partial void OnItemsChanged(ImmutableArray<BatchItem> value) => Comparison.SetInput(value, Result is not null);
+
+    partial void OnResultChanged(BatchResult? value) => Comparison.SetInput(Items, value is not null);
 
     /// <summary>Whether the result can be exported (there is one and no run is in progress).</summary>
     public bool CanExport => Result is not null && !IsRunning;
@@ -271,6 +295,7 @@ public partial class BatchViewModel : ObservableObject
 
     partial void OnAutoCorrectChanged(bool value)
     {
+        Comparison.AutoCorrect = value;
         if (Result is not null)
         {
             ClearResult();
@@ -291,7 +316,8 @@ public partial class BatchViewModel : ObservableObject
             Summaries.Add(SummaryLine(s));
         }
 
-        _allRows = [.. result.Items.Select(i => new BatchRowViewModel(i))];
+        _allRows = [.. result.Items.Select(i => new BatchRowViewModel(i, Comparison))];
+        Comparison.Attach(_allRows);
         HasCorrectedRows = _allRows.Any(r => r.IsAutoCorrected);
         ApplyFilter();
     }
@@ -324,6 +350,7 @@ public partial class BatchViewModel : ObservableObject
         Editions = [];
         Summaries.Clear();
         _allRows = [];
+        Comparison.Attach([]);
         HasCorrectedRows = false;
         SelectedRow = null;
         Rows.Clear();
@@ -341,6 +368,8 @@ public partial class BatchViewModel : ObservableObject
             BatchFilter.Valid => r.IsValid,
             BatchFilter.Incomplete => r.IsIncomplete,
             BatchFilter.AutoCorrected => r.IsAutoCorrected,
+            BatchFilter.Disagreements => r.Comparison?.IsDisagreement ?? false,
+            BatchFilter.Untriaged => r.Comparison?.IsUntriaged ?? false,
             _ => true,
         }))
         {

@@ -205,6 +205,22 @@ public class CytoGpsPanelTests
     }
 
     [Fact]
+    public async Task Agreement_FollowsTheAutocorrectCheckbox()
+    {
+        var checker = new FakeChecker { Immediate = s => Answer(s, ExternalVerdict.Valid, "VALID") };
+        var vm = new MainWindowViewModel(null, Rules.RuleStore.DefaultPath, checker, null) { Input = "46,xy" };
+        Assert.True(vm.AutoCorrect);
+
+        vm.CytoGps.CheckCommand.Execute(null);
+        await Settle(vm.CytoGps);
+        Assert.Equal(Agreement.BothValid, vm.CytoGps.AgreementKind); // valid after autocorrection counts as valid
+
+        vm.AutoCorrect = false; // same input: no new check, the badge is compared again
+        Assert.Equal(1, checker.Calls);
+        Assert.Equal(Agreement.OnlyCytoLexInvalid, vm.CytoGps.AgreementKind);
+    }
+
+    [Fact]
     public async Task Failure_ShowsAdapterMessageInTabOnly()
     {
         var checker = new FakeChecker { Immediate = s => Failed(s, "CytoGPS build failed (javac exit 1):\nerror: x") };

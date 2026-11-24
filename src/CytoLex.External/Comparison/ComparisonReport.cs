@@ -62,6 +62,9 @@ public static class ComparisonReport
         Line(sb, "the matrix. Triage labels come from the committed triage file (`tests/data/comparison/`).");
         Line(sb);
         Line(sb, $"- {c}: {StatusText(result)}");
+        Line(sb, result.AutoCorrect
+            ? $"- CytoLex: with autocorrection (T-096): valid after autocorrection counts as valid ({result.Items.Count(i => i.CytoLexAutoCorrected)} strings); {c} gets the strings as written"
+            : "- CytoLex: as written (no autocorrection)");
         Line(sb, $"- Strings: {m.Total} (compared {m.Compared}, not supported by {c} {m.NotSupported}, not compared {m.NotCompared})");
         Line(sb);
         Line(sb, $"## Agreement matrix ({m.Compared} strings)");
