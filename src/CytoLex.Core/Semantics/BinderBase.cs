@@ -71,8 +71,16 @@ internal abstract class BinderBase(IEditionKb kb, SyntaxTree tree)
         Issues = IssuesOf(element),
     };
 
+    /// <summary>The spans of the underlined tokens bound as chromosome identifiers so far (T-042), for <see cref="SegmentModel.UnderlinedChromosomes"/>.</summary>
+    internal HashSet<TextSpan> UnderlinedChromosomeSpans { get; } = [];
+
     protected ChromosomeRef Chromosome(SyntaxToken token, SyntaxToken? questionMark = null, string? arm = null, SyntaxNode? node = null)
     {
+        if (token.IsUnderlined)
+        {
+            UnderlinedChromosomeSpans.Add(token.Span);
+        }
+
         var name = token.Kind == TokenKind.Question ? "?" : token.ValueText;
         return new ChromosomeRef
         {

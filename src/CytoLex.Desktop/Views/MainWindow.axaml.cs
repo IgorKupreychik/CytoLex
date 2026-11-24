@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using CytoLex.Core.Text;
+using CytoLex.Desktop.Editing;
 using CytoLex.Desktop.Highlighting;
 using CytoLex.Desktop.ViewModels;
 
@@ -154,6 +155,35 @@ public partial class MainWindow : Window
         {
             e.Handled = true;
         }
+        else if (e.Key == Key.U && e.KeyModifiers == KeyModifiers.Control)
+        {
+            ToggleUnderline();
+            e.Handled = true;
+        }
+    }
+
+    private void OnUnderlineClick(object? sender, RoutedEventArgs e) => ToggleUnderline();
+
+    private void OnCutClick(object? sender, RoutedEventArgs e) => Input.Cut();
+
+    private void OnCopyClick(object? sender, RoutedEventArgs e) => Input.Copy();
+
+    private void OnPasteClick(object? sender, RoutedEventArgs e) => Input.Paste();
+
+    /// <summary>
+    /// Adds or removes U+0332 on the selection or the number at the caret (T-042), as one document replace so Ctrl+Z
+    /// undoes it; the changed text stays selected.
+    /// </summary>
+    private void ToggleUnderline()
+    {
+        if (Underlining.Toggle(Input.Text ?? "", Input.SelectionStart, Input.SelectionLength) is not { } edit)
+        {
+            return;
+        }
+
+        Input.Document.Replace(edit.Start, edit.Length, edit.NewText);
+        Input.Select(edit.Start, edit.NewText.Length);
+        Input.TextArea.Focus();
     }
 
     private void SyncEditorText()

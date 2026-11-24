@@ -49,8 +49,10 @@ rules:
           note: Without underlining, both sites are on the same chromosome 10.
     review:
       paraphrase_checked: true
-      needs_review: true
+      needs_review: false
       note: >-
-        §7.2 is on the underlined-homologue list (docs/extraction-review-2016.md); typed input
-        cannot carry underlining, so validator behaviour is T-042.
+        §7.2 is on the underlined-homologue list (docs/extraction-review-2016.md); the underlining
+        of E1 was recovered as U+0332 (T-003). Input convention (T-042): U+0332 after each
+        underlined character is the only form; the validator accepts it on chromosome identifiers,
+        and underlining elsewhere stays not validated.
     related: [FRA.HERITABLE_VARIANT]

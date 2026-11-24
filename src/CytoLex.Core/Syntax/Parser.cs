@@ -250,7 +250,7 @@ public sealed class Parser
 
             if (t.IsUnderlined)
             {
-                result.Add(new(ConstructKind.Underlining, t.Span, "underlined homologue (T-042): not implemented in the pilot"));
+                result.Add(new(ConstructKind.Underlining, t.Span, "underlining outside a chromosome number (T-042): not implemented in the pilot"));
             }
         }
 

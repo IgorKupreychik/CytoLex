@@ -11,7 +11,10 @@ public enum ConstructKind
     /// <summary>A meiotic notation symbol (ch. 12; T-018).</summary>
     Meiotic,
 
-    /// <summary>An underlined character (U+0332) telling homologues apart (T-042).</summary>
+    /// <summary>
+    /// An underlined character (U+0332). The parser reports every one; the validator drops those the binder reads as a
+    /// chromosome identifier (homologue distinction, <see cref="Semantics.SegmentModel.UnderlinedChromosomes"/>, T-042).
+    /// </summary>
     Underlining,
 }
 

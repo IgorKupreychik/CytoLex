@@ -109,8 +109,13 @@ public sealed class Binder
     public KaryotypeModel Bind(SyntaxTree tree)
     {
         ArgumentNullException.ThrowIfNull(tree);
-        return new KaryotypeBinder(_kb, tree).BindRoot();
+        var binder = new KaryotypeBinder(_kb, tree);
+        var model = binder.BindRoot();
+        return model with { UnderlinedChromosomes = Underlined(binder) };
     }
+
+    private static ImmutableArray<TextSpan> Underlined(params BinderBase[] binders) =>
+        [.. binders.SelectMany(b => b.UnderlinedChromosomeSpans).Distinct().OrderBy(s => s.Start)];
 
     internal const string GenomeBuildRequired = "GEN.GENOME_BUILD_REQUIRED";
     internal const string ArrRegionFormat = "ARR.REGION_FORMAT";
@@ -143,7 +148,9 @@ public sealed class Binder
             throw new ArgumentException($"Not an arr syntax tree (root {tree.Root.Kind}).", nameof(tree));
         }
 
-        return new ArrBinder(_kb, tree).BindArrRoot();
+        var binder = new ArrBinder(_kb, tree);
+        var model = binder.BindArrRoot();
+        return model with { UnderlinedChromosomes = Underlined(binder) };
     }
 
     /// <summary>The meaning of an in situ segment's <paramref name="tree"/> (root <see cref="SyntaxKind.FishResult"/>, T-033).</summary>
@@ -156,7 +163,10 @@ public sealed class Binder
             throw new ArgumentException($"Not an in situ syntax tree (root {tree.Root.Kind}).", nameof(tree));
         }
 
-        return new FishBinder(_kb, tree, new KaryotypeBinder(_kb, tree)).BindRoot();
+        var karyotype = new KaryotypeBinder(_kb, tree);
+        var binder = new FishBinder(_kb, tree, karyotype);
+        var model = binder.BindRoot();
+        return model with { UnderlinedChromosomes = Underlined(binder, karyotype) };
     }
 
     /// <summary>The meaning of <paramref name="tree"/>, by its root: an arr, in situ or karyotype model.</summary>

@@ -116,8 +116,10 @@ rules:
           note: Sequence-based translocation between homologous chromosomes 9 (T-019).
     review:
       paraphrase_checked: true
-      needs_review: true
+      needs_review: false
       note: >-
-        Underlining is recovered as U+0332 after the underlined character (T-003); how the
-        validator reads and accepts it is T-042. T-019 added seq (§16.3.7 E2).
+        Underlining is recovered as U+0332 after the underlined character (T-003). Input
+        convention (T-042): U+0332 after each underlined character is the only form; the validator
+        accepts it on chromosome identifiers, and underlining elsewhere stays not validated. T-019
+        added seq (§16.3.7 E2).
     related: [DER.HOMOLOGUE_UNDERLINING, FRA.HOMOLOGUE_UNDERLINING, STRUCT.MULTI_CHROMOSOME_ORDER]

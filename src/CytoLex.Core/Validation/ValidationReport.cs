@@ -33,7 +33,7 @@ public sealed record SeverityCounts(int Errors, int Warnings, int Infos, int Con
 /// <param name="Segment">The segment.</param>
 /// <param name="Status"><see cref="EditionStatus.NotImplemented"/> when its notation type has no implementation.</param>
 /// <param name="Reason">Why it was not validated, e.g. <c>ish: not implemented in the pilot</c>.</param>
-/// <param name="Constructs">Constructs inside a validated segment that were not validated (<c>idem</c>, <c>cp</c>, U+0332, …).</param>
+/// <param name="Constructs">Constructs inside a validated segment that were not validated (ch. 10/12 symbols, underlining outside a chromosome identifier, …).</param>
 public sealed record SegmentResult(
     Segment Segment,
     EditionStatus Status,

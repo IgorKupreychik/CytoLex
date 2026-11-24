@@ -236,11 +236,12 @@ rules:
           cite: {section: "9.2.3", page: 65, example: E34}
     review:
       paraphrase_checked: true
-      needs_review: true
+      needs_review: false
       note: >-
         §9.2.3 is on the underlined-homologue list (docs/extraction-review-2016.md). Underlining is
-        U+0332 after the digit, as recovered by the extractor; typed input cannot carry it, so the
-        validator behaviour is T-042.
+        U+0332 after the digit, as recovered by the extractor (T-003). Input convention (T-042):
+        U+0332 after each underlined character is the only form; the validator accepts it on
+        chromosome identifiers, and underlining elsewhere stays not validated.
     related: [DER.HOMOLOGUE_NOT_SPECIFIED, FRA.HOMOLOGUE_UNDERLINING]
 
   - id: DER.COMPLEX_USE_DETAILED

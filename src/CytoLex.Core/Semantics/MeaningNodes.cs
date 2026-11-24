@@ -106,6 +106,12 @@ public abstract record SegmentModel : MeaningNode
 {
     /// <summary>The syntax tree the model was bound from.</summary>
     public required SyntaxTree Tree { get; init; }
+
+    /// <summary>
+    /// The underlined tokens read as chromosome identifiers (homologue distinction, <c>der(1̲)</c>, <c>7̲p13</c>; T-042), in
+    /// input order. Underlining anywhere else stays a not-implemented construct.
+    /// </summary>
+    public ImmutableArray<TextSpan> UnderlinedChromosomes { get; init; } = [];
 }
 
 /// <summary>The meaning of one karyotype segment (or book fragment).</summary>

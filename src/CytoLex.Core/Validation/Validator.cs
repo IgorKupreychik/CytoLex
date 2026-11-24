@@ -171,7 +171,7 @@ public sealed class Validator
                 diagnostics.AddRange(ctx.Findings.Select(f => DiagnosticFactory.FromFinding(rule, input, f, DiagnosticOrigin.Rule, context.Effective)).OfType<Diagnostic>());
             }
 
-            segmentResults.Add(new SegmentResult(segment, EditionStatus.Implemented, null, tree.Constructs));
+            segmentResults.Add(new SegmentResult(segment, EditionStatus.Implemented, null, OpenConstructs(tree, model)));
         }
 
         if (context.IsContradictory && !context.Markers.IsEmpty)
@@ -194,6 +194,21 @@ public sealed class Validator
             ? TranslationBuilder.Build(profile.Kb, input, models, sorted, context, validity.IsValid, options.IncludeCoordinates)
             : null;
         return new EditionResult(profile.Edition, EditionStatus.Implemented, null, validity, CountsOf(sorted), sorted, segs, cellLines, entries, translation);
+    }
+
+    /// <summary>
+    /// The parser's not-implemented constructs without the underlining the binder read as a chromosome identifier
+    /// (homologue distinction, T-042): only underlining elsewhere leaves the segment unvalidated.
+    /// </summary>
+    private static ImmutableArray<NotImplementedConstruct> OpenConstructs(SyntaxTree tree, SegmentModel model)
+    {
+        if (model.UnderlinedChromosomes.IsEmpty)
+        {
+            return tree.Constructs;
+        }
+
+        var bound = model.UnderlinedChromosomes.ToHashSet();
+        return [.. tree.Constructs.Where(c => c.Kind != ConstructKind.Underlining || !bound.Contains(c.Span))];
     }
 
     /// <summary>Validity per §9: known context → no errors; unknown → the contexts without (firm or conditional) errors.</summary>

@@ -11,7 +11,7 @@ namespace CytoLex.Core.Syntax;
 /// <param name="Segment">The segment parsed.</param>
 /// <param name="Root">A <see cref="SyntaxKind.Karyotype"/> or <see cref="SyntaxKind.Fragment"/> node.</param>
 /// <param name="Diagnostics">Syntax errors, in input order.</param>
-/// <param name="Constructs">Not-implemented constructs, in input order.</param>
+/// <param name="Constructs">Not-implemented constructs, in input order; every underlined token among them (the binder tells chromosome identifiers apart, T-042).</param>
 public sealed record SyntaxTree(
     string Input,
     Segment Segment,

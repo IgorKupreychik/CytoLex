@@ -106,7 +106,7 @@ rules:
 | `review.needs_review` | ✔ | `true` when the book is ambiguous or the section is listed in `docs/extraction-review-<version>.md`; then `review.note` (why) is required. Caps findings at `warning` (see [Severity](#severity)) |
 | `related` | | IDs of related rules |
 
-Unknown fields are errors (catches typos). Example strings are written the way the book prints them (`→`, `–`, `×`, U+0332 for underlining); see T-053 for ASCII input forms.
+Unknown fields are errors (catches typos). Example strings are written the way the book prints them (`→`, `–`, `×`, U+0332 for underlining); see T-053 for ASCII input forms. Underlining has no ASCII form: U+0332 after each underlined character is also the input convention (T-042).
 
 ## Quote file
 ```yaml

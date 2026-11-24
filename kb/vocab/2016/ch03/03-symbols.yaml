@@ -926,7 +926,7 @@ entries:
       - text: "Distinguishes homologous chromosomes."
         sections: ["4.1", "9.2.3", "9.2.17.1"]
     cite: {section: "3", page: 36, para: "¶4"}
-    note: "Formatting under a chromosome number, not a typed character (U+0332 in the source text); handling of plain-text input is T-042."
+    note: "Formatting under a chromosome number, not a typed character. In text it is U+0332 after each underlined character, the only input form (T-042); accepted on chromosome identifiers."
   - label: "underscore (_)"
     tokens: ["_"]
     kind: punctuation

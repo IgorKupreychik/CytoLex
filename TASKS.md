@@ -51,7 +51,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-039 | done | 2 | T-036, T-005 | Desktop: rule browser |
 | T-040 | done | 2 | T-036, T-035 | Desktop: fix UI (diff view, Apply → re-validate) |
 | T-041 | done | 3 | T-035 | Level 2 "did you mean" suggestions |
-| T-042 | todo | 3 | T-027 | Handling of underlined homologue notation |
+| T-042 | done | 3 | T-027 | Handling of underlined homologue notation |
 | T-043 | discussion | 5 | – | Copyright cleanup before any public deployment |
 | T-044 | todo | 5 | T-028 | Web service wrapping the core library + browser page |
 | T-045 | todo | 5 | T-013 | ISCN 2020 KB + version profile |
@@ -906,10 +906,11 @@ Deviations from the plan: no CLI (user); new label `severity-policy` and CytoLex
 **Notes:** Done 2026-11-24. `Fix` level 2 (`FixLevel.Suggestion`, `Fix.IsSuggestion`/`HasEdits`; `IsEdit` stays level 1 only, so fix all, autocorrection and highlights ignore options): 1–3 options per diagnostic before the level-3 explanation, from `SuggestionProposal`s (`RuleFinding.Suggestions`, `DiagnosticFactory.WithSuggestions`, `MaxSuggestions = 3`). `SYM.LISTED_ONLY`: `src/CytoLex.Core/Validation/Suggestions/SymbolSuggester.cs` (vocab abbreviations by meaning prefix, near meaning typo, or token typo by OSA distance; each verified by re-parsing the segment), wired in `Validator.Run`. `BAND.MUST_EXIST`: `src/CytoLex.Core/Rules/Checks/BandSuggestions.cs` (arr position band via `ArrPositionFit.HoldingBand`, nearest same-form siblings, enclosing band, other arm; book bands only outside arr). Desktop: `FixItemViewModel` shows options as diff + Apply. Tests: `tests/CytoLex.Core.Tests/Validation/SuggestionTests.cs` (15-typo test set, KB arr corrected forms, never auto-applied), `FixUiTests`, `HighlightBuilderTests`; `FixTests.NoSingleFix_GivesExplanationWithCitations` now allows options before the explanation. Deviation from the task text: the rules are chosen in code, not by a KB flag (user decision, `docs/decisions.md` → Fix suggestions).
 
 ### T-042 — Underlined homologue notation
-**Status:** todo
+**Status:** done
 **Description:** Underlining distinguishes homologous chromosomes, but plain text can't carry it. Decide on an input convention, then parse and validate it.
 **Acceptance:** Convention documented; related KB examples pass.
 **Notes:** KB rules with underlined examples (U+0332, `needs_review`): `FRA.HOMOLOGUE_UNDERLINING` (§7.2, T-010) and `DER.HOMOLOGUE_UNDERLINING` (§9.2.3 E32–E34, T-012), and `TRANSLOC.HOMOLOGUE_UNDERLINING` (§9.2.17.1 E8, E10, T-013).
+**Outcome (2026-11-24):** Decided with the user: U+0332 after each underlined character is the only input form (no ASCII typed form); underlining on a chromosome identifier is validated, underlining elsewhere stays a not-implemented construct (no KB basis for an error). Core: `BinderBase.Chromosome` records underlined chromosome tokens → `SegmentModel.UnderlinedChromosomes` (all three binders, via `Binder`); `Validator.OpenConstructs` drops the parser's `ConstructKind.Underlining` constructs at those spans (the parser still reports every U+0332; reason now "underlining outside a chromosome number"). Desktop: "Underline homologue" command (Ctrl+U + an editor context menu with Cut/Copy/Paste), `src/CytoLex.Desktop/Editing/Underlining.cs`, one undoable document replace. KB: `needs_review` cleared on the three underlining rules, notes and the ch. 3 vocab note state the convention; `kb/README.md`. Tests: `tests/CytoLex.Core.Tests/Validation/UnderliningTests.cs` (every underlined KB example valid and complete; underlining elsewhere stays a construct; binder spans), `tests/CytoLex.Desktop.Tests/UnderliningTests.cs` (toggle + view model). Docs: decision entry, `docs/design/core.md`, `CLAUDE.md`, `README.md`, CytoGPS comparison row. Deviation: the construct reason keeps the shared "not implemented in the pilot" ending. Left as is: the "(T-042)" mention in the statement of the ch. 4 three-break rule (a statement change needs a paraphrase approval).
 
 ### T-043 — Copyright cleanup before public deployment
 **Status:** discussion

@@ -37,7 +37,18 @@
     <Border DockPanel.Dock="Top" BorderBrush="Gray" BorderThickness="1" Padding="4">
       <ae:TextEditor x:Name="Input" FontFamily="Cascadia Mono,Consolas,monospace" FontSize="18"
                      ShowLineNumbers="False" WordWrap="True" MinHeight="32"
-                     HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled" />
+                     HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled">
+        <!-- Underlined homologue (T-042): U+0332 after each underlined character -->
+        <ae:TextEditor.ContextMenu>
+          <ContextMenu>
+            <MenuItem Header="Underline homologue" InputGesture="Ctrl+U" Click="OnUnderlineClick" />
+            <Separator />
+            <MenuItem Header="Cut" InputGesture="Ctrl+X" Click="OnCutClick" />
+            <MenuItem Header="Copy" InputGesture="Ctrl+C" Click="OnCopyClick" />
+            <MenuItem Header="Paste" InputGesture="Ctrl+V" Click="OnPasteClick" />
+          </ContextMenu>
+        </ae:TextEditor.ContextMenu>
+      </ae:TextEditor>
     </Border>
 
     <!-- Corrected line (T-097): the selected edition's corrected string with one note per correction -->
