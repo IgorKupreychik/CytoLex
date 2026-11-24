@@ -1,0 +1,12 @@
+# Test fixture: an excerpt of kb/bands/2016/exceptions.yaml (T-007), read by `kb build` for kb.sqlite (T-084).
+version: '2016'
+exceptions:
+  - level: 850
+    region: '6p24'
+    book: ['6p24']
+    ncbi: ['6p24.3', '6p24.2', '6p24.1']
+    resolution: book
+    keep: ['6p24.3', '6p24.2', '6p24.1']
+    cite: {section: '2.5', page: 21, float: 'Fig. 5'}
+    note: >-
+      Fig. 5 shows 6p24 undivided at the 850-band level; NCBI's 850 set has 6p24.3, 6p24.2, 6p24.1. Book wins: 6p24 gets level 850. 6p24.3, 6p24.2, 6p24.1 appear in no idiogram of the book; listed under keep, they stay valid with their NCBI level 850 and book: false, since array/sequence notation uses genome-assembly bands.

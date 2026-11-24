@@ -191,7 +191,7 @@ public partial class RuleBrowserViewModel : ObservableObject, IDisposable
         return SelectedHit is not null;
     }
 
-    /// <summary>Opens the KB entry of a translation link (T-059): a rule or a vocab item. Bands have no browser entry (tooltip only).</summary>
+    /// <summary>Opens the KB entry of a translation link (T-059): a rule or a vocab item. Bands open in the Bands tab (<see cref="BandBrowserViewModel"/>, T-084).</summary>
     /// <returns>Whether the entry was found.</returns>
     public bool OpenKbRef(string edition, KbRef kbRef)
     {

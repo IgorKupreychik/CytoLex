@@ -58,10 +58,9 @@ public sealed class TranslationViewTests
         Assert.False(item.HasDiagnostics);
         Assert.False(item.HasCoordinates); // off by default
         var del = item.Links.First(l => l.Ref == KbRef.Vocab("symbols", "del"));
-        Assert.True(del.IsNavigable);
+        Assert.False(del.IsBand);
         Assert.StartsWith("vocab:symbols/del", del.Tip, StringComparison.Ordinal);
         var band = item.Links.First(l => l.Ref.Kind == KbRefKind.Band);
-        Assert.False(band.IsNavigable);
         Assert.True(band.IsBand);
     }
 
@@ -184,14 +183,21 @@ public sealed class TranslationViewTests
     }
 
     [Fact]
-    public void BandLink_IsNotNavigable()
+    public void BandLink_OpensItsBandInTheRuleBrowser()
     {
+        // T-084: band links were tooltip-only in T-059; now they open the band in the Bands tab.
         var vm = new MainWindowViewModel { Input = "46,XY,del(5)(q13q33)" };
-        var band = vm.SelectedPanel!.Translation!.Items[0].Links.First(l => l.Ref.Kind == KbRefKind.Band);
-        band.OpenCommand.Execute(null);
-        Assert.Equal(MainWindowViewModel.SingleTab, vm.SelectedMainTab);
-        Assert.False(vm.OpenKbEntry("2016", band.Ref));
+        var band = vm.SelectedPanel!.Translation!.Items[0].Links.First(l => l.Ref == KbRef.Band("5q13"));
         Assert.Contains("\"Genomic coordinates\"", band.Tip, StringComparison.Ordinal); // a hint until coordinates are on
+        Assert.EndsWith("open in the rule browser", band.Tip, StringComparison.Ordinal);
+        band.OpenCommand.Execute(null);
+        Assert.Equal(MainWindowViewModel.BandsTab, vm.SelectedMainTab);
+        Assert.Equal("5q13", vm.Bands.SelectedItem?.Name);
+        Assert.Equal("band:5q13", vm.Bands.Detail?.Id);
+        Assert.Null(vm.Rules.SelectedHit); // the rule browser is untouched
+        Assert.True(vm.OpenKbEntry("2016", band.Ref));
+        Assert.False(vm.OpenKbEntry("2016", KbRef.Band("5q99")));
+        Assert.Equal(MainWindowViewModel.BandsTab, vm.SelectedMainTab);
     }
 
     [Fact]

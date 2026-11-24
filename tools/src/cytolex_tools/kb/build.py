@@ -14,7 +14,8 @@ Checks (errors fail the build; nothing is written then):
      tokens; (chunks present) the labels equal the first-column
      cells of the `source` tables, and each entry's label is in its own cited block
   9. (T-060) `kb/bands/<version>/bands.yaml`: `version` = edition, every band has the keys the
-     runtime bundle carries, unique band names
+     runtime bundle carries, unique band names; (T-084) `exceptions.yaml` next to it, if present,
+     matches its schema (its exceptions go into `kb.sqlite` for the rule browser)
  10. (T-057) `kb/translation/<version>/`: `templates.<language>.yaml` (keys are existing rules or
      vocab items, unique keys and constructs, every construct covered, placeholders are declared
      slots, variant names unique and required with several forms) and `golden.yaml` (unique
@@ -72,6 +73,7 @@ class Edition:
     template_files: list[KbFile] = field(default_factory=list)  # T-057
     golden_file: KbFile | None = None  # T-057
     bands: dict | None = None  # parsed kb/bands/<version>/bands.yaml
+    band_exceptions: list[dict] = field(default_factory=list)  # exceptions.yaml (T-084)
     chunks_checked: bool = False
     sections: dict[str, Section] = field(default_factory=dict)  # the chunks, when present
 
@@ -392,6 +394,24 @@ def _load_bands(ed: Edition, bands_dir: Path, report: BuildReport) -> None:
             )
         seen.setdefault(b["name"], i)
     ed.bands = data
+    _load_band_exceptions(ed, bands_dir / ed.version / "exceptions.yaml", report)
+
+
+def _load_band_exceptions(ed: Edition, path: Path, report: BuildReport) -> None:
+    """The cited book-vs-NCBI band decisions (T-007) for the rule browser (T-084); optional."""
+    if not path.is_file():
+        return
+    problems = validate_file(path)
+    if problems:
+        report.errors.extend(problems)
+        return
+    data = load_yaml(path)
+    if str(data.get("version")) != ed.version:
+        report.errors.append(
+            Problem(path, "version", f"{data.get('version')!r} != edition {ed.version!r}")
+        )
+        return
+    ed.band_exceptions = data["exceptions"]
 
 
 def _check_edition(ed: Edition, source_dir: Path, report: BuildReport) -> None:
@@ -693,6 +713,16 @@ CREATE TABLE vocab (
   PRIMARY KEY (version, vocabulary, label));
 CREATE TABLE vocab_tokens (version TEXT, vocabulary TEXT, token TEXT, label TEXT);
 CREATE INDEX vocab_tokens_token ON vocab_tokens (version, token);
+CREATE TABLE bands (
+  version TEXT NOT NULL, name TEXT NOT NULL, ord INTEGER NOT NULL, chrom TEXT NOT NULL,
+  arm TEXT NOT NULL, parent TEXT, levels TEXT NOT NULL, derived INTEGER NOT NULL, stain TEXT,
+  book INTEGER NOT NULL, grch37_start INTEGER, grch37_end INTEGER,
+  grch38_start INTEGER, grch38_end INTEGER,
+  PRIMARY KEY (version, name));
+CREATE INDEX bands_parent ON bands (version, parent);
+CREATE TABLE band_exceptions (
+  version TEXT, ord INTEGER, level INTEGER, region TEXT, resolution TEXT,
+  book TEXT, ncbi TEXT, keep TEXT, note TEXT, cite_rendered TEXT);
 CREATE VIRTUAL TABLE rules_fts USING fts5(
   version UNINDEXED, id, title, statement, examples, tokenize = 'unicode61');
 CREATE VIRTUAL TABLE quotes_fts USING fts5(
@@ -716,6 +746,9 @@ def write_sqlite(report: BuildReport, path: Path) -> None:
         }
         for e in report.editions:
             meta[f"chunks_checked.{e.version}"] = str(int(e.chunks_checked))
+            if e.bands is not None:
+                levels = e.bands.get("levels_available") or []
+                meta[f"bands.levels_available.{e.version}"] = ",".join(str(n) for n in levels)
         con.executemany("INSERT INTO meta VALUES (?, ?)", sorted(meta.items()))
         for v, f, r in report.rules():
             fix, review = r.get("fix") or {}, r["review"]
@@ -809,10 +842,55 @@ def write_sqlite(report: BuildReport, path: Path) -> None:
                     con.execute(
                         "INSERT INTO vocab_tokens VALUES (?,?,?,?)", (v, name, tok, e["label"])
                     )
+        for e in report.editions:
+            _write_bands(con, e)
         con.commit()
     finally:
         con.close()
     os.replace(tmp, path)
+
+
+def _range(r: list | None) -> tuple:
+    return (r[0], r[1]) if r else (None, None)
+
+
+def _write_bands(con: sqlite3.Connection, ed: Edition) -> None:
+    """The edition's bands and band exceptions for the rule browser (T-084)."""
+    v = ed.version
+    for i, b in enumerate((ed.bands or {}).get("bands") or []):
+        con.execute(
+            "INSERT INTO bands VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (
+                v,
+                b["name"],
+                i,
+                str(b["chrom"]),
+                b["arm"],
+                b["parent"],
+                json.dumps(b["levels"]),
+                int(bool(b["derived"])),
+                b.get("stain"),
+                int(bool(b["book"])),
+                *_range(b["grch37"]),
+                *_range(b["grch38"]),
+            ),
+        )
+    for i, x in enumerate(ed.band_exceptions):
+        con.execute(
+            "INSERT INTO band_exceptions VALUES (?,?,?,?,?,?,?,?,?,?)",
+            (
+                v,
+                i,
+                x["level"],
+                x["region"],
+                x["resolution"],
+                json.dumps(x["book"]),
+                json.dumps(x["ncbi"]),
+                json.dumps(x.get("keep") or []),
+                x["note"].strip(),
+                render_cite(v, x["cite"]),
+            ),
+        )
 
 
 def _with_rendered(v: str, c: dict) -> dict:

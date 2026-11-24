@@ -100,7 +100,7 @@ public sealed record RuleDetail(
 
 /// <summary>
 /// Read-only access to <c>build/kb.sqlite</c> (written by <c>kb build</c>; tables and FTS5 indexes in kb/README.md) for the
-/// rule browser (T-039), rules and vocab items (T-059, via <see cref="VocabStore"/>). User queries are turned into safe FTS5 queries: every whitespace-separated word becomes a prefix
+/// rule browser (T-039), rules and vocab items (T-059, via <see cref="VocabStore"/>), and of the Bands tab (T-084, via <see cref="BandStore"/>). User queries are turned into safe FTS5 queries: every whitespace-separated word becomes a prefix
 /// phrase of its letter/digit tokens (<c>t(9;22)</c> → <c>"t 9 22"*</c>), words are ANDed. Quotes are optional: an empty
 /// <c>quotes</c> table is a normal KB build without <c>kb/source-quotes/</c>.
 /// </summary>
@@ -118,6 +118,7 @@ public sealed class RuleStore : IDisposable
     private static int _initialized;
     private readonly SqliteConnection _connection;
     private readonly VocabStore _vocab;
+    private readonly BandStore? _bands;
 
     private readonly bool _hasFixAuto;
 
@@ -126,6 +127,7 @@ public sealed class RuleStore : IDisposable
         _connection = connection;
         _hasFixAuto = HasColumn(connection, "rules", "fix_auto");
         _vocab = new VocabStore(connection);
+        _bands = HasTable(connection, "bands") && HasTable(connection, "band_exceptions") ? new BandStore(connection) : null;
         Editions = editions;
     }
 
@@ -197,7 +199,8 @@ public sealed class RuleStore : IDisposable
     /// The rules and vocab items of <paramref name="edition"/> (optionally of one <paramref name="section"/>) that match
     /// <paramref name="query"/>: a vocab item whose label or token equals the query and an exact rule ID first, then the
     /// rules by relevance, then the other vocab items. A blank query (or one without letters or digits) lists every rule
-    /// in book order, then every vocab item (a vocab item named exactly by a symbol-only query first).
+    /// in book order, then every vocab item (a vocab item named exactly by a symbol-only query first). Bands are not listed
+    /// here: they have their own tab (<see cref="Bands"/>, T-084).
     /// </summary>
     public ImmutableArray<RuleHit> Search(string edition, string? query, string? section = null)
     {
@@ -224,6 +227,21 @@ public sealed class RuleStore : IDisposable
                 .Concat(otherVocab.Select(r => r.ToHit(edition, RuleMatch.Vocab)))
                 .Take(_maxHits),
         ];
+    }
+
+    /// <summary>Every band of <paramref name="edition"/> in band order (pter → qter per chromosome); empty for a database written before T-084.</summary>
+    public ImmutableArray<CytoLex.Core.Kb.Band> Bands(string edition)
+    {
+        ArgumentNullException.ThrowIfNull(edition);
+        return _bands?.Rows(edition) ?? [];
+    }
+
+    /// <summary>The band <paramref name="name"/> of <paramref name="edition"/> (exact name), or <c>null</c>.</summary>
+    public BandDetail? Band(string edition, string name)
+    {
+        ArgumentNullException.ThrowIfNull(edition);
+        ArgumentNullException.ThrowIfNull(name);
+        return _bands?.Detail(edition, name);
     }
 
     /// <summary>The vocab item <paramref name="label"/> of <paramref name="vocabulary"/> in <paramref name="edition"/>, or <c>null</c>.</summary>
@@ -335,6 +353,15 @@ public sealed class RuleStore : IDisposable
             Examples: Examples(edition, id),
             Quotes: Quotes(edition, id),
             FixAuto: r.GetInt32(11) != 0);
+    }
+
+    // A database written before T-084 has no band tables: the browser then lists no bands.
+    private static bool HasTable(SqliteConnection connection, string table)
+    {
+        using var cmd = connection.CreateCommand();
+        cmd.CommandText = "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = $t";
+        cmd.Parameters.AddWithValue("$t", table);
+        return Convert.ToInt64(cmd.ExecuteScalar(), CultureInfo.InvariantCulture) > 0;
     }
 
     // A database written before T-097 has no fix_auto column: read it as "not flagged" rather than failing.

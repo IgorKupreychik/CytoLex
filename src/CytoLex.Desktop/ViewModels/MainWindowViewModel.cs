@@ -90,10 +90,11 @@ public partial class MainWindowViewModel : ObservableObject
             ComparisonViewModel.DefaultTriagePath());
         Batch = new BatchViewModel(_validator, EditionChoices, SelectedEditionChoice, OpenInSingleCheck, comparison);
         Rules = new RuleBrowserViewModel(ruleDatabasePath, SelectedEditionChoice?.Edition, CheckExample);
+        Bands = new BandBrowserViewModel(ruleDatabasePath, SelectedEditionChoice?.Edition);
         Validate();
     }
 
-    /// <summary>Index of the main tab: <see cref="SingleTab"/>, <see cref="BatchTab"/> or <see cref="RulesTab"/>.</summary>
+    /// <summary>Index of the main tab: <see cref="SingleTab"/>, <see cref="BatchTab"/>, <see cref="RulesTab"/> or <see cref="BandsTab"/>.</summary>
     [ObservableProperty]
     public partial int SelectedMainTab { get; set; }
 
@@ -106,20 +107,31 @@ public partial class MainWindowViewModel : ObservableObject
     /// <summary>The rule browser tab (T-039).</summary>
     public const int RulesTab = 2;
 
+    /// <summary>The band browser tab (T-084).</summary>
+    public const int BandsTab = 3;
+
     /// <summary>Batch validation (T-038).</summary>
     public BatchViewModel Batch { get; }
 
     /// <summary>The rule browser (T-039).</summary>
     public RuleBrowserViewModel Rules { get; }
 
-    /// <summary>Opens a translation link (T-059) of <paramref name="edition"/> in the rule browser: a rule or a vocab item.</summary>
-    /// <returns>Whether the entry was found (bands have no browser entry and return <c>false</c> without switching tabs).</returns>
+    /// <summary>The band browser (T-084).</summary>
+    public BandBrowserViewModel Bands { get; }
+
+    /// <summary>
+    /// Opens a translation link (T-059) of <paramref name="edition"/>: a rule or a vocab item in the rule browser, a band in
+    /// the band browser (T-084).
+    /// </summary>
+    /// <returns>Whether the entry was found.</returns>
     public bool OpenKbEntry(string edition, KbRef kbRef)
     {
         ArgumentNullException.ThrowIfNull(edition);
         if (kbRef.Kind == KbRefKind.Band)
         {
-            return false;
+            var band = Bands.OpenBand(edition, kbRef.Id);
+            SelectedMainTab = BandsTab;
+            return band;
         }
 
         var found = Rules.OpenKbRef(edition, kbRef);

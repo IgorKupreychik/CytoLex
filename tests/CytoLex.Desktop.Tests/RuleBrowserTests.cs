@@ -149,6 +149,7 @@ public sealed class RuleBrowserTests
         using var db = NoQuotesCopy.Create();
         var main = new MainWindowViewModel(null, db.Path);
         using var store = main.Rules; // releases the file before the copy is deleted
+        using var bandStore = main.Bands; // the Bands tab (T-084) has its own read-only connection
         var rules = main.Rules;
         Assert.True(rules.IsAvailable);
         rules.Query = "decreasing length";

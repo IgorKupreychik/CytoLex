@@ -522,6 +522,80 @@ def test_bands_missing_key(kb):
     assert_fails(build(kb), kb, "bands[3]", "missing key(s) book")
 
 
+def exceptions_file(kb) -> Path:
+    return kb[0] / "bands" / "2016" / "exceptions.yaml"
+
+
+def test_sqlite_bands_and_exceptions(kb):
+    """T-084: the rule browser reads the bands and the band exceptions from kb.sqlite."""
+    assert build(kb).errors == []
+    con = sqlite3.connect(kb[2] / "kb.sqlite")
+    rows = con.execute(
+        "SELECT name, ord, chrom, arm, parent, levels, derived, stain, book, "
+        "grch37_start, grch37_end, grch38_start, grch38_end FROM bands ORDER BY ord"
+    ).fetchall()
+    assert [r[0] for r in rows] == ["1p36", "1p36.3", "1q32.11", "6p24.1"]
+    assert rows[1] == (
+        "1p36.3",
+        1,
+        "1",
+        "p",
+        "1p36",
+        "[300, 400, 550, 700]",
+        0,
+        "gneg",
+        1,
+        1,
+        7200000,
+        1,
+        7100000,
+    )
+    assert rows[0][4] is None and rows[0][6] == 1  # nesting ancestor
+    assert rows[2][7:] == (None, 1, None, None, None, None)  # no coordinates
+    assert rows[3][8] == 0  # not in the book
+    assert con.execute(
+        "SELECT value FROM meta WHERE key = 'bands.levels_available.2016'"
+    ).fetchone() == ("300,400,550,700,850",)
+    ex = con.execute(
+        "SELECT ord, level, region, resolution, book, ncbi, keep, cite_rendered, note "
+        "FROM band_exceptions"
+    ).fetchall()
+    assert len(ex) == 1
+    assert ex[0][:7] == (
+        0,
+        850,
+        "6p24",
+        "book",
+        '["6p24"]',
+        '["6p24.3", "6p24.2", "6p24.1"]',
+        '["6p24.3", "6p24.2", "6p24.1"]',
+    )
+    assert ex[0][7] == "ISCN 2016 §2.5, p.21, Fig. 5"
+    assert ex[0][8].startswith("Fig. 5 shows 6p24 undivided")
+
+
+def test_sqlite_without_band_exceptions(kb):
+    exceptions_file(kb).unlink()
+    assert build(kb).errors == []
+    con = sqlite3.connect(kb[2] / "kb.sqlite")
+    assert con.execute("SELECT count(*) FROM bands").fetchone() == (4,)
+    assert con.execute("SELECT count(*) FROM band_exceptions").fetchone() == (0,)
+
+
+def test_band_exceptions_schema_error(kb):
+    edit(exceptions_file(kb), "resolution: book", "resolution: maybe")
+    report = build(kb)
+    assert any("maybe" in e.message for e in report.errors), report.errors
+    assert not kb[2].exists()
+
+
+def test_band_exceptions_version_mismatch(kb):
+    edit(exceptions_file(kb), "version: '2016'", "version: '2020'")
+    report = build(kb)
+    assert any(e.where == "version" and "edition '2016'" in e.message for e in report.errors)
+    assert not kb[2].exists()
+
+
 # --- translation (T-057) -----------------------------------------------------------------
 
 TEMPLATES = """\

@@ -22,8 +22,8 @@ public enum CoordinateBuild
 }
 
 /// <summary>
-/// A KB link of a translation part (T-059): the entry's title, its KB ID on hover. Rule and vocab links open the entry in the
-/// rule browser; band links are not navigable (decided with the user, 2026-11-22) and show the band's coordinates on hover.
+/// A KB link of a translation part (T-059): the entry's title, its KB ID on hover. Every link opens its entry in the rule
+/// browser; a band link (T-084; tooltip-only in T-059) also shows the band's coordinates on hover.
 /// </summary>
 public sealed partial class KbLinkViewModel : ObservableObject
 {
@@ -48,11 +48,8 @@ public sealed partial class KbLinkViewModel : ObservableObject
     /// <summary>The title shown.</summary>
     public string Title => Link.Title;
 
-    /// <summary>Whether the link opens the rule browser (rule or vocab item).</summary>
-    public bool IsNavigable => Link.Ref.Kind != KbRefKind.Band;
-
-    /// <summary>Whether the link is a band (a plain chip).</summary>
-    public bool IsBand => !IsNavigable;
+    /// <summary>Whether the link is a band (its tooltip shows the coordinates).</summary>
+    public bool IsBand => Link.Ref.Kind == KbRefKind.Band;
 
     /// <summary>The tooltip: the KB ID (<c>rule:DEL.FORMAT</c>), plus the coordinates of a band in the chosen build.</summary>
     [ObservableProperty]
@@ -63,13 +60,7 @@ public sealed partial class KbLinkViewModel : ObservableObject
 
     /// <summary>Opens the entry in the rule browser.</summary>
     [RelayCommand]
-    private void Open()
-    {
-        if (IsNavigable)
-        {
-            _open?.Invoke(Link.Ref);
-        }
-    }
+    private void Open() => _open?.Invoke(Link.Ref);
 
     private string TipOf(CoordinateBuild build)
     {
@@ -79,7 +70,8 @@ public sealed partial class KbLinkViewModel : ObservableObject
             return id + " · open in the rule browser";
         }
 
-        return id + " · " + (_band is null ? "coordinates: switch on \"Genomic coordinates\"" : CoordinateText.Band(_band, build));
+        return id + " · " + (_band is null ? "coordinates: switch on \"Genomic coordinates\"" : CoordinateText.Band(_band, build))
+            + " · open in the rule browser";
     }
 }
 

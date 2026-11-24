@@ -60,6 +60,64 @@ public sealed class RuleStoreTests : IDisposable
     }
 
     [Fact]
+    public void EveryRuntimeBand_IsListedAndOpens_WithTheSameCoordinates()
+    {
+        // T-084 acceptance: the Bands tab's bands (kb.sqlite) are the bands the core embeds (kb-runtime.json), field by field.
+        var kb = KnowledgeBase.LoadEmbedded();
+        foreach (var edition in kb.Editions)
+        {
+            var set = kb.ForEdition(edition)!.Bands;
+            if (set is null)
+            {
+                continue;
+            }
+
+            var listed = _store.Bands(edition);
+            Assert.Equal(set.Bands.Select(b => b.Name), listed.Select(b => b.Name)); // same names, same order
+            foreach (var band in set.Bands)
+            {
+                var detail = _store.Band(edition, band.Name);
+                Assert.NotNull(detail);
+                var stored = detail.Band;
+                Assert.Equal(band.Chromosome, stored.Chromosome);
+                Assert.Equal(band.Arm, stored.Arm);
+                Assert.Equal(band.Parent, stored.Parent);
+                Assert.Equal(band.Levels, stored.Levels);
+                Assert.Equal(band.Derived, stored.Derived);
+                Assert.Equal(band.Book, stored.Book);
+                Assert.Equal(band.Grch37, stored.Grch37);
+                Assert.Equal(band.Grch38, stored.Grch38);
+                Assert.Equal(set.Bands.Where(b => b.Parent == band.Name).Select(b => b.Name), detail.Children);
+            }
+        }
+    }
+
+    [Fact]
+    public void BandExceptions_NameTheirBands_WithCitations()
+    {
+        var kept = _store.Band("2016", "6p24.3")!;
+        Assert.False(kept.Band.Book);
+        var x = Assert.Single(kept.Exceptions);
+        Assert.Equal("6p24", x.Region);
+        Assert.Equal(850, x.Level);
+        Assert.Contains("6p24.3", x.Keep);
+        Assert.Equal("ISCN 2016 §2.5, p.21, Fig. 5", x.Citation);
+        Assert.Contains(_store.Band("2016", "6p24")!.Exceptions, e => e.Region == "6p24"); // the region itself
+        Assert.Contains(_store.Band("2016", "15q26.1")!.Exceptions, e => e.Region == "15q26" && e.Level == 400);
+        Assert.Empty(_store.Band("2016", "1p36.3")!.Exceptions);
+    }
+
+    [Fact]
+    public void WithoutBandTables_NoBandsAreListed()
+    {
+        using var db = NoQuotesCopy.Create("DROP TABLE bands; DROP TABLE band_exceptions;");
+        using var store = RuleStore.Open(db.Path);
+        Assert.Empty(store.Bands("2016"));
+        Assert.Null(store.Band("2016", "5q13"));
+        Assert.Contains(store.Search("2016", "TRANSLOC"), h => h.Id == "TRANSLOC.FORMAT");
+    }
+
+    [Fact]
     public void Search_ByExactId_PutsThatRuleFirst()
     {
         var hits = _store.Search("2016", "TRANSLOC.FORMAT");
