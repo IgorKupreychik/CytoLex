@@ -153,7 +153,7 @@ public class BatchExportTests
         Assert.Equal(EditionVerdict.ValidAfterAutoCorrection, result.Verdict);
         Assert.Equal("47,XY,+21", result.AutoCorrection!.Corrected);
         Assert.Equal("47,XY, +21", back.Items[0].Report.Input);
-        Assert.Contains("\"FormatVersion\": 2", Encoding.UTF8.GetString(json), StringComparison.Ordinal);
+        Assert.Contains("\"FormatVersion\": 3", Encoding.UTF8.GetString(json), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -162,6 +162,38 @@ public class BatchExportTests
         using var v1 = new MemoryStream(Encoding.UTF8.GetBytes("{\"Format\":\"cytolex-batch\",\"FormatVersion\":1,\"Editions\":[\"2016\"],\"Items\":[]}"));
 
         Assert.Empty(BatchExport.ReadJson(v1).Items);
+    }
+
+    // --- T-070: inherited changes and full forms of idem/sl/sdl lines ---
+
+    [Fact]
+    public void Json_CarriesCloneReferences()
+    {
+        var result = BatchRunner.Run(
+            Validator.Default,
+            [new BatchItem(1, null, "46,XX,t(9;22)(q34;q11.2)[7]/43,sl,-7,-9,-15[11]")],
+            new ValidationOptions { Editions = EditionSelection.One("2016") });
+        var json = Bytes(s => BatchExport.WriteJson(s, result));
+        using var input = new MemoryStream(json);
+
+        var back = BatchExport.ReadJson(input);
+
+        Assert.Equal(json, Bytes(s => BatchExport.WriteJson(s, back)));
+        var line = back.Items[0].Report.Results[0].CellLines[1];
+        Assert.Equal("43,XX,-7,-9,t(9;22)(q34;q11.2),-15[11]", line.FullForm);
+        Assert.Equal("sl", line.Reference!.Symbol);
+        Assert.Equal(0, Assert.Single(line.Inherited).SourceCellLine);
+        Assert.Empty(back.Items[0].Report.Results[0].CellLines[0].Inherited);
+    }
+
+    [Fact]
+    public void Json_ReadsVersion2()
+    {
+        var json = Encoding.UTF8.GetString(Bytes(s => BatchExport.WriteJson(s, _autoResult.Value)))
+            .Replace("\"FormatVersion\": 3", "\"FormatVersion\": 2", StringComparison.Ordinal);
+        using var v2 = new MemoryStream(Encoding.UTF8.GetBytes(json));
+
+        Assert.Equal(_autoItems.Length, BatchExport.ReadJson(v2).Items.Length);
     }
 
     [Fact]

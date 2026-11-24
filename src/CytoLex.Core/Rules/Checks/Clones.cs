@@ -23,7 +23,10 @@ internal enum CloneLineKind
 /// <param name="Index">Its index in <see cref="KaryotypeModel.CellLines"/>.</param>
 /// <param name="Line">The cell line.</param>
 /// <param name="Kind">Clone, normal diploid or constitutional-only.</param>
-/// <param name="Changes">Its acquired changes, references expanded (the target's changes plus its own).</param>
+/// <param name="Changes">
+/// Its acquired changes, references expanded (the target's changes plus its own, as named: no <c>×n</c>, no cancellation;
+/// what a line contains is <see cref="CloneExpansion"/>, T-070).
+/// </param>
 /// <param name="HasOmitted">The line (or a clone it refers to) has <c>…</c>: its changes are not all known.</param>
 internal sealed record CloneLine(int Index, CellLine Line, CloneLineKind Kind, ImmutableArray<KaryotypeItem> Changes, bool HasOmitted)
 {
@@ -133,20 +136,7 @@ internal sealed class Clones
 
         return a is Abnormality x && b is Abnormality y && x.Sign == y.Sign
             && (!x.Breakpoints.Any() || !y.Breakpoints.Any())
-            && string.Equals(Skeleton(x), Skeleton(y), StringComparison.Ordinal);
-    }
-
-    /// <summary>An abnormality without its breakpoints: <c>der(2)t(2;5)</c>.</summary>
-    private static string Skeleton(Abnormality a)
-    {
-        var sb = new StringBuilder();
-        foreach (var p in a.Parts)
-        {
-            sb.Append(string.Join(' ', p.Symbols.Select(s => s.Symbol))).Append(p.SymbolNumber)
-                .Append('(').Append(string.Join(';', p.Chromosomes.Select(c => c.Name))).Append(')');
-        }
-
-        return sb.ToString();
+            && string.Equals(CloneExpansion.Skeleton(x), CloneExpansion.Skeleton(y), StringComparison.Ordinal);
     }
 
     // ── Tie keys ──────────────────────────────────────────────────────────────────────────────────────

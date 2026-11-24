@@ -208,7 +208,40 @@ public sealed record CellLineSummary(
     int? BasedOn = null,
     SegmentTechnique Technique = SegmentTechnique.Karyotype,
     string? Build = null,
-    NotationType? Notation = null);
+    NotationType? Notation = null)
+{
+    /// <summary>The line's <c>idem</c>/<c>sl</c>/<c>sdl</c> reference (T-070); <c>null</c> for a line written in full.</summary>
+    public CloneReferenceSummary? Reference { get; init; }
+
+    /// <summary>
+    /// The changes a line written with a reference inherits from the clone it refers to (T-070), in the order of that
+    /// clone's expansion; empty otherwise. Removed ones (<see cref="InheritedChange.RemovedBy"/>) are included.
+    /// </summary>
+    public ImmutableArray<InheritedChange> Inherited { get; init; } = [];
+
+    /// <summary>
+    /// The line written out without its reference (T-070): count, sex chromosomes, the inherited and own changes in §6
+    /// order, the cell count, e.g. <c>43,XX,t(9;22)(q34;q11.2),-7,-9,-15[11]</c>; <c>null</c> for a line written in full,
+    /// or when the reference has no target or the line or the clone it refers to is partial.
+    /// </summary>
+    public string? FullForm { get; init; }
+}
+
+/// <summary>A cell line's reference to an earlier clone (§11.1.4, T-070).</summary>
+/// <param name="Span">The reference item (<c>sl×2</c>) in the whole input.</param>
+/// <param name="Symbol"><c>idem</c>, <c>sl</c> or <c>sdl</c>.</param>
+/// <param name="Number">The number after the symbol (<c>sl2</c>, <c>sdl1</c>).</param>
+/// <param name="Multiplier">The <c>×n</c> of a polyploid subclone; 1 without one.</param>
+/// <param name="TargetLine">The index (in <see cref="EditionResult.CellLines"/>) of the clone referred to; <c>null</c> when there is none.</param>
+public sealed record CloneReferenceSummary(TextSpan Span, string Symbol, int? Number, int Multiplier, int? TargetLine);
+
+/// <summary>A change a cell line inherits through its <c>idem</c>/<c>sl</c>/<c>sdl</c> reference (T-070).</summary>
+/// <param name="Entry">The entry of the change where it is written (an index into <see cref="EditionResult.Abnormalities"/>; its span is the source span).</param>
+/// <param name="SourceCellLine">The cell line it is written in (an index into <see cref="EditionResult.CellLines"/>).</param>
+/// <param name="Copies">The copies in this line: written copies × every <c>×n</c> on the way, less those cancelled; 0 when removed.</param>
+/// <param name="Text">How the change is written in <see cref="CellLineSummary.FullForm"/> (<c>t(9;22)(q34;q11.2)×2</c>, <c>+8,+8</c>); the source text when removed.</param>
+/// <param name="RemovedBy">The entry of the own item that removes it (<c>–inv(6)</c>, or <c>+3</c> for an inherited <c>–3</c>); <c>null</c> when kept.</param>
+public sealed record InheritedChange(int Entry, int SourceCellLine, int Copies, string Text, int? RemovedBy = null);
 
 /// <summary>A breakpoint of an abnormality.</summary>
 /// <param name="Span">The breakpoint in the whole input.</param>

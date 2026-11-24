@@ -146,6 +146,20 @@ internal static class ItemOrder
         return FixProposal.Replace(TextSpan.FromBounds(items[from].Span.Start, items[to].Span.End), text);
     }
 
+    /// <summary>
+    /// <paramref name="items"/> in §6 order (a stable sort by the key above); items without a key (<c>…</c>, <c>inc</c>,
+    /// <c>or</c> readings) follow in their given order. Used to write out the full form of a clone (T-070).
+    /// </summary>
+    public static List<T> Sort<T>(IEnumerable<T> items, Func<T, KaryotypeItem> item)
+    {
+        var withKeys = items.Select(x => (Value: x, Key: KeyOf(item(x)))).ToList();
+        return
+        [
+            .. withKeys.Where(x => x.Key is not null).OrderBy(x => x.Key!.Value, Comparer<Key>.Create(Compare)).Select(x => x.Value),
+            .. withKeys.Where(x => x.Key is null).Select(x => x.Value),
+        ];
+    }
+
     private static int Compare(Key a, Key b)
     {
         var c = a.Category.CompareTo(b.Category);

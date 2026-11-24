@@ -223,19 +223,30 @@ public partial class MainWindow : Window
         }
     }
 
+    // An inherited row (T-070) marks its source span.
     private void OnCardPointerEntered(object? sender, PointerEventArgs e)
     {
-        if (_viewModel is not null && sender is Control { DataContext: AbnormalityItemViewModel item })
+        if (_viewModel is not null && sender is Control { DataContext: AbnormalityItemViewModel or InheritedItemViewModel } control)
         {
-            _viewModel.HoverSpan = item.Span;
+            _viewModel.HoverSpan = ((ISpanItem)control.DataContext!).Span;
         }
     }
 
     private void OnCardPointerExited(object? sender, PointerEventArgs e)
     {
-        if (_viewModel is not null && sender is Control { DataContext: AbnormalityItemViewModel item } && _viewModel.HoverSpan == item.Span)
+        if (_viewModel is not null && sender is Control { DataContext: AbnormalityItemViewModel or InheritedItemViewModel } control
+            && _viewModel.HoverSpan == ((ISpanItem)control.DataContext!).Span)
         {
             _viewModel.HoverSpan = null;
+        }
+    }
+
+    // Abnormalities panel (T-070): copies a cell line's full form.
+    private async void OnCopyFullForm(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Control { DataContext: CellLineGroupViewModel { FullForm: { } fullForm } } && TopLevel.GetTopLevel(this)?.Clipboard is { } clipboard)
+        {
+            await clipboard.SetTextAsync(fullForm);
         }
     }
 

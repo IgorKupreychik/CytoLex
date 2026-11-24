@@ -4,7 +4,7 @@ using CytoLex.Desktop.ViewModels;
 
 namespace CytoLex.Desktop.Tests;
 
-/// <summary>T-069: the abnormalities panel (cell line groups, cards, parts, flags, span selection).</summary>
+/// <summary>T-069: the abnormalities panel (cell line groups, cards, parts, flags, span selection); T-070: clone references.</summary>
 public class AbnormalityPanelTests
 {
     [Fact]
@@ -236,5 +236,86 @@ public class AbnormalityPanelTests
         vm.Input = "46,XX,der(9)(9pter→9q34::22q11.2→22qter)";
         var written = Assert.Single(Assert.Single(vm.SelectedPanel!.CellLineGroups).Items);
         Assert.False(written.ShowDetailed); // already written in the detailed system
+    }
+
+    // --- T-070: idem/sl/sdl references ---
+
+    [Fact]
+    public void CloneReference_ExpandsToInheritedChanges_AndFullForm()
+    {
+        const string input = "46,XX,t(9;22)(q34;q11.2)[7]/43,sl,-7,-9,-15[11]";
+        var vm = new MainWindowViewModel { Input = input };
+        var groups = vm.SelectedPanel!.CellLineGroups;
+
+        Assert.False(groups[0].HasFullForm);
+        Assert.True(groups[1].HasFullForm);
+        Assert.Equal("43,XX,-7,-9,t(9;22)(q34;q11.2),-15[11]", groups[1].FullForm);
+
+        var card = groups[1].Items[0];
+        Assert.Equal("clone", card.KindLabel);
+        Assert.True(card.HasReference);
+        Assert.False(groups[0].Items[0].HasReference);
+        Assert.All(groups[1].Items.Skip(1), c => Assert.False(c.HasReference));
+
+        var reference = card.Reference!;
+        Assert.Equal("sl = stemline → line 1", reference.Label);
+        Assert.Equal("46,XX,t(9;22)(q34;q11.2)[7]", reference.TargetText);
+        Assert.Equal("1 inherited change", reference.InheritedHeader);
+        Assert.False(reference.IsExpanded);
+        var changed = new List<string?>();
+        reference.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+        reference.IsExpanded = true;
+        Assert.Equal([nameof(CloneReferenceViewModel.IsExpanded)], changed);
+
+        var inherited = Assert.Single(reference.Inherited);
+        Assert.Equal(("t(9;22)(q34;q11.2)", "t(9;22)", "from line 1", false), (inherited.Text, inherited.ShortForm, inherited.Tag, inherited.IsRemoved));
+        vm.SelectSpan(inherited.Span);
+        Assert.Equal("t(9;22)(q34;q11.2)", vm.SelectedSpan!.Value.Of(input));
+        Assert.Equal(groups[0].Items[0].Span, inherited.Span);
+    }
+
+    [Fact]
+    public void CloneReference_ChainsAndMultipliers_Labelled()
+    {
+        var vm = new MainWindowViewModel { Input = "46,XY,t(9;22)(q34;q11.2)[3]/92,sl×2[5]/93,sdl,+8[2]" };
+        var groups = vm.SelectedPanel!.CellLineGroups;
+
+        Assert.Equal("sl×2 = stemline ×2 → line 1", groups[1].Items[0].Reference!.Label);
+        var sdl = groups[2].Items[0].Reference!;
+        Assert.Equal("sdl = sideline → line 2", sdl.Label);
+        Assert.Equal(("t(9;22)(q34;q11.2)×2", "from line 1"), sdl.Inherited.Select(i => (i.Text, i.Tag)).Single());
+        Assert.Equal("93,XXYY,+8,t(9;22)(q34;q11.2)×2[2]", groups[2].FullForm);
+
+        vm.Input = "46,XX,t(9;22)(q34;q11.2)[3]/47,sl,+8[17]/48,sdl1,+9[3]/49,idem,+8,+9,+11[12]";
+        groups = vm.SelectedPanel!.CellLineGroups;
+        Assert.Equal("sdl1 = sideline 1 → line 2", groups[2].Items[0].Reference!.Label);
+        Assert.Equal("idem = first karyotype → line 1", groups[3].Items[0].Reference!.Label);
+    }
+
+    [Fact]
+    public void CloneReference_RemovedChangeStruckThrough()
+    {
+        var vm = new MainWindowViewModel { Input = "49,XX,inv(6)(p21q25),…[17]/52,sl,–inv(6),+7,+8,+9,+mar[11]" };
+        var reference = vm.SelectedPanel!.CellLineGroups[1].Items[0].Reference!;
+
+        var removed = Assert.Single(reference.Inherited);
+        Assert.True(removed.IsRemoved);
+        Assert.False(removed.IsKept);
+        Assert.Equal("Removed by –inv(6) (signs are relative to the clone referred to, ISCN §11.1.4)", removed.RemovedTip);
+        Assert.Equal("0 inherited changes", reference.InheritedHeader);
+    }
+
+    [Fact]
+    public void CloneReference_SpansFollowTheTypedText_WithAutocorrection()
+    {
+        const string typed = "46, XX,t(9;22)(q34;q11.2)[3]/47,sl,+8[17]";
+        var vm = new MainWindowViewModel { Input = typed };
+        Assert.True(vm.SelectedPanel!.IsAutoCorrected);
+
+        var group = vm.SelectedPanel.CellLineGroups[1];
+        Assert.Equal("47,XX,+8,t(9;22)(q34;q11.2)[17]", group.FullForm);
+        var inherited = Assert.Single(group.Items[0].Reference!.Inherited);
+        vm.SelectSpan(inherited.Span);
+        Assert.Equal("t(9;22)(q34;q11.2)", vm.SelectedSpan!.Value.Of(typed));
     }
 }

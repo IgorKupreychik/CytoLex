@@ -92,6 +92,12 @@ public sealed class AbnormalityItemViewModel : ISpanItem
     /// <summary>The entry shown.</summary>
     public AbnormalityEntry Entry { get; }
 
+    /// <summary>The expandable reference of an <c>idem</c>/<c>sl</c>/<c>sdl</c> card (T-070); <c>null</c> for other cards.</summary>
+    public CloneReferenceViewModel? Reference { get; init; }
+
+    /// <summary>Whether <see cref="Reference"/> is set.</summary>
+    public bool HasReference => Reference is not null;
+
     /// <inheritdoc/>
     public TextSpan Span { get; }
 
@@ -401,6 +407,12 @@ public sealed record CellLineGroupViewModel(string Header, ImmutableArray<Abnorm
     /// <summary>Whether the cell line has no abnormalities.</summary>
     public bool IsEmpty => Items.IsEmpty;
 
+    /// <summary>The line written out without its <c>idem</c>/<c>sl</c>/<c>sdl</c> (T-070, <see cref="CellLineSummary.FullForm"/>); <c>null</c> otherwise.</summary>
+    public string? FullForm { get; init; }
+
+    /// <summary>Whether <see cref="FullForm"/> is set.</summary>
+    public bool HasFullForm => FullForm is not null;
+
     /// <summary>The groups of <paramref name="result"/>, one per cell line.</summary>
     public static ImmutableArray<CellLineGroupViewModel> From(EditionResult result) => From(result, null);
 
@@ -409,6 +421,10 @@ public sealed record CellLineGroupViewModel(string Header, ImmutableArray<Abnorm
     {
         ArgumentNullException.ThrowIfNull(result);
         var many = result.CellLines.Count(l => l.Technique == SegmentTechnique.Karyotype) > 1;
+        var lineNumbers = result.CellLines.Where(l => l.Technique == SegmentTechnique.Karyotype)
+            .Select((l, k) => (l.Index, Number: k + 1))
+            .ToDictionary(x => x.Index, x => x.Number);
+        int LineNumber(int index) => lineNumbers.TryGetValue(index, out var n) ? n : index + 1;
         var inSituLines = result.CellLines.Where(l => l.Technique == SegmentTechnique.InSitu)
             .GroupBy(l => l.SegmentIndex)
             .ToDictionary(g => g.Key, g => g.Count());
@@ -448,7 +464,15 @@ public sealed record CellLineGroupViewModel(string Header, ImmutableArray<Abnorm
             }
 
             number++;
-            groups.Add(new CellLineGroupViewModel(HeaderOf(line, many ? number : null, relation), cards));
+            if (line.Reference is { } reference)
+            {
+                var row = new CloneReferenceViewModel(line, result, LineNumber, toEditor ?? (static s => s));
+                cards = [.. cards.Select(c => c.Entry.Kind == AbnormalityKind.CloneReference && c.Entry.Span == reference.Span
+                    ? new AbnormalityItemViewModel(c.Entry, result.Diagnostics, toEditor) { Reference = row }
+                    : c)];
+            }
+
+            groups.Add(new CellLineGroupViewModel(HeaderOf(line, many ? number : null, relation), cards) { FullForm = line.FullForm });
         }
 
         return groups.ToImmutable();

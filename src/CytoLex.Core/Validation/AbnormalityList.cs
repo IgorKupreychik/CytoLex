@@ -23,6 +23,7 @@ internal sealed class AbnormalityList(string input)
     public void Add(int segmentIndex, KaryotypeModel model)
     {
         var first = _cellLines.Count;
+        var entryOf = new Dictionary<KaryotypeItem, int>(ReferenceEqualityComparer.Instance);
         foreach (var line in model.CellLines)
         {
             var lineIndex = _cellLines.Count;
@@ -31,6 +32,7 @@ internal sealed class AbnormalityList(string input)
             {
                 if (Entry(item, lineIndex, _entries.Count) is { } entry)
                 {
+                    entryOf[item] = _entries.Count;
                     _entries.Add(entry);
                 }
             }
@@ -49,6 +51,41 @@ internal sealed class AbnormalityList(string input)
                 line.IsPartial,
                 _entries.Count - before,
                 line.BasedOn?.TargetIndex is { } target ? first + target : null));
+        }
+
+        AddReferences(model, first, entryOf);
+    }
+
+    /// <summary>
+    /// Fills <see cref="CellLineSummary.Reference"/>, <see cref="CellLineSummary.Inherited"/> and
+    /// <see cref="CellLineSummary.FullForm"/> of the lines written with <c>idem</c>/<c>sl</c>/<c>sdl</c> (T-070).
+    /// </summary>
+    private void AddReferences(KaryotypeModel model, int first, Dictionary<KaryotypeItem, int> entryOf)
+    {
+        if (model.CellLines.All(l => l.BasedOn is null))
+        {
+            return;
+        }
+
+        foreach (var line in CloneExpansion.Of(model).Where(l => l.Line.BasedOn is not null))
+        {
+            var reference = line.Line.BasedOn!;
+            var inherited = line.Inherited
+                .Where(c => entryOf.ContainsKey(c.Item))
+                .Select(c => new InheritedChange(entryOf[c.Item], first + c.SourceLine, c.Copies, FullForm.Piece(input, c)))
+                .Concat(line.Removed
+                    .Where(r => entryOf.ContainsKey(r.Item))
+                    .Select(r => new InheritedChange(
+                        entryOf[r.Item], first + r.SourceLine, 0, r.Item.Span.Of(input), entryOf.TryGetValue(r.RemovedBy, out var by) ? by : null)))
+                .OrderBy(c => c.Entry);
+            var index = first + line.Index;
+            _cellLines[index] = _cellLines[index] with
+            {
+                Reference = new CloneReferenceSummary(
+                    reference.Item.Span, reference.Symbol, reference.Number, reference.Multiplier ?? 1, reference.TargetIndex is { } t ? first + t : null),
+                Inherited = [.. inherited],
+                FullForm = FullForm.Of(input, line),
+            };
         }
     }
 
