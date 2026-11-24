@@ -18,5 +18,6 @@
     <!-- Our own wrapper around CytoGPS's batch JSON writer, compiled together with the CytoGPS sources. -->
     <EmbeddedResource Include="CytoGps/CytoGpsCli.java" LogicalName="CytoLex.External.CytoGpsCli.java" />
     <InternalsVisibleTo Include="CytoLex.External.Tests" />
+    <InternalsVisibleTo Include="CytoLex.Desktop.Tests" />
   </ItemGroup>
 </Project>

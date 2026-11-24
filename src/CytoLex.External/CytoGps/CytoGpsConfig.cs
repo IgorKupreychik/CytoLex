@@ -1,5 +1,4 @@
 using System.Globalization;
-using YamlDotNet.RepresentationModel;
 
 namespace CytoLex.External.CytoGps;
 
@@ -42,58 +41,26 @@ public sealed record CytoGpsConfig(
             ?? throw new InvalidOperationException("CytoLex repo root not found (no CytoLex.slnx above " + AppContext.BaseDirectory + ").");
         environment ??= Environment.GetEnvironmentVariable;
 
-        var values = ReadSection(Path.Combine(repoRoot, "config", "local.yaml"));
+        var values = CytoGpsConfigFile.ReadValues(repoRoot);
         string? Get(string key)
         {
-            var env = environment("CYTOLEX_CYTOGPS_" + key.ToUpperInvariant());
+            var env = environment(CytoGpsConfigFile.EnvironmentVariable(key));
             var value = !string.IsNullOrWhiteSpace(env) ? env : values.GetValueOrDefault(key);
             return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
         }
 
-        var diskCache = Get("disk_cache") is { } dc && bool.TryParse(dc, out var b) && b;
-        var timeout = Get("timeout_seconds") is { } ts
+        var diskCache = Get(CytoGpsConfigFile.DiskCacheKey) is { } dc && bool.TryParse(dc, out var b) && b;
+        var timeout = Get(CytoGpsConfigFile.TimeoutSecondsKey) is { } ts
             && int.TryParse(ts, NumberStyles.Integer, CultureInfo.InvariantCulture, out var secs) && secs > 0
                 ? TimeSpan.FromSeconds(secs)
                 : DefaultTimeout;
-        return new CytoGpsConfig(repoRoot, Get("source_dir"), Get("java_home"), Get("javax_json_jar"), diskCache, timeout);
-    }
-
-    private static Dictionary<string, string> ReadSection(string path)
-    {
-        var result = new Dictionary<string, string>(StringComparer.Ordinal);
-        if (!File.Exists(path))
-        {
-            return result;
-        }
-
-        var stream = new YamlStream();
-        try
-        {
-            using var reader = new StreamReader(path);
-            stream.Load(reader);
-        }
-        catch (YamlDotNet.Core.YamlException ex)
-        {
-            throw new InvalidOperationException($"{path}: malformed YAML ({ex.Message}).", ex);
-        }
-
-        if (stream.Documents.Count == 0
-            || stream.Documents[0].RootNode is not YamlMappingNode root
-            || !root.Children.TryGetValue(new YamlScalarNode(Section), out var node)
-            || node is not YamlMappingNode section)
-        {
-            return result;
-        }
-
-        foreach (var (key, value) in section.Children)
-        {
-            if (key is YamlScalarNode { Value: { } k } && value is YamlScalarNode { Value: { } v })
-            {
-                result[k] = v;
-            }
-        }
-
-        return result;
+        return new CytoGpsConfig(
+            repoRoot,
+            Get(CytoGpsConfigFile.SourceDirKey),
+            Get(CytoGpsConfigFile.JavaHomeKey),
+            Get(CytoGpsConfigFile.JavaxJsonJarKey),
+            diskCache,
+            timeout);
     }
 }
 

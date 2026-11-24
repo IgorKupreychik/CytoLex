@@ -429,4 +429,70 @@ public class CytoGpsPanelTests
         Assert.False(vm.IsCytoGpsViewSelected);
         Assert.Equal((int)ResultView.Diagnostics, vm.SelectedViewIndex);
     }
+
+    [Fact]
+    public async Task SetChecker_NotConfiguredToReady_AndBack()
+    {
+        var panel = Panel(null);
+        panel.SetInput(_valid);
+        Assert.Equal(CytoGpsState.NotConfigured, panel.State);
+
+        var checker = new FakeChecker { Immediate = s => Answer(s, ExternalVerdict.Valid, "VALID") };
+        panel.SetChecker(checker, null);
+        Assert.Equal(CytoGpsState.Idle, panel.State);
+        Assert.Null(panel.NotConfiguredReason);
+        Assert.True(panel.CheckCommand.CanExecute(null));
+        panel.CheckCommand.Execute(null);
+        await Settle(panel);
+        Assert.True(panel.IsValid);
+
+        panel.SetChecker(null, "CytoGPS not configured: set 'source_dir'.");
+        Assert.Equal(CytoGpsState.NotConfigured, panel.State);
+        Assert.Equal("CytoGPS not configured: set 'source_dir'.", panel.StateText); // the prefix is not repeated
+        Assert.Null(panel.Verdict);
+        Assert.False(panel.CheckCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task SetChecker_DuringARun_TheRunKeepsItsChecker_NextCheckUsesTheNewOne()
+    {
+        var oldChecker = new FakeChecker();
+        var panel = Panel(oldChecker);
+        panel.SetInput(_valid);
+        panel.CheckCommand.Execute(null);
+        await oldChecker.Started.Task.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
+
+        var newChecker = new FakeChecker { Immediate = s => Answer(s, ExternalVerdict.Invalid, "INVALID") };
+        panel.SetChecker(newChecker, null);
+        Assert.Equal(CytoGpsState.Running, panel.State);
+        Assert.False(oldChecker.LastToken.IsCancellationRequested);
+
+        oldChecker.Release(s => Answer(s, ExternalVerdict.Valid, "VALID"));
+        await Settle(panel);
+        Assert.True(panel.IsValid); // the old checker's result is shown
+
+        panel.CheckCommand.Execute(null);
+        await Settle(panel);
+        Assert.True(panel.IsInvalid);
+        Assert.Equal(1, oldChecker.Calls);
+        Assert.Equal(1, newChecker.Calls);
+    }
+
+    [Fact]
+    public async Task SetChecker_NotConfiguredDuringARun_AppliesWhenTheRunEnds()
+    {
+        var checker = new FakeChecker();
+        var panel = Panel(checker);
+        panel.SetInput(_valid);
+        panel.CheckCommand.Execute(null);
+        await checker.Started.Task.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
+
+        panel.SetChecker(null, "gone");
+        Assert.Equal(CytoGpsState.Running, panel.State);
+
+        checker.Release(s => Answer(s, ExternalVerdict.Valid, "VALID"));
+        await Settle(panel);
+        Assert.Equal(CytoGpsState.NotConfigured, panel.State);
+        Assert.Equal("gone", panel.NotConfiguredReason);
+    }
 }

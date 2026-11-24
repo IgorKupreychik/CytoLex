@@ -78,43 +78,25 @@ internal static class CytoGpsBuild
             return "set 'javax_json_jar'" + Where + "CYTOLEX_CYTOGPS_JAVAX_JSON_JAR.";
         }
 
-        if (!Directory.Exists(c.SourceDir))
+        // The per-field checks are shared with the settings view (T-089); this order gives the first problem.
+        if (CytoGpsSetupCheck.SourceDirProblem(c.SourceDir, out antlr) is { } sourceProblem)
         {
-            return $"source_dir '{c.SourceDir}' does not exist.";
+            return sourceProblem;
+        }
+
+        if (CytoGpsSetupCheck.JavaHomeProblem(c.JavaHome, out var javaPath, out var javacPath) is { } jdkProblem)
+        {
+            return jdkProblem;
+        }
+
+        (java, javac) = (javaPath, javacPath);
+        if (CytoGpsSetupCheck.JarProblem(c.JavaxJsonJar, expectedSha1) is { } jarProblem)
+        {
+            return jarProblem;
         }
 
         var src = Path.Combine(c.SourceDir, "src");
         var generated = Path.Combine(c.SourceDir, "target", "generated-sources", "antlr4");
-        if (!File.Exists(Path.Combine(src, "toolkit", "AggregateJsonForBatchFile.java")) || !Directory.Exists(generated))
-        {
-            return $"source_dir '{c.SourceDir}' is not a CytoGPS source tree (expected src/toolkit/AggregateJsonForBatchFile.java and target/generated-sources/antlr4/).";
-        }
-
-        antlr = Path.GetFullPath(Path.Combine(c.SourceDir, AntlrJarPath));
-        if (!File.Exists(antlr))
-        {
-            return $"the ANTLR runtime '{antlr}' is missing.";
-        }
-
-        var exe = OperatingSystem.IsWindows() ? ".exe" : "";
-        java = Path.GetFullPath(Path.Combine(c.JavaHome, "bin", "java" + exe));
-        javac = Path.GetFullPath(Path.Combine(c.JavaHome, "bin", "javac" + exe));
-        if (!File.Exists(java) || !File.Exists(javac))
-        {
-            return $"java_home '{c.JavaHome}' is not a JDK (expected bin/java{exe} and bin/javac{exe}).";
-        }
-
-        if (!File.Exists(c.JavaxJsonJar))
-        {
-            return $"javax_json_jar '{c.JavaxJsonJar}' does not exist (download org.glassfish:javax.json:1.1.4 from Maven Central).";
-        }
-
-        var sha1 = Sha1Hex(c.JavaxJsonJar);
-        if (!string.Equals(sha1, expectedSha1, StringComparison.Ordinal))
-        {
-            return $"javax_json_jar '{c.JavaxJsonJar}' has SHA-1 {sha1}, expected {expectedSha1} (org.glassfish:javax.json:1.1.4).";
-        }
-
         sources = [.. Directory.EnumerateFiles(src, "*.java", SearchOption.AllDirectories)
             .Concat(Directory.EnumerateFiles(generated, "*.java", SearchOption.AllDirectories))
             .Select(Path.GetFullPath)
@@ -213,12 +195,4 @@ internal static class CytoGpsBuild
     /// <summary>The last part of a long tool output.</summary>
     public static string Tail(string text, int max = 4000) =>
         text.Length <= max ? text.Trim() : "…" + text[^max..].Trim();
-
-    [SuppressMessage("Security", "CA5350:Do Not Use Weak Cryptographic Algorithms",
-        Justification = "Integrity check against the SHA-1 Maven Central publishes for the jar; not a security boundary.")]
-    private static string Sha1Hex(string path)
-    {
-        using var stream = File.OpenRead(path);
-        return Convert.ToHexStringLower(SHA1.HashData(stream));
-    }
 }

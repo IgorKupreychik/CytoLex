@@ -7,6 +7,7 @@ using CytoLex.Core.Context;
 using CytoLex.Core.Semantics;
 using CytoLex.Core.Text;
 using CytoLex.Core.Validation;
+using CytoLex.Desktop.ExternalCheckers;
 using CytoLex.Desktop.Highlighting;
 using CytoLex.Desktop.Rules;
 using CytoLex.External;
@@ -34,6 +35,7 @@ public partial class MainWindowViewModel : ObservableObject
     ];
 
     private readonly Validator? _validator;
+    private readonly Func<(IExternalChecker? Checker, string? Error)> _createExternalChecker;
     private EditionPanelViewModel? _observedPanel;
     private bool _applying;
 
@@ -57,10 +59,30 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// <summary>
     /// The view model with the CytoGPS tab (T-081) over <paramref name="externalChecker"/>; <c>null</c> = not configured,
-    /// with <paramref name="externalSetupError"/> as the reason.
+    /// with <paramref name="externalSetupError"/> as the reason. The Settings tab (T-089) edits <c>config/local.yaml</c> under
+    /// <paramref name="repoRoot"/> (<c>null</c>: read-only) and, after a save, swaps in the checker <paramref name="createExternalChecker"/>
+    /// makes (default: <see cref="CytoGpsSetup.TryCreate"/> for that root).
     /// </summary>
-    public MainWindowViewModel(Validator? validator, string ruleDatabasePath, IExternalChecker? externalChecker, string? externalSetupError)
+    /// <param name="validator">CytoLex (<c>null</c> = <see cref="Validator.Default"/>).</param>
+    /// <param name="ruleDatabasePath">The KB database of the rule and band browsers.</param>
+    /// <param name="externalChecker">The CytoGPS checker, or <c>null</c>.</param>
+    /// <param name="externalSetupError">Why there is no checker.</param>
+    /// <param name="repoRoot">The repo root whose <c>config/local.yaml</c> the Settings tab edits.</param>
+    /// <param name="settings">The Settings tab's CytoGPS view (tests; default: one over <paramref name="repoRoot"/>).</param>
+    /// <param name="createExternalChecker">Makes the checker after a save (tests; default: <see cref="CytoGpsSetup.TryCreate"/>).</param>
+    public MainWindowViewModel(
+        Validator? validator,
+        string ruleDatabasePath,
+        IExternalChecker? externalChecker,
+        string? externalSetupError,
+        string? repoRoot = null,
+        Func<Action, CytoGpsSettingsViewModel>? settings = null,
+        Func<(IExternalChecker? Checker, string? Error)>? createExternalChecker = null)
     {
+        _createExternalChecker = createExternalChecker ?? (() => CytoGpsSetup.TryCreate(repoRoot));
+        CytoGpsSettings = settings is null
+            ? new CytoGpsSettingsViewModel(repoRoot, applied: ReloadExternalChecker)
+            : settings(ReloadExternalChecker);
         CytoGps = new CytoGpsPanelViewModel(
             externalChecker,
             externalChecker is null ? externalSetupError ?? "no setup (see config/local.yaml → cytogps)." : null,
@@ -109,6 +131,37 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// <summary>The band browser tab (T-084).</summary>
     public const int BandsTab = 3;
+
+    /// <summary>The settings tab (T-089).</summary>
+    public const int SettingsTab = 4;
+
+    /// <summary>The Settings tab's CytoGPS setup (T-089).</summary>
+    public CytoGpsSettingsViewModel CytoGpsSettings { get; }
+
+    /// <summary>Opens the Settings tab (the "Set up…" buttons of the CytoGPS tab and the batch comparison).</summary>
+    [RelayCommand]
+    public void OpenSettings() => SelectedMainTab = SettingsTab;
+
+    /// <summary>
+    /// Creates the external checker again from the saved setup and hands it to the CytoGPS tab and the batch comparison
+    /// (T-089; no restart). Running checks finish with their old checker.
+    /// </summary>
+    public void ReloadExternalChecker()
+    {
+        (IExternalChecker? Checker, string? Error) created;
+        try
+        {
+            created = _createExternalChecker();
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException)
+        {
+            created = (null, ex.Message);
+        }
+
+        var error = created.Checker is null ? created.Error ?? "no setup (see config/local.yaml → cytogps)." : null;
+        CytoGps.SetChecker(created.Checker, error);
+        Batch.Comparison.SetChecker(created.Checker, error);
+    }
 
     /// <summary>Batch validation (T-038).</summary>
     public BatchViewModel Batch { get; }

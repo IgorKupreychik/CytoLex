@@ -97,7 +97,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-086 | done | 3 | T-066 | Use `Abnormality.Composition`: detailed composition vs. its symbol (rule), translation and LGF read one shape |
 | T-087 | done | 3 | T-066 | Band compositions the KB doesn't define yet: insertion recombinants, `der(?)` with an insertion or hsr at an unknown site |
 | T-088 | done | 2 | T-071, T-034 | Arr: check positions against the bands of the stated build (`ARR.POSITIONS_IN_BANDS`) |
-| T-089 | todo | 3 | T-081 | Desktop: settings view to set up external checkers (CytoGPS paths, cache, timeout) instead of editing `config/local.yaml` by hand |
+| T-089 | in_progress | 3 | T-081 | Desktop: settings view to set up external checkers (CytoGPS paths, cache, timeout) instead of editing `config/local.yaml` by hand |
 | T-090 | todo | 5 | T-018 | Parser + rules: breakage (ch. 10) and meiotic (ch. 12) notation |
 | T-091 | todo | 5 | T-019 | Parser + rules: region-specific assays (`rsa`, ch. 15) and sequence-based notation (`seq`, ch. 16), incl. multi-line input |
 | T-092 | done | 2 | T-033, T-069, T-098 | Abnormality list: in situ results (core API + desktop panel) |
@@ -115,6 +115,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-104 | discussion | 3 | T-069, T-101 | Disease/condition associations from abnormalities: intended use, sources, format, review |
 | T-105 | todo | 3 | T-034, T-058 | Literal translation of microarray results (templates, golden entries, renderer) |
 | T-106 | discussion | 3 | T-032 | What `idem`/`sl`/`sdl` refer to on the donor side of `//` (KB rule first, then the binder) |
+| T-107 | todo | 5 | T-089 | Settings outside a repo checkout (per-user settings file + build cache) for packaged installs |
 
 ---
 
@@ -744,7 +745,7 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 **Notes:** Created 2026-11-20 from T-073. T-047 findings (`docs/research/cytogps.md` §4, §5.1, §8): CytoGPS strips all whitespace before parsing and matches keywords case-insensitively, so every listed space/case string is accepted silently (`Success`), with no report or normalisation notice. **Outcome (2026-11-24, with the user):** both rules stay `error` (the book is the basis). The practical need behind a softer severity (CytoGPS accepts these strings silently) is covered by autocorrection (T-096, T-097): meaning-preserving fixes of these rules are applied automatically, the original is kept and the result says "valid after autocorrection". No KB change. Logged in `docs/decisions.md`.
 
 ### T-089 — Desktop: settings view for the external checkers
-**Status:** todo
+**Status:** in_progress
 **Description:** A settings view in the desktop app, opened from the CytoGPS tab ("Set up…" next to the not-configured reason) and from the main window, that edits the `cytogps` section of `config/local.yaml`. Today that section can only be edited by hand, and the app has to be restarted.
 - **Fields:** `source_dir`, `java_home` and `javax_json_jar` with folder/file pickers; `disk_cache` (with the data-policy note: synthetic/book strings only, T-048); `timeout_seconds`.
 - **Checking the setup:** each field shows whether it's OK, using the adapter's own checks (`CytoGpsBuild.TryResolve` / `CheckAvailability`: missing folder, no `bin/javac`, wrong jar SHA-1). Nothing is started while you type. A "Test" button runs one book string through CytoGPS (this compiles it on the first run) and shows the result or the adapter's message.
@@ -1101,3 +1102,9 @@ Outcome (2026-11-24, confirmed by the user after the check by hand): "Autocorrec
 **Description:** `CloneReferences.Resolve` (T-032) resolves `idem`/`sl`/`sdl` over all cell lines of a karyotype, so in `46,XX[20]//46,XY,t(9;22)(q34;q11.2)[3]/47,sl,+8[5]` the donor's `sl` points to the recipient's `46,XX`. The clone order rules treat the two sides of `//` separately (§4.1 ¶10), and "idem refers to the karyotype listed first" may mean the first line of its own side. The KB has no rule or example on references after `//`. Read §4.1 ¶10 and §11.1.4 (and any chimera examples with clones), decide, and if the book supports per-side resolution add the KB rule (with citation and examples) before changing the binder; the T-070 expansion and full form follow `BasedOn` automatically.
 **Acceptance:** Decision in `docs/decisions.md`; a KB rule (or a recorded "the book is silent" with the chosen behaviour); a follow-up `todo` task for the binder change if adopted.
 **Notes:** Created 2026-11-24 from T-070 (user: keep the current resolution in T-070, settle the donor side here). `tests/CytoLex.Core.Tests/Validation/CloneExpansionTests.DoubleSlash_FollowsBasedOn` documents today's behaviour.
+
+### T-107 — Settings outside a repo checkout (packaged installs)
+**Status:** todo
+**Description:** The Settings tab (T-089) edits `config/local.yaml` only when the app runs from a repo checkout; the CytoGPS build cache (`build/cache/cytogps/`) and the opt-in result cache are repo-bound too. For a packaged desktop app (no `CytoLex.slnx` above it), keep the CytoGPS settings in a per-user file (e.g. `%APPDATA%/CytoLex/settings.yaml`, same keys and environment overrides) with a per-user cache directory, and decide how it combines with `config/local.yaml` in a checkout (the repo file overriding the per-user one was the option discussed in T-089).
+**Acceptance:** Decision on location and precedence in `docs/decisions.md`; `CytoGpsConfig`/`CytoGpsConfigFile` read and write the per-user file when there is no repo root; the Settings tab is editable there; tests on temp directories; README updated.
+**Notes:** Created 2026-11-24 from T-089 (user: repo checkouts only for the pilot).

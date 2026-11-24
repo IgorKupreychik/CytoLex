@@ -44,13 +44,14 @@ public partial class CytoGpsPanelViewModel : ObservableObject
     public static readonly TimeSpan DefaultAutoDelay = TimeSpan.FromSeconds(1.5);
 
     /// <summary>Where to read how to set CytoGPS up.</summary>
-    public const string SetupPointer = "To set it up, see README → \"CytoGPS (optional)\".";
+    public const string SetupPointer = "Set it up in the Settings tab, or see README → \"CytoGPS (optional)\".";
 
-    private readonly IExternalChecker? _checker;
     private readonly IExternalCoverage _coverage;
     private readonly Func<string, string, bool?> _cytoLexVerdict;
     private readonly TimeSpan _autoDelay;
-    private readonly string? _notConfigured;
+    private IExternalChecker? _checker;
+    private string? _notConfigured;
+    private bool _setupPending;
     private string _input = string.Empty;
     private CancellationTokenSource? _run;
 
@@ -106,6 +107,7 @@ public partial class CytoGpsPanelViewModel : ObservableObject
 
     /// <summary>Why CytoGPS is not set up (<c>CytoGPS not configured: …</c> names the missing key, path or file).</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StateText))]
     public partial string? NotConfiguredReason { get; private set; }
 
     /// <summary>Why CytoGPS's grammar doesn't cover the input (e.g. <c>detailed system</c>), or <c>null</c>.</summary>
@@ -206,7 +208,7 @@ public partial class CytoGpsPanelViewModel : ObservableObject
     /// <summary>The state line of the panel.</summary>
     public string StateText => State switch
     {
-        CytoGpsState.NotConfigured => $"{Name} not configured: {NotConfiguredReason}",
+        CytoGpsState.NotConfigured => NotConfiguredLine(Name, NotConfiguredReason),
         CytoGpsState.Idle => $"Not checked yet. {Name} runs on demand (one Java process per check; ISCN {Edition}).",
         CytoGpsState.Waiting => $"Checking with {Name} after the typing pause…",
         CytoGpsState.Running => $"Running {Name}…",
@@ -216,6 +218,16 @@ public partial class CytoGpsPanelViewModel : ObservableObject
         CytoGpsState.Cancelled => "Cancelled.",
         _ => string.Empty,
     };
+
+    /// <summary>
+    /// <c>{name} not configured: {reason}</c>, without repeating the prefix when the adapter's reason already has it
+    /// (<c>CytoGPS not configured: set 'source_dir' …</c>).
+    /// </summary>
+    internal static string NotConfiguredLine(string name, string? reason)
+    {
+        var prefix = name + " not configured: ";
+        return reason is not null && reason.StartsWith(prefix, StringComparison.Ordinal) ? reason : prefix + reason;
+    }
 
     /// <summary>Whether CytoGPS accepts the input.</summary>
     public bool IsValid => State == CytoGpsState.Done && Verdict == ExternalVerdict.Valid;
@@ -274,7 +286,49 @@ public partial class CytoGpsPanelViewModel : ObservableObject
 
         StopRun();
         ProgressText = null;
-        State = CytoGpsState.Cancelled;
+        if (State != CytoGpsState.NotConfigured)
+        {
+            State = CytoGpsState.Cancelled;
+        }
+    }
+
+    /// <summary>
+    /// Uses another checker from now on (the Settings tab saved a new setup, T-089). Without a running check the panel
+    /// switches at once (the shown result is dropped: it came from the old setup); a running check keeps its checker and
+    /// its result is shown, and the new setup applies when it ends.
+    /// </summary>
+    /// <param name="checker">The new checker; <c>null</c> when it could not be created (<paramref name="setupError"/> says why).</param>
+    /// <param name="setupError">Why there is no checker.</param>
+    public void SetChecker(IExternalChecker? checker, string? setupError)
+    {
+        _checker = checker;
+        _notConfigured = checker is null ? setupError ?? "no setup." : Availability(checker);
+        if (_run is not null)
+        {
+            _setupPending = true;
+            return;
+        }
+
+        ApplySetup(reset: true);
+    }
+
+    /// <summary>Shows the current setup; <paramref name="reset"/> drops the shown result (else it stays unless not configured).</summary>
+    private void ApplySetup(bool reset)
+    {
+        _setupPending = false;
+        NotConfiguredReason = _notConfigured;
+        if (_notConfigured is not null)
+        {
+            ClearResult();
+            State = CytoGpsState.NotConfigured;
+        }
+        else if (reset || State == CytoGpsState.NotConfigured)
+        {
+            ClearResult();
+            State = CytoGpsState.Idle;
+        }
+
+        CheckCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnIsAutoCheckChanged(bool value)
@@ -336,6 +390,11 @@ public partial class CytoGpsPanelViewModel : ObservableObject
             {
                 _run = null;
                 ProgressText = null;
+                if (_setupPending)
+                {
+                    ApplySetup(reset: false);
+                }
+
                 CheckCommand.NotifyCanExecuteChanged();
                 CancelCommand.NotifyCanExecuteChanged();
             }
@@ -358,6 +417,11 @@ public partial class CytoGpsPanelViewModel : ObservableObject
             {
                 // Already finished.
             }
+        }
+
+        if (_setupPending)
+        {
+            ApplySetup(reset: true);
         }
     }
 

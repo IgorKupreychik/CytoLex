@@ -57,9 +57,10 @@ public sealed record TriageLabelChoice(TriageLabel Label, string Name)
 public partial class ComparisonViewModel : ObservableObject
 {
     private readonly Validator? _validator;
-    private readonly IExternalChecker? _checker;
     private readonly IExternalCoverage _coverage;
-    private readonly string? _notConfigured;
+    private IExternalChecker? _checker;
+    private string? _notConfigured;
+    private bool _setupPending;
     private ImmutableArray<BatchItem> _items = [];
     private bool _hasBatchResult;
     private ImmutableArray<BatchRowViewModel> _rows = [];
@@ -82,9 +83,9 @@ public partial class ComparisonViewModel : ObservableObject
         {
             _notConfigured = setupError ?? "no setup.";
         }
-        else if (checker.CheckAvailability() is { IsConfigured: false } availability)
+        else
         {
-            _notConfigured = availability.Reason ?? "not configured.";
+            _notConfigured = NotConfiguredReason(checker);
         }
 
         State = _notConfigured is null ? ComparisonState.Idle : ComparisonState.NotConfigured;
@@ -141,6 +142,9 @@ public partial class ComparisonViewModel : ObservableObject
 
     /// <summary>Whether a checker is configured.</summary>
     public bool IsConfigured => _notConfigured is null;
+
+    /// <summary>Whether no checker is configured (the view offers "Set up…").</summary>
+    public bool IsNotConfigured => !IsConfigured;
 
     /// <summary>Where the comparison stands.</summary>
     [ObservableProperty]
@@ -258,6 +262,7 @@ public partial class ComparisonViewModel : ObservableObject
         var items = _items;
         var triage = Triage;
         var autoCorrect = AutoCorrect;
+        var checker = _checker!;
         State = ComparisonState.Running;
         Progress = 0;
         ProgressMax = Math.Max(1, items.Length);
@@ -282,7 +287,7 @@ public partial class ComparisonViewModel : ObservableObject
         {
             // Off the UI thread: the adapter hashes and may compile the sources before its first await.
             var result = await Task.Run(
-                () => ComparisonEngine.CompareAsync(items, _validator!, _checker!, _coverage, triage, progress, validated, autoCorrect, cancellationToken),
+                () => ComparisonEngine.CompareAsync(items, _validator!, checker, _coverage, triage, progress, validated, autoCorrect, cancellationToken),
                 cancellationToken).ConfigureAwait(true);
             if (items != _items || autoCorrect != AutoCorrect)
             {
@@ -315,6 +320,60 @@ public partial class ComparisonViewModel : ObservableObject
         finally
         {
             ProgressText = null;
+            if (_setupPending)
+            {
+                ApplySetup();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Uses another checker from now on (the Settings tab saved a new setup, T-089). A running comparison finishes with
+    /// its old checker; the new setup applies when it ends. The shown result and the triage file stay.
+    /// </summary>
+    /// <param name="checker">The new checker; <c>null</c> when it could not be created (<paramref name="setupError"/> says why).</param>
+    /// <param name="setupError">Why there is no checker.</param>
+    public void SetChecker(IExternalChecker? checker, string? setupError)
+    {
+        _checker = checker;
+        _notConfigured = checker is null ? setupError ?? "no setup." : NotConfiguredReason(checker);
+        if (State == ComparisonState.Running)
+        {
+            _setupPending = true;
+            return;
+        }
+
+        ApplySetup();
+    }
+
+    private void ApplySetup()
+    {
+        _setupPending = false;
+        if (_notConfigured is not null)
+        {
+            State = ComparisonState.NotConfigured;
+        }
+        else if (State == ComparisonState.NotConfigured)
+        {
+            State = Result is null ? ComparisonState.Idle : ComparisonState.Done;
+        }
+
+        OnPropertyChanged(nameof(IsConfigured));
+        OnPropertyChanged(nameof(IsNotConfigured));
+        CompareCommand.NotifyCanExecuteChanged();
+        UpdateStatus();
+    }
+
+    private static string? NotConfiguredReason(IExternalChecker checker)
+    {
+        try
+        {
+            var availability = checker.CheckAvailability();
+            return availability.IsConfigured ? null : availability.Reason ?? "not configured.";
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
+        {
+            return ex.Message;
         }
     }
 
@@ -511,7 +570,8 @@ public partial class ComparisonViewModel : ObservableObject
     {
         StatusText = State switch
         {
-            ComparisonState.NotConfigured => $"{CheckerName} not configured: {_notConfigured} {CytoGpsPanelViewModel.SetupPointer} The CytoLex batch works without it.",
+            ComparisonState.NotConfigured =>
+                $"{CytoGpsPanelViewModel.NotConfiguredLine(CheckerName, _notConfigured)} {CytoGpsPanelViewModel.SetupPointer} The CytoLex batch works without it.",
             ComparisonState.Running => $"Comparing {_items.Length} string(s) with {CheckerName} (ISCN {Edition}, {Mode})…",
             ComparisonState.Cancelled => "Comparison cancelled.",
             ComparisonState.Done when Result is { CheckerStatus: not ExternalBatchStatus.Completed } r =>

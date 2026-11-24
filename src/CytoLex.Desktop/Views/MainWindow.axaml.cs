@@ -368,6 +368,60 @@ public partial class MainWindow : Window
 
     // Batch comparison with CytoGPS (T-052): triage file and report pickers.
     private static readonly FilePickerFileType _triage = new("Triage file (*.yaml)") { Patterns = ["*.yaml", "*.yml"] };
+    private static readonly FilePickerFileType _jar = new("Java archive (*.jar)") { Patterns = ["*.jar"] };
+
+    /// <summary>"Set up…" in the CytoGPS tab and the batch comparison: opens the Settings tab (T-089).</summary>
+    private void OnOpenSettings(object? sender, RoutedEventArgs e) => _viewModel?.OpenSettings();
+
+    /// <summary>"Browse…" of a settings path (T-089): a folder or a jar, put into the field.</summary>
+    private async void OnBrowseSetting(object? sender, RoutedEventArgs e)
+    {
+        if (_viewModel is null || (sender as Control)?.DataContext is not SettingFieldViewModel field || !field.CanBrowse)
+        {
+            return;
+        }
+
+        var start = await StartFolder(field.EffectiveValue);
+        string? path = null;
+        if (field.Picker == SettingPicker.Folder)
+        {
+            var folders = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+            {
+                Title = field.Label,
+                AllowMultiple = false,
+                SuggestedStartLocation = start,
+            });
+            path = folders.Count > 0 ? folders[0].TryGetLocalPath() : null;
+        }
+        else if (field.Picker == SettingPicker.JarFile)
+        {
+            var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = field.Label,
+                AllowMultiple = false,
+                FileTypeFilter = [_jar, FilePickerFileTypes.All],
+                SuggestedStartLocation = start,
+            });
+            path = files.Count > 0 ? files[0].TryGetLocalPath() : null;
+        }
+
+        if (path is not null)
+        {
+            _viewModel.CytoGpsSettings.SetPickedPath(field, path);
+        }
+    }
+
+    /// <summary>The folder of the current value (or the value itself when it is a folder), if it exists.</summary>
+    private async Task<IStorageFolder?> StartFolder(string? value)
+    {
+        if (value is null)
+        {
+            return null;
+        }
+
+        var folder = Directory.Exists(value) ? value : Path.GetDirectoryName(value);
+        return folder is not null && Directory.Exists(folder) ? await StorageProvider.TryGetFolderFromPathAsync(folder) : null;
+    }
 
     private async void OnOpenTriage(object? sender, RoutedEventArgs e)
     {

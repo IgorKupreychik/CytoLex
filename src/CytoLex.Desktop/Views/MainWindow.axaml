@@ -11,7 +11,7 @@
         Title="CytoLex"
         Icon="/Assets/cytolex.ico"
         Width="1000" Height="680">
-  <!-- Main tabs: single-string check (T-036), batch validation (T-038) and rule browser (T-039) -->
+  <!-- Main tabs: single-string check (T-036), batch validation (T-038), rule browser (T-039), bands (T-084), settings (T-089) -->
   <TabControl x:Name="MainTabs" SelectedIndex="{Binding SelectedMainTab}" Margin="8,4,8,8">
   <TabItem Header="Single string">
   <DockPanel Margin="8">
@@ -398,8 +398,12 @@
               </StackPanel>
               <TextBlock Text="{Binding StateText}" FontWeight="SemiBold" FontSize="15" TextWrapping="Wrap"
                          Classes.valid="{Binding IsValid}" Classes.invalid="{Binding IsInvalid}" Classes.notimpl="{Binding IsNotImplemented}" />
-              <TextBlock Text="{x:Static vm:CytoGpsPanelViewModel.SetupPointer}" IsVisible="{Binding IsNotConfigured}"
-                         Opacity="0.8" TextWrapping="Wrap" />
+              <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsNotConfigured}">
+                <Button Content="Set up…" Click="OnOpenSettings"
+                        ToolTip.Tip="Opens the Settings tab: CytoGPS paths, cache and time limit (config/local.yaml)" />
+                <TextBlock Text="{x:Static vm:CytoGpsPanelViewModel.SetupPointer}" Opacity="0.8" TextWrapping="Wrap"
+                           VerticalAlignment="Center" />
+              </StackPanel>
               <TextBlock Text="{Binding ProgressText}" IsVisible="{Binding IsRunning}" Opacity="0.7" FontSize="12" TextWrapping="Wrap" />
               <Border Classes="banner" IsVisible="{Binding IsUnsupported}">
                 <TextBlock Text="{Binding UnsupportedText}" TextWrapping="Wrap" FontSize="13" />
@@ -492,7 +496,12 @@
           </Grid>
           <ProgressBar Minimum="0" Maximum="{Binding ProgressMax}" Value="{Binding Progress}" IsVisible="{Binding IsRunning}" />
           <TextBlock Text="{Binding ProgressText}" Opacity="0.7" IsVisible="{Binding IsRunning}" TextWrapping="Wrap" />
-          <TextBlock Text="{Binding StatusText}" Opacity="0.8" TextWrapping="Wrap" />
+          <DockPanel>
+            <Button DockPanel.Dock="Left" Content="Set up…" Click="OnOpenSettings" IsVisible="{Binding IsNotConfigured}"
+                    Margin="0,0,8,0" VerticalAlignment="Top"
+                    ToolTip.Tip="Opens the Settings tab: CytoGPS paths, cache and time limit (config/local.yaml)" />
+            <TextBlock Text="{Binding StatusText}" Opacity="0.8" TextWrapping="Wrap" VerticalAlignment="Center" />
+          </DockPanel>
           <TextBlock Text="{Binding TriageError}" Classes="invalid" IsVisible="{Binding HasTriageError}" TextWrapping="Wrap" />
           <TextBlock Text="{Binding MatrixText}" FontWeight="SemiBold" IsVisible="{Binding HasResult}" TextWrapping="Wrap" />
           <Expander Header="Stale triage entries (no longer a disagreement in this batch)" IsVisible="{Binding HasStaleTriage}">
@@ -931,6 +940,81 @@
       </Grid>
     </DockPanel>
   </TabItem>
+  <!-- Settings (T-089): the cytogps section of config/local.yaml; per-field checks, test run, save without restart -->
+  <TabItem Header="Settings">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" DataContext="{Binding CytoGpsSettings}" x:DataType="vm:CytoGpsSettingsViewModel">
+      <StackPanel Margin="12,8,20,12" Spacing="10" MaxWidth="900" HorizontalAlignment="Left">
+        <TextBlock Text="External checkers · CytoGPS" FontWeight="SemiBold" FontSize="16" />
+        <TextBlock TextWrapping="Wrap" Opacity="0.8"
+                   Text="Optional: a local CytoGPS build for comparison (ISCN 2016). Runs locally only; CytoLex validation never depends on it. Saving writes the cytogps section of config/local.yaml and keeps every other line." />
+        <TextBlock Text="{Binding FileText}" Opacity="0.7" FontSize="12" FontFamily="Cascadia Mono,Consolas,monospace" />
+        <Border Classes="banner" IsVisible="{Binding HasReadOnlyReason}">
+          <TextBlock Text="{Binding ReadOnlyReason}" TextWrapping="Wrap" />
+        </Border>
+
+        <ItemsControl ItemsSource="{Binding Fields}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:SettingFieldViewModel">
+              <Grid ColumnDefinitions="150,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,0,0,10">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Label}" FontWeight="SemiBold" VerticalAlignment="Center"
+                           ToolTip.Tip="{Binding Key}" />
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Text}" IsReadOnly="{Binding IsReadOnly}"
+                         FontFamily="Cascadia Mono,Consolas,monospace" PlaceholderText="{Binding Key}" />
+                <Button Grid.Row="0" Grid.Column="2" Content="Browse…" Margin="8,0,0,0" Click="OnBrowseSetting"
+                        IsVisible="{Binding HasPicker}" IsEnabled="{Binding CanBrowse}" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Hint}" Opacity="0.6" FontSize="12" TextWrapping="Wrap" />
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding OverrideText}" IsVisible="{Binding IsOverridden}"
+                           FontSize="12" TextWrapping="Wrap" Foreground="#CA5010" />
+                <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Spacing="6" IsVisible="{Binding HasStatus}">
+                  <TextBlock Text="✓" Classes="valid" IsVisible="{Binding IsOk}" />
+                  <TextBlock Text="✗" Classes="invalid" IsVisible="{Binding IsProblem}" />
+                  <SelectableTextBlock Text="{Binding StatusText}" TextWrapping="Wrap" FontSize="12" />
+                </StackPanel>
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto">
+          <TextBlock Grid.Row="0" Grid.Column="0" Text="Disk cache" FontWeight="SemiBold" VerticalAlignment="Center" ToolTip.Tip="disk_cache" />
+          <CheckBox Grid.Row="0" Grid.Column="1" Content="Also cache results on disk" IsChecked="{Binding DiskCache}"
+                    IsEnabled="{Binding CanEditDiskCache}" />
+          <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Static vm:CytoGpsSettingsViewModel.DiskCacheNote}" Opacity="0.7"
+                     FontSize="12" TextWrapping="Wrap" />
+          <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding DiskCacheOverrideText}" IsVisible="{Binding IsDiskCacheOverridden}"
+                     FontSize="12" TextWrapping="Wrap" Foreground="#CA5010" />
+        </Grid>
+
+        <Grid ColumnDefinitions="150,120,*" RowDefinitions="Auto,Auto,Auto" DataContext="{Binding TimeoutSeconds}" x:DataType="vm:SettingFieldViewModel">
+          <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Label}" FontWeight="SemiBold" VerticalAlignment="Center" ToolTip.Tip="{Binding Key}" />
+          <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Text}" IsReadOnly="{Binding IsReadOnly}" PlaceholderText="600" />
+          <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Hint}" Opacity="0.6" FontSize="12" Margin="8,0,0,0"
+                     VerticalAlignment="Center" TextWrapping="Wrap" />
+          <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding OverrideText}" IsVisible="{Binding IsOverridden}"
+                     FontSize="12" TextWrapping="Wrap" Foreground="#CA5010" />
+          <TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding StatusText}" IsVisible="{Binding HasStatus}"
+                     Classes="invalid" FontSize="12" TextWrapping="Wrap" />
+        </Grid>
+
+        <TextBlock Text="{Binding SetupText}" FontWeight="SemiBold" TextWrapping="Wrap"
+                   Classes.valid="{Binding IsSetupOk}" Classes.invalid="{Binding !IsSetupOk}" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Content="Save" Command="{Binding SaveCommand}"
+                  ToolTip.Tip="Writes the changed keys to config/local.yaml; the CytoGPS tab and the batch comparison pick them up at once" />
+          <Button Content="Revert" Command="{Binding RevertCommand}" ToolTip.Tip="Drops the edits and reads the file again" />
+          <Button Content="Test" Command="{Binding TestCommand}"
+                  ToolTip.Tip="Runs the ISCN book string 47,XY,+21 through CytoGPS with the values as typed (not saved); the first run compiles CytoGPS" />
+          <Button Content="Cancel test" Command="{Binding TestCancelCommand}" IsVisible="{Binding TestCommand.IsRunning}" />
+        </StackPanel>
+        <TextBlock Text="{Binding TestProgress}" Opacity="0.7" FontSize="12" TextWrapping="Wrap" IsVisible="{Binding TestCommand.IsRunning}" />
+        <SelectableTextBlock Text="{Binding TestResult}" IsVisible="{Binding HasTestResult}" TextWrapping="Wrap"
+                             FontFamily="Cascadia Mono,Consolas,monospace" FontSize="12"
+                             Classes.failed="{Binding IsTestFailed}" />
+        <TextBlock Text="{Binding StatusText}" IsVisible="{Binding HasStatus}" TextWrapping="Wrap"
+                   Classes.invalid="{Binding IsStatusError}" />
+      </StackPanel>
+    </ScrollViewer>
+  </TabItem>
   </TabControl>
 
   <Window.Resources>
@@ -1160,6 +1244,10 @@
     <Style Selector="Border.agreement.disagree">
       <Setter Property="Background" Value="#33CA5010" />
       <Setter Property="BorderBrush" Value="#CA5010" />
+    </Style>
+    <!-- Settings (T-089): a test run without a verdict -->
+    <Style Selector="SelectableTextBlock.failed">
+      <Setter Property="Foreground" Value="#D13438" />
     </Style>
     <Style Selector="Border.part:pointerover">
       <Setter Property="Background" Value="#200078D4" />
