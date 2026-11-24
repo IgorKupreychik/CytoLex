@@ -15,6 +15,7 @@ Works on one task from `TASKS.md` at the repo root. Arguments: `$ARGUMENTS` (opt
    - If any task is already `in_progress`, mention it and ask whether to resume it instead.
    - If nothing is startable, say so and list the closest candidates with their blockers.
 4. Tell the user which task was picked and why, in one or two lines.
+5. **No ID given → confirm before starting.** Ask with `AskUserQuestion` whether to proceed with the picked task. Name its ID, title, status and Pri in the question. Offer "Proceed with T-xxx (Recommended)" first, and up to two other startable tasks (next by Pri, then ID) as alternatives. The user can also type another ID under "Other". Do nothing else for the task (no sign-off, plan mode or status change) until they answer. If they pick another task, select it as if its ID had been given (step 2). If they decline, stop. When an ID was given, don't ask again: that is the confirmation.
 
 ## 2. Sign-off first (before planning)
 If the task's **Notes** ask for a person sign-off (tables or figures with `review.human: pending` in `tools/src/cytolex_tools/extract/tables/<version>.yaml`), do it **before** entering plan mode. The plan depends on the signed-off data.

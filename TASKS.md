@@ -81,14 +81,14 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-069 | done | 2 | T-036 | Abnormality list: core API + desktop panel |
 | T-070 | todo | 3 | T-032, T-069 | Abnormality list: inherited changes of idem/sl/sdl clones (expandable reference, full form) |
 | T-071 | done | 2 | T-034 | Arr: nucleotide positions vs. bands of the stated build (KB rule, GRCh37-under-[GRCh38] book examples) |
-| T-072 | todo | 3 | T-034, T-069 | Abnormality list: arr aberrations (core API + desktop panel) |
+| T-072 | todo | 2 | T-034, T-069, T-098 | Abnormality list: arr aberrations (core API + desktop panel) |
 | T-073 | done | 2 | T-029 | Stray spaces inside a karyotype (`47,XY, +21`, `46,X Y`) are not reported: KB basis and fix |
 | T-074 | done | 2 | T-073, T-035 | Checks for `SYM.NO_OTHER_SPACE` and `SYM.LETTER_CASE` (stray spaces, letter case; level-1 fixes) |
-| T-075 | discussion | 3 | T-047, T-073 | Severity of stray spaces and letter case (`SYM.NO_OTHER_SPACE`, `SYM.LETTER_CASE`) vs. CytoGPS behaviour |
+| T-075 | done | 3 | T-047, T-073 | Severity of stray spaces and letter case (`SYM.NO_OTHER_SPACE`, `SYM.LETTER_CASE`) vs. CytoGPS behaviour |
 | T-077 | todo | 5 | T-050, T-038 | Batch statistics per band (loss/gain/fusion share of clones, aggregate LGF table) |
-| T-078 | todo | 5 | T-050, T-069 | Desktop: ideogram view of loss/gain/fusion per band and clone |
+| T-078 | todo | 5 | T-050, T-069, T-101 | Desktop: ideogram view of loss/gain/fusion per band and clone |
 | T-079 | todo | 5 | T-050, T-038 | Export in CytoGPS's JSON result format (RCytoGPS-compatible) |
-| T-080 | discussion | 3 | T-075 | Optional lenient mode (stray spaces, letter case as warnings) |
+| T-080 | done | 3 | T-075 | Optional lenient mode (stray spaces, letter case as warnings) — replaced by autocorrection (T-096, T-097) |
 | T-081 | done | 2 | T-049, T-036 | Desktop: CytoGPS panel in the single-string check (optional, never blocks CytoLex) |
 | T-082 | todo | 5 | T-057 | Review the translation templates and golden file (ISCN 2016) |
 | T-083 | done | 3 | – | Refactor: remove hand-written partial classes (`Binder`, `Parser`) per the code standard |
@@ -100,10 +100,19 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-089 | todo | 3 | T-081 | Desktop: settings view to set up external checkers (CytoGPS paths, cache, timeout) instead of editing `config/local.yaml` by hand |
 | T-090 | todo | 5 | T-018 | Parser + rules: breakage (ch. 10) and meiotic (ch. 12) notation |
 | T-091 | todo | 5 | T-019 | Parser + rules: region-specific assays (`rsa`, ch. 15) and sequence-based notation (`seq`, ch. 16), incl. multi-line input |
-| T-092 | todo | 3 | T-033, T-069 | Abnormality list: in situ results (core API + desktop panel) |
+| T-092 | todo | 2 | T-033, T-069, T-098 | Abnormality list: in situ results (core API + desktop panel) |
 | T-093 | todo | 4 | T-033, T-058 | Literal translation of in situ results (templates, golden entries, renderer) |
-| T-094 | discussion | 4 | T-033 | Probe positions for locus and chromosome order in FISH (`ISH.LOCUS_ORDER_PTER_QTER`, `NUC_ISH.CHROMOSOME_ORDER`) |
+| T-094 | done | 4 | T-033 | Probe positions for locus and chromosome order in FISH (`ISH.LOCUS_ORDER_PTER_QTER`, `NUC_ISH.CHROMOSOME_ORDER`) |
 | T-095 | discussion | 4 | T-033 | Apply karyotype rules (STRUCT.*, symbol formats) to the abnormalities of ish results? |
+| T-096 | todo | 2 | T-074, T-035 | Autocorrection: core + KB flag `fix.auto` (meaning-preserving level-1 fixes applied automatically, original kept) |
+| T-097 | todo | 2 | T-096, T-098, T-038 | Autocorrection: desktop (checkbox, corrected line, highlights on the original) + batch tab |
+| T-098 | todo | 2 | T-037, T-059, T-081 | Desktop: single-string layout redesign (edition verdict strip + full-width view tabs) |
+| T-099 | todo | 4 | T-098 | Desktop: pin a view tab to a side pane |
+| T-100 | discussion | 4 | T-072, T-092 | Link one event across techniques in combined strings (karyotype + ish + arr) |
+| T-101 | todo | 3 | T-098, T-033, T-034 | Locus list from the string + desktop "Map" view (ideograms) |
+| T-102 | todo | 3 | T-033 | Probe table: people-editable CSV with review flags, HGNC/NCBI pre-fill, `kb build` checks |
+| T-103 | todo | 3 | T-101, T-102 | Use the probe table: probe loci with "unreviewed" badges; locus/chromosome order checks (T-094) |
+| T-104 | discussion | 3 | T-069, T-101 | Disease/condition associations from abnormalities: intended use, sources, format, review |
 
 ---
 
@@ -701,7 +710,7 @@ Outcome (2026-11-18):
 **Status:** todo
 **Description:** `EditionResult.Abnormalities` and the desktop "Abnormalities" panel list karyotype segments only (T-069). Add the aberrations of arr segments (T-034, `ArrModel`): region or chromosome group, bands, positions and build, copy number (gain/loss/amp/cx/cth), proportion, zygosity and origin, linked diagnostics; one group per arr segment.
 **Acceptance:** Every valid arr KB example lists one entry per aberration with its bands, positions and copy number; the desktop panel shows them, and clicking an entry selects its span.
-**Notes:** Created 2026-11-20 from T-034 (out of its scope, decided with the user at plan approval). `Validator.Run` adds only `KaryotypeModel`s to `AbnormalityList` today.
+**Notes:** Created 2026-11-20 from T-034 (out of its scope, decided with the user at plan approval). `Validator.Run` adds only `KaryotypeModel`s to `AbnormalityList` today. 2026-11-24 (feature discussion, user): priority 3 → 2; depends on T-098 too, so the entries show in the full-width Abnormalities view. One group per arr segment; linking an arr gain/loss with the same event in the karyotype or ish part is T-100.
 
 ### T-073 — Stray spaces inside a karyotype
 **Status:** done
@@ -722,13 +731,13 @@ Related: lower-case `46,xy` gets only `SYM.LISTED_ONLY` (warning, explanation); 
 **Notes:** Created 2026-11-20 from T-073. **Outcome (2026-11-20):** `SYM.NO_OTHER_SPACE`: `src/CytoLex.Core/Rules/Checks/NoOtherSpaceCheck.cs` (every space between two tokens unless prescribed: around `or`, between two listed symbols, symbol + chromosome count, arr after the build or after `arr` when the build is missing, before an arr qualifier; spaces of `SYM.NO_SPACE_AT_PARENTHESIS`/`BAND.DESIGNATION_FORMAT` left to them through their shared `Gaps`/`Designations`; segment-edge whitespace not reported). `SYM.LETTER_CASE`: the lexer reads a run that folds to exactly one listed token (`Del`, `T`, `INV`, `y`) or a sex-letter run with a lower-case letter (`xy`) as the listed form (`SyntaxToken.Text` = listed, new `WrittenText` = input, `IsCaseFolded`; the tree stays lossless); the parser folds `45,x` → `X` and `I(` → `i` by position before parsing; `LetterCaseCheck.cs` reports each folded run with a replace fix (only the wrong letters: `Xy` → `y`). Tests: `tests/CytoLex.Core.Tests/Rules/SpaceAndCaseChecksTests.cs`, `LexerTests.cs`, `InvalidExampleExpectations.cs` (`46,xy`, `Del(5)` → `[]`), 5 non-book strings in `FixToValidTests.cs`. The 4 KB examples are fixed to valid in one round. `dotnet test`: 4,581 total, 0 failed, 16 skipped; `dotnet format` clean. Docs: `docs/design/core.md` §4, `CLAUDE.md`, `README.md`. Deviations: the bare `T(9;22)(…)` non-book string became `46,XY,T(9;22)(q34;q11.2)`; the space after `arr` without a build is left to `GEN.GENOME_BUILD_REQUIRED`. Note: `47,XXY c,…` (invalid example of the not yet checked `KARYO.CONSTITUTIONAL_C`) is reported by `SYM.NO_OTHER_SPACE`; that rule's check must claim this space when it is written.
 
 ### T-075 — Stray spaces and letter case: severity vs. CytoGPS
-**Status:** discussion
+**Status:** done
 **Description:** T-073 made `SYM.NO_OTHER_SPACE` (spaces outside the prescribed places) and `SYM.LETTER_CASE` (symbols/sex chromosomes not in the printed case) `error` with a level-1 fix. The space rule rests on the printed format, not on an explicit book sentence, so a `warning` + fix was also considered (2026-11-20, kept as error for now). Once CytoGPS is researched (T-047), compare:
 - how CytoGPS treats stray spaces (`47,XY, +21`, `46,X Y,dup(1)(q21q32)`, `46 ,XX`, `47,XX,+ 21`) and wrong letter case (`46,xy`, `46,XX,Del(5)(q13q33)`, `46,XY,T(9;22)(q34;q11.2)`): rejected, accepted silently, or normalised;
 - what each choice means for the CytoGPS 2×2 comparison and batch results.
 Then decide whether each rule stays `error` or becomes `warning` (book-stated spacing rules such as `SYM.SPACE_BETWEEN_SYMBOLS` stay `error` either way). The book, not CytoGPS, remains the basis; CytoGPS informs the choice.
 **Acceptance:** Decision in `docs/decisions.md`; if a severity changes, the rule's `severity` and review note are updated in the KB (then `kb build`, `dotnet build`).
-**Notes:** Created 2026-11-20 from T-073. T-047 findings (`docs/research/cytogps.md` §4, §5.1, §8): CytoGPS strips all whitespace before parsing and matches keywords case-insensitively, so every listed space/case string is accepted silently (`Success`), with no report or normalisation notice.
+**Notes:** Created 2026-11-20 from T-073. T-047 findings (`docs/research/cytogps.md` §4, §5.1, §8): CytoGPS strips all whitespace before parsing and matches keywords case-insensitively, so every listed space/case string is accepted silently (`Success`), with no report or normalisation notice. **Outcome (2026-11-24, with the user):** both rules stay `error` (the book is the basis). The practical need behind a softer severity (CytoGPS accepts these strings silently) is covered by autocorrection (T-096, T-097): meaning-preserving fixes of these rules are applied automatically, the original is kept and the result says "valid after autocorrection". No KB change. Logged in `docs/decisions.md`.
 
 ### T-089 — Desktop: settings view for the external checkers
 **Status:** todo
@@ -773,7 +782,7 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 **Status:** todo
 **Description:** CytoGPS draws the chromosomes at 850 resolution with each band's loss/gain/fusion, clone by clone. Add a desktop panel that draws the ideogram from the KB band data (`kb/bands/<version>/bands.yaml`, already in the runtime bundle) and colours the T-050 LGF of the selected cell line. Link it to the abnormality list (T-069): selecting an abnormality highlights its bands.
 **Acceptance:** The panel shows the LGF of every cell line of a sample of KB examples; band positions are checked against the band data; selection works both ways.
-**Notes:** Created 2026-11-20 from the CytoGPS comparison (T-047). Low priority (user).
+**Notes:** Created 2026-11-20 from the CytoGPS comparison (T-047). Low priority (user). 2026-11-24: the ideogram drawing (band layout, markers, selection links) moves to T-101's "Map" view, which needs no LGF; this task adds the T-050 loss/gain/fusion colouring per band and clone on top of it (new dependency T-101).
 
 ### T-079 — Export in CytoGPS's JSON result format
 **Status:** todo
@@ -782,10 +791,10 @@ Then decide whether each rule stays `error` or becomes `warning` (book-stated sp
 **Notes:** Created 2026-11-20 from the CytoGPS comparison (T-047). Low priority (user). Also simplifies T-049/T-051: both sides produce the same format.
 
 ### T-080 — Optional lenient mode
-**Status:** discussion
+**Status:** done
 **Description:** CytoGPS silently accepts stray spaces and any letter case (`docs/research/cytogps.md` §4). Decide whether CytoLex gets an optional "lenient" mode (e.g. for old records) that reports `SYM.NO_OTHER_SPACE` and `SYM.LETTER_CASE` as warnings instead of errors, and if so: which rules it covers, where it's switched on (validator option, desktop, batch), and how results show that it was on. The book stays the basis; the default stays strict.
 **Acceptance:** Decision in `docs/decisions.md`; if adopted, a `todo` task for the implementation.
-**Notes:** Created 2026-11-20 from the CytoGPS comparison (T-047). Depends on T-075: if the two rules become warnings anyway, lenient mode may not be needed.
+**Notes:** Created 2026-11-20 from the CytoGPS comparison (T-047). Depends on T-075: if the two rules become warnings anyway, lenient mode may not be needed. **Outcome (2026-11-24, with the user):** not adopted; replaced by autocorrection (T-096 core + KB flag, T-097 desktop + batch), which keeps the rules strict and reports what was corrected instead of downgrading their severity. Logged in `docs/decisions.md`.
 
 ### T-081 — Desktop: CytoGPS panel in the single-string check
 **Status:** done
@@ -977,7 +986,7 @@ Deviations from the plan: no CLI (user); new label `severity-policy` and CytoLex
 **Status:** todo
 **Description:** Add FISH results to `EditionResult.CellLines`/`Abnormalities` (`AbnormalityList.cs` reads `KaryotypeModel`s only): ish abnormalities with their loci and status, normal-chromosome and nuc ish results with counts, positions and cells; show them in the desktop "Abnormalities" panel.
 **Acceptance:** every valid FISH KB example lists its results with spans; desktop panel shows them grouped by cell line.
-**Notes:** From T-033: the model is `FishModel` (`src/CytoLex.Core/Semantics/FishNodes.cs`); ish abnormalities are karyotype `Abnormality` nodes plus `FishGroup`s. Like T-072 for arr.
+**Notes:** From T-033: the model is `FishModel` (`src/CytoLex.Core/Semantics/FishNodes.cs`); ish abnormalities are karyotype `Abnormality` nodes plus `FishGroup`s. Like T-072 for arr. 2026-11-24 (feature discussion, user): priority 3 → 2; depends on T-098 too. Normal ish/nuc ish results (e.g. `nuc ish(D21Z1×2)[200]`) are listed as well, shown muted with a "normal" tag, so the list mirrors the string. One group per segment; cross-technique linking is T-100. Probe positions (map) are T-101/T-103.
 
 ### T-093 — Literal translation of in situ results
 **Status:** todo
@@ -986,12 +995,90 @@ Deviations from the plan: no CLI (user); new label `severity-policy` and CytoLex
 **Notes:** From T-033. Draft wording until reviewed (T-082 pattern).
 
 ### T-094 — Probe positions for locus and chromosome order in FISH
-**Status:** discussion
+**Status:** done
 **Description:** `ISH.LOCUS_ORDER_PTER_QTER` (loci from pter to qter) and `NUC_ISH.CHROMOSOME_ORDER` in the short form need the chromosome and position of each probe, which the strings don't carry and the KB doesn't have. Decide whether to add a probe/locus table (source, licence, versioning per genome build), check only what the string gives (detailed nuc ish bands, `wcp`/`pcp` numbers), or leave the rules unchecked.
-**Notes:** From T-033: both rules have no check; their invalid examples skip as "rule not implemented".
+**Acceptance:** Decision in `docs/decisions.md`; follow-up tasks.
+**Notes:** From T-033: both rules have no check; their invalid examples skip as "rule not implemented". **Outcome (2026-11-24, with the user):** add a probe/locus table: a people-editable CSV with review flags, genes pre-filled from HGNC/NCBI, checked by `kb build` (T-102); used for probe loci in the map and for the two order checks (T-103; positions from unreviewed rows → warning naming the source). Logged in `docs/decisions.md`.
 
 ### T-095 — Karyotype rules on ish abnormalities
 **Status:** discussion
 **Description:** The abnormalities of ish results are written in karyotype notation (`del(22)(q11.2q11.2)`, `t(9;22)(…)`), but karyotype rules (`STRUCT.BREAKPOINT_GROUPS`, `DEL.FORMAT`, `INV.FORMAT`, …) have `applies_to: [karyotype]`, so they are not checked in ish segments (T-033 note). Decide whether to extend their `applies_to` to `ish` (KB basis: §13.2 ¶2 "the symbol of the abnormality"), with which exceptions (breakpoints left out, `ISH.BREAKPOINTS_OMITTED`), and whether `ISH.SUBTEL_ABNORMAL` gets a check.
 **Notes:** From T-033: the §13.2 E22 breakpoint misprint is reported under `ISH.STRUCTURAL_FORMAT` meanwhile.
 
+### T-096 — Autocorrection: core + KB flag
+**Status:** todo
+**Description:** Apply obvious, meaning-preserving fixes automatically and keep the original (feature discussion 2026-11-24).
+- **KB:** a rule-level flag `fix.auto: true` (rule schema, `kb/README.md`, runtime bundle). Only for level-1 fixes that keep the meaning, have a single alternative and don't depend on the context. First set on `SYM.NO_OTHER_SPACE`, `SYM.LETTER_CASE`, `SYM.NO_SPACE_AT_PARENTHESIS` and the space part of `BAND.DESIGNATION_FORMAT` (check whether its space and format faults need separate fix proposals); more rules only after review. The choice traces to the KB; nothing is hard-coded.
+- **Core:** `ValidationOptions.AutoCorrect` (off by default in the API). The validator applies the fixes of the flagged rules (reuse `Fixer.ApplyAll` with a filter), re-validates, and repeats to a fixed point with a round limit, per edition (rules differ by edition). The result keeps `Input` (original), `Corrected`, `AutoCorrections` (rule ID, original span, edit, citations) and an offset map corrected → original, so remaining diagnostics can be highlighted on the original.
+- **Verdict:** a new verdict "valid after autocorrection" (the corrected string is valid, the original isn't book-conformant); an invalid string stays invalid, with the corrections still applied and listed.
+- **Batch:** `BatchRunner` takes the option; `BatchExport` JSON and CSV carry the original, the corrected string and the applied corrections; both still round-trip (`BatchReader` reads the CSV back).
+**Acceptance:** every invalid KB example of a flagged rule is corrected to its `corrected` form (or further, when it has other faults); no valid KB example changes; the non-book strings `47,XY, +21`, `46,X Y,dup(1)(q21q32)`, `46,xy`, `46,XY,T(9;22)(q34;q11.2)` end as "valid after autocorrection" with the right corrections; mapped spans of remaining diagnostics point into the original; batch export round-trip tests; `dotnet test` green.
+**Notes:** Created 2026-11-24 (user). Decided with the user: autocorrection replaces the lenient mode (T-080); the rules stay `error` (T-075). Run `kb build` + `dotnet build` after adding the KB flag.
+
+### T-097 — Autocorrection: desktop + batch tab
+**Status:** todo
+**Description:** Desktop side of T-096 (layout "A", decided with the user 2026-11-24):
+- Checkbox "Autocorrect" (default on) in the single-string check and in the Batch tab.
+- The editor keeps the typed text. Remaining diagnostics are highlighted there (spans mapped back through T-096's offset map); auto-corrected spots get a soft style of their own (e.g. a dotted grey underline with a tooltip naming the rule), not an error style.
+- A read-only "Corrected" line under the editor, shown only when something was corrected: the corrected string, one note per correction (rule ID + citation; the rule link opens the rule browser), [Copy] and [Use corrected] (document replace, so Ctrl+Z undoes it).
+- The edition verdict shows "valid after autocorrection".
+- Batch tab: the checkbox, a corrected column, a filter for corrected rows; exports from T-096.
+**Acceptance:** view-model tests: checkbox on/off, corrected-line visibility, mapped highlights, Use corrected + undo, batch column and filter; checked by hand.
+**Notes:** Created 2026-11-24 (user). Lands in the redesigned layout (T-098).
+
+### T-098 — Desktop: single-string layout redesign
+**Status:** todo
+**Description:** The right-hand column (Abnormalities | Translation) is cramped, and every view is repeated inside each edition tab. New layout (option "B", decided with the user 2026-11-24):
+- Editor row (book examples; the Autocorrect checkbox comes with T-097), then the corrected line (T-097).
+- An edition chip strip: one chip per edition with its verdict (`2016 ✗ 2 errors`, `2020 n/a`); clicking selects the edition. It replaces the edition result tabs; the edition selector still chooses which editions are validated.
+- Full-width view tabs for the selected edition: Diagnostics (default: verdict, Fix all, segments, diagnostics with fixes) | Abnormalities | Translation | CytoGPS; later views (Map, T-101) add a tab.
+- Editor ↔ view links unchanged: hover and selection between the editor and the abnormality/translation cards, diagnostic selection, rule links, highlights of the selected edition.
+- Touches `MainWindow.axaml`, `MainWindowViewModel` (`ResultTabs`/`SelectedResultTab` → editions + views), `EditionPanelViewModel`, `IResultTab`, `CytoGpsPanelViewModel` (no longer an edition-like tab).
+**Acceptance:** view-model tests updated (edition selection, view selection kept when the edition changes, CytoGPS tab, hover/selection links); checked by hand with a karyotype, an arr and a combined string.
+**Notes:** Created 2026-11-24 (user). Pinning a view to a side pane is T-099.
+
+### T-099 — Desktop: pin a view tab to a side pane
+**Status:** todo
+**Description:** Let the user pin one view of T-098 (e.g. Abnormalities) to a right-hand pane with a splitter, so it can be seen next to Diagnostics; unpinning returns it to the tabs. The choice is kept for the session.
+**Acceptance:** view-model tests for pin/unpin and selection; checked by hand.
+**Notes:** Created 2026-11-24 (user: later, as a follow-up of the redesign).
+
+### T-100 — Link one event across techniques in combined strings
+**Status:** discussion
+**Description:** In a combined string (`46,XX,t(9;22)(q34;q11.2).ish t(9;22)(ABL1+,BCR+)`, karyotype + arr) the same event appears in several segments. After T-072/T-092 each segment has its own group. Decide whether and how to link them (e.g. "confirmed by ish", "arr loss = karyotype del"): matching rules (same abnormality and bands; copy-number change vs. band composition; probe positions from T-103), how uncertain matches are shown, and whether the KB (§13, §14 combined results) says anything about it.
+**Acceptance:** Decision in `docs/decisions.md`; a follow-up `todo` task if adopted.
+**Notes:** Created 2026-11-24 (user: groups per segment now, linking later).
+
+### T-101 — Locus list + desktop "Map" view
+**Status:** todo
+**Description:** Map the data of a string onto the chromosomes (feature discussion 2026-11-24).
+- **Core:** a locus list per segment: chromosome, band or band range, position range per build when known, effect (gain/loss/normal/fusion/break), cell counts, span and source (string or probe table). Sources in the string: karyotype breakpoints and band compositions (T-066), arr coordinates and bands, ish/nuc ish bands (detailed forms, ish abnormalities), `wcp`/`pcp` chromosome numbers, `D<chr>Z<n>` names (chromosome only). Bands → coordinates from the runtime band data. Probe names without a position stay "unplaced" until T-103.
+- **Desktop:** a "Map" view tab (T-098) that draws the ideograms from the edition's band data (850 level) and marks the loci; selection links both ways with the editor and the abnormality list.
+**Acceptance:** loci of the valid karyotype, arr and FISH KB examples match hand-checked spot checks; unplaced probes are listed; the Map view shows the loci; view-model tests.
+**Notes:** Created 2026-11-24 (user). Takes over the drawing part of T-078 (which keeps the LGF colouring).
+
+### T-102 — Probe table: people-editable CSV with review flags
+**Status:** todo
+**Description:** A probe/locus table that medical people can review and extend (decided with the user 2026-11-24):
+- **File:** `kb/probes/probes.csv` (UTF-8, LF, committed) with the columns `probe, aliases, kind (gene/centromere/clone/paint/commercial/other), chromosome, band, grch37, grch38, source, reviewed (yes/no), reviewer, date, note`, plus a README for non-technical editors (how to open it as text in Excel/LibreOffice so names aren't turned into dates). Python scripts may turn it into other forms later; the CSV stays the source.
+- **Pre-fill:** `kb probes` adds gene rows from HGNC symbols + NCBI Gene positions per build (pinned downloads with sha256, like `kb bands`), marked `source: … (auto)` and `reviewed: no`; it never overwrites a reviewed row.
+- **Checks in `kb build`:** required fields, kinds, band exists and matches the coordinates (band data), GRCh37 and GRCh38 agree, duplicate names/aliases, date-mangled gene names (`SEPT9`, `MARCH1`); results in `build/review/probes-review.md` (unreviewed rows, conflicts). The table goes into the runtime bundle; no network at run time.
+- Sources and licences recorded (HGNC CC0, NCBI public domain); vendor probe names are typed in from datasheets with the source cited, never copied as a catalogue.
+**Acceptance:** `kb probes` + `kb build` on a small seed (the probes of the ch. 13 KB examples); a check test per fault; the review report; `kb check` covers the file.
+**Notes:** Created 2026-11-24 (user). Resolves the open question of T-094.
+
+### T-103 — Use the probe table
+**Status:** todo
+**Description:** Place probes through the T-102 table: loci in the T-101 list and the Map view, with an "unreviewed" badge and the source in a tooltip (hatched markers) for rows with `reviewed: no`. Implement `ISH.LOCUS_ORDER_PTER_QTER` and `NUC_ISH.CHROMOSOME_ORDER` (T-094) from the positions; a finding that relies on an unreviewed row is a warning naming the source.
+**Acceptance:** the invalid KB examples of both rules report them; no valid FISH KB example does; badges shown in the desktop; tests.
+**Notes:** Created 2026-11-24 (user).
+
+### T-104 — Disease/condition associations from abnormalities
+**Status:** discussion
+**Description:** Abnormalities often point to a condition (`+21` → Down syndrome, `t(9;22)(q34;q11.2)` → BCR::ABL1 in CML/ALL, `t(15;17)` → APL). Decide in an interview:
+- **Intended use and wording:** "associated conditions (literature)" vs. a diagnosis suggestion; regulatory consequences (clinical decision support, EU MDR/IVDR, FDA); disclaimer; effect on T-044 and T-061.
+- **Sources and licences:** this is not ISCN; candidates WHO-HAEM5 / ICC 2022 (neoplasms), ClinGen dosage regions (CC0), Orphanet (CC BY 4.0), the Mitelman database (licence to check); avoid OMIM (licensed).
+- **Format:** a people-editable CSV with review flags like T-102 (pattern, context constitutional/neoplastic, condition, strength, source citation, reviewed, reviewer, note); a pattern language (exact abnormality, any break in a band, copy-number overlap with a region via T-101 loci).
+- **Display:** an "Associations" view (T-098) with citations, unreviewed badges and the disclaimer.
+**Acceptance:** Decision in `docs/decisions.md`; follow-up `todo` tasks.
+**Notes:** Created 2026-11-24 (user). The framing (associations vs. diagnosis) is left open for this discussion (user).

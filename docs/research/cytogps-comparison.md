@@ -21,7 +21,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
 - **Speed and privacy.** CytoLex checks 951 strings in **0.4 s**. CytoGPS (local build) takes **66 s**, and the hosted site takes about 1 s per string. CytoLex runs entirely on the user's machine. The hosted CytoGPS has no privacy policy and keeps uploaded batch results on its server.
 - **Where CytoGPS is ahead today:**
   - Loss–Gain–Fusion (LGF) band data for research analysis, with batch statistics per band (CytoLex: T-050, T-077; deferred to priority 3, 2026-11-21);
-  - an ideogram view (CytoLex: T-078);
+  - an ideogram view (CytoLex: a "Map" view, T-101; LGF colouring, T-078);
   - no installation (web site; CytoLex: web service + browser page, T-044);
   - an R package ecosystem (CytoLex: T-079, an export that RCytoGPS can read);
   - peer-reviewed publications.
@@ -42,7 +42,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
 | `fra`, `upd`, `rec`, `fis`, `tas`, `neo` | ❌ | ✅ | |
 | Microarray (`arr`) | ❌ ("not yet", per its web site) | ✅ | 🗓 arr entries in the abnormality list (T-072) |
 | Combined karyotype + arr strings | ❌ | ✅ | |
-| FISH (`ish`, `nuc ish`) | ❌ | ✅ (ish, nuc ish, fib ish, rev ish, cgh; T-033; locus order not checked, T-094) | |
+| FISH (`ish`, `nuc ish`) | ❌ | ✅ (ish, nuc ish, fib ish, rev ish, cgh; T-033; locus order not checked: probe table planned, T-102/T-103) | |
 | Breakage, meiotic, RSA, sequence-based (ch. 10, 12, 15, 16) | ❌ | ❌ (breakage and meiotic strings are detected by their leading symbol, rsa and seq by their keyword, and all are reported as not implemented; their KB rules exist, T-018, T-019) | 🗓 T-090, T-091 |
 | Printed symbols `–` `×` `→` (as in the book) | ❌ (ASCII only) | ✅ (printed and typed forms) | |
 | **ISCN editions** | | | |
@@ -56,7 +56,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
 | Chromosome count vs. the changes listed | ❌ | ✅ | |
 | Sex-chromosome conventions | ❌ | ✅ | |
 | Clone order, cell counts, `idem`/`sl` references | ◐ | ✅ | 🗓 inherited changes in the abnormality list (T-070) |
-| Stray spaces, letter case | ❌ (silently ignored) | ✅ | 🗓 severity review (T-075); optional lenient mode, under discussion (T-080) |
+| Stray spaces, letter case | ❌ (silently ignored) | ✅ | 🗓 rules stay `error` (T-075 decided); autocorrection with the original kept, "valid after autocorrection" (T-096, T-097; replaces the lenient mode of T-080) |
 | Underlined homologues | ❌ | ❌ | 🗓 T-042 |
 | Rules catalogue | none published | 179 rules for ISCN 2016; 122 checked (103 by a dedicated check, the rest by the parser); the others are mostly informational | 🗓 more rules with each chapter |
 | **Feedback** | | | |
@@ -72,7 +72,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
 | **Analysis output** | | | |
 | Loss–Gain–Fusion per band | ✅ (916 bands, JSON/CSV) | ❌ | 🗓 T-050 (deferred, priority 3) |
 | Aggregate statistics over a batch | ✅ (per-band loss/gain/fusion share, aggregate LGF table) | ◐ (summary per edition and rule) | 🗓 per-band statistics and aggregate LGF table (T-077) |
-| Ideogram view | ✅ | ❌ | 🗓 desktop panel linked to the abnormality list (T-078, low priority) |
+| Ideogram view | ✅ | ❌ | 🗓 desktop "Map" view of the loci, linked to the abnormality list (T-101); LGF colouring (T-078, low priority) |
 | R package | ✅ (RCytoGPS) | ❌ | 🗓 export in CytoGPS's JSON format, readable by RCytoGPS (T-079, low priority) |
 | Comparison with CytoGPS built in | – | ◐ (adapter: runs the local CytoGPS build on a batch, T-049; comparison engine: 2×2 verdict matrix, not-supported notation kept out, triage labels, KB-example drafts, report in `build/review/comparison/`, T-051; desktop CytoGPS tab in the single-string check with an agreement badge, T-081) | 🗓 desktop batch view (T-052) |
 | **Batch** | | | |
@@ -148,7 +148,7 @@ The 5 invalid karyotypes CytoLex doesn't flag are context- or form-dependent rul
 ## 4. Caveats (read before presenting)
 
 - **Home advantage.** The test set is CytoLex's own regression suite. CytoLex is built to pass it, so its 100 % on valid examples is expected and doesn't measure performance on unseen strings. The CytoGPS numbers on the same set are a fair measure of CytoGPS. For a neutral figure, compare both tools on an independent corpus: the planned review-flagged test corpus (T-062) or anonymised real-world strings run through the local CytoGPS only.
-- **Reference edition.** Both tools target ISCN 2016. Some CytoGPS acceptances (spaces, case) are deliberate leniency, not bugs. Whether these should be errors or warnings in CytoLex is still being decided (T-075).
+- **Reference edition.** Both tools target ISCN 2016. Some CytoGPS acceptances (spaces, case) are deliberate leniency, not bugs. CytoLex keeps them as errors (T-075, decided 2026-11-24) and will offer autocorrection, which fixes them and reports the correction (T-096, T-097).
 - **Different goals.** CytoGPS was built to extract LGF data for research, with validation as a filter. CytoLex is built to validate and correct notation against the book. On LGF output CytoGPS is ahead until T-050, and on research tooling until T-077–T-079 (all deferred to priority 3 on 2026-11-21: CytoLex focuses on validation).
 - **CytoGPS version.** The local build is the 2021 GitHub snapshot. The hosted site gave identical results on all 28 strings probed and on a 5-line batch ([`cytogps.md`](cytogps.md) §5.1).
 
