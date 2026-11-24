@@ -216,7 +216,7 @@ internal sealed class LocusGrammar(TokenCursor cursor) : GrammarBase(cursor), IA
 
             if (AtEnd || At(TokenKind.OpenBracket) || At(TokenKind.OpenParen))
             {
-                children.Add(MissingReported(TokenKind.CloseParen, ")", CoreCodes.Unparsed, "'(' needs a closing ')'."));
+                children.Add(MissingReported(TokenKind.CloseParen, ")", ParenthesesPaired, "The loci need a closing ')'."));
                 return;
             }
 

@@ -76,7 +76,7 @@ public class AbnormalityPanelTests
     [Fact]
     public void Partial_FadedWithDiagnosticsDot()
     {
-        var vm = new MainWindowViewModel { Input = "46,XX,del(5)(q13q33" };
+        var vm = new MainWindowViewModel { AutoCorrect = false, Input = "46,XX,del(5)(q13q33" };
         var card = Assert.Single(Assert.Single(vm.SelectedPanel!.CellLineGroups).Items);
         Assert.True(card.IsPartial);
         Assert.Equal(0.5, card.Opacity);

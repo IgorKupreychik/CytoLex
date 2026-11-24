@@ -191,7 +191,7 @@ internal sealed class ArrGrammar(TokenCursor cursor, KaryotypeGrammar karyotype)
 
             if (AtEnd || At(TokenKind.Multiply) || At(TokenKind.OpenBracket))
             {
-                children.Add(MissingReported(TokenKind.CloseParen, ")", ArrRegionFormat, "The chromosomes are closed by a parenthesis."));
+                children.Add(MissingReported(TokenKind.CloseParen, ")", ParenthesesPaired, "The chromosomes are closed by a parenthesis."));
                 break;
             }
 
@@ -227,7 +227,7 @@ internal sealed class ArrGrammar(TokenCursor cursor, KaryotypeGrammar karyotype)
 
             if (AtEnd || At(TokenKind.Multiply) || At(TokenKind.OpenBracket))
             {
-                children.Add(MissingReported(TokenKind.CloseParen, ")", ArrRegionFormat, "The grouped regions are closed by a parenthesis."));
+                children.Add(MissingReported(TokenKind.CloseParen, ")", ParenthesesPaired, "The grouped regions are closed by a parenthesis."));
                 break;
             }
 
@@ -311,7 +311,7 @@ internal sealed class ArrGrammar(TokenCursor cursor, KaryotypeGrammar karyotype)
 
             if (AtEnd || At(TokenKind.OpenBracket))
             {
-                children.Add(MissingReported(TokenKind.CloseParen, ")", ArrRegionFormat, "The nucleotide positions are closed by a parenthesis."));
+                children.Add(MissingReported(TokenKind.CloseParen, ")", ParenthesesPaired, "The nucleotide positions are closed by a parenthesis."));
                 break;
             }
 

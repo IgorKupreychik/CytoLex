@@ -159,26 +159,26 @@ corpus:
     iscn: "46,XY,t(9;22)(q34;q11"
     types: [karyotype]
     features: [truncated]
-    rules: []
+    rules: [SYM.PARENTHESES_PAIRED]
     source: synthetic
-    expected: {"2016": {verdict: invalid, context: acquired, fires: [CORE.UNPARSED]}}
-    review: {checked: false, note: "Truncated: no KB rule covers a missing closing parenthesis yet, so the text is unparsed (T-085)."}
+    expected: {"2016": {verdict: invalid, context: acquired, fires: [SYM.PARENTHESES_PAIRED]}}
+    review: {checked: false, note: "Truncated: the breakpoint group lacks its closing parenthesis (T-085)."}
   - id: R-021
     iscn: "46,XY,del(5)(q13"
     types: [karyotype]
     features: [truncated]
-    rules: []
+    rules: [SYM.PARENTHESES_PAIRED]
     source: synthetic
-    expected: {"2016": {verdict: invalid, context: constitutional, fires: [CORE.UNPARSED]}}
-    review: {checked: false, note: "Truncated: no KB rule covers a missing closing parenthesis yet, so the text is unparsed (T-085)."}
+    expected: {"2016": {verdict: invalid, context: constitutional, fires: [SYM.PARENTHESES_PAIRED]}}
+    review: {checked: false, note: "Truncated: the breakpoint group lacks its closing parenthesis (T-085)."}
   - id: R-022
     iscn: "47,XX,+"
     types: [karyotype]
     features: [truncated]
-    rules: []
+    rules: [KARYO.GAIN_LOSS_SIGN]
     source: synthetic
-    expected: {"2016": {verdict: invalid, context: constitutional, fires: [CORE.UNPARSED]}}
-    review: {checked: false, note: "Truncated: a sign without a chromosome is unparsed (T-085)."}
+    expected: {"2016": {verdict: invalid, context: constitutional, fires: [KARYO.GAIN_LOSS_SIGN]}}
+    review: {checked: false, note: "Truncated: a sign without a chromosome or abnormality after it (T-085)."}
   - id: R-023
     iscn: "46,XX,del(9)(q35)"
     types: [karyotype]

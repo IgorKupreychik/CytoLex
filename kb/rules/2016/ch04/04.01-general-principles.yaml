@@ -96,7 +96,7 @@ rules:
           corrected: "46,XX,del(4)(p14)"
     fix: {level: 1, kind: insert, hint: Put the chromosome number in parentheses directly after the rearrangement symbol.}
     review: {paraphrase_checked: true, needs_review: false}
-    related: [SYM.NO_SPACE_AT_PARENTHESIS, STRUCT.BREAKPOINT_GROUPS]
+    related: [SYM.NO_SPACE_AT_PARENTHESIS, STRUCT.BREAKPOINT_GROUPS, SYM.PARENTHESES_PAIRED]
 
   - id: STRUCT.CHROMOSOME_SEPARATOR
     title: Semicolon between the chromosomes of a rearrangement
@@ -216,6 +216,8 @@ rules:
         - text: "47,XX,21+"
           why: The plus sign goes before the chromosome number, not after it.
           corrected: "47,XX,+21"
+        - text: "47,XX,+"
+          why: The plus sign is not followed by the gained chromosome or abnormality.
     fix: {level: 1, kind: reorder, hint: Move the sign in front of the chromosome or abnormality.}
     review: {paraphrase_checked: true, needs_review: false}
     related: [KARYO.NO_ARM_LENGTH_SIGN]

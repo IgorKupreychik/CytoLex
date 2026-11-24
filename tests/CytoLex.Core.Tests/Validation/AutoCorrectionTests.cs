@@ -71,6 +71,9 @@ public class AutoCorrectionTests
         { "46,X Y,dup(1)(q21q32)", "46,XY,dup(1)(q21q32)", ["SYM.NO_OTHER_SPACE@4-5="] },
         { "46,xy", "46,XY", ["SYM.LETTER_CASE@3-5=XY"] },
         { "46,XY,T(9;22)(q34;q11.2)", "46,XY,t(9;22)(q34;q11.2)", ["SYM.LETTER_CASE@6-7=t"] },
+        // Unpaired parentheses (T-085), also at the end of a cut-off string.
+        { "46,XY,t(9;22)(q34;q11", "46,XY,t(9;22)(q34;q11)", ["SYM.PARENTHESES_PAIRED@21-21=)"] },
+        { "46,XY,del5)(q13)", "46,XY,del(5)(q13)", ["SYM.PARENTHESES_PAIRED@9-9=("] },
     };
 
     [Theory]

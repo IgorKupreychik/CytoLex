@@ -57,6 +57,7 @@ public sealed class Parser
     internal const string ChromosomeInParentheses = "KARYO.CHROMOSOME_IN_PARENTHESES";
     internal const string ChromosomeSeparator = "STRUCT.CHROMOSOME_SEPARATOR";
     internal const string BreakpointGroups = "STRUCT.BREAKPOINT_GROUPS";
+    internal const string ParenthesesPaired = "SYM.PARENTHESES_PAIRED";
     internal const string GainLossSign = "KARYO.GAIN_LOSS_SIGN";
     internal const string NoArmLengthSign = "KARYO.NO_ARM_LENGTH_SIGN";
     internal const string VarLengthSign = "VAR.LENGTH_SIGN";
@@ -98,7 +99,7 @@ public sealed class Parser
     /// <summary>Every KB rule ID the parser can report (a test checks they exist in the KB).</summary>
     internal static readonly ImmutableArray<string> RuleIds =
     [
-        CountSexOrder, AbnormalityOrder, ChromosomeInParentheses, ChromosomeSeparator, BreakpointGroups, GainLossSign,
+        CountSexOrder, AbnormalityOrder, ChromosomeInParentheses, ChromosomeSeparator, BreakpointGroups, ParenthesesPaired, GainLossSign,
         NoArmLengthSign, VarLengthSign, ListedOnly, TypedSymbolForms, ArmSymbol, SubbandFormat, ChromIdentifiers,
         CloneSeparator, MosaicChimeraPrefix, Endoreduplication, ParentalOrigin, MultiplySignAfter, PloidyInAngleBrackets,
         QuestionableItem, DminFormat, UpdFormat, IsoFormat, HsrNoAbrSymbol, MarNoSizeMorphology, PolyploidSubclone,

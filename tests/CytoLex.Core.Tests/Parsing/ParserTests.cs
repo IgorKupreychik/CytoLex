@@ -2,6 +2,7 @@ using CytoLex.Core.Segmentation;
 using CytoLex.Core.Syntax;
 using CytoLex.Core.Tests.KbExamples;
 using CytoLex.Core.Text;
+using CytoLex.Core.Validation;
 
 namespace CytoLex.Core.Tests.Parsing;
 
@@ -83,6 +84,30 @@ public class ParserTests
         Assert.Equal(",", d.Expected);
         Assert.Equal("46XX", tree.ToFullString());
     }
+
+    [Theory]
+    [InlineData("46,XY,del(5)(q13", "SYM.PARENTHESES_PAIRED ''@16", ")")]
+    [InlineData("46,XY,t(9;22)(q34;q11", "SYM.PARENTHESES_PAIRED ''@21", ")")]
+    [InlineData("46,XY,del(5", "SYM.PARENTHESES_PAIRED ''@11", ")")]
+    [InlineData("47,XY,del(5)(q13,+8", "SYM.PARENTHESES_PAIRED ''@16", ")")]
+    [InlineData("47,XY,del(5,+8", "SYM.PARENTHESES_PAIRED ''@11", ")")]
+    [InlineData("46,XY,del(5(q13)", "SYM.PARENTHESES_PAIRED ''@11", ")")]
+    [InlineData("46,XY,del5)(q13)", "SYM.PARENTHESES_PAIRED ''@9", "(")]
+    [InlineData("46,XY,del(5)q13)", "SYM.PARENTHESES_PAIRED ''@12", "(")]
+    [InlineData("47,XX,+", "KARYO.GAIN_LOSS_SIGN '+'@6", null)]
+    public void UnpairedParenthesisOrLoneSign_IsReportedUnderItsKbRule(string text, string expected, string? insert)
+    {
+        Assert.Equal([expected], Diagnostics(text));
+        var d = Assert.Single(Parse(text).Diagnostics);
+        Assert.Equal(insert is null ? [] : [new TextEdit(new TextSpan(d.Span.Start, 0), insert)], d.FixEdits);
+        Assert.Equal(text, Parse(text).ToFullString());
+    }
+
+    [Theory]
+    [InlineData("46,XY,t(2,5)(q21;q31)", "STRUCT.CHROMOSOME_SEPARATOR ','@9")]
+    [InlineData("46,XY,t(2;5)(q21,q31)", "STRUCT.BREAKPOINT_GROUPS ','@16")]
+    public void CommaBeforeAChromosomeOrBand_IsStillASeparatorFault(string text, string expected) =>
+        Assert.Equal([expected], Diagnostics(text));
 
     [Fact]
     public void UnparseableText_IsSkippedAndKept()

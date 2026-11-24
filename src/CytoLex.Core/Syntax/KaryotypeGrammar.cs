@@ -476,7 +476,7 @@ internal sealed class KaryotypeGrammar(TokenCursor cursor, IAbnormalityLoci? loc
 
         if (signs is not null)
         {
-            Report(CoreCodes.Unparsed, signs.Span, SyntaxDiagnosticKind.Unexpected, "A sign must be followed by a chromosome or an abnormality.");
+            Report(GainLossSign, signs.Span, SyntaxDiagnosticKind.Unexpected, "A sign must be followed by a chromosome or an abnormality.");
             return signs;
         }
 
@@ -487,6 +487,14 @@ internal sealed class KaryotypeGrammar(TokenCursor cursor, IAbnormalityLoci? loc
         }
 
         return Skip(t => t.Kind is TokenKind.Comma or TokenKind.Slash or TokenKind.DoubleSlash or TokenKind.OpenBracket, CoreCodes.Unparsed, "Text not understood.");
+    }
+
+    /// <summary>A zero-width '(' at <paramref name="at"/>, reported under SYM.PARENTHESES_PAIRED (T-085).</summary>
+    private SyntaxToken MissingOpenParen(int at, string message)
+    {
+        var open = new SyntaxToken(TokenKind.OpenParen, new TextSpan(at, 0), "(", [], [], isMissing: true);
+        Report(ParenthesesPaired, open.Span, SyntaxDiagnosticKind.Missing, message, "(");
+        return open;
     }
 
     private static void AddIfNotNull(List<SyntaxElement> list, SyntaxElement? element)
@@ -806,6 +814,13 @@ internal sealed class KaryotypeGrammar(TokenCursor cursor, IAbnormalityLoci? loc
             {
                 children.Add(Node(SyntaxKind.SymbolNumber, number));
             }
+            else if (lastSymbol.Text != "dmin" && At(TokenKind.CloseParen) && Adjacent)
+            {
+                // del5)(q13): the chromosome's '(' is missing.
+                var open = MissingOpenParen(number.Span.Start, "The chromosome has a closing ')' but no opening '('.");
+                children.Add(Node(SyntaxKind.ChromosomeList, open, Node(SyntaxKind.ChromosomeSpec, number), Eat()));
+                groups = 1;
+            }
             else
             {
                 var (rule, message) = lastSymbol.Text switch
@@ -836,8 +851,18 @@ internal sealed class KaryotypeGrammar(TokenCursor cursor, IAbnormalityLoci? loc
         if (groups == 1 && Adjacent && (IsWord(Current, ArmWords) || IsArmSymbolTypo(Current)))
         {
             var bare = ParseBreakpointList(withParens: false);
-            Report(BreakpointGroups, bare.Span, SyntaxDiagnosticKind.Unexpected, "Breakpoints are written in parentheses.", Insert(bare.Span.Start, "("), Insert(bare.Span.End, ")"));
-            children.Add(bare);
+            if (At(TokenKind.CloseParen) && Adjacent)
+            {
+                // del(5)q13): the breakpoints' '(' is missing.
+                var open = MissingOpenParen(bare.Span.Start, "The breakpoints have a closing ')' but no opening '('.");
+                children.Add(Node(SyntaxKind.BreakpointList, [open, .. bare.Children, Eat()]));
+            }
+            else
+            {
+                Report(BreakpointGroups, bare.Span, SyntaxDiagnosticKind.Unexpected, "Breakpoints are written in parentheses.", Insert(bare.Span.Start, "("), Insert(bare.Span.End, ")"));
+                children.Add(bare);
+            }
+
             groups++;
         }
 
@@ -904,9 +929,9 @@ internal sealed class KaryotypeGrammar(TokenCursor cursor, IAbnormalityLoci? loc
                 break;
             }
 
-            if (AtItemEnd && !At(TokenKind.Comma))
+            if ((AtItemEnd && !At(TokenKind.Comma)) || (children.Count > 1 && (At(TokenKind.OpenParen) || CommaEndsGroup)))
             {
-                children.Add(MissingReported(TokenKind.CloseParen, ")", CoreCodes.Unparsed, "'(' needs a closing ')'."));
+                children.Add(MissingReported(TokenKind.CloseParen, ")", ParenthesesPaired, "The chromosomes need a closing ')'."));
                 break;
             }
 
@@ -937,12 +962,12 @@ internal sealed class KaryotypeGrammar(TokenCursor cursor, IAbnormalityLoci? loc
             {
                 children.Add(Eat());
             }
-            else if (At(TokenKind.Comma))
+            else if (At(TokenKind.Comma) && !CommaEndsGroup)
             {
                 Report(ChromosomeSeparator, Current.Span, SyntaxDiagnosticKind.Unexpected, "The chromosomes of a rearrangement are separated by a semicolon.", ";");
                 children.Add(Eat());
             }
-            else if (!At(TokenKind.CloseParen) && !AtItemEnd)
+            else if (!At(TokenKind.CloseParen) && !AtItemEnd && !At(TokenKind.OpenParen))
             {
                 children.Add(Skip(t => t.Kind is TokenKind.Semicolon or TokenKind.CloseParen or TokenKind.Comma or TokenKind.Slash or TokenKind.DoubleSlash,
                     CoreCodes.Unparsed, "Text not understood in the chromosome list."));
@@ -951,6 +976,16 @@ internal sealed class KaryotypeGrammar(TokenCursor cursor, IAbnormalityLoci? loc
 
         return Node(SyntaxKind.ChromosomeList, children);
     }
+
+    /// <summary>
+    /// A comma inside a parenthesis group that starts the next item rather than separating chromosomes or breakpoints
+    /// (<c>del(5)(q13,+8</c>): the group lacks its closing parenthesis (SYM.PARENTHESES_PAIRED, T-085).
+    /// </summary>
+    private bool CommaEndsGroup => At(TokenKind.Comma) && !StartsGroupContent(Peek(1));
+
+    private static bool StartsGroupContent(SyntaxToken t) =>
+        t.Kind is TokenKind.Number or TokenKind.ChromosomeLetter or TokenKind.Question or TokenKind.Arrow or TokenKind.Colon or TokenKind.DoubleColon
+        || IsWord(t, ArmWords) || IsWord(t, LandmarkWords) || IsArmSymbolTypo(t);
 
     /// <summary>
     /// Breakpoints in parentheses, short or detailed system: groups separated by semicolons, each a sequence of bands,
@@ -976,7 +1011,7 @@ internal sealed class KaryotypeGrammar(TokenCursor cursor, IAbnormalityLoci? loc
 
             if (withParens)
             {
-                children.Add(At(TokenKind.CloseParen) ? Eat() : MissingReported(TokenKind.CloseParen, ")", CoreCodes.Unparsed, "'(' needs a closing ')'."));
+                children.Add(At(TokenKind.CloseParen) ? Eat() : MissingReported(TokenKind.CloseParen, ")", ParenthesesPaired, "The breakpoints need a closing ')'."));
             }
 
             break;
@@ -987,7 +1022,7 @@ internal sealed class KaryotypeGrammar(TokenCursor cursor, IAbnormalityLoci? loc
 
     private bool AtGroupEnd(bool withParens) =>
         Current.Kind is TokenKind.Semicolon or TokenKind.EndOfSegment or TokenKind.Slash or TokenKind.DoubleSlash or TokenKind.OpenBracket
-        || (withParens ? Current.Kind == TokenKind.CloseParen : Current.Kind is TokenKind.Comma or TokenKind.CloseParen);
+        || (withParens ? Current.Kind == TokenKind.CloseParen || CommaEndsGroup : Current.Kind is TokenKind.Comma or TokenKind.CloseParen);
 
     private SyntaxNode ParseBreakpointGroup(bool withParens)
     {

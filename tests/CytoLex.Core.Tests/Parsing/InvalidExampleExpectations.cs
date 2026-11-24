@@ -41,6 +41,11 @@ internal static class InvalidExampleExpectations
             ["46,XY,t(16;12)(p11.1;q13)"] = [], // STRUCT.CHROMOSOME_ORDER
             ["46,X,t(18;X)(q11.1;p11.1)"] = [], // STRUCT.CHROMOSOME_ORDER
             ["47,XX,21+"] = [("KARYO.GAIN_LOSS_SIGN", "21+", 6)], // KARYO.GAIN_LOSS_SIGN
+            ["47,XX,+"] = [("KARYO.GAIN_LOSS_SIGN", "+", 6)], // KARYO.GAIN_LOSS_SIGN (T-085)
+            ["46,XY,del(5"] = [("SYM.PARENTHESES_PAIRED", "", 11)], // SYM.PARENTHESES_PAIRED (T-085)
+            ["47,XY,del(5)(q13,+8"] = [("SYM.PARENTHESES_PAIRED", "", 16)], // SYM.PARENTHESES_PAIRED (T-085)
+            ["46,XY,del5)(q13)"] = [("SYM.PARENTHESES_PAIRED", "", 9)], // SYM.PARENTHESES_PAIRED (T-085)
+            ["46,XY,del(5)q13)"] = [("SYM.PARENTHESES_PAIRED", "", 12)], // SYM.PARENTHESES_PAIRED (T-085)
             ["46,XX,5q–"] = [("KARYO.NO_ARM_LENGTH_SIGN", "5q–", 6)], // KARYO.NO_ARM_LENGTH_SIGN
             ["46,XY,4p+"] = [("KARYO.NO_ARM_LENGTH_SIGN", "4p+", 6)], // KARYO.NO_ARM_LENGTH_SIGN
             ["45,XX,–1,–3,der(1;3)(p10;q10)"] = [], // KARYO.REPLACED_NORMAL_NOT_MISSING
@@ -61,6 +66,7 @@ internal static class InvalidExampleExpectations
             ["46,XX,ins(5;2)(p14q22q32)"] = [], // STRUCT.BREAKPOINT_GROUPS
             ["46,XX,ins(5;2)(p14;q22;q32)"] = [], // STRUCT.BREAKPOINT_GROUPS
             ["46,XX,inv(2)p21q31"] = [("STRUCT.BREAKPOINT_GROUPS", "p21q31", 12)], // STRUCT.BREAKPOINT_GROUPS
+            ["46,XY,del(5)(q13"] = [("SYM.PARENTHESES_PAIRED", "", 16)], // SYM.PARENTHESES_PAIRED (T-085)
             ["46,XX,inv(2)(q31p21)"] = [], // STRUCT.SHORT_ARM_BREAKPOINT_FIRST
             ["46,XX,inv(2)(p23p13)"] = [], // STRUCT.PROXIMAL_BREAKPOINT_FIRST
             ["46,XY,ins(2;5)(q22q32;p14)"] = [], // STRUCT.INSERTION_RECEPTOR_FIRST

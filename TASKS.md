@@ -93,7 +93,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-082 | todo | 5 | T-057 | Review the translation templates and golden file (ISCN 2016) |
 | T-083 | done | 3 | – | Refactor: remove hand-written partial classes (`Binder`, `Parser`) per the code standard |
 | T-084 | done | 3 | T-059 | Rule browser: bands (band table in `kb.sqlite`, band links of the translation open it) |
-| T-085 | todo | 3 | T-062 | Parser: report truncated input (missing `)`, trailing sign) under a KB rule instead of `CORE.UNPARSED` |
+| T-085 | done | 3 | T-062 | Parser: report truncated input (missing `)`, trailing sign) under a KB rule instead of `CORE.UNPARSED` |
 | T-086 | todo | 3 | T-066 | Use `Abnormality.Composition`: detailed composition vs. its symbol (rule), translation and LGF read one shape |
 | T-087 | discussion | 3 | T-066 | Band compositions the KB doesn't define yet: insertion recombinants, `der(?)` with an insertion or hsr at an unknown site |
 | T-088 | done | 2 | T-071, T-034 | Arr: check positions against the bands of the stated build (`ARR.POSITIONS_IN_BANDS`) |
@@ -599,10 +599,11 @@ Outcome (2026-11-18):
 **Notes:** Found during T-063 (2026-11-18). Merged into T-055 on 2026-11-18 at the user's request: its description, acceptance (`uv run --directory tools pytest` passes on Windows with `core.autocrlf=true`; generators and checkout agree) and fix options now live there. No work done here; the ID is kept so references stay valid.
 
 ### T-085 — Parser: truncated input under a KB rule
-**Status:** todo
+**Status:** done
 **Description:** Truncated strings from the test corpus (`tests/data/corpus/robustness.yaml`: `46,XY,t(9;22)(q34;q11`, `46,XY,del(5)(q13`, `47,XX,+`) are reported only as `CORE.UNPARSED` ("text not attributed to any KB rule"). Find the KB rule that covers each fault (e.g. a breakpoint group that lacks its closing parenthesis, a sign without a chromosome); if the KB has none, add it with a citation first. Then let the parser report the fault under that rule, with a level-1 fix where one edit is certain (insert `)`).
 **Acceptance:** the three corpus entries report a KB rule (their `fires` updated from `CORE.UNPARSED`); KB examples and the corpus stay green.
 **Notes:** Created 2026-11-23 from T-062 (corpus robustness entries). Labels must trace to KB rules (CLAUDE.md).
+**Outcome (2026-11-24):** New KB rule `SYM.PARENTHESES_PAIRED` (§3 ¶3 p.35, §4.1 ¶3, §4.3.1 ¶1; level-1 insert, `fix.auto: true`; 5 invalid examples; quote in `kb/source-quotes/2016/ch03/`; `paraphrase_checked: false`, awaiting a person check) for a `(` without its `)` or a `)` without its `(`. Parser (`KaryotypeGrammar.cs`): unclosed chromosome and breakpoint groups at an item end, before `(` or before a comma that starts the next item (`del(5)(q13,+8`); missing `(` recovered for `del5)(q13)` and `del(5)q13)`; `ArrGrammar.cs` (was `ARR.REGION_FORMAT`, no fix) and `LocusGrammar.cs` (was `CORE.UNPARSED`) report it too. A lone sign (`47,XX,+`) is `KARYO.GAIN_LOSS_SIGN` with an explanation only (new invalid example). Corpus R-020/R-021 → `SYM.PARENTHESES_PAIRED`, R-022 → `KARYO.GAIN_LOSS_SIGN`. Tests: `ParserTests` (unpaired parentheses, comma separators unchanged), `InvalidExampleExpectations`, `ArrParserTests`, `FixToValidTests` and `AutoCorrectionTests` rows; three desktop tests that need a partial part run with Autocorrect off. Deviation from the plan (user, same day): the faults first went under `STRUCT.BREAKPOINT_GROUPS`/`KARYO.CHROMOSOME_IN_PARENTHESES`, then moved to the new rule so they can be autocorrected, including a `)` missing at the end of a cut-off string (decision in `docs/decisions.md`). `dotnet test`: 11,651 tests, 0 failed.
 
 ### T-086 — Use the band composition in rules and the translation
 **Status:** todo

@@ -68,7 +68,7 @@ public sealed class TranslationViewTests
     public void InvalidString_BannerAndUntranslatedPartWithDiagnosticLinks()
     {
         // A syntax-damaged part (missing comma) is not translated; its diagnostic links select the diagnostic.
-        var vm = new MainWindowViewModel { Input = "46,XX,del(5)(q13q33)t(1;3)(p32;q21" };
+        var vm = new MainWindowViewModel { AutoCorrect = false, Input = "46,XX,del(5)(q13q33)t(1;3)(p32;q21" };
         var panel = vm.SelectedPanel!;
         var t = panel.Translation!;
         Assert.True(t.HasBanner);

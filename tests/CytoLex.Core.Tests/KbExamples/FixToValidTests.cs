@@ -69,6 +69,8 @@ public class FixToValidTests
         // Letter case (T-074): sex chromosomes, a symbol.
         { "46,xy", null, "46,XY" },
         { "46,XY,T(9;22)(q34;q11.2)", null, "46,XY,t(9;22)(q34;q11.2)" },
+        // Truncated input (T-085): the closing parenthesis of the breakpoints.
+        { "46,XY,t(9;22)(q34;q11", null, "46,XY,t(9;22)(q34;q11)" },
         // Case, a stray space and the order of abnormalities together.
         { "47,xy, +21,Del(5)(q13q33)", null, "47,XY,del(5)(q13q33),+21" },
     };

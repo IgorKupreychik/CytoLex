@@ -65,8 +65,8 @@ public class ArrParserTests
 
     [Theory]
     [InlineData("arr[GRCh38 6q21q25.1(1_2)×1", "GEN.GENOME_BUILD_REQUIRED")]
-    [InlineData("arr(1–22,X×2", "ARR.REGION_FORMAT")]
-    [InlineData("arr[GRCh38] 6q21q25.1(1_2×1", "ARR.REGION_FORMAT")]
+    [InlineData("arr(1–22,X×2", "SYM.PARENTHESES_PAIRED")]
+    [InlineData("arr[GRCh38] 6q21q25.1(1_2×1", "SYM.PARENTHESES_PAIRED")]
     [InlineData("arr(X)×1[0.6", "ARR.MOSAIC_PROPORTION")]
     [InlineData("arr(X)×1 ;", "CORE.UNPARSED")]
     [InlineData("arr ×2", "CORE.UNPARSED")]

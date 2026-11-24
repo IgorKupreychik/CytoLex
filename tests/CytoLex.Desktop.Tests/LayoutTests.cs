@@ -76,7 +76,7 @@ public sealed class LayoutTests
     [Fact]
     public void TranslationDiagnosticLink_ShowsTheDiagnosticsView()
     {
-        var vm = new MainWindowViewModel { Input = "46,XX,del(5)(q13q33)t(1;3)(p32;q21" };
+        var vm = new MainWindowViewModel { AutoCorrect = false, Input = "46,XX,del(5)(q13q33)t(1;3)(p32;q21" };
         vm.SelectedViewIndex = (int)ResultView.Translation;
         var panel = vm.SelectedPanel!;
         var link = panel.Translation!.Items.First(i => !i.IsTranslated).Diagnostics[0];
