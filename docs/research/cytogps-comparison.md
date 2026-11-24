@@ -40,7 +40,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
 | Neoplastic clones, `idem`/`sl`/`sdl`, composite `[cp]` | ✅ | ✅ | |
 | Constitutional mosaics/chimeras (`mos`, `chi`) | ◐ (read, but the order of cell lines isn't checked; transplant chimera `//` is rejected) | ✅ | |
 | `fra`, `upd`, `rec`, `fis`, `tas`, `neo` | ❌ | ✅ | |
-| Microarray (`arr`) | ❌ ("not yet", per its web site) | ✅ | 🗓 arr entries in the abnormality list (T-072) |
+| Microarray (`arr`) | ❌ ("not yet", per its web site) | ✅ | ✅ arr results in the abnormality list (T-072) |
 | Combined karyotype + arr strings | ❌ | ✅ | |
 | FISH (`ish`, `nuc ish`) | ❌ | ✅ (ish, nuc ish, fib ish, rev ish, cgh; T-033; locus order not checked: probe table planned, T-102/T-103) | |
 | Breakage, meiotic, RSA, sequence-based (ch. 10, 12, 15, 16) | ❌ | ❌ (breakage and meiotic strings are detected by their leading symbol, rsa and seq by their keyword, and all are reported as not implemented; their KB rules exist, T-018, T-019) | 🗓 T-090, T-091 |

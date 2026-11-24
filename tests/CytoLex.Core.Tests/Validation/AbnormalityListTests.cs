@@ -17,6 +17,10 @@ public class AbnormalityListTests
 
     private static string[] Texts(IEnumerable<BreakpointSummary> breakpoints) => [.. breakpoints.Select(b => b.Text)];
 
+    /// <summary>The entries of the karyotype cell lines (T-072 adds arr groups to the same list).</summary>
+    private static List<AbnormalityEntry> KaryotypeEntries(EditionResult result) =>
+        [.. result.Abnormalities.Where(a => result.CellLines[a.CellLine].Technique == SegmentTechnique.Karyotype)];
+
     public static IEnumerable<TheoryDataRow<string, bool, bool>> KbCases() =>
         ParseHelper.KbExamples()
             .Select(x => new TheoryDataRow<string, bool, bool>(x.Text, x.Fragment, x.Kind == ExampleKind.Invalid) { TestDisplayName = $"{x.RuleId} {x.Kind}: {x.Text}" });
@@ -30,15 +34,17 @@ public class AbnormalityListTests
         var models = BindHelper.Bind(text, fragment);
         var lines = models.SelectMany(m => m.CellLines).ToList();
         var items = lines.SelectMany(l => l.Items).Where(i => i is not OmittedItems).ToList();
+        var karyotypeLines = result.CellLines.Where(c => c.Technique == SegmentTechnique.Karyotype).ToList();
+        var entries = KaryotypeEntries(result);
 
-        Assert.Equal(lines.Select(l => l.Span), result.CellLines.Select(c => c.Span));
-        Assert.Equal(items.Select(i => i.Span), result.Abnormalities.Select(a => a.Span));
-        Assert.Equal(Enumerable.Range(0, items.Count), result.Abnormalities.Select(a => a.Index));
+        Assert.Equal(lines.Select(l => l.Span), karyotypeLines.Select(c => c.Span));
+        Assert.Equal(items.Select(i => i.Span), entries.Select(a => a.Span));
+        Assert.Equal(Enumerable.Range(0, result.Abnormalities.Length), result.Abnormalities.Select(a => a.Index));
         Assert.Equal(result.Abnormalities.Length, result.CellLines.Sum(c => c.AbnormalityCount));
 
         for (var i = 0; i < items.Count; i++)
         {
-            var (item, entry) = (items[i], result.Abnormalities[i]);
+            var (item, entry) = (items[i], entries[i]);
             var line = result.CellLines[entry.CellLine];
             Assert.True(line.Span.Start <= entry.Span.Start && entry.Span.End <= line.Span.End, $"'{entry.Text}' outside its cell line '{line.Text}'");
             Assert.Equal(item.IsPartial, entry.Flags.IsPartial);
@@ -244,10 +250,11 @@ public class AbnormalityListTests
         var result = Result(text, fragment);
         var items = BindHelper.Bind(text, fragment).SelectMany(m => m.CellLines).SelectMany(l => l.Items).Where(i => i is not OmittedItems).ToList();
         var composed = 0;
+        var entries = KaryotypeEntries(result);
         for (var i = 0; i < items.Count; i++)
         {
             var expected = (items[i] as Abnormality)?.Composition?.Detailed;
-            Assert.Equal(expected, result.Abnormalities[i].Detailed);
+            Assert.Equal(expected, entries[i].Detailed);
             composed += expected is null ? 0 : 1;
         }
 

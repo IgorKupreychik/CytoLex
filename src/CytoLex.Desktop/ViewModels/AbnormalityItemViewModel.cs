@@ -43,6 +43,10 @@ public sealed class AbnormalityItemViewModel : ISpanItem
     private static readonly IImmutableSolidColorBrush _clone = Brush(0x03, 0x83, 0x87);
     private static readonly IImmutableSolidColorBrush _unrecognised = Brush(0x8A, 0x8A, 0x8A);
 
+    // Arr results (T-072): one neutral colour per result kind, no gain/loss colours (the copy number is not interpreted).
+    private static readonly IImmutableSolidColorBrush _arrCopyNumber = Brush(0x3B, 0x5B, 0x78);
+    private static readonly IImmutableSolidColorBrush _arrOther = Brush(0x6B, 0x4E, 0x2E);
+
     public AbnormalityItemViewModel(AbnormalityEntry entry, ImmutableArray<Diagnostic> diagnostics)
     {
         ArgumentNullException.ThrowIfNull(entry);
@@ -53,8 +57,9 @@ public sealed class AbnormalityItemViewModel : ISpanItem
         ShortForm = entry.ShortForm;
         Detailed = entry.Detailed;
         KindLabel = KindLabelOf(entry);
-        KindBrush = KindBrushOf(entry.Kind);
-        Tags = TagsOf(entry.Chromosomes, entry.Breakpoints);
+        KindBrush = KindBrushOf(entry);
+        Tags = entry.Arr is { } arr ? ArrTagsOf(entry, arr) : TagsOf(entry.Chromosomes, entry.Breakpoints);
+        PositionsText = entry.Arr is { } a ? PositionsOf(a) : null;
         Flags = FlagsOf(entry);
         Parts = entry.Kind == AbnormalityKind.Alternatives
             ? [.. entry.Readings.Select(r => new AbnormalityPartViewModel(r.Span, r.Text, r.ShortForm, TagsOf(r.Chromosomes, r.Breakpoints)))]
@@ -100,6 +105,15 @@ public sealed class AbnormalityItemViewModel : ISpanItem
     /// <summary>Chromosome tags (<c>chr 9</c>) and band tags (<c>9q34</c>).</summary>
     public ImmutableArray<string> Tags { get; }
 
+    /// <summary>
+    /// The nucleotide positions of an arr result (T-072): <c>GRCh38 · chr4:163,146,681–183,022,312</c>, <c>or</c> readings
+    /// joined, detailed-system items with their copy numbers; <c>null</c> without positions.
+    /// </summary>
+    public string? PositionsText { get; }
+
+    /// <summary>Whether there are positions to show.</summary>
+    public bool HasPositions => PositionsText is not null;
+
     /// <summary>Flag glyphs.</summary>
     public ImmutableArray<FlagViewModel> Flags { get; }
 
@@ -138,11 +152,13 @@ public sealed class AbnormalityItemViewModel : ISpanItem
         AbnormalityKind.Variant => "variant",
         AbnormalityKind.Alternatives => "or",
         AbnormalityKind.CloneReference => "clone",
+        AbnormalityKind.ArrResult => entry.Arr?.CopyText ?? "arr",
         _ => "?",
     };
 
-    private static IBrush KindBrushOf(AbnormalityKind kind) => kind switch
+    private static IBrush KindBrushOf(AbnormalityEntry entry) => entry.Kind switch
     {
+        AbnormalityKind.ArrResult => entry.Arr?.Kind is ArrResultKind.CopyNumber or null ? _arrCopyNumber : _arrOther,
         AbnormalityKind.Gain => _gain,
         AbnormalityKind.Loss => _loss,
         AbnormalityKind.Structural => _structural,
@@ -158,10 +174,79 @@ public sealed class AbnormalityItemViewModel : ISpanItem
             .. breakpoints.Select(b => b.Text).Distinct(StringComparer.Ordinal),
         ];
 
+    /// <summary>
+    /// Arr tags: the chromosome group as written (<c>chr 1–22,X</c>) for a whole-chromosome result, otherwise the
+    /// chromosomes and each region's bands as written (<c>chr 4</c>, <c>4q32.2q35.1</c>).
+    /// </summary>
+    internal static ImmutableArray<string> ArrTagsOf(AbnormalityEntry entry, ArrResultSummary arr)
+    {
+        if (arr.IsWholeChromosomes)
+        {
+            var close = entry.ShortForm.IndexOf(')', StringComparison.Ordinal);
+            return close > 1 ? ["chr " + entry.ShortForm[1..close]] : [.. entry.Chromosomes.Select(c => "chr " + c)];
+        }
+
+        return
+        [
+            .. entry.Chromosomes.Select(c => "chr " + c),
+            .. arr.Regions.SelectMany(r => new[] { r }.Concat(r.Alternatives)).Select(r => r.Bands).Distinct(StringComparer.Ordinal),
+        ];
+    }
+
+    /// <summary>The positions line of an arr result; <c>null</c> when no region gives positions.</summary>
+    internal static string? PositionsOf(ArrResultSummary arr)
+    {
+        var regions = arr.Regions.Where(r => !r.Positions.IsEmpty).Select(RegionPositions).ToList();
+        if (regions.Count == 0)
+        {
+            return null;
+        }
+
+        var text = string.Join("; ", regions);
+        return arr.Build is { } build ? $"{build} · {text}" : text;
+    }
+
+    private static string RegionPositions(ArrRegionSummary region)
+    {
+        var chromosomes = new[] { region }.Concat(region.Alternatives).Select(r => r.Chromosome).ToList();
+        return string.Join(", ", region.Positions.Select(p =>
+            string.Join(" or ", new[] { p }.Concat(p.Alternatives).Select((x, i) =>
+                (i < chromosomes.Count && chromosomes[i] is { } c ? $"chr{c}:" : string.Empty) + PositionText(x)))));
+    }
+
+    private static string PositionText(ArrPositionSummary p)
+    {
+        var text = p.Start is { } s ? s.ToString("N0", CultureInfo.InvariantCulture) : "?";
+        if (p.End is { } e)
+        {
+            text += "–" + e.ToString("N0", CultureInfo.InvariantCulture);
+        }
+
+        return p.CopyText is { } copy ? text + " " + copy : text;
+    }
+
     internal static ImmutableArray<FlagViewModel> FlagsOf(AbnormalityEntry entry)
     {
         var f = entry.Flags;
         var flags = ImmutableArray.CreateBuilder<FlagViewModel>();
+        if (entry.Arr is { } arr)
+        {
+            if (arr.Proportion is { } proportion)
+            {
+                flags.Add(new($"[{proportion}]", $"Proportion of cells with the result ([{proportion}])"));
+            }
+
+            if (arr.Zygosity is { } zygosity)
+            {
+                flags.Add(new(zygosity, zygosity == "hmz" ? "Homozygous (hmz)" : "Heterozygous (htz)"));
+            }
+
+            if (arr.IsMosaic)
+            {
+                flags.Add(new("mos", "Mosaic (mos)"));
+            }
+        }
+
         if (f.IsQuestioned)
         {
             flags.Add(new("?", "Questionable identification (?)"));
@@ -216,12 +301,20 @@ public sealed record CellLineGroupViewModel(string Header, ImmutableArray<Abnorm
     public static ImmutableArray<CellLineGroupViewModel> From(EditionResult result)
     {
         ArgumentNullException.ThrowIfNull(result);
-        var many = result.CellLines.Length > 1;
+        var many = result.CellLines.Count(l => l.Technique == SegmentTechnique.Karyotype) > 1;
         var groups = ImmutableArray.CreateBuilder<CellLineGroupViewModel>();
         var donor = false;
         int? segment = null;
+        var number = 0;
         foreach (var line in result.CellLines)
         {
+            if (line.Technique == SegmentTechnique.Arr)
+            {
+                groups.Add(new CellLineGroupViewModel(ArrHeaderOf(line), Cards(result, line)));
+                continue;
+            }
+
+            number++;
             // Transplant chimera: the cell lines before // are the recipient's, those after it the donor's.
             donor = segment == line.SegmentIndex && (donor || line.SeparatorBefore == CellLineSeparator.DoubleSlash);
             segment = line.SegmentIndex;
@@ -232,18 +325,35 @@ public sealed record CellLineGroupViewModel(string Header, ImmutableArray<Abnorm
                 CellLineRelation.Transplant => donor ? "donor" : "recipient",
                 _ => null,
             };
-            groups.Add(new CellLineGroupViewModel(
-                HeaderOf(line, many, relation),
-                [.. result.Abnormalities.Where(a => a.CellLine == line.Index).Select(a => new AbnormalityItemViewModel(a, result.Diagnostics))]));
+            groups.Add(new CellLineGroupViewModel(HeaderOf(line, many ? number : null, relation), Cards(result, line)));
         }
 
         return groups.ToImmutable();
     }
 
-    internal static string HeaderOf(CellLineSummary line, bool numbered, string? relation)
+    private static ImmutableArray<AbnormalityItemViewModel> Cards(EditionResult result, CellLineSummary line) =>
+        [.. result.Abnormalities.Where(a => a.CellLine == line.Index).Select(a => new AbnormalityItemViewModel(a, result.Diagnostics))];
+
+    /// <summary>The header of an arr group (T-072): <c>Microarray (arr) · GRCh38 · 3 results</c>.</summary>
+    internal static string ArrHeaderOf(CellLineSummary line)
+    {
+        var parts = new List<string> { "Microarray (arr)" };
+        if (line.Build is { } build)
+        {
+            parts.Add(build);
+        }
+
+        parts.Add(line.AbnormalityCount == 1 ? "1 result" : $"{line.AbnormalityCount} results");
+        return string.Join(" · ", parts);
+    }
+
+    /// <param name="line">The cell line.</param>
+    /// <param name="number">Its number among the karyotype cell lines (1-based); <c>null</c> when there is only one.</param>
+    /// <param name="relation"><c>mos</c>, <c>chi</c>, <c>recipient</c> or <c>donor</c>.</param>
+    internal static string HeaderOf(CellLineSummary line, int? number, string? relation)
     {
         var parts = new List<string>();
-        var title = numbered ? $"Cell line {line.Index + 1}" : "Cell line";
+        var title = number is { } n ? $"Cell line {n}" : "Cell line";
         parts.Add(relation is null ? title : $"{title} ({relation})");
 
         var karyotype = string.Join(",", new[] { line.Count, line.Sex }.OfType<string>());

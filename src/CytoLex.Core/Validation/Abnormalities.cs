@@ -27,7 +27,78 @@ public enum AbnormalityKind
 
     /// <summary>Text that could not be given a meaning, or a whole chromosome without a sign.</summary>
     Unrecognised,
+
+    /// <summary>A microarray result (ch. 14, T-072): regions or a chromosome group with a copy number, in <see cref="AbnormalityEntry.Arr"/>.</summary>
+    ArrResult,
 }
+
+/// <summary>The technique of a group in <see cref="EditionResult.CellLines"/> (T-072).</summary>
+public enum SegmentTechnique
+{
+    /// <summary>A cell line of a karyotype segment.</summary>
+    Karyotype,
+
+    /// <summary>A microarray (<c>arr</c>) segment: one group per segment.</summary>
+    Arr,
+}
+
+/// <summary>A nucleotide position or span of an arr region (T-072).</summary>
+/// <param name="Span">The position(s) in the whole input.</param>
+/// <param name="Start">The (first) position; <c>null</c> when it does not parse.</param>
+/// <param name="End">The last position of a span; <c>null</c> for a single position.</param>
+/// <param name="CopyText">The copy number of this item as written in the detailed system (<c>×1</c>); <c>null</c> otherwise.</param>
+/// <param name="Alternatives">Other readings joined by <c>or</c>.</param>
+public sealed record ArrPositionSummary(
+    TextSpan Span,
+    long? Start,
+    long? End,
+    string? CopyText,
+    ImmutableArray<ArrPositionSummary> Alternatives);
+
+/// <summary>A region of an arr result: the chromosome, its bands and positions (T-072).</summary>
+/// <param name="Span">The region (bands and positions) in the whole input.</param>
+/// <param name="Chromosome">The chromosome of the first band.</param>
+/// <param name="Bands">The bands as written (<c>4q32.2q35.1</c>).</param>
+/// <param name="Breakpoints">The first and last band.</param>
+/// <param name="Positions">The nucleotide positions, in input order; empty when none are written.</param>
+/// <param name="Alternatives">Other band readings joined by <c>or</c> (<c>Xq28 or Yq12</c>).</param>
+public sealed record ArrRegionSummary(
+    TextSpan Span,
+    string? Chromosome,
+    string Bands,
+    ImmutableArray<BreakpointSummary> Breakpoints,
+    ImmutableArray<ArrPositionSummary> Positions,
+    ImmutableArray<ArrRegionSummary> Alternatives);
+
+/// <summary>
+/// The microarray details of an <see cref="AbnormalityKind.ArrResult"/> entry (T-072). The copy number is given as
+/// written; whether it is a gain or a loss depends on the sex and ploidy and is not interpreted.
+/// </summary>
+/// <param name="Kind">A copy number, or the word in its place (<c>amp</c>, <c>cx</c>, <c>cth</c>).</param>
+/// <param name="CopyMin">The copy number, or the low end of a range.</param>
+/// <param name="CopyMax">The high end of a range; equal to <paramref name="CopyMin"/> otherwise.</param>
+/// <param name="CopyText">The result as written (<c>×1</c>, <c>×2~4</c>, <c>amp</c>); in the detailed system the copy number of the one span; <c>null</c> when none.</param>
+/// <param name="IsWholeChromosomes">A chromosome group (<c>(8)</c>, <c>(1–22,X)</c>) rather than regions.</param>
+/// <param name="IsRegionGroup">Regions grouped in parentheses before one result (§14.2.1 E5).</param>
+/// <param name="IsDetailed">The detailed system: a copy number per position (§14.1 ¶2).</param>
+/// <param name="Regions">The regions; empty for a chromosome group.</param>
+/// <param name="Proportion">The proportion of cells as written (<c>0.6</c>).</param>
+/// <param name="Zygosity"><c>htz</c> or <c>hmz</c>.</param>
+/// <param name="IsMosaic">The qualifier <c>mos</c>.</param>
+/// <param name="Build">The genome build of the segment (<c>GRCh38</c>).</param>
+public sealed record ArrResultSummary(
+    ArrResultKind Kind,
+    int? CopyMin,
+    int? CopyMax,
+    string? CopyText,
+    bool IsWholeChromosomes,
+    bool IsRegionGroup,
+    bool IsDetailed,
+    ImmutableArray<ArrRegionSummary> Regions,
+    string? Proportion,
+    string? Zygosity,
+    bool IsMosaic,
+    string? Build);
 
 /// <summary>One cell line of a karyotype segment, for grouping the abnormality list.</summary>
 /// <param name="Index">Index in <see cref="EditionResult.CellLines"/>.</param>
@@ -43,6 +114,8 @@ public enum AbnormalityKind
 /// <param name="IsPartial">Built from recovered input.</param>
 /// <param name="AbnormalityCount">The entries of <see cref="EditionResult.Abnormalities"/> in this cell line.</param>
 /// <param name="BasedOn">The index (in <see cref="EditionResult.CellLines"/>) of the clone this line refers to with <c>idem</c>/<c>sl</c>/<c>sdl</c> (T-032).</param>
+/// <param name="Technique">A karyotype cell line, or a whole arr segment (T-072: count, sex and cells are then <c>null</c>).</param>
+/// <param name="Build">The genome build of an arr segment (<c>GRCh38</c>).</param>
 public sealed record CellLineSummary(
     int Index,
     int SegmentIndex,
@@ -56,7 +129,9 @@ public sealed record CellLineSummary(
     bool IsComposite,
     bool IsPartial,
     int AbnormalityCount,
-    int? BasedOn = null);
+    int? BasedOn = null,
+    SegmentTechnique Technique = SegmentTechnique.Karyotype,
+    string? Build = null);
 
 /// <summary>A breakpoint of an abnormality.</summary>
 /// <param name="Span">The breakpoint in the whole input.</param>
@@ -141,6 +216,7 @@ public sealed record AbnormalityFlags(
 /// The abnormality in the detailed system (T-066): <c>der(9)(9pter→9q34::22q11.2→22qter)</c>, computed from the short
 /// system or as written; <c>null</c> without a band composition (<see cref="Semantics.Abnormality.Composition"/>).
 /// </param>
+/// <param name="Arr">The microarray details of an <see cref="AbnormalityKind.ArrResult"/> (T-072); <c>null</c> otherwise.</param>
 public sealed record AbnormalityEntry(
     int Index,
     int CellLine,
@@ -158,4 +234,5 @@ public sealed record AbnormalityEntry(
     AbnormalityFlags Flags,
     ImmutableArray<int> Diagnostics,
     ImmutableArray<KbRef> Kb,
-    string? Detailed = null);
+    string? Detailed = null,
+    ArrResultSummary? Arr = null);

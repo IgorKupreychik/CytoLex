@@ -48,8 +48,8 @@ public sealed record SegmentResult(
 /// <param name="Counts">Diagnostic counts.</param>
 /// <param name="Diagnostics">Diagnostics, sorted by span start, then most severe first.</param>
 /// <param name="Segments">One result per segment; empty for a not-implemented edition.</param>
-/// <param name="CellLines">The cell lines of the karyotype segments, in input order (T-069).</param>
-/// <param name="Abnormalities">The abnormalities of the karyotype segments, in input order; each names its cell line (T-069).</param>
+/// <param name="CellLines">The cell lines of the karyotype segments and one group per arr segment, in input order (T-069, T-072).</param>
+/// <param name="Abnormalities">The abnormalities of the karyotype segments and the arr results, in input order; each names its cell line or arr group (T-069, T-072).</param>
 /// <param name="Translation">The literal translation (T-058); <c>null</c> unless <see cref="ValidationOptions.IncludeTranslation"/>.</param>
 /// <param name="AutoCorrection">
 /// What autocorrection did (T-096); <c>null</c> unless <see cref="ValidationOptions.AutoCorrect"/> (and for a

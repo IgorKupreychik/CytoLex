@@ -119,7 +119,7 @@ public class ArrChecksTests
         var segment = Assert.Single(result.Segments);
         Assert.Equal(EditionStatus.Implemented, segment.Status);
         Assert.True(result.Validity.IsComplete);
-        Assert.Empty(result.Abnormalities); // arr entries: T-072
+        Assert.Equal(["(8)×3", "(21)×3"], result.Abnormalities.Select(a => a.ShortForm)); // T-072
     }
 
     [Fact]

@@ -128,6 +128,46 @@ public class AbnormalityPanelTests
         Assert.True(group.IsEmpty);
     }
 
+    /// <summary>T-072: an arr segment is one group; each result is a card with its copy number, bands and positions.</summary>
+    [Fact]
+    public void Arr_GroupAndCards()
+    {
+        const string input = "arr[GRCh38] 4q32.2q35.1(163146681_183022312)×1 mat,(21)×3,7p11.2(54290345_55087100)amp";
+        var vm = new MainWindowViewModel { Input = input };
+        var group = Assert.Single(vm.SelectedPanel!.CellLineGroups);
+        Assert.Equal("Microarray (arr) · GRCh38 · 3 results", group.Header);
+        Assert.Equal("Abnormalities (3)", vm.SelectedPanel.AbnormalitiesHeader);
+        Assert.Equal(["×1", "×3", "amp"], group.Items.Select(i => i.KindLabel));
+
+        var region = group.Items[0];
+        Assert.Equal("4q32.2q35.1×1", region.ShortForm);
+        Assert.Equal(["chr 4", "4q32.2q35.1"], region.Tags);
+        Assert.Equal("GRCh38 · chr4:163,146,681–183,022,312", region.PositionsText);
+        Assert.Equal(["mat"], region.Flags.Select(f => f.Glyph));
+        Assert.NotEqual(group.Items[0].KindBrush, group.Items[2].KindBrush);
+
+        var whole = group.Items[1];
+        Assert.Equal(["chr 21"], whole.Tags);
+        Assert.False(whole.HasPositions);
+
+        vm.SelectSpan(region.Span);
+        Assert.Equal("4q32.2q35.1(163146681_183022312)×1 mat", vm.SelectedSpan!.Value.Of(input));
+    }
+
+    [Fact]
+    public void Arr_CombinedWithKaryotype_FlagsAndDetailed()
+    {
+        var vm = new MainWindowViewModel { Input = "46,XX.arr[GRCh38] 4q32.2q35.1(163002425×2,163146681_183022312×1,184322231×2),(1–22,X)×2,(X)×1[0.6],15q11.2q26.3(23123715_101888908)×2 hmz" };
+        var groups = vm.SelectedPanel!.CellLineGroups;
+        Assert.Equal(["Cell line · 46,XX · 0 abnormalities", "Microarray (arr) · GRCh38 · 4 results"], groups.Select(g => g.Header));
+        var items = groups[1].Items;
+        Assert.Equal("GRCh38 · chr4:163,002,425 ×2, chr4:163,146,681–183,022,312 ×1, chr4:184,322,231 ×2", items[0].PositionsText);
+        Assert.Equal("×1", items[0].KindLabel);
+        Assert.Equal(["chr 1–22,X"], items[1].Tags);
+        Assert.Equal(["[0.6]"], items[2].Flags.Select(f => f.Glyph));
+        Assert.Equal(["hmz"], items[3].Flags.Select(f => f.Glyph));
+    }
+
     /// <summary>T-066: a card shows the detailed-system form when it differs from the written text.</summary>
     [Fact]
     public void DetailedForm_Shown()

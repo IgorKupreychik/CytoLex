@@ -134,7 +134,11 @@ public sealed class Validator
             models.Add((segment, model));
             if (model is KaryotypeModel karyotype)
             {
-                abnormalities.Add(segment.Index, karyotype); // arr entries: T-072
+                abnormalities.Add(segment.Index, karyotype);
+            }
+            else if (model is ArrModel arr)
+            {
+                abnormalities.Add(segment.Index, arr); // T-072
             }
 
             diagnostics.AddRange(tree.Diagnostics.Select(d => DiagnosticFactory.FromSyntax(profile.Kb, input, d, context.Effective)).OfType<Diagnostic>());

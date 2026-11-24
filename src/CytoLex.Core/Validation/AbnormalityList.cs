@@ -7,8 +7,8 @@ using CytoLex.Core.Text;
 namespace CytoLex.Core.Validation;
 
 /// <summary>
-/// Flattens the semantic model of karyotype segments into <see cref="EditionResult.CellLines"/> and
-/// <see cref="EditionResult.Abnormalities"/> (docs/design/core.md §9, T-069).
+/// Flattens the semantic model of karyotype and arr segments into <see cref="EditionResult.CellLines"/> and
+/// <see cref="EditionResult.Abnormalities"/> (docs/design/core.md §9, T-069, T-072).
 /// </summary>
 internal sealed class AbnormalityList(string input)
 {
@@ -49,6 +49,40 @@ internal sealed class AbnormalityList(string input)
                 _entries.Count - before,
                 line.BasedOn?.TargetIndex is { } target ? first + target : null));
         }
+    }
+
+    /// <summary>Adds one arr segment as one group and its results as entries, in input order (T-072).</summary>
+    public void Add(int segmentIndex, ArrModel model)
+    {
+        var lineIndex = _cellLines.Count;
+        var before = _entries.Count;
+        var build = model.Build?.Text;
+        foreach (var node in model.Children().Where(n => n is ArrAberration or UnboundItem).OrderBy(n => n.Span.Start))
+        {
+            _entries.Add(node switch
+            {
+                ArrAberration a => ArrEntries.Entry(input, a, build, lineIndex, _entries.Count),
+                UnboundItem u => Basic(u, lineIndex, _entries.Count, AbnormalityKind.Unrecognised, u.Text, Flags(u, null, false, false)),
+                _ => throw new InvalidOperationException("unreachable"),
+            });
+        }
+
+        _cellLines.Add(new CellLineSummary(
+            lineIndex,
+            segmentIndex,
+            model.Span,
+            model.Span.Of(input),
+            CellLineSeparator.None,
+            CellLineRelation.None,
+            null,
+            null,
+            null,
+            false,
+            model.IsPartial,
+            _entries.Count - before,
+            null,
+            SegmentTechnique.Arr,
+            build));
     }
 
     /// <summary>The cell lines and the entries, with the diagnostics inside each entry's span linked.</summary>
@@ -218,7 +252,7 @@ internal sealed class AbnormalityList(string input)
         return sb.Append('(').Append(string.Join(';', names)).Append(')').ToString();
     }
 
-    private BreakpointSummary Summary(Breakpoint b) => new(
+    internal static BreakpointSummary Summary(Breakpoint b) => new(
         b.Span,
         FullText(b),
         b.Chromosome?.Name,
