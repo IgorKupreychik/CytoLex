@@ -223,8 +223,15 @@ public enum CompositionGapKind
     /// <summary>A breakpoint is uncertain (<c>q2?3</c>, <c>~</c>, <c>or</c>) or missing, or a chromosome is not given.</summary>
     Uncertain,
 
-    /// <summary>The type or shape has no defined composition yet (insertion recombinants, T-087).</summary>
+    /// <summary>The composer computes no composition for this type or shape (its fallback when none of the other kinds applies).</summary>
     Unsupported,
+
+    /// <summary>
+    /// ISCN defines no band composition for this (T-087): insertion recombinants (<c>REC.DEFINITION</c> spells out only
+    /// inversion recombinants), an insertion or hsr on the unknown chromosome of a <c>der(?)</c> (the short system doesn't
+    /// say on which arm), and aberrations between other chromosomes recorded in a derivative (their history, §11.3 E10).
+    /// </summary>
+    Undefined,
 
     /// <summary>
     /// An aberration of a derivative names a band the chromosome being built no longer has after the earlier

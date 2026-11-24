@@ -97,7 +97,7 @@ public class CompositionRuleTests
     [InlineData("46,XX,der(1)t(1;3)(p32;q21)t(1;11)(q25;q13)")]
     [InlineData("46,XY,der(1)t(1;3)(p32;q21)t(3;7)(q28;q11.2)")] // a new rearrangement the short system still places
     [InlineData("46,XX,der(1)t(1;3)(p3?2;q21)t(1;5)(p34;q31)")] // uncertain: not a placement fault
-    [InlineData("47,XX,+der(?)t(?;9)(?;p13)ins(?;7)(?;q11.2q32)")] // undefined shape (T-087)
+    [InlineData("47,XX,+der(?)t(?;9)(?;p13)ins(?;7)(?;q11.2q32)")] // no composition by decision (T-087)
     [InlineData("46,XX,der(9)t(9;11)(p22;q23)t(11;12)(p13;q22)c,der(11)t(9;11)t(11;12)c,der(12)t(11;12)c[20]")] // §11.3 E10: history of other chromosomes
     public void ComposedOrUndefinedDerivative_IsNotReported(string input) => Assert.Empty(Of(input, _complex));
 }

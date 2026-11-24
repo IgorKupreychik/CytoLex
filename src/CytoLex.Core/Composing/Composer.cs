@@ -368,7 +368,9 @@ internal sealed class Composer(Func<string, bool> hasRule)
 
         if (head.Head == "rec")
         {
-            return Recombinant(a, chromosomes[0]);
+            var recombinant = Recombinant(a, chromosomes[0]);
+            gap = recombinant is null ? new CompositionGap(CompositionGapKind.Undefined) : null;
+            return recombinant;
         }
 
         WorkingChromosome w;
@@ -408,8 +410,10 @@ internal sealed class Composer(Func<string, bool> hasRule)
         for (var i = 1; i < a.Parts.Length; i++)
         {
             var part = a.Parts[i];
+            var onUnknown = w.HasUnknownCentric && NamesUnknown(part);
             if (Groups(part) is not { Count: > 0 } groups)
             {
+                gap = onUnknown ? new CompositionGap(CompositionGapKind.Undefined) : null;
                 return null;
             }
 
@@ -424,12 +428,16 @@ internal sealed class Composer(Func<string, bool> hasRule)
             {
                 // Only an aberration of the derivative's own chromosome is a placement fault; one between other chromosomes
                 // records their history (§11.3 E10: der(9)t(9;11)(p22;q23)t(11;12)(p13;q22)c) and has no defined shape.
-                gap = groups.Any(g => chromosomes.Contains(g.Chromosome)) ? new CompositionGap(CompositionGapKind.Unplaceable, i) : null;
+                gap = groups.Any(g => chromosomes.Contains(g.Chromosome))
+                    ? new CompositionGap(CompositionGapKind.Unplaceable, i)
+                    : new CompositionGap(CompositionGapKind.Undefined);
                 return null;
             }
 
             if (!Apply(w, part.Head, groups, pendingCentric, rules))
             {
+                // der(?)ins(?;7)(?;q11.2q32): the short system doesn't say where on the unknown chromosome (T-087)
+                gap = onUnknown ? new CompositionGap(CompositionGapKind.Undefined) : null;
                 return null;
             }
         }
@@ -449,7 +457,7 @@ internal sealed class Composer(Func<string, bool> hasRule)
 
     /// <summary>
     /// <c>REC.DEFINITION</c> (§4.5 ¶4): the recombinants of a pericentric inversion inv(n)(pXqY): <c>dup(np)</c> → pter→qY::pX→pter,
-    /// <c>dup(nq)</c> → qter→qY::pX→qter (then oriented). Other recombinants (insertions) have no defined composition yet.
+    /// <c>dup(nq)</c> → qter→qY::pX→qter (then oriented). Other recombinants (insertions) have none (T-087: <see cref="CompositionGapKind.Undefined"/>).
     /// </summary>
     private static List<ComposedChromosome>? Recombinant(Abnormality a, ChromosomeId c)
     {
@@ -508,7 +516,7 @@ internal sealed class Composer(Func<string, bool> hasRule)
     /// Whether the chromosome being built still has the place an aberration acts on: a translocation or insertion needs
     /// one of its groups on it (where <see cref="Receive"/> and <see cref="Insert"/> look), the other types every band.
     /// </summary>
-    /// <remarks>An unknown partner on the unknown chromosome of a der(?) is not a placement fault but an undefined shape (T-087).</remarks>
+    /// <remarks>An unknown partner on the unknown chromosome of a der(?) is not a placement fault: ISCN defines no shape for it (T-087).</remarks>
     private static bool Placeable(WorkingChromosome w, string head, List<Group> groups) => (w.HasUnknownCentric && groups.Any(g => g.IsUnknown)) || head switch
     {
         "t" => groups.Any(g => !g.IsUnknown && g.Points.Length is 1 or 2 && w.Contains(g.First))
@@ -561,6 +569,9 @@ internal sealed class Composer(Func<string, bool> hasRule)
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────────────────────────
+
+    /// <summary>Whether the aberration names the unknown chromosome (<c>ins(?;7)</c>, <c>hsr(?)</c>).</summary>
+    private static bool NamesUnknown(AbnormalityPart part) => part.Chromosomes.Any(c => ChromosomeId.Of(c).IsUnknown);
 
     /// <summary>The breakpoint groups as points; <c>null</c> when a group has no chromosome or an uncertain point.</summary>
     private static List<Group>? Groups(AbnormalityPart part)

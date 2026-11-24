@@ -121,11 +121,13 @@ public class CompositionTypeTests
     [InlineData("46,XX,del(5)(q13~q21)", CompositionGapKind.Uncertain)]
     [InlineData("46,XX,t(1;3)(p32 or p34;q21)", CompositionGapKind.Uncertain)]
     [InlineData("46,XX,der(1)t(1;3)(p22;q13.1)t(1;5)(p32;q31)", CompositionGapKind.Unplaceable)] // 1p32 lost by the first translocation (T-086)
-    [InlineData("46,XX,der(1)t(1;3)(p32;q21)t(5;7)(q11;p13)", CompositionGapKind.Unsupported)] // an aberration of other chromosomes: their history, no defined shape
+    [InlineData("46,XX,der(1)t(1;3)(p32;q21)t(5;7)(q11;p13)", CompositionGapKind.Undefined)] // an aberration of other chromosomes: their history, no defined shape (T-087)
     [InlineData("46,XX,der(1)t(1;3)(p32;q21)del(1)(p34)", CompositionGapKind.Unplaceable)]
     [InlineData("46,XX,der(1)t(1;3)(p32;q21)del(1)(p2?2)", CompositionGapKind.Uncertain)]
-    [InlineData("46,XX,rec(21)del(21)ins(21)(p13q22.2q22.3)pat", CompositionGapKind.Unsupported)] // insertion recombinants: no rule defines the crossover product
-    [InlineData("47,XX,+der(?)t(?;9)(?;p13)ins(?;7)(?;q11.2q32)", CompositionGapKind.Unsupported)] // insertion into the unknown chromosome (T-087)
+    [InlineData("46,XX,rec(21)del(21)ins(21)(p13q22.2q22.3)pat", CompositionGapKind.Undefined)] // insertion recombinants: no rule defines the crossover product (T-087)
+    [InlineData("46,XY,rec(1)dup(5q)ins(1;5)(q32;q11.2q22)inh", CompositionGapKind.Undefined)]
+    [InlineData("47,XX,+der(?)t(?;9)(?;p13)ins(?;7)(?;q11.2q32)", CompositionGapKind.Undefined)] // insertion or hsr on the unknown chromosome: no arm given (T-087)
+    [InlineData("47,XX,+der(?)t(?;9)(?;p13)hsr(?)", CompositionGapKind.Undefined)]
     public void NoComposition(string text, CompositionGapKind gap)
     {
         var a = First(text);

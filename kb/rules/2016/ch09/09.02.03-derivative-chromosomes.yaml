@@ -191,6 +191,10 @@ rules:
       note: >-
         E27 writes ?cen, E28/E29 write ?→cen in the detailed form; both kept as printed.
         Placement in the karyotype: ORDER.UNKNOWN_CENTROMERE_DER.
+        Band composition (T-087): E28/E29 put the insertion and the hsr on an arm of the
+        unknown chromosome that only the captions name ("in the long arm"); the short system
+        doesn't say where, so CytoLex computes no composition for an insertion or hsr on the
+        unknown chromosome (no convention inferred from the examples).
     related: [ORDER.UNKNOWN_CENTROMERE_DER, UNCERTAIN.QUESTION_MARK_DESIGNATION, RING.MONOCENTRIC_AS_DER]
 
   - id: DER.HOMOLOGUE_NOT_SPECIFIED

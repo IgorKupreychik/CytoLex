@@ -237,7 +237,7 @@ public class AbnormalityListTests
 
     public static IEnumerable<TheoryDataRow<string>> PairShortForms() =>
         Composition.CompositionPairTests.Pairs
-            .Where(p => !Composition.PendingCompositions.Table.ContainsKey(p.Cite))
+            .Where(p => !Composition.PendingCompositions.Table.ContainsKey(p.Cite) && !Composition.UndefinedCompositions.Table.ContainsKey(p.Cite))
             .SelectMany(p => p.ShortForms)
             .Distinct(StringComparer.Ordinal)
             .Select(s => new TheoryDataRow<string>(s));

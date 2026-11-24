@@ -34,9 +34,12 @@ public class CompositionPairTests
         var pair = Pairs.Single(p => p.Cite == cite);
         var failures = new List<string>();
         var compared = 0;
+        var undefined = 0;
+        var isUndefined = UndefinedCompositions.Table.ContainsKey(cite);
         foreach (var shortForm in pair.ShortForms)
         {
-            var computed = Items(shortForm).Select(i => (i as Abnormality)?.Composition).ToList();
+            var abnormalities = Items(shortForm).Select(i => i as Abnormality).ToList();
+            var computed = abnormalities.Select(a => a?.Composition).ToList();
             var printed = pair.DetailedForms.Select(d => Items(d).Select(Written).ToList()).ToList();
             for (var i = 0; i < computed.Count; i++)
             {
@@ -48,6 +51,12 @@ public class CompositionPairTests
 
                 compared++;
                 var actual = computed[i];
+                if (isUndefined && actual is null && abnormalities[i]?.CompositionGap?.Kind == CompositionGapKind.Undefined)
+                {
+                    undefined++;
+                    continue;
+                }
+
                 if (actual is null || actual.Source != CompositionSource.Computed || !expected.Any(e => e.SequenceEqual(actual.Products)))
                 {
                     failures.Add($"{shortForm} item {i}: computed {(actual is null ? "none" : string.Join(";", actual.Products))}, printed {string.Join(" or ", expected.Select(e => string.Join(";", e)))}");
@@ -55,6 +64,7 @@ public class CompositionPairTests
             }
         }
 
+        Assert.False(isUndefined && undefined == 0, $"'{cite}' has no item without a composition any more: remove it from {nameof(UndefinedCompositions)}.");
         PendingCompositions.SkipOrFailIfFixed(cite, failures.Count == 0 && compared > 0);
         Assert.True(compared > 0, "no item to compare");
         Assert.Empty(failures);
@@ -139,8 +149,6 @@ internal static class PendingCompositions
     public static readonly IReadOnlyDictionary<string, string> Table =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            ["9.2.3 p.64 E28"] = "insertion into the unknown chromosome at an unknown site (ins(?;7)(?;q11.2q32) → ?→cen→?::7q11.2→7q32::?): no KB rule places it or orients the segment (T-087)",
-            ["9.2.3 p.64 E29"] = "hsr(?) without a band; the book writes the unknown chromosome as ?→cen→?::hsr→?, which no KB rule defines (T-087)",
         };
 
     public static void SkipOrFailIfFixed(string cite, bool passes)
@@ -153,4 +161,19 @@ internal static class PendingCompositions
         Assert.False(passes, $"'{cite}' now passes: remove it from {nameof(PendingCompositions)}.");
         Assert.Skip($"pending - {reason}");
     }
+}
+
+/// <summary>
+/// Example blocks whose short form has, by decision, no band composition (<see cref="CompositionGapKind.Undefined"/>,
+/// T-087): the printed detailed form says more than the short form does. Their items must report <c>Undefined</c>
+/// instead of composing; an entry whose items all compose fails its test, so the entry is removed then.
+/// </summary>
+internal static class UndefinedCompositions
+{
+    public static readonly IReadOnlyDictionary<string, string> Table =
+        new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["9.2.3 p.64 E28"] = "ins(?;7)(?;q11.2q32) on the unknown chromosome: the arm (\"in the long arm\") is only in the caption",
+            ["9.2.3 p.64 E29"] = "hsr(?) on the unknown chromosome without a band: the arm is only in the caption",
+        };
 }
