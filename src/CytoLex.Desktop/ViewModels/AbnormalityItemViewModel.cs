@@ -54,11 +54,18 @@ public sealed class AbnormalityItemViewModel : ISpanItem
     private static readonly IImmutableSolidColorBrush _normal = Brush(0x7A, 0x7A, 0x7A);
 
     public AbnormalityItemViewModel(AbnormalityEntry entry, ImmutableArray<Diagnostic> diagnostics)
+        : this(entry, diagnostics, null)
+    {
+    }
+
+    /// <summary>A card whose spans are mapped to the editor text by <paramref name="toEditor"/> (T-097: autocorrection; <c>null</c> = as they are).</summary>
+    public AbnormalityItemViewModel(AbnormalityEntry entry, ImmutableArray<Diagnostic> diagnostics, Func<TextSpan, TextSpan>? toEditor)
     {
         ArgumentNullException.ThrowIfNull(entry);
 
+        toEditor ??= static s => s;
         Entry = entry;
-        Span = entry.Span;
+        Span = toEditor(entry.Span);
         Text = entry.Text;
         ShortForm = entry.ShortForm;
         Detailed = entry.Detailed;
@@ -69,8 +76,8 @@ public sealed class AbnormalityItemViewModel : ISpanItem
         LociText = entry.InSitu is { } s ? LociOf(s) : null;
         Flags = FlagsOf(entry);
         Parts = entry.Kind == AbnormalityKind.Alternatives
-            ? [.. entry.Readings.Select(r => new AbnormalityPartViewModel(r.Span, r.Text, r.ShortForm, TagsOf(r.Chromosomes, r.Breakpoints)))]
-            : [.. entry.Parts.Select(p => new AbnormalityPartViewModel(p.Span, p.Text, p.ShortForm, TagsOf(p.Chromosomes, p.Breakpoints)))];
+            ? [.. entry.Readings.Select(r => new AbnormalityPartViewModel(toEditor(r.Span), r.Text, r.ShortForm, TagsOf(r.Chromosomes, r.Breakpoints)))]
+            : [.. entry.Parts.Select(p => new AbnormalityPartViewModel(toEditor(p.Span), p.Text, p.ShortForm, TagsOf(p.Chromosomes, p.Breakpoints)))];
         PartsHeader = entry.Kind == AbnormalityKind.Alternatives ? $"{Parts.Length} readings" : $"{Parts.Length} parts";
 
         var linked = entry.Diagnostics.Where(i => i >= 0 && i < diagnostics.Length).Select(i => diagnostics[i]).ToList();
@@ -395,7 +402,10 @@ public sealed record CellLineGroupViewModel(string Header, ImmutableArray<Abnorm
     public bool IsEmpty => Items.IsEmpty;
 
     /// <summary>The groups of <paramref name="result"/>, one per cell line.</summary>
-    public static ImmutableArray<CellLineGroupViewModel> From(EditionResult result)
+    public static ImmutableArray<CellLineGroupViewModel> From(EditionResult result) => From(result, null);
+
+    /// <summary>The groups of <paramref name="result"/>, with spans mapped to the editor text by <paramref name="toEditor"/> (T-097).</summary>
+    public static ImmutableArray<CellLineGroupViewModel> From(EditionResult result, Func<TextSpan, TextSpan>? toEditor)
     {
         ArgumentNullException.ThrowIfNull(result);
         var many = result.CellLines.Count(l => l.Technique == SegmentTechnique.Karyotype) > 1;
@@ -411,7 +421,7 @@ public sealed record CellLineGroupViewModel(string Header, ImmutableArray<Abnorm
         {
             if (line.Technique == SegmentTechnique.Arr)
             {
-                groups.Add(new CellLineGroupViewModel(ArrHeaderOf(line), Cards(result, line)));
+                groups.Add(new CellLineGroupViewModel(ArrHeaderOf(line), Cards(result, line, toEditor)));
                 continue;
             }
 
@@ -428,7 +438,7 @@ public sealed record CellLineGroupViewModel(string Header, ImmutableArray<Abnorm
                 CellLineRelation.Transplant => donor ? "donor" : "recipient",
                 _ => null,
             };
-            var cards = Cards(result, line);
+            var cards = Cards(result, line, toEditor);
             if (line.Technique == SegmentTechnique.InSitu)
             {
                 int? numbered = inSituLines[line.SegmentIndex] > 1 ? inSituNumber : null;
@@ -444,8 +454,8 @@ public sealed record CellLineGroupViewModel(string Header, ImmutableArray<Abnorm
         return groups.ToImmutable();
     }
 
-    private static ImmutableArray<AbnormalityItemViewModel> Cards(EditionResult result, CellLineSummary line) =>
-        [.. result.Abnormalities.Where(a => a.CellLine == line.Index).Select(a => new AbnormalityItemViewModel(a, result.Diagnostics))];
+    private static ImmutableArray<AbnormalityItemViewModel> Cards(EditionResult result, CellLineSummary line, Func<TextSpan, TextSpan>? toEditor) =>
+        [.. result.Abnormalities.Where(a => a.CellLine == line.Index).Select(a => new AbnormalityItemViewModel(a, result.Diagnostics, toEditor))];
 
     /// <summary>The header of an in situ cell line (T-092): <c>In situ (nuc ish) · cell line 2 (donor) · [50/400] · 1 result</c>.</summary>
     /// <param name="line">The cell line.</param>

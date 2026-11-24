@@ -204,4 +204,27 @@ public class AutoCorrectionTests
         Assert.Equal(new TextSpan(3, 2), auto.ToOriginal(new TextSpan(3, 1)));
         Assert.Equal(new TextSpan(0, 2), auto.ToOriginal(new TextSpan(0, 2)));
     }
+
+    [Fact]
+    public void TryToOriginal_MapsARemainingFixOntoTheTypedText()
+    {
+        const string input = "46, xy,inv(3)(q27p21)";
+        var result = Correct(input);
+        var auto = result.AutoCorrection!;
+        var fix = result.Diagnostics.SelectMany(d => d.Fixes).First(f => f.IsEdit);
+
+        Assert.True(auto.TryToOriginal(fix.Edits, out var edits));
+        Assert.Equal("46, xy,inv(3)(p21q27)", Fixer.Apply(input, edits));
+    }
+
+    [Fact]
+    public void TryToOriginal_FailsOnAutocorrectedText()
+    {
+        var auto = Correct("46,xy").AutoCorrection!;
+
+        Assert.False(auto.TryToOriginal([new TextEdit(new TextSpan(3, 2), "XX")], out var edits));
+        Assert.True(edits.IsEmpty);
+        Assert.True(auto.TryToOriginal([new TextEdit(new TextSpan(0, 2), "47")], out edits));
+        Assert.Equal(new TextSpan(0, 2), Assert.Single(edits).Span);
+    }
 }

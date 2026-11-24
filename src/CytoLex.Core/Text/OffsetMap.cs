@@ -73,6 +73,39 @@ public sealed record OffsetMap(int OriginalLength, ImmutableArray<OffsetPiece> P
     /// <summary>The original offset of the derived offset <paramref name="offset"/> (as the start of a span).</summary>
     public int ToOriginal(int offset) => StartToOriginal(offset);
 
+    /// <summary>
+    /// Whether <paramref name="span"/> of the derived text lies in text copied unchanged from the original (T-097): no
+    /// character of it was written by an edit, and an empty span (an insertion point) is not strictly inside written text.
+    /// Such a span maps to an original span of the same text (<see cref="ToOriginal(TextSpan)"/>).
+    /// </summary>
+    public bool IsCopied(TextSpan span)
+    {
+        if (span.Start < 0 || span.End > Length)
+        {
+            return false;
+        }
+
+        var pieceStart = 0;
+        foreach (var p in Pieces)
+        {
+            var pieceEnd = pieceStart + p.Length;
+            if (!p.IsCopy)
+            {
+                var overlaps = span.Length == 0
+                    ? pieceStart < span.Start && span.Start < pieceEnd
+                    : span.Start < pieceEnd && pieceStart < span.End;
+                if (overlaps)
+                {
+                    return false;
+                }
+            }
+
+            pieceStart = pieceEnd;
+        }
+
+        return true;
+    }
+
     private int StartToOriginal(int offset)
     {
         var pieceStart = 0;

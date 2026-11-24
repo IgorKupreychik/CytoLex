@@ -30,30 +30,57 @@ public partial class EditionPanelViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(report);
         ArgumentNullException.ThrowIfNull(result);
 
+        // With autocorrection (T-097) the result's spans refer to the corrected string; the editor shows the typed text.
         var input = report.Input;
+        var text = EditionText.Of(report, result);
         Result = result;
         Edition = result.Edition;
         IsNotImplemented = result.Status == EditionStatus.NotImplemented;
         IsValid = !IsNotImplemented && result.Validity.IsValid;
+        IsAutoCorrected = result.Verdict == EditionVerdict.ValidAfterAutoCorrection;
         ValidityText = VerdictOf(result, report.Context);
-        ChipText = ChipOf(Edition, IsNotImplemented, IsValid, result.Counts.Errors);
+        ChipText = ChipOf(Edition, IsNotImplemented, IsValid, result.Counts.Errors, IsAutoCorrected);
         CountsText = IsNotImplemented ? string.Empty : CountsOf(result.Counts);
         ChipTip = CountsText.Length == 0 ? ValidityText : $"{ValidityText} · {CountsText}";
 
         Segments = [.. report.Segments.Select(s => SegmentItemViewModel.From(input, s, result.Segments.FirstOrDefault(r => r.Segment.Index == s.Index)))];
-        Diagnostics = [.. result.Diagnostics.Select((d, i) => new DiagnosticItemViewModel(input, d, i, result.Edition, applyFix))];
-        FixAll = FixAllViewModel.From(input, result, report.Context.Effective, applyFix);
-        CellLineGroups = CellLineGroupViewModel.From(result);
-        Highlights = IsNotImplemented ? [] : HighlightBuilder.Build(input, result, report.Context.Effective);
+        Diagnostics = [.. result.Diagnostics.Select((d, i) => new DiagnosticItemViewModel(text, d, i, result.Edition, applyFix))];
+        FixAll = FixAllViewModel.From(text, result, report.Context.Effective, applyFix);
+        CellLineGroups = CellLineGroupViewModel.From(result, text.ToEditor);
+        Highlights = IsNotImplemented ? [] : HighlightBuilder.Build(text, result, report.Context.Effective);
+        if (text.IsCorrected)
+        {
+            Corrected = text.Text;
+            Corrections = [.. result.AutoCorrection!.Corrections.Select(c => new CorrectionItemViewModel(
+                c,
+                openKbEntry is null ? null : id => openKbEntry(result.Edition, KbRef.Rule(id))))];
+        }
+
         Translation = result.Translation is { } translation
             ? new TranslationViewModel(
                 translation,
                 result.Diagnostics,
                 build,
                 openKbEntry is null ? null : r => openKbEntry(result.Edition, r),
-                SelectDiagnostic)
+                SelectDiagnostic,
+                text.ToEditor)
             : null;
     }
+
+    /// <summary>The corrected string (T-097); <c>null</c> when autocorrection was off or changed nothing.</summary>
+    public string? Corrected { get; }
+
+    /// <summary>Whether the "Corrected" line is shown: autocorrection changed the input.</summary>
+    public bool HasCorrection => Corrected is not null;
+
+    /// <summary>One note per applied autocorrection (rule, change, citation).</summary>
+    public IReadOnlyList<CorrectionItemViewModel> Corrections { get; } = [];
+
+    /// <summary>Whether the verdict is "valid after autocorrection" (T-097): valid, but not as written.</summary>
+    public bool IsAutoCorrected { get; }
+
+    /// <summary>Valid as written (the plain green chip).</summary>
+    public bool IsValidAsWritten => IsValid && !IsAutoCorrected;
 
     /// <summary>The literal translation (T-059); <c>null</c> when the edition has none (not implemented, or not requested).</summary>
     public TranslationViewModel? Translation { get; }
@@ -152,15 +179,19 @@ public partial class EditionPanelViewModel : ObservableObject
 
         var v = result.Validity;
         var all = Enum.GetValues<SampleContext>().Length;
+        var valid = result.Verdict == EditionVerdict.ValidAfterAutoCorrection
+            ? $"Valid in ISCN {result.Edition} after autocorrection"
+            : $"Valid in ISCN {result.Edition}";
         var text = !v.IsValid ? $"Not valid in ISCN {result.Edition}"
             : context.Effective is null && v.ValidContexts.Length < all
-                ? $"Valid in ISCN {result.Edition} as {string.Join(" or ", v.ValidContexts.Select(DiagnosticItemViewModel.Label))} only"
-                : $"Valid in ISCN {result.Edition}";
+                ? $"{valid}{(result.Verdict == EditionVerdict.ValidAfterAutoCorrection ? "," : string.Empty)} as {string.Join(" or ", v.ValidContexts.Select(DiagnosticItemViewModel.Label))} only"
+                : valid;
         return v.IsComplete ? text : text + " (as far as implemented)";
     }
 
-    internal static string ChipOf(string edition, bool notImplemented, bool valid, int errors) =>
+    internal static string ChipOf(string edition, bool notImplemented, bool valid, int errors, bool autoCorrected = false) =>
         notImplemented ? $"{edition} n/a"
+        : valid && autoCorrected ? $"{edition} ✓ valid after autocorrection"
         : valid ? $"{edition} ✓ valid"
         : errors == 1 ? $"{edition} ✗ 1 error"
         : errors > 1 ? $"{edition} ✗ {errors} errors"

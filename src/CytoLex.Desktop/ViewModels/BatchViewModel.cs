@@ -21,6 +21,9 @@ public enum BatchFilter
 
     /// <summary>A segment or construct was not validated ("valid as far as implemented").</summary>
     Incomplete,
+
+    /// <summary>Autocorrection changed the string in at least one edition (T-097).</summary>
+    AutoCorrected,
 }
 
 /// <summary>An entry of the batch filter box.</summary>
@@ -65,7 +68,16 @@ public partial class BatchViewModel : ObservableObject
         new(BatchFilter.NotValid, "Not valid"),
         new(BatchFilter.Valid, "Valid"),
         new(BatchFilter.Incomplete, "Valid as far as implemented / partly validated"),
+        new(BatchFilter.AutoCorrected, "Autocorrected"),
     ];
+
+    /// <summary>Whether the strings are autocorrected (T-097; on by default); changing it drops the result (run again).</summary>
+    [ObservableProperty]
+    public partial bool AutoCorrect { get; set; } = true;
+
+    /// <summary>Whether some row of the result was autocorrected (shows the "Corrected" column).</summary>
+    [ObservableProperty]
+    public partial bool HasCorrectedRows { get; set; }
 
     /// <summary>The edition selector entries.</summary>
     public IReadOnlyList<EditionChoice> EditionChoices { get; }
@@ -177,7 +189,7 @@ public partial class BatchViewModel : ObservableObject
     private async Task RunAsync(CancellationToken cancellationToken)
     {
         var choice = SelectedEditionChoice ?? EditionChoice.All;
-        var options = new ValidationOptions { Editions = choice.Edition is { } e ? EditionSelection.One(e) : EditionSelection.All };
+        var options = new ValidationOptions { Editions = choice.Edition is { } e ? EditionSelection.One(e) : EditionSelection.All, AutoCorrect = AutoCorrect };
         ClearResult();
         IsRunning = true;
         Progress = 0;
@@ -257,6 +269,15 @@ public partial class BatchViewModel : ObservableObject
         }
     }
 
+    partial void OnAutoCorrectChanged(bool value)
+    {
+        if (Result is not null)
+        {
+            ClearResult();
+            Status = "Autocorrection " + (value ? "on" : "off") + " · press Run.";
+        }
+    }
+
     partial void OnSelectedFilterChanged(BatchFilterChoice? value) => ApplyFilter();
 
     private void Show(BatchResult result)
@@ -271,6 +292,7 @@ public partial class BatchViewModel : ObservableObject
         }
 
         _allRows = [.. result.Items.Select(i => new BatchRowViewModel(i))];
+        HasCorrectedRows = _allRows.Any(r => r.IsAutoCorrected);
         ApplyFilter();
     }
 
@@ -281,7 +303,8 @@ public partial class BatchViewModel : ObservableObject
             return $"ISCN {s.Edition}: not implemented";
         }
 
-        var line = $"ISCN {s.Edition}: {s.Valid} valid, {s.NotValid} not valid of {s.Total}";
+        var afterAuto = s.ValidAfterAutoCorrection > 0 ? $"{s.ValidAfterAutoCorrection} valid after autocorrection, " : string.Empty;
+        var line = $"ISCN {s.Edition}: {s.Valid} valid, {afterAuto}{s.NotValid} not valid of {s.Total}";
         if (s.Incomplete > 0)
         {
             line += $" · {s.Incomplete} validated only in part";
@@ -301,6 +324,7 @@ public partial class BatchViewModel : ObservableObject
         Editions = [];
         Summaries.Clear();
         _allRows = [];
+        HasCorrectedRows = false;
         SelectedRow = null;
         Rows.Clear();
         Progress = 0;
@@ -316,6 +340,7 @@ public partial class BatchViewModel : ObservableObject
             BatchFilter.NotValid => r.IsNotValid,
             BatchFilter.Valid => r.IsValid,
             BatchFilter.Incomplete => r.IsIncomplete,
+            BatchFilter.AutoCorrected => r.IsAutoCorrected,
             _ => true,
         }))
         {

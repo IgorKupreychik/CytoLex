@@ -10,6 +10,7 @@ namespace CytoLex.Desktop.Highlighting;
 /// <summary>
 /// Draws <see cref="HighlightKind.Insert"/> highlights: a zero-length inline element at the insertion point with a
 /// severity-coloured marker and the expected text in grey. It is not part of the document, so offsets are unchanged.
+/// An autocorrected insertion (T-097) gets a thin grey marker with the inserted text.
 /// </summary>
 public sealed class InsertionElementGenerator : VisualLineElementGenerator
 {
@@ -21,7 +22,7 @@ public sealed class InsertionElementGenerator : VisualLineElementGenerator
         var next = -1;
         foreach (var h in Highlights)
         {
-            if (h.Kind == HighlightKind.Insert && h.Span.Start >= startOffset && (next < 0 || h.Span.Start < next))
+            if (h.IsInsertion && h.Span.Start >= startOffset && (next < 0 || h.Span.Start < next))
             {
                 next = h.Span.Start;
             }
@@ -32,20 +33,21 @@ public sealed class InsertionElementGenerator : VisualLineElementGenerator
 
     public override VisualLineElement? ConstructElement(int offset)
     {
-        var inserts = Highlights.Where(h => h.Kind == HighlightKind.Insert && h.Span.Start == offset).ToList();
+        var inserts = Highlights.Where(h => h.IsInsertion && h.Span.Start == offset).ToList();
         if (inserts.Count == 0)
         {
             return null;
         }
 
-        var worst = inserts.Max(h => h.Severity);
+        var findings = inserts.Where(h => h.Kind == HighlightKind.Insert).ToList();
+        var marker = findings.Count == 0 ? SeverityBrushes.AutoCorrected : SeverityBrushes.For(findings.Max(h => h.Severity));
         var text = string.Concat(inserts.Select(h => h.InsertText));
         var panel = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
         panel.Children.Add(new Border
         {
-            Width = 2,
+            Width = findings.Count == 0 ? 1 : 2,
             Margin = new Thickness(1, 0),
-            Background = SeverityBrushes.For(worst),
+            Background = marker,
             VerticalAlignment = VerticalAlignment.Stretch,
         });
         if (text.Length > 0)

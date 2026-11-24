@@ -96,7 +96,7 @@ public class MainWindowViewModelTests
     [Fact]
     public void ExtraSpace_Location()
     {
-        var vm = new MainWindowViewModel { Input = "46,XX,del (5)(q13q33)" };
+        var vm = new MainWindowViewModel { AutoCorrect = false, Input = "46,XX,del (5)(q13q33)" };
         var item = Assert.Single(vm.SelectedPanel!.Diagnostics, d => d.RuleId == "SYM.NO_SPACE_AT_PARENTHESIS");
         Assert.Equal("col 10: \" \"", item.Location);
     }
@@ -188,7 +188,7 @@ public class MainWindowViewModelTests
     [Fact]
     public void SelectingDiagnostic_SelectsSpan()
     {
-        var vm = new MainWindowViewModel { Input = "46,XX,del (5)(q13q33)" };
+        var vm = new MainWindowViewModel { AutoCorrect = false, Input = "46,XX,del (5)(q13q33)" };
         var item = vm.SelectedPanel!.Diagnostics[0];
         var raised = 0;
         vm.PropertyChanged += (_, e) => raised += e.PropertyName == nameof(MainWindowViewModel.SelectedSpan) ? 1 : 0;

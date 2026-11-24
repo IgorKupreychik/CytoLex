@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using CytoLex.Core.Context;
 using CytoLex.Core.Text;
 using CytoLex.Core.Validation;
+using CytoLex.Desktop.ViewModels;
 
 namespace CytoLex.Desktop.Highlighting;
 
@@ -46,6 +47,50 @@ public static class HighlightBuilder
         }
 
         return highlights.ToImmutable();
+    }
+
+    /// <summary>
+    /// The highlights of <paramref name="result"/> in the editor text (T-097): the diagnostics' highlights over
+    /// <see cref="EditionText.Text"/> mapped onto the typed text, then one <see cref="HighlightKind.AutoCorrected"/>
+    /// highlight per applied autocorrection.
+    /// </summary>
+    public static ImmutableArray<Highlight> Build(EditionText text, EditionResult result, SampleContext? context)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        ArgumentNullException.ThrowIfNull(result);
+
+        var highlights = Build(text.Text, result, context);
+        if (!text.IsCorrected)
+        {
+            return highlights;
+        }
+
+        var builder = ImmutableArray.CreateBuilder<Highlight>();
+        builder.AddRange(highlights.Select(h => h with { Span = text.ToEditor(h.Span) }));
+        foreach (var c in text.AutoCorrection!.Corrections)
+        {
+            var span = Clamp(c.OriginalSpan, text.Original.Length);
+            builder.Add(new Highlight(span, HighlightKind.AutoCorrected, Severity.Info, span.Length == 0 ? c.NewText : null, -1, NoteOf(c)));
+        }
+
+        return builder.ToImmutable();
+    }
+
+    /// <summary>The tooltip of an autocorrected spot: <c>Autocorrected (SYM.LETTER_CASE): "xy" → "XY" — Write … (ISCN 2016 §3, p.…)</c>.</summary>
+    public static string NoteOf(AppliedCorrection correction)
+    {
+        ArgumentNullException.ThrowIfNull(correction);
+        var cite = correction.Citations.IsDefaultOrEmpty ? string.Empty : $" ({correction.Citations[0].Rendered})";
+        return $"Autocorrected ({correction.RuleId}): {ChangeOf(correction)} — {correction.Description}{cite}";
+    }
+
+    /// <summary>The change of a correction: <c>"xy" → "XY"</c>, <c>removed " "</c> or <c>inserted ","</c>.</summary>
+    public static string ChangeOf(AppliedCorrection correction)
+    {
+        ArgumentNullException.ThrowIfNull(correction);
+        return correction.NewText.Length == 0 ? $"removed \"{correction.OriginalText}\""
+            : correction.OriginalText.Length == 0 ? $"inserted \"{correction.NewText}\""
+            : $"\"{correction.OriginalText}\" → \"{correction.NewText}\"";
     }
 
     /// <summary>

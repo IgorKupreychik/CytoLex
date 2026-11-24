@@ -454,6 +454,9 @@ public sealed class RuleDetailViewModel
     /// <summary>Whether <see cref="Fix"/> is set.</summary>
     public bool HasFix => Fix is not null;
 
+    /// <summary>Whether the KB flags the rule's fix for autocorrection (<c>fix.auto</c>, T-097): the badge in the detail.</summary>
+    public bool IsAutoCorrected => Rule.FixAuto;
+
     /// <summary>The review state (book-ambiguous, paraphrase not checked, note), if any.</summary>
     public string? Review { get; }
 

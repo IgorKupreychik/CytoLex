@@ -19,6 +19,9 @@ public static class SeverityBrushes
     /// <summary>The grey of expected (inserted) text.</summary>
     public static IImmutableSolidColorBrush Expected { get; } = new ImmutableSolidColorBrush(Color.FromRgb(0x8A, 0x8A, 0x8A));
 
+    /// <summary>The soft grey of autocorrected spots (T-097): not an error colour.</summary>
+    public static IImmutableSolidColorBrush AutoCorrected { get; } = new ImmutableSolidColorBrush(Color.FromRgb(0x9A, 0x9A, 0x9A));
+
     /// <summary>The brush of <paramref name="severity"/>.</summary>
     public static IImmutableSolidColorBrush For(Severity severity) => severity switch
     {

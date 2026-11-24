@@ -105,7 +105,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-094 | done | 4 | T-033 | Probe positions for locus and chromosome order in FISH (`ISH.LOCUS_ORDER_PTER_QTER`, `NUC_ISH.CHROMOSOME_ORDER`) |
 | T-095 | discussion | 4 | T-033 | Apply karyotype rules (STRUCT.*, symbol formats) to the abnormalities of ish results? |
 | T-096 | done | 2 | T-074, T-035 | Autocorrection: core + KB flag `fix.auto` (meaning-preserving level-1 fixes applied automatically, original kept) |
-| T-097 | todo | 2 | T-096, T-098, T-038 | Autocorrection: desktop (checkbox, corrected line, highlights on the original) + batch tab |
+| T-097 | done | 2 | T-096, T-098, T-038 | Autocorrection: desktop (checkbox, corrected line, highlights on the original) + batch tab |
 | T-098 | done | 2 | T-037, T-059, T-081 | Desktop: single-string layout redesign (edition verdict strip + full-width view tabs) |
 | T-099 | todo | 4 | T-098 | Desktop: pin a view tab to a side pane |
 | T-100 | discussion | 4 | T-072, T-092 | Link one event across techniques in combined strings (karyotype + ish + arr) |
@@ -1018,7 +1018,7 @@ Deviations from the plan: no CLI (user); new label `severity-policy` and CytoLex
 Outcome (2026-11-24): KB `fix.auto` (schema: level 1 only; `kb/README.md`) set on `SYM.NO_OTHER_SPACE`, `SYM.LETTER_CASE`, `SYM.NO_SPACE_AT_PARENTHESIS` and `BAND.DESIGNATION_FORMAT` (flagged as a whole: its check reports only spaces, so no separate proposals were needed; decision recorded). Core: `RuleFixHint.Auto`, `ValidationOptions.AutoCorrect`, `Validation/AutoCorrector.cs` (context-free fixes of flagged rules via `Fixer.ApplyAll(…, include)`, re-validate, ≤8 rounds), `Validation/AutoCorrection.cs` (`AutoCorrection`, `AppliedCorrection`, `EditionVerdict`), `Text/OffsetMap.cs`; `EditionResult.AutoCorrection` + `Verdict`. With autocorrection on, an edition result's spans refer to the corrected string (`AutoCorrection.ToOriginal` maps back). Batch: CSV + `verdict`/`corrected`/`autocorrections` (old header still read), JSON format v2 (v1 still read), `BatchSummary.ValidAfterAutoCorrection`. Tests `Validation/AutoCorrectionTests.cs`, `OffsetMapTests.cs`, `Batch/BatchExportTests.cs`, tool schema test. Docs: `docs/design/core.md` §9/§10, `docs/decisions.md`, `CLAUDE.md`, `README.md`, `docs/research/cytogps-comparison.md`. Not done: `kb.sqlite` doesn't carry the flag (rule browser display fits T-097).
 
 ### T-097 — Autocorrection: desktop + batch tab
-**Status:** todo
+**Status:** done
 **Description:** Desktop side of T-096 (layout "A", decided with the user 2026-11-24):
 - Checkbox "Autocorrect" (default on) in the single-string check and in the Batch tab.
 - The editor keeps the typed text. Remaining diagnostics are highlighted there (spans mapped back through T-096's offset map); auto-corrected spots get a soft style of their own (e.g. a dotted grey underline with a tooltip naming the rule), not an error style.
@@ -1027,6 +1027,7 @@ Outcome (2026-11-24): KB `fix.auto` (schema: level 1 only; `kb/README.md`) set o
 - Batch tab: the checkbox, a corrected column, a filter for corrected rows; exports from T-096.
 **Acceptance:** view-model tests: checkbox on/off, corrected-line visibility, mapped highlights, Use corrected + undo, batch column and filter; checked by hand.
 **Notes:** Created 2026-11-24 (user). Lands in the redesigned layout (T-098).
+Outcome (2026-11-24, confirmed by the user after the check by hand): "Autocorrect" checkbox (on by default) in the single-string check and the Batch tab. `ViewModels/EditionText.cs` (typed text vs. the text the result's spans refer to) maps diagnostics, highlights, abnormality and translation spans onto the typed text; fixes and Fix all apply onto the typed text (decided with the user), falling back to the corrected string with the note "also writes in the autocorrections" when an edit touches autocorrected text (core helpers `OffsetMap.IsCopied`, `AutoCorrection.TryToOriginal`). `HighlightKind.AutoCorrected` (dotted grey, note) + editor tooltip (`EditorToolTip`); "Corrected" line (`EditionPanelViewModel.Corrected`/`Corrections`, `CorrectionItemViewModel` with rule link, Copy, Use corrected); verdict and chip "valid after autocorrection"; the CytoGPS agreement compares the as-written verdict. Batch: `✓ auto` cells, Corrected column, "Autocorrected" filter, summary count. Added beyond the description (decided with the user): `kb.sqlite` `rules.fix_auto` (`kb build`) → `RuleDetail.FixAuto` → "Autocorrected (fix.auto)" badge in the rule browser. Tests: `tests/CytoLex.Desktop.Tests/AutoCorrectionUiTests.cs`, core `OffsetMapTests`/`AutoCorrectionTests`, `test_fix_auto_sqlite`; six older desktop tests now set `AutoCorrect = false` (they check as-written results). Docs: `CLAUDE.md`, `README.md`, `kb/README.md`, `docs/research/cytogps-comparison.md`.
 
 ### T-098 — Desktop: single-string layout redesign
 **Status:** done

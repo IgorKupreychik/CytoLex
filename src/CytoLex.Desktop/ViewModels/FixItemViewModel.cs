@@ -20,8 +20,17 @@ public sealed partial class FixItemViewModel
     private readonly ApplyFixHandler? _apply;
 
     public FixItemViewModel(string input, Fix fix, ApplyFixHandler? apply = null)
+        : this(EditionText.Plain(input), fix, apply)
     {
-        ArgumentNullException.ThrowIfNull(input);
+    }
+
+    /// <summary>
+    /// A fix of a result whose spans refer to <see cref="EditionText.Text"/> (T-097): the diff, preview and Apply are on the
+    /// typed text when the edits map back to it, else on the corrected string (noted in the label).
+    /// </summary>
+    public FixItemViewModel(EditionText text, Fix fix, ApplyFixHandler? apply = null)
+    {
+        ArgumentNullException.ThrowIfNull(text);
         ArgumentNullException.ThrowIfNull(fix);
 
         Fix = fix;
@@ -35,8 +44,20 @@ public sealed partial class FixItemViewModel
         };
 
         IsEdit = fix.IsEdit && fix.Preview is not null;
-        Preview = IsEdit ? fix.Preview : null;
-        DiffParts = IsEdit ? [.. FixDiff.Build(input, fix).Select(p => new DiffPartViewModel(p))] : [];
+        if (IsEdit)
+        {
+            var target = text.Target(fix.Edits);
+            Preview = target.Apply();
+            DiffParts = [.. FixDiff.Build(target.Base, target.Edits).Select(p => new DiffPartViewModel(p))];
+            if (!target.OnTypedText)
+            {
+                Label += $" ({EditTarget.WritesCorrectionsNote})";
+            }
+        }
+        else
+        {
+            DiffParts = [];
+        }
     }
 
     /// <summary>The fix shown.</summary>

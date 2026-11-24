@@ -100,7 +100,7 @@ public sealed class RuleBrowserTests
     [InlineData("46,XY,t(22;9)(q11.2;q34)")]
     public void DiagnosticLink_OpensItsRuleInThePanelsEdition(string input)
     {
-        var main = new MainWindowViewModel { Input = input };
+        var main = new MainWindowViewModel { AutoCorrect = false, Input = input }; // as written (T-097)
         var panel = main.SelectedPanel!;
         var linked = panel.Diagnostics.Where(d => d.HasKbRule).ToList();
         Assert.NotEmpty(linked);

@@ -39,7 +39,7 @@ public class FixUiTests
     [Fact]
     public void RemovedSpace_IsShownAsVisibleDot()
     {
-        var vm = new MainWindowViewModel { Input = "46,XX,del (5)(q13q33)" };
+        var vm = new MainWindowViewModel { AutoCorrect = false, Input = "46,XX,del (5)(q13q33)" };
         var fix = vm.SelectedPanel!.Diagnostics.Single(d => d.RuleId == "SYM.NO_SPACE_AT_PARENTHESIS").Fixes.First(f => f.IsEdit);
         var removed = Assert.Single(fix.DiffParts, p => p.IsRemoved);
         Assert.Equal("·", removed.Text);
@@ -49,7 +49,7 @@ public class FixUiTests
     [Fact]
     public void FixAll_OneRound_ThenGone()
     {
-        var vm = new MainWindowViewModel { Input = "46XX,del (5)(q13q33)" };
+        var vm = new MainWindowViewModel { AutoCorrect = false, Input = "46XX,del (5)(q13q33)" };
         var panel = vm.SelectedPanel!;
         Assert.True(panel.HasFixAll);
         Assert.Equal(2, panel.FixAll!.Count);
@@ -96,7 +96,7 @@ public class FixUiTests
     [Fact]
     public void NotImplementedEdition_HasNoFixAll()
     {
-        var vm = new MainWindowViewModel { Input = "46XX,del (5)(q13q33)" };
+        var vm = new MainWindowViewModel { AutoCorrect = false, Input = "46XX,del (5)(q13q33)" };
         vm.SelectedEditionChoice = vm.EditionChoices.Single(c => c.Edition is null);
         Assert.Contains(vm.Panels, p => p.IsImplemented && p.HasFixAll);
         Assert.All(vm.Panels.Where(p => p.IsNotImplemented), p => Assert.False(p.HasFixAll));

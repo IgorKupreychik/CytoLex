@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using CytoLex.Core.Context;
 using CytoLex.Core.Semantics;
 using CytoLex.Core.Text;
@@ -163,8 +164,53 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// The editor tooltip at <see cref="HoverOffset"/> (T-097): the autocorrection notes and the findings of the highlights
+    /// there, one per line; <c>null</c> when there are none.
+    /// </summary>
+    [ObservableProperty]
+    public partial string? EditorToolTip { get; set; }
+
+    /// <summary>Whether the input is autocorrected (T-097; on by default): spaces and letter case the KB flags with <c>fix.auto</c>. Changing it re-validates.</summary>
+    [ObservableProperty]
+    public partial bool AutoCorrect { get; set; } = true;
+
+    partial void OnAutoCorrectChanged(bool value) => Validate();
+
+    /// <summary>The tooltip lines of the highlights at <paramref name="offset"/> of the editor text.</summary>
+    internal string? ToolTipAt(int? offset)
+    {
+        if (offset is not { } o || SelectedPanel is not { } panel)
+        {
+            return null;
+        }
+
+        var lines = panel.Highlights
+            .Where(h => h.Covers(o))
+            .Select(h => h.Kind == HighlightKind.AutoCorrected
+                ? h.Note
+                : h.DiagnosticIndex >= 0 && h.DiagnosticIndex < panel.Diagnostics.Count
+                    ? $"{panel.Diagnostics[h.DiagnosticIndex].SeverityLabel} ({panel.Diagnostics[h.DiagnosticIndex].RuleId}): {panel.Diagnostics[h.DiagnosticIndex].Message}"
+                    : null)
+            .OfType<string>()
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+        return lines.Count == 0 ? null : string.Join(Environment.NewLine, lines);
+    }
+
+    /// <summary>Sets the input to the selected edition's corrected string (T-097); the editor takes it as one undoable change.</summary>
+    [RelayCommand]
+    private void UseCorrected()
+    {
+        if (SelectedPanel?.Corrected is { } corrected)
+        {
+            ApplyFix(corrected, "the autocorrected string");
+        }
+    }
+
     partial void OnHoverOffsetChanged(int? value)
     {
+        EditorToolTip = ToolTipAt(value);
         var translation = SelectedPanel?.Translation;
         if (translation is null)
         {
@@ -296,7 +342,8 @@ public partial class MainWindowViewModel : ObservableObject
             result = _validator.Validate(input, new ValidationOptions { Editions = EditionSelection.One(edition) }).Results.FirstOrDefault();
         }
 
-        return result is { Status: EditionStatus.Implemented } ? result.Validity.IsValid : null;
+        // As written (T-097): CytoGPS reads the typed string, as the comparison engine (T-051) compares it.
+        return result is { Status: EditionStatus.Implemented } ? result.Verdict == EditionVerdict.Valid : null;
     }
 
     /// <summary>The selected edition chip; the views show it and the editor draws its highlights.</summary>
@@ -430,7 +477,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         var editions = choice.Edition is { } edition ? EditionSelection.One(edition) : EditionSelection.All;
-        var options = new ValidationOptions { Editions = editions, IncludeTranslation = true, IncludeCoordinates = ShowCoordinates };
+        var options = new ValidationOptions { Editions = editions, IncludeTranslation = true, IncludeCoordinates = ShowCoordinates, AutoCorrect = AutoCorrect };
         var report = _validator.Validate(input, options);
         Report = report;
         foreach (var result in report.Results)

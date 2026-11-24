@@ -326,6 +326,17 @@ def test_cli_build(kb, monkeypatch, capsys):
 # --- vocab (T-008) -----------------------------------------------------------------------
 
 
+def test_fix_auto_sqlite(kb):
+    """T-097: the rule browser reads the autocorrection flag (`fix.auto`) from kb.sqlite."""
+    edit(rules_file(kb), "      kind: reorder\n", "      kind: reorder\n      auto: true\n")
+    report = build(kb)
+    assert report.errors == []
+    con = sqlite3.connect(kb[2] / "kb.sqlite")
+    rows = con.execute("SELECT id, fix_auto FROM rules ORDER BY id").fetchall()
+    con.close()
+    assert rows == [("TRANSLOC.CHROMOSOME_ORDER", 1), ("TRANSLOC.THREE_WAY_ORDER", 0)]
+
+
 def test_vocab_sqlite(kb):
     assert build(kb).errors == []
     con = sqlite3.connect(kb[2] / "kb.sqlite")

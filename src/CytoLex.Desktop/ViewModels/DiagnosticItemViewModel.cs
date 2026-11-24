@@ -12,13 +12,22 @@ namespace CytoLex.Desktop.ViewModels;
 public sealed class DiagnosticItemViewModel
 {
     public DiagnosticItemViewModel(string input, Diagnostic diagnostic, int index, string? edition = null, ApplyFixHandler? applyFix = null)
+        : this(EditionText.Plain(input), diagnostic, index, edition, applyFix)
     {
-        ArgumentNullException.ThrowIfNull(input);
+    }
+
+    /// <summary>
+    /// A diagnostic of a result whose spans refer to <see cref="EditionText.Text"/> (T-097): its span and location are given
+    /// in the typed text the editor shows.
+    /// </summary>
+    public DiagnosticItemViewModel(EditionText text, Diagnostic diagnostic, int index, string? edition = null, ApplyFixHandler? applyFix = null)
+    {
+        ArgumentNullException.ThrowIfNull(text);
         ArgumentNullException.ThrowIfNull(diagnostic);
 
         Diagnostic = diagnostic;
         Index = index;
-        Span = diagnostic.Span;
+        Span = text.ToEditor(diagnostic.Span);
         SeverityLabel = Label(diagnostic.Severity);
         SeverityBrush = SeverityBrushes.For(diagnostic.Severity);
         RuleId = diagnostic.RuleId;
@@ -28,13 +37,13 @@ public sealed class DiagnosticItemViewModel
         HasKbRule = edition is not null && !diagnostic.Citations.IsDefaultOrEmpty;
         Message = diagnostic.Message;
         Detail = diagnostic.Detail;
-        Location = LocationOf(input, diagnostic.Span);
+        Location = LocationOf(text.Original, Span);
         Condition = diagnostic.Condition is { } condition ? ConditionText(condition) : null;
         Review = diagnostic.BookAmbiguous
             ? "Book-ambiguous rule (capped at warning)" + (diagnostic.ReviewNote is { Length: > 0 } note ? ": " + note.Trim() : string.Empty)
             : null;
         Citations = diagnostic.Citations.IsDefaultOrEmpty ? null : string.Join("; ", diagnostic.Citations.Select(c => c.Rendered));
-        Fixes = diagnostic.Fixes.IsDefaultOrEmpty ? [] : [.. diagnostic.Fixes.Select(f => new FixItemViewModel(input, f, applyFix))];
+        Fixes = diagnostic.Fixes.IsDefaultOrEmpty ? [] : [.. diagnostic.Fixes.Select(f => new FixItemViewModel(text, f, applyFix))];
     }
 
     /// <summary>The diagnostic shown.</summary>
@@ -43,7 +52,7 @@ public sealed class DiagnosticItemViewModel
     /// <summary>Its index in the edition's diagnostics.</summary>
     public int Index { get; }
 
-    /// <summary>Its primary span in the input.</summary>
+    /// <summary>Its primary span in the input as typed (the editor text).</summary>
     public TextSpan Span { get; }
 
     /// <summary><c>error</c>, <c>warning</c> or <c>info</c>.</summary>

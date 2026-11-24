@@ -52,4 +52,31 @@ public sealed record AutoCorrection(string Corrected, ImmutableArray<AppliedCorr
 
     /// <summary>The span of the original input that <paramref name="span"/> of <see cref="Corrected"/> comes from.</summary>
     public TextSpan ToOriginal(TextSpan span) => Map.ToOriginal(span);
+
+    /// <summary>
+    /// Maps <paramref name="edits"/> of <see cref="Corrected"/> (a fix of a remaining diagnostic) to edits of the original
+    /// input (T-097), so the fix can be applied to the text as typed. Fails when an edit touches text that autocorrection
+    /// wrote (<see cref="OffsetMap.IsCopied"/>): there the original has no matching text to edit.
+    /// </summary>
+    /// <param name="edits">Edits against <see cref="Corrected"/>.</param>
+    /// <param name="original">The same edits against the original input; empty when the mapping fails.</param>
+    /// <returns>Whether every edit could be mapped.</returns>
+    public bool TryToOriginal(IEnumerable<TextEdit> edits, out ImmutableArray<TextEdit> original)
+    {
+        ArgumentNullException.ThrowIfNull(edits);
+        var mapped = ImmutableArray.CreateBuilder<TextEdit>();
+        foreach (var edit in edits)
+        {
+            if (!Map.IsCopied(edit.Span))
+            {
+                original = [];
+                return false;
+            }
+
+            mapped.Add(edit with { Span = Map.ToOriginal(edit.Span) });
+        }
+
+        original = mapped.ToImmutable();
+        return true;
+    }
 }

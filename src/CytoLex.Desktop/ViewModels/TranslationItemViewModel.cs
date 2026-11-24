@@ -115,10 +115,22 @@ public sealed partial class TranslationItemViewModel : ObservableObject, ISpanIt
         CoordinateBuild build,
         Action<KbRef>? openKbRef,
         Action<int>? selectDiagnostic)
+        : this(item, diagnostics, build, openKbRef, selectDiagnostic, null)
+    {
+    }
+
+    /// <summary>A part whose span is mapped to the editor text by <paramref name="toEditor"/> (T-097: autocorrection; <c>null</c> = as it is).</summary>
+    public TranslationItemViewModel(
+        TranslationItem item,
+        ImmutableArray<Diagnostic> diagnostics,
+        CoordinateBuild build,
+        Action<KbRef>? openKbRef,
+        Action<int>? selectDiagnostic,
+        Func<TextSpan, TextSpan>? toEditor)
     {
         ArgumentNullException.ThrowIfNull(item);
         IsSummary = false;
-        Span = item.Span;
+        Span = toEditor is null ? item.Span : toEditor(item.Span);
         Text = item.Text;
         Sentence = item.Sentence;
         IsTranslated = item.IsTranslated;

@@ -13,15 +13,20 @@ public sealed partial class FixAllViewModel
 {
     private readonly ApplyFixHandler _apply;
 
-    private FixAllViewModel(string input, FixAllResult round, SampleContext? context, ApplyFixHandler apply)
+    private FixAllViewModel(EditionText text, FixAllResult round, SampleContext? context, ApplyFixHandler apply)
     {
         _apply = apply;
-        Text = round.Text;
+        var target = text.Target(round.Applied.SelectMany(f => f.Edits));
+        Text = target.Apply();
         Count = round.Applied.Length;
         SkippedCount = round.Skipped.Length;
         Header = $"Fix all ({Count})";
-        DiffParts = [.. FixDiff.Build(input, round.Applied.SelectMany(f => f.Edits)).Select(p => new DiffPartViewModel(p))];
+        DiffParts = [.. FixDiff.Build(target.Base, target.Edits).Select(p => new DiffPartViewModel(p))];
         var notes = new List<string> { $"Applies {Count} fixes in one step, then re-validates." };
+        if (!target.OnTypedText)
+        {
+            notes.Add("It " + EditTarget.WritesCorrectionsNote + ".");
+        }
         if (SkippedCount > 0)
         {
             notes.Add($"{SkippedCount} overlapping fix(es) are left for the next round.");
@@ -34,17 +39,24 @@ public sealed partial class FixAllViewModel
     }
 
     /// <summary>The fix-all round of <paramref name="result"/>, or <c>null</c> when it would apply fewer than two fixes (one fix has its own Apply).</summary>
-    public static FixAllViewModel? From(string input, EditionResult result, SampleContext? context, ApplyFixHandler? apply)
+    public static FixAllViewModel? From(string input, EditionResult result, SampleContext? context, ApplyFixHandler? apply) =>
+        From(EditionText.Plain(input), result, context, apply);
+
+    /// <summary>
+    /// The fix-all round of <paramref name="result"/>, whose spans refer to <see cref="EditionText.Text"/> (T-097): computed
+    /// there, applied to the typed text when every edit maps back to it.
+    /// </summary>
+    public static FixAllViewModel? From(EditionText text, EditionResult result, SampleContext? context, ApplyFixHandler? apply)
     {
-        ArgumentNullException.ThrowIfNull(input);
+        ArgumentNullException.ThrowIfNull(text);
         ArgumentNullException.ThrowIfNull(result);
         if (apply is null || result.Status == EditionStatus.NotImplemented)
         {
             return null;
         }
 
-        var round = Fixer.ApplyAll(input, result, context);
-        return round.Applied.Length < 2 ? null : new FixAllViewModel(input, round, context, apply);
+        var round = Fixer.ApplyAll(text.Text, result, context);
+        return round.Applied.Length < 2 ? null : new FixAllViewModel(text, round, context, apply);
     }
 
     /// <summary>The input after the round.</summary>

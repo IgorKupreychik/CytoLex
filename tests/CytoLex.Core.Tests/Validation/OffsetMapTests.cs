@@ -91,4 +91,22 @@ public class OffsetMapTests
         Assert.Equal(map.OriginalLength, back.OriginalLength);
         Assert.Equal(map.Pieces, back.Pieces);
     }
+
+    [Fact]
+    public void IsCopied_TellsCopiedFromWrittenText()
+    {
+        const string original = "46,xy, +21";
+        (TextSpan, string)[] edits = [(new TextSpan(3, 2), "XY"), (new TextSpan(6, 1), string.Empty)];
+        var map = OffsetMap.Identity(original.Length).Apply(edits); // "46,XY,+21"
+
+        Assert.True(map.IsCopied(new TextSpan(0, 3)));    // "46,"
+        Assert.False(map.IsCopied(new TextSpan(3, 1)));   // "X": written
+        Assert.False(map.IsCopied(new TextSpan(2, 2)));   // ",X": touches written text
+        Assert.True(map.IsCopied(new TextSpan(6, 3)));    // "+21"
+        Assert.True(map.IsCopied(new TextSpan(3, 0)));    // insertion point at the start of written text
+        Assert.True(map.IsCopied(new TextSpan(5, 0)));    // ... and at its end
+        Assert.False(map.IsCopied(new TextSpan(4, 0)));   // strictly inside written text
+        Assert.True(map.IsCopied(new TextSpan(9, 0)));    // the end of the text
+        Assert.False(map.IsCopied(new TextSpan(8, 5)));   // past the end
+    }
 }

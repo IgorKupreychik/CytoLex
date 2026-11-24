@@ -672,6 +672,7 @@ CREATE TABLE rules (
   title TEXT NOT NULL, severity TEXT NOT NULL, statement TEXT NOT NULL,
   fix_level INTEGER, fix_kind TEXT, fix_hint TEXT,
   paraphrase_checked INTEGER NOT NULL, needs_review INTEGER NOT NULL, review_note TEXT,
+  fix_auto INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (version, id));
 CREATE TABLE rule_applies_to (version TEXT, rule_id TEXT, type TEXT);
 CREATE TABLE rule_context (version TEXT, rule_id TEXT, context TEXT);
@@ -719,7 +720,7 @@ def write_sqlite(report: BuildReport, path: Path) -> None:
         for v, f, r in report.rules():
             fix, review = r.get("fix") or {}, r["review"]
             con.execute(
-                "INSERT INTO rules VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                "INSERT INTO rules VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (
                     v,
                     r["id"],
@@ -734,6 +735,7 @@ def write_sqlite(report: BuildReport, path: Path) -> None:
                     int(review["paraphrase_checked"]),
                     int(review["needs_review"]),
                     review.get("note"),
+                    int(bool(fix.get("auto"))),  # fix.auto (T-096), rule browser badge (T-097)
                 ),
             )
             for t in r["applies_to"]:

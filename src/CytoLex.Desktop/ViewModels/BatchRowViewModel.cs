@@ -26,7 +26,25 @@ public sealed class BatchRowViewModel
             .OrderByDescending(d => d.Severity)
             .FirstOrDefault();
         FirstProblem = first is null ? string.Empty : $"{first.Message} ({first.RuleId})";
+
+        // T-097: the corrected string of the first implemented edition that changed it (editions may differ: each has its rules).
+        var corrected = implemented.FirstOrDefault(r => r.AutoCorrection is { IsChanged: true });
+        if (corrected?.AutoCorrection is { } auto)
+        {
+            IsAutoCorrected = true;
+            Corrected = auto.Corrected.ReplaceLineEndings(" ");
+            CorrectedTip = $"ISCN {corrected.Edition}: " + string.Join("; ", auto.Corrections.Select(c => $"{c.RuleId} {Highlighting.HighlightBuilder.ChangeOf(c)}"));
+        }
     }
+
+    /// <summary>Whether autocorrection changed the string in an implemented edition (T-097).</summary>
+    public bool IsAutoCorrected { get; }
+
+    /// <summary>The corrected string; empty when nothing was corrected.</summary>
+    public string Corrected { get; } = string.Empty;
+
+    /// <summary>The corrections, e.g. <c>ISCN 2016: SYM.LETTER_CASE "xy" → "XY"</c>; <c>null</c> when nothing was corrected.</summary>
+    public string? CorrectedTip { get; }
 
     /// <summary>The string's batch result.</summary>
     public BatchItemResult Result { get; }
@@ -56,7 +74,7 @@ public sealed class BatchRowViewModel
     public string FirstProblem { get; }
 }
 
-/// <summary>The verdict of one string in one edition: <c>✓</c>, <c>✓*</c> (as far as implemented), <c>✗ 2E 1W</c> or <c>–</c>.</summary>
+/// <summary>The verdict of one string in one edition: <c>✓</c>, <c>✓*</c> (as far as implemented), <c>✓ auto</c> (after autocorrection, T-097), <c>✗ 2E 1W</c> or <c>–</c>.</summary>
 public sealed class BatchCellViewModel
 {
     public BatchCellViewModel(EditionResult result)
@@ -66,13 +84,17 @@ public sealed class BatchCellViewModel
         IsNotImplemented = result.Status == EditionStatus.NotImplemented;
         IsValid = !IsNotImplemented && result.Validity.IsValid;
         IsInvalid = !IsNotImplemented && !IsValid;
+        var auto = result.Verdict == EditionVerdict.ValidAfterAutoCorrection;
+        var corrections = result.AutoCorrection?.Corrections.Length ?? 0;
         var c = result.Counts;
         Text = IsNotImplemented ? "–"
-            : IsValid ? (result.Validity.IsComplete ? "✓" : "✓*")
+            : IsValid ? (result.Validity.IsComplete ? "✓" : "✓*") + (auto ? " auto" : string.Empty)
             : $"✗ {c.Errors}E" + (c.Warnings > 0 ? $" {c.Warnings}W" : string.Empty);
         Tip = IsNotImplemented ? result.Reason ?? $"ISCN {Edition}: not implemented"
             : $"ISCN {Edition}: {(IsValid ? "valid" : "not valid")}"
+                + (auto ? " after autocorrection" : string.Empty)
                 + (result.Validity.IsComplete ? string.Empty : " as far as implemented")
+                + (corrections > 0 ? $" · {corrections} autocorrection(s)" : string.Empty)
                 + $" · {c.Errors} error(s), {c.Warnings} warning(s), {c.Infos} info";
     }
 

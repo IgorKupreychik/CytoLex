@@ -37,6 +37,7 @@ public sealed class RuleStoreTests : IDisposable
                 Assert.Equal(rule.Statement, detail.Statement);
                 Assert.Equal(rule.Severity.ToString(), detail.Severity, ignoreCase: true);
                 Assert.Equal(rule.Citations.Select(c => c.Rendered), detail.Citations);
+                Assert.Equal(rule.Fix?.Auto == true, detail.FixAuto);
             }
         }
     }

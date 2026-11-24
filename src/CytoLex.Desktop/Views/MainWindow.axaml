@@ -15,8 +15,11 @@
   <TabItem Header="Single string">
   <DockPanel Margin="8">
     <!-- Input -->
-    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,8">
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto,Auto" Margin="0,0,0,8">
       <TextBlock Grid.Column="0" Text="ISCN string" FontWeight="SemiBold" VerticalAlignment="Center" />
+      <!-- Autocorrection (T-097): meaning-preserving fixes of the rules the KB flags with fix.auto; the editor keeps the typed text -->
+      <CheckBox Grid.Column="3" Content="Autocorrect" IsChecked="{Binding AutoCorrect}" Margin="8,0,0,0"
+                ToolTip.Tip="Correct stray spaces and letter case (KB rules with fix.auto); the typed text is kept" />
       <!-- Edition selector (T-037): one edition or all editions (one tab each) -->
       <ComboBox Grid.Column="1" x:Name="EditionSelector" MinWidth="220" Margin="0,0,8,0"
                 ToolTip.Tip="ISCN edition to validate against"
@@ -35,6 +38,36 @@
       <ae:TextEditor x:Name="Input" FontFamily="Cascadia Mono,Consolas,monospace" FontSize="18"
                      ShowLineNumbers="False" WordWrap="True" MinHeight="32"
                      HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled" />
+    </Border>
+
+    <!-- Corrected line (T-097): the selected edition's corrected string with one note per correction -->
+    <Border DockPanel.Dock="Top" Classes="corrected" IsVisible="{Binding SelectedPanel.HasCorrection, FallbackValue=False}"
+            Margin="0,4,0,0">
+      <StackPanel Spacing="2">
+        <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+          <TextBlock Grid.Column="0" Text="Corrected:" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0" />
+          <SelectableTextBlock Grid.Column="1" Text="{Binding SelectedPanel.Corrected}" FontFamily="Cascadia Mono,Consolas,monospace"
+                               FontSize="15" VerticalAlignment="Center" TextWrapping="Wrap" />
+          <Button Grid.Column="2" Content="Copy" Click="OnCopyCorrected" Padding="8,1" Margin="8,0,0,0"
+                  ToolTip.Tip="Copy the corrected string" />
+          <Button Grid.Column="3" Content="Use corrected" Command="{Binding UseCorrectedCommand}" Padding="8,1" Margin="6,0,0,0"
+                  ToolTip.Tip="Replace the input with the corrected string (Ctrl+Z undoes it)" />
+        </Grid>
+        <ItemsControl ItemsSource="{Binding SelectedPanel.Corrections}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:CorrectionItemViewModel">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Classes="link" Content="{Binding RuleId}" Command="{Binding OpenRuleCommand}"
+                        ToolTip.Tip="Open the rule in the rule browser" />
+                <TextBlock Text="{Binding Change}" FontFamily="Cascadia Mono,Consolas,monospace" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Description}" VerticalAlignment="Center" Opacity="0.85" />
+                <TextBlock Text="{Binding Citation}" IsVisible="{Binding HasCitation}" VerticalAlignment="Center"
+                           FontStyle="Italic" Opacity="0.7" />
+              </StackPanel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
     </Border>
 
     <!-- Status -->
@@ -58,7 +91,7 @@
       <ListBox.ItemTemplate>
         <DataTemplate x:DataType="vm:EditionPanelViewModel">
           <TextBlock Text="{Binding ChipText}" FontSize="14" ToolTip.Tip="{Binding ChipTip}"
-                     Classes.valid="{Binding IsValid}" Classes.invalid="{Binding IsInvalid}" Classes.notimpl="{Binding IsNotImplemented}" />
+                     Classes.valid="{Binding IsValidAsWritten}" Classes.autocorrected="{Binding IsAutoCorrected}" Classes.invalid="{Binding IsInvalid}" Classes.notimpl="{Binding IsNotImplemented}" />
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
@@ -70,7 +103,7 @@
           <StackPanel DockPanel.Dock="Top" Margin="0,4,0,10" Spacing="4">
             <StackPanel Orientation="Horizontal" Spacing="16">
               <TextBlock Text="{Binding ValidityText}" FontWeight="SemiBold" FontSize="15"
-                         Classes.valid="{Binding IsValid}" Classes.invalid="{Binding IsInvalid}" Classes.notimpl="{Binding IsNotImplemented}" />
+                         Classes.valid="{Binding IsValidAsWritten}" Classes.autocorrected="{Binding IsAutoCorrected}" Classes.invalid="{Binding IsInvalid}" Classes.notimpl="{Binding IsNotImplemented}" />
               <TextBlock Text="{Binding CountsText}" VerticalAlignment="Center" Opacity="0.8" />
             </StackPanel>
             <!-- Fix all (T-040): one previewed round of every applicable fix -->
@@ -377,6 +410,8 @@
             </DataTemplate>
           </ComboBox.ItemTemplate>
         </ComboBox>
+        <CheckBox Content="Autocorrect" IsChecked="{Binding AutoCorrect}" IsEnabled="{Binding !IsRunning}"
+                  ToolTip.Tip="Correct stray spaces and letter case (KB rules with fix.auto) before judging; the original is kept" />
         <Button Content="Run" Command="{Binding RunCommand}" />
         <Button Content="Cancel" Command="{Binding RunCancelCommand}" IsVisible="{Binding IsRunning}" />
         <Button Content="Export CSV…" Click="OnExportBatchCsv" IsEnabled="{Binding CanExport}"
@@ -423,11 +458,12 @@
       </StackPanel>
 
       <!-- Table header -->
-      <Grid DockPanel.Dock="Top" ColumnDefinitions="60,90,2*,Auto,*" Margin="4,0,4,2" IsVisible="{Binding HasResult}">
+      <Grid DockPanel.Dock="Top" ColumnDefinitions="60,90,2*,Auto,Auto,*" Margin="4,0,4,2" IsVisible="{Binding HasResult}">
         <TextBlock Grid.Column="0" Text="Line" FontWeight="SemiBold" />
         <TextBlock Grid.Column="1" Text="ID" FontWeight="SemiBold" />
         <TextBlock Grid.Column="2" Text="ISCN string" FontWeight="SemiBold" />
-        <ItemsControl Grid.Column="3" ItemsSource="{Binding Editions}">
+        <TextBlock Grid.Column="3" Text="Corrected" FontWeight="SemiBold" Width="240" IsVisible="{Binding HasCorrectedRows}" />
+        <ItemsControl Grid.Column="4" ItemsSource="{Binding Editions}">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <StackPanel Orientation="Horizontal" />
@@ -439,7 +475,7 @@
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <TextBlock Grid.Column="4" Text="First problem" FontWeight="SemiBold" Margin="8,0,0,0" />
+        <TextBlock Grid.Column="5" Text="First problem" FontWeight="SemiBold" Margin="8,0,0,0" />
       </Grid>
 
       <!-- Rows (virtualised) -->
@@ -447,12 +483,15 @@
                IsVisible="{Binding HasResult}" DoubleTapped="OnBatchRowDoubleTapped">
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="vm:BatchRowViewModel">
-            <Grid ColumnDefinitions="60,90,2*,Auto,*">
+            <Grid ColumnDefinitions="60,90,2*,Auto,Auto,*">
               <TextBlock Grid.Column="0" Text="{Binding Line}" Opacity="0.7" />
               <TextBlock Grid.Column="1" Text="{Binding Id}" Opacity="0.7" TextTrimming="CharacterEllipsis" />
               <TextBlock Grid.Column="2" Text="{Binding Input}" FontFamily="Cascadia Mono,Consolas,monospace"
                          TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Input}" Margin="0,0,8,0" />
-              <ItemsControl Grid.Column="3" ItemsSource="{Binding Cells}">
+              <TextBlock Grid.Column="3" Text="{Binding Corrected}" Width="240" FontFamily="Cascadia Mono,Consolas,monospace"
+                         TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding CorrectedTip}" Margin="0,0,8,0"
+                         IsVisible="{Binding $parent[ListBox].((vm:BatchViewModel)DataContext).HasCorrectedRows}" />
+              <ItemsControl Grid.Column="4" ItemsSource="{Binding Cells}">
                 <ItemsControl.ItemsPanel>
                   <ItemsPanelTemplate>
                     <StackPanel Orientation="Horizontal" />
@@ -465,7 +504,7 @@
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
-              <TextBlock Grid.Column="4" Text="{Binding FirstProblem}" TextTrimming="CharacterEllipsis"
+              <TextBlock Grid.Column="5" Text="{Binding FirstProblem}" TextTrimming="CharacterEllipsis"
                          ToolTip.Tip="{Binding FirstProblem}" Margin="8,0,0,0" Opacity="0.85" />
             </Grid>
           </DataTemplate>
@@ -578,6 +617,11 @@
             </ItemsControl>
             <TextBlock Text="{Binding Scope}" TextWrapping="Wrap" Opacity="0.85" />
             <TextBlock Text="{Binding Fix}" IsVisible="{Binding HasFix}" TextWrapping="Wrap" Opacity="0.85" />
+            <!-- T-097: rules whose fix is applied by autocorrection (KB fix.auto) -->
+            <Border Classes="tag" IsVisible="{Binding IsAutoCorrected}" HorizontalAlignment="Left"
+                    ToolTip.Tip="KB fix.auto: this fix is applied automatically when Autocorrect is on; the original is kept">
+              <TextBlock Text="Autocorrected (fix.auto)" FontSize="12" />
+            </Border>
             <TextBlock Text="{Binding Review}" IsVisible="{Binding HasReview}" TextWrapping="Wrap" FontStyle="Italic" Opacity="0.8" />
 
             <StackPanel Spacing="2" IsVisible="{Binding HasRelated}">
@@ -748,6 +792,15 @@
     </Style>
     <Style Selector="TextBlock.valid">
       <Setter Property="Foreground" Value="#107C10" />
+    </Style>
+    <Style Selector="TextBlock.autocorrected">
+      <Setter Property="Foreground" Value="#498205" />
+    </Style>
+    <Style Selector="Border.corrected">
+      <Setter Property="BorderBrush" Value="#9A9A9A" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Padding" Value="6,4" />
     </Style>
     <Style Selector="TextBlock.invalid">
       <Setter Property="Foreground" Value="#D13438" />

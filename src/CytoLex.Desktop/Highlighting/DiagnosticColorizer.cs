@@ -9,7 +9,10 @@ using CytoLex.Core.Validation;
 
 namespace CytoLex.Desktop.Highlighting;
 
-/// <summary>Draws <see cref="HighlightKind.Underline"/> and <see cref="HighlightKind.Strike"/> highlights as text decorations, and the hovered abnormality span as a background.</summary>
+/// <summary>
+/// Draws <see cref="HighlightKind.Underline"/>, <see cref="HighlightKind.Strike"/> and (T-097) non-empty
+/// <see cref="HighlightKind.AutoCorrected"/> highlights as text decorations, and the hovered abnormality span as a background.
+/// </summary>
 public sealed class DiagnosticColorizer : DocumentColorizingTransformer
 {
     /// <summary>The current highlights; the view redraws the text view after setting them.</summary>
@@ -33,8 +36,13 @@ public sealed class DiagnosticColorizer : DocumentColorizingTransformer
             }
         }
 
-        // Strike first, then underline, so an underline wins where both fall on the same characters.
-        foreach (var h in Highlights.Where(h => h.Kind != HighlightKind.Insert).OrderByDescending(h => h.Kind == HighlightKind.Strike))
+        // Autocorrected spots first (soft), then strike, then underline, so an underline wins where they fall on the same characters.
+        foreach (var h in Highlights.Where(h => !h.IsInsertion).OrderBy(h => h.Kind switch
+        {
+            HighlightKind.AutoCorrected => 0,
+            HighlightKind.Strike => 1,
+            _ => 2,
+        }))
         {
             var start = Math.Max(h.Span.Start, line.Offset);
             var end = Math.Min(h.Span.End, line.EndOffset);
@@ -60,6 +68,23 @@ public sealed class DiagnosticColorizer : DocumentColorizingTransformer
 
     private static TextDecoration[] Decorations(Highlight h)
     {
+        if (h.Kind == HighlightKind.AutoCorrected)
+        {
+            return
+            [
+                new TextDecoration
+                {
+                    Location = TextDecorationLocation.Underline,
+                    Stroke = SeverityBrushes.AutoCorrected,
+                    StrokeThickness = 1,
+                    StrokeThicknessUnit = TextDecorationUnit.Pixel,
+                    StrokeOffset = 4,
+                    StrokeOffsetUnit = TextDecorationUnit.Pixel,
+                    StrokeDashArray = new AvaloniaList<double> { 1, 2 },
+                },
+            ];
+        }
+
         var brush = SeverityBrushes.For(h.Severity);
         var decoration = new TextDecoration
         {

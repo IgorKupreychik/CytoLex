@@ -22,6 +22,18 @@ public sealed class TranslationViewModel
         CoordinateBuild build,
         Action<KbRef>? openKbRef,
         Action<int>? selectDiagnostic)
+        : this(translation, diagnostics, build, openKbRef, selectDiagnostic, null)
+    {
+    }
+
+    /// <summary>A translation whose part spans are mapped to the editor text by <paramref name="toEditor"/> (T-097: autocorrection).</summary>
+    public TranslationViewModel(
+        TranslationResult translation,
+        ImmutableArray<Diagnostic> diagnostics,
+        CoordinateBuild build,
+        Action<KbRef>? openKbRef,
+        Action<int>? selectDiagnostic,
+        Func<TextSpan, TextSpan>? toEditor)
     {
         ArgumentNullException.ThrowIfNull(translation);
         Result = translation;
@@ -31,7 +43,7 @@ public sealed class TranslationViewModel
             ? "Context unknown: where the context changes the meaning, both readings are given."
             : null;
         Summary = new TranslationItemViewModel(translation.Summary, build, openKbRef);
-        Items = [.. translation.Items.Select(i => new TranslationItemViewModel(i, diagnostics, build, openKbRef, selectDiagnostic))];
+        Items = [.. translation.Items.Select(i => new TranslationItemViewModel(i, diagnostics, build, openKbRef, selectDiagnostic, toEditor))];
     }
 
     /// <summary>The core result.</summary>

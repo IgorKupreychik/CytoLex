@@ -75,7 +75,7 @@ public sealed record RuleExample(bool IsValid, string Text, string? Why, string?
 /// <param name="Text">The quote text.</param>
 public sealed record RuleQuote(string Citation, string Text);
 
-/// <summary>Everything the KB database holds about one rule in one edition.</summary>
+/// <summary>Everything the KB database holds about one rule in one edition; <c>FixAuto</c> = the KB <c>fix.auto</c> flag (autocorrection, T-097).</summary>
 public sealed record RuleDetail(
     string Edition,
     string Id,
@@ -95,7 +95,8 @@ public sealed record RuleDetail(
     ImmutableArray<string> Citations,
     ImmutableArray<string> Related,
     ImmutableArray<RuleExample> Examples,
-    ImmutableArray<RuleQuote> Quotes);
+    ImmutableArray<RuleQuote> Quotes,
+    bool FixAuto = false);
 
 /// <summary>
 /// Read-only access to <c>build/kb.sqlite</c> (written by <c>kb build</c>; tables and FTS5 indexes in kb/README.md) for the
@@ -118,9 +119,12 @@ public sealed class RuleStore : IDisposable
     private readonly SqliteConnection _connection;
     private readonly VocabStore _vocab;
 
+    private readonly bool _hasFixAuto;
+
     private RuleStore(SqliteConnection connection, ImmutableArray<string> editions)
     {
         _connection = connection;
+        _hasFixAuto = HasColumn(connection, "rules", "fix_auto");
         _vocab = new VocabStore(connection);
         Editions = editions;
     }
@@ -300,8 +304,8 @@ public sealed class RuleStore : IDisposable
         ArgumentNullException.ThrowIfNull(edition);
         ArgumentNullException.ThrowIfNull(id);
         using var cmd = Command(
-            "SELECT title, section, severity, statement, file, fix_level, fix_kind, fix_hint, paraphrase_checked, needs_review, review_note "
-            + "FROM rules WHERE version = $v AND id = $id",
+            "SELECT title, section, severity, statement, file, fix_level, fix_kind, fix_hint, paraphrase_checked, needs_review, review_note, "
+            + (_hasFixAuto ? "fix_auto" : "0") + " FROM rules WHERE version = $v AND id = $id",
             ("$v", edition),
             ("$id", id));
         using var r = cmd.ExecuteReader();
@@ -329,7 +333,17 @@ public sealed class RuleStore : IDisposable
             Citations: Strings("SELECT rendered FROM citations WHERE version = $v AND rule_id = $id ORDER BY ord", edition, id),
             Related: Strings("SELECT related_id FROM rule_related WHERE version = $v AND rule_id = $id", edition, id),
             Examples: Examples(edition, id),
-            Quotes: Quotes(edition, id));
+            Quotes: Quotes(edition, id),
+            FixAuto: r.GetInt32(11) != 0);
+    }
+
+    // A database written before T-097 has no fix_auto column: read it as "not flagged" rather than failing.
+    private static bool HasColumn(SqliteConnection connection, string table, string column)
+    {
+        using var cmd = connection.CreateCommand();
+        cmd.CommandText = $"SELECT count(*) FROM pragma_table_info('{table}') WHERE name = $c";
+        cmd.Parameters.AddWithValue("$c", column);
+        return Convert.ToInt64(cmd.ExecuteScalar(), CultureInfo.InvariantCulture) > 0;
     }
 
     /// <inheritdoc/>

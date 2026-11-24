@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
@@ -84,6 +85,12 @@ public partial class MainWindow : Window
             case nameof(MainWindowViewModel.HoverSpan):
                 _colorizer.HoverSpan = _viewModel?.HoverSpan;
                 Input.TextArea.TextView.Redraw();
+                break;
+            case nameof(MainWindowViewModel.EditorToolTip):
+                // T-097: autocorrection notes and findings at the mouse position.
+                var textView = Input.TextArea.TextView;
+                ToolTip.SetTip(textView, _viewModel?.EditorToolTip);
+                ToolTip.SetIsOpen(textView, _viewModel?.EditorToolTip is not null);
                 break;
             default:
                 break;
@@ -245,6 +252,15 @@ public partial class MainWindow : Window
         if (_viewModel is not null)
         {
             _viewModel.HoverOffset = null;
+        }
+    }
+
+    // Corrected line (T-097): copies the selected edition's corrected string.
+    private async void OnCopyCorrected(object? sender, RoutedEventArgs e)
+    {
+        if (_viewModel?.SelectedPanel?.Corrected is { } corrected && TopLevel.GetTopLevel(this)?.Clipboard is { } clipboard)
+        {
+            await clipboard.SetTextAsync(corrected);
         }
     }
 

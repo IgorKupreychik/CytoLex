@@ -56,7 +56,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
 | Chromosome count vs. the changes listed | ❌ | ✅ | |
 | Sex-chromosome conventions | ❌ | ✅ | |
 | Clone order, cell counts, `idem`/`sl` references | ◐ | ✅ | 🗓 inherited changes in the abnormality list (T-070) |
-| Stray spaces, letter case | ❌ (silently ignored) | ✅ | rules stay `error` (T-075 decided); autocorrection with the original kept, "valid after autocorrection": core and batch exports done (T-096; replaces the lenient mode of T-080); 🗓 desktop T-097 |
+| Stray spaces, letter case | ❌ (silently ignored) | ✅ | rules stay `error` (T-075 decided); autocorrection with the original kept, "valid after autocorrection": core and batch exports done (T-096; replaces the lenient mode of T-080); desktop single-string check and Batch tab done (T-097) |
 | Underlined homologues | ❌ | ❌ | 🗓 T-042 |
 | Rules catalogue | none published | 179 rules for ISCN 2016; 122 checked (103 by a dedicated check, the rest by the parser); the others are mostly informational | 🗓 more rules with each chapter |
 | **Feedback** | | | |
