@@ -99,7 +99,11 @@ public static class KnowledgeBase
                 ? [.. ctx.EnumerateArray().Select(c => MapContext(c.GetString()!)).OfType<SampleContext>().Distinct()]
                 : [],
             r.TryGetProperty("fix", out var fix)
-                ? new RuleFixHint(fix.GetProperty("level").GetInt32(), OptionalString(fix, "kind"), OptionalString(fix, "hint"))
+                ? new RuleFixHint(
+                    fix.GetProperty("level").GetInt32(),
+                    OptionalString(fix, "kind"),
+                    OptionalString(fix, "hint"),
+                    fix.TryGetProperty("auto", out var auto) && auto.GetBoolean())
                 : null,
             review.GetProperty("needs_review").GetBoolean(),
             OptionalString(review, "note"),

@@ -91,10 +91,26 @@ public sealed class Validator
 
         var results = editions
             .Select(e => _profiles.TryGetValue(e, out var profile)
-                ? Run(profile, input, segments, context, options)
+                ? RunEdition(profile, input, segments, context, options)
                 : NotImplemented(e))
             .ToImmutableArray();
         return new ValidationReport(input, segments, context, results);
+    }
+
+    /// <summary>One edition; with <see cref="ValidationOptions.AutoCorrect"/>, autocorrected to a fixed point (T-096).</summary>
+    private static EditionResult RunEdition(EditionProfile profile, string input, ImmutableArray<Segment> segments, ContextInfo context, ValidationOptions options)
+    {
+        var first = Run(profile, input, segments, context, options);
+        if (!options.AutoCorrect)
+        {
+            return first;
+        }
+
+        return AutoCorrector.Correct(profile.Kb, input, first, text =>
+        {
+            var corrected = Segmenter.Split(text);
+            return Run(profile, text, corrected, ContextInference.Infer(text, corrected, options.ContextHint), options);
+        });
     }
 
     private static EditionResult Run(EditionProfile profile, string input, ImmutableArray<Segment> segments, ContextInfo context, ValidationOptions options)

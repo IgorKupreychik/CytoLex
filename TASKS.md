@@ -104,7 +104,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-093 | todo | 4 | T-033, T-058 | Literal translation of in situ results (templates, golden entries, renderer) |
 | T-094 | done | 4 | T-033 | Probe positions for locus and chromosome order in FISH (`ISH.LOCUS_ORDER_PTER_QTER`, `NUC_ISH.CHROMOSOME_ORDER`) |
 | T-095 | discussion | 4 | T-033 | Apply karyotype rules (STRUCT.*, symbol formats) to the abnormalities of ish results? |
-| T-096 | todo | 2 | T-074, T-035 | Autocorrection: core + KB flag `fix.auto` (meaning-preserving level-1 fixes applied automatically, original kept) |
+| T-096 | done | 2 | T-074, T-035 | Autocorrection: core + KB flag `fix.auto` (meaning-preserving level-1 fixes applied automatically, original kept) |
 | T-097 | todo | 2 | T-096, T-098, T-038 | Autocorrection: desktop (checkbox, corrected line, highlights on the original) + batch tab |
 | T-098 | todo | 2 | T-037, T-059, T-081 | Desktop: single-string layout redesign (edition verdict strip + full-width view tabs) |
 | T-099 | todo | 4 | T-098 | Desktop: pin a view tab to a side pane |
@@ -1006,7 +1006,7 @@ Deviations from the plan: no CLI (user); new label `severity-policy` and CytoLex
 **Notes:** From T-033: the §13.2 E22 breakpoint misprint is reported under `ISH.STRUCTURAL_FORMAT` meanwhile.
 
 ### T-096 — Autocorrection: core + KB flag
-**Status:** todo
+**Status:** done
 **Description:** Apply obvious, meaning-preserving fixes automatically and keep the original (feature discussion 2026-11-24).
 - **KB:** a rule-level flag `fix.auto: true` (rule schema, `kb/README.md`, runtime bundle). Only for level-1 fixes that keep the meaning, have a single alternative and don't depend on the context. First set on `SYM.NO_OTHER_SPACE`, `SYM.LETTER_CASE`, `SYM.NO_SPACE_AT_PARENTHESIS` and the space part of `BAND.DESIGNATION_FORMAT` (check whether its space and format faults need separate fix proposals); more rules only after review. The choice traces to the KB; nothing is hard-coded.
 - **Core:** `ValidationOptions.AutoCorrect` (off by default in the API). The validator applies the fixes of the flagged rules (reuse `Fixer.ApplyAll` with a filter), re-validates, and repeats to a fixed point with a round limit, per edition (rules differ by edition). The result keeps `Input` (original), `Corrected`, `AutoCorrections` (rule ID, original span, edit, citations) and an offset map corrected → original, so remaining diagnostics can be highlighted on the original.
@@ -1014,6 +1014,7 @@ Deviations from the plan: no CLI (user); new label `severity-policy` and CytoLex
 - **Batch:** `BatchRunner` takes the option; `BatchExport` JSON and CSV carry the original, the corrected string and the applied corrections; both still round-trip (`BatchReader` reads the CSV back).
 **Acceptance:** every invalid KB example of a flagged rule is corrected to its `corrected` form (or further, when it has other faults); no valid KB example changes; the non-book strings `47,XY, +21`, `46,X Y,dup(1)(q21q32)`, `46,xy`, `46,XY,T(9;22)(q34;q11.2)` end as "valid after autocorrection" with the right corrections; mapped spans of remaining diagnostics point into the original; batch export round-trip tests; `dotnet test` green.
 **Notes:** Created 2026-11-24 (user). Decided with the user: autocorrection replaces the lenient mode (T-080); the rules stay `error` (T-075). Run `kb build` + `dotnet build` after adding the KB flag.
+Outcome (2026-11-24): KB `fix.auto` (schema: level 1 only; `kb/README.md`) set on `SYM.NO_OTHER_SPACE`, `SYM.LETTER_CASE`, `SYM.NO_SPACE_AT_PARENTHESIS` and `BAND.DESIGNATION_FORMAT` (flagged as a whole: its check reports only spaces, so no separate proposals were needed; decision recorded). Core: `RuleFixHint.Auto`, `ValidationOptions.AutoCorrect`, `Validation/AutoCorrector.cs` (context-free fixes of flagged rules via `Fixer.ApplyAll(…, include)`, re-validate, ≤8 rounds), `Validation/AutoCorrection.cs` (`AutoCorrection`, `AppliedCorrection`, `EditionVerdict`), `Text/OffsetMap.cs`; `EditionResult.AutoCorrection` + `Verdict`. With autocorrection on, an edition result's spans refer to the corrected string (`AutoCorrection.ToOriginal` maps back). Batch: CSV + `verdict`/`corrected`/`autocorrections` (old header still read), JSON format v2 (v1 still read), `BatchSummary.ValidAfterAutoCorrection`. Tests `Validation/AutoCorrectionTests.cs`, `OffsetMapTests.cs`, `Batch/BatchExportTests.cs`, tool schema test. Docs: `docs/design/core.md` §9/§10, `docs/decisions.md`, `CLAUDE.md`, `README.md`, `docs/research/cytogps-comparison.md`. Not done: `kb.sqlite` doesn't carry the flag (rule browser display fits T-097).
 
 ### T-097 — Autocorrection: desktop + batch tab
 **Status:** todo

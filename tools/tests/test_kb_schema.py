@@ -36,7 +36,7 @@ EXPECTED = {
     "bad-para-label.yaml": ("rules[0].cite[0].para", "is not a paragraph label"),
     "unknown-field.yaml": ("rules[0]", "unknown field(s) ('severty' was unexpected)"),
     "cite-no-anchor.yaml": ("rules[0].cite[0]", "needs at least one of: para, example, float"),
-    "kind-on-level-3.yaml": ("rules[1].fix", "'kind' is only allowed with fix level 1"),
+    "kind-on-level-3.yaml": ("rules[1].fix", "'kind' and 'auto' are only allowed with fix level 1"),
     "duplicate-key.yaml": ("line 31", 'duplicate key "needs_review"'),
     "vocab-bad.yaml": ("entries[0].tokens", "should be non-empty"),
 }
@@ -83,6 +83,37 @@ def test_needs_review_requires_note():
     assert [(p.where, p.message) for p in problems] == [
         ("rules[0].review", "'note' is a required property")
     ]
+
+
+@pytest.mark.parametrize(
+    ("fix", "ok"),
+    [
+        ({"level": 1, "kind": "delete", "hint": "h", "auto": True}, True),
+        ({"level": 1, "kind": "delete", "hint": "h", "auto": False}, True),
+        ({"level": 3, "hint": "h", "auto": True}, False),
+    ],
+    ids=["level-1-auto", "level-1-not-auto", "level-3-auto"],
+)
+def test_fix_auto_only_on_level_1(fix, ok):
+    """T-096: `fix.auto` (autocorrection) is a level-1 flag."""
+    rule = {
+        "id": "A.B",
+        "title": "t",
+        "applies_to": ["general"],
+        "severity": "error",
+        "statement": "s",
+        "cite": [{"section": "1", "page": 1, "para": "¶1"}],
+        "examples": {"valid": []},
+        "fix": fix,
+        "review": {"paraphrase_checked": False, "needs_review": False},
+    }
+    problems = validate_data({"version": "2016", "section": "1", "rules": [rule]}, Path("r.yaml"))
+    if ok:
+        assert problems == []
+    else:
+        assert [(p.where, p.message) for p in problems] == [
+            ("rules[0].fix", "'kind' and 'auto' are only allowed with fix level 1")
+        ]
 
 
 @pytest.mark.parametrize("label", ["Fig. 7", "Fig. 6a", "Table 4", "Ploidy table", "Fibre diagram"])

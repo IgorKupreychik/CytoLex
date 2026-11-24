@@ -61,7 +61,8 @@ public static class Fixer
     /// <param name="input">The string <paramref name="result"/> was validated from.</param>
     /// <param name="result">One edition's result.</param>
     /// <param name="context">The context to fix for; <c>null</c> = only fixes that don't depend on a context.</param>
-    public static FixAllResult ApplyAll(string input, EditionResult result, SampleContext? context = null)
+    /// <param name="include">Which diagnostics take part; <c>null</c> = all (autocorrection: the rules with <c>fix.auto</c>, T-096).</param>
+    public static FixAllResult ApplyAll(string input, EditionResult result, SampleContext? context = null, Func<Diagnostic, bool>? include = null)
     {
         ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(result);
@@ -69,6 +70,11 @@ public static class Fixer
         var candidates = new List<Fix>();
         foreach (var d in result.Diagnostics)
         {
+            if (include is not null && !include(d))
+            {
+                continue;
+            }
+
             if (d.Condition is { } condition && (context is not { } c || condition.In(c) is null))
             {
                 continue;

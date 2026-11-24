@@ -101,7 +101,7 @@ rules:
 | `cite` | ✔ | ≥1 citation (below) |
 | `examples.valid` | ✔ | `{text, cite?, note?}`. **Every book example** in the section goes here, with its `En` cite. May be `[]` |
 | `examples.invalid` | | `{text, why, corrected?, cite?}`. `why` names the faulty part; `corrected` when there is exactly one valid form |
-| `fix` | | `level: 1` = deterministic edit (`kind`: `replace` · `insert` · `delete` · `reorder`, required); `level: 3` = explanation only (no `kind`). `hint` describes the edit or the explanation |
+| `fix` | | `level: 1` = deterministic edit (`kind`: `replace` · `insert` · `delete` · `reorder`, required); `level: 3` = explanation only (no `kind`). `hint` describes the edit or the explanation. `auto: true` (level 1 only, T-096) = the validator may apply the rule's fixes automatically when autocorrection is on (`ValidationOptions.AutoCorrect`); set it only for fixes that keep the meaning, have a single alternative and don't depend on the sample context, and only after review (2016: `SYM.NO_OTHER_SPACE`, `SYM.LETTER_CASE`, `SYM.NO_SPACE_AT_PARENTHESIS`, `BAND.DESIGNATION_FORMAT`) |
 | `review.paraphrase_checked` | ✔ | `true` once a person has approved `statement` against the quote |
 | `review.needs_review` | ✔ | `true` when the book is ambiguous or the section is listed in `docs/extraction-review-<version>.md`; then `review.note` (why) is required. Caps findings at `warning` (see [Severity](#severity)) |
 | `related` | | IDs of related rules |
@@ -166,7 +166,7 @@ Policy: `docs/decisions.md` → "Strictness & severity" (T-022); applied to the 
 | `applies_to` | `general` · `karyotype` · `breakage` · `meiotic` · `ish` · `nuc_ish` · `fib_ish` · `rev_ish` · `cgh` · `arr` · `rsa` · `seq` |
 | `context` | `constitutional` · `neoplastic` · `meiotic` |
 | `severity` | `error` · `warning` · `info` |
-| `fix.level` / `fix.kind` | `1` with `replace` · `insert` · `delete` · `reorder`; `3` (no kind) |
+| `fix.level` / `fix.kind` / `fix.auto` | `1` with `replace` · `insert` · `delete` · `reorder` (optional `auto: true`); `3` (no kind, no auto) |
 
 Type assignment: the chapter sets the default `applies_to`/`context`; explicit book text overrides it; ambiguous cases get `needs_review` (see `docs/decisions.md`).
 

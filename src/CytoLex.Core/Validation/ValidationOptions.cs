@@ -55,4 +55,11 @@ public sealed record ValidationOptions
 
     /// <summary>With <see cref="IncludeTranslation"/>: add approximate GRCh37/38 band coordinates and segment sizes (off by default, T-054).</summary>
     public bool IncludeCoordinates { get; init; }
+
+    /// <summary>
+    /// Autocorrection (T-096): in each implemented edition, apply the level-1 fixes of the rules the KB flags with
+    /// <c>fix.auto</c> (meaning-preserving, context-free), re-validate, and repeat; the result keeps the original and
+    /// lists the corrections (<see cref="EditionResult.AutoCorrection"/>). Off by default.
+    /// </summary>
+    public bool AutoCorrect { get; init; }
 }

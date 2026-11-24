@@ -11,11 +11,12 @@ public sealed record RuleCount(string RuleId, int Strings);
 /// <summary>The totals of one edition over a batch (T-038).</summary>
 /// <param name="Edition">The edition.</param>
 /// <param name="Total">Strings in the batch.</param>
-/// <param name="Valid">Validated and valid.</param>
+/// <param name="Valid">Validated and valid as written.</param>
 /// <param name="NotValid">Validated and not valid.</param>
 /// <param name="NotImplemented">Not validated: the edition is not implemented.</param>
 /// <param name="Incomplete">Validated, but a segment or construct was not (valid "as far as implemented").</param>
 /// <param name="TopRules">The rules with errors or warnings in the most strings, most first.</param>
+/// <param name="ValidAfterAutoCorrection">Validated and valid only after autocorrection (T-096; 0 without it).</param>
 public sealed record EditionSummary(
     string Edition,
     int Total,
@@ -23,7 +24,8 @@ public sealed record EditionSummary(
     int NotValid,
     int NotImplemented,
     int Incomplete,
-    ImmutableArray<RuleCount> TopRules);
+    ImmutableArray<RuleCount> TopRules,
+    int ValidAfterAutoCorrection);
 
 /// <summary>Totals per edition of a <see cref="BatchResult"/>.</summary>
 public static class BatchSummary
@@ -52,10 +54,11 @@ public static class BatchSummary
         return new EditionSummary(
             edition,
             result.Items.Length,
-            implemented.Count(r => r.Validity.IsValid),
+            implemented.Count(r => r.Verdict == EditionVerdict.Valid),
             implemented.Count(r => !r.Validity.IsValid),
             editionResults.Count - implemented.Count,
             implemented.Count(r => !r.Validity.IsComplete),
-            [.. rules]);
+            [.. rules],
+            implemented.Count(r => r.Verdict == EditionVerdict.ValidAfterAutoCorrection));
     }
 }

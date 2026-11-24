@@ -16,7 +16,8 @@ public sealed record Citation(string Section, int Page, string? Anchor, string R
 /// <param name="Level">1 = deterministic edit, 2 = "did you mean", 3 = explanation only.</param>
 /// <param name="Kind">The KB <c>fix.kind</c> (<c>replace</c>, <c>insert</c>, <c>delete</c>, <c>reorder</c>), if any.</param>
 /// <param name="Hint">The KB hint text, if any.</param>
-public sealed record RuleFixHint(int Level, string? Kind, string? Hint);
+/// <param name="Auto">KB <c>fix.auto</c>: autocorrection may apply the rule's level-1 fixes automatically (T-096).</param>
+public sealed record RuleFixHint(int Level, string? Kind, string? Hint, bool Auto = false);
 
 /// <summary>
 /// The runtime metadata of one KB rule in one edition (docs/design/core.md §6): everything the engine needs to turn a

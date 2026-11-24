@@ -51,6 +51,11 @@ public sealed record SegmentResult(
 /// <param name="CellLines">The cell lines of the karyotype segments, in input order (T-069).</param>
 /// <param name="Abnormalities">The abnormalities of the karyotype segments, in input order; each names its cell line (T-069).</param>
 /// <param name="Translation">The literal translation (T-058); <c>null</c> unless <see cref="ValidationOptions.IncludeTranslation"/>.</param>
+/// <param name="AutoCorrection">
+/// What autocorrection did (T-096); <c>null</c> unless <see cref="ValidationOptions.AutoCorrect"/> (and for a
+/// not-implemented edition). When set, every span of this result (diagnostics, fixes, segments, abnormalities,
+/// translation) refers to <see cref="AutoCorrection.Corrected"/>; <see cref="AutoCorrection.ToOriginal"/> maps it back.
+/// </param>
 public sealed record EditionResult(
     string Edition,
     EditionStatus Status,
@@ -61,7 +66,19 @@ public sealed record EditionResult(
     ImmutableArray<SegmentResult> Segments,
     ImmutableArray<CellLineSummary> CellLines,
     ImmutableArray<AbnormalityEntry> Abnormalities,
-    TranslationResult? Translation = null);
+    TranslationResult? Translation = null,
+    AutoCorrection? AutoCorrection = null)
+{
+    /// <summary>The verdict (T-096): valid as written, valid after autocorrection, not valid, or not implemented.</summary>
+    public EditionVerdict Verdict => Status == EditionStatus.NotImplemented
+        ? EditionVerdict.NotImplemented
+        : !Validity.IsValid
+            ? EditionVerdict.NotValid
+            : AutoCorrection is { IsChanged: true } ? EditionVerdict.ValidAfterAutoCorrection : EditionVerdict.Valid;
+
+    /// <summary>The text this result's spans refer to: the corrected string with autocorrection, else <paramref name="input"/>.</summary>
+    public string TextOf(string input) => AutoCorrection?.Corrected ?? input;
+}
 
 /// <summary>The result of <see cref="Validator.Validate"/>: the segments, the context, and one result per edition requested.</summary>
 /// <param name="Input">The input string; every span refers to it.</param>

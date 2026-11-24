@@ -80,7 +80,7 @@ rules:
         - text: "1 p31"
           why: Space between the chromosome number and the arm symbol.
           corrected: "1p31"
-    fix: {level: 1, kind: delete, hint: Remove the spaces inside the band designation.}
+    fix: {level: 1, kind: delete, hint: Remove the spaces inside the band designation., auto: true}
     review: {paraphrase_checked: true, needs_review: false}
     related: [BAND.SUBBAND_FORMAT]
 

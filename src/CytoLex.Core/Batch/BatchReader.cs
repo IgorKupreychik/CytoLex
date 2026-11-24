@@ -114,7 +114,7 @@ public static class BatchReader
         }
 
         var header = records[0].Fields.Select(f => f.Trim()).ToList();
-        if (header.SequenceEqual(BatchExport.CsvColumns, StringComparer.OrdinalIgnoreCase))
+        if (BatchExport.IsExportHeader(header, StringComparer.OrdinalIgnoreCase))
         {
             return ParseExport(records, warnings);
         }

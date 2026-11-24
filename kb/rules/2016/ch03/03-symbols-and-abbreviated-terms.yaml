@@ -127,7 +127,7 @@ rules:
         - text: "arr (1–22,X)×2"
           why: No space is written between arr and the opening parenthesis (§14.2 ¶1).
           corrected: "arr(1–22,X)×2"
-    fix: {level: 1, kind: delete, hint: Remove the space next to the parenthesis.}
+    fix: {level: 1, kind: delete, hint: Remove the space next to the parenthesis., auto: true}
     review: {paraphrase_checked: true, needs_review: false}
     related: [SYM.NO_OTHER_SPACE]
 
@@ -173,7 +173,7 @@ rules:
             other shared count in ch. 13 follows the parenthesis directly (E11, E14, E15, E22, …).
             Treated as a book inconsistency (T-016).
           corrected: "nuc ish(D17Z1,ERBB2)×2[100]"
-    fix: {level: 1, kind: delete, hint: Remove the space.}
+    fix: {level: 1, kind: delete, hint: Remove the space., auto: true}
     review:
       paraphrase_checked: true
       needs_review: false
@@ -213,7 +213,7 @@ rules:
         - text: "46,XX,Del(5)(q13q33)"
           why: The deletion symbol is listed as lower-case del.
           corrected: "46,XX,del(5)(q13q33)"
-    fix: {level: 1, kind: replace, hint: Write the symbol in its listed letter case.}
+    fix: {level: 1, kind: replace, hint: Write the symbol in its listed letter case., auto: true}
     review:
       paraphrase_checked: false
       needs_review: false

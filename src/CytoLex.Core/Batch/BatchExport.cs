@@ -20,7 +20,10 @@ namespace CytoLex.Core.Batch;
 /// <param name="Warnings">Warning count.</param>
 /// <param name="Infos">Info count.</param>
 /// <param name="Conditional">Context-dependent diagnostics (also counted by their worst severity).</param>
-/// <param name="Rules">The diagnostics, <c>;</c>-separated, as <c>Severity:RULE.ID@start-end</c>.</param>
+/// <param name="Rules">The diagnostics, <c>;</c>-separated, as <c>Severity:RULE.ID@start-end</c> (spans in <paramref name="Corrected"/> when it is set).</param>
+/// <param name="Verdict">The verdict (T-096); for a pre-T-096 export read back, derived from <paramref name="Status"/> and <paramref name="Valid"/>.</param>
+/// <param name="Corrected">The string after autocorrection when autocorrection changed it (T-096); else empty.</param>
+/// <param name="AutoCorrections">The applied corrections, <c>;</c>-separated, as <c>RULE.ID@start-end=new text</c> (spans in <paramref name="Input"/>).</param>
 public sealed record BatchCsvRow(
     int Line,
     string? Id,
@@ -34,7 +37,10 @@ public sealed record BatchCsvRow(
     int Warnings,
     int Infos,
     int Conditional,
-    string Rules);
+    string Rules,
+    EditionVerdict Verdict,
+    string Corrected,
+    string AutoCorrections);
 
 /// <summary>The JSON export document.</summary>
 /// <param name="Format">Always <see cref="BatchExport.JsonFormat"/>.</param>
@@ -56,12 +62,21 @@ public static class BatchExport
     /// <summary>The <c>Format</c> value of a JSON export.</summary>
     public const string JsonFormat = "cytolex-batch";
 
-    /// <summary>The current JSON format version.</summary>
-    public const int JsonFormatVersion = 1;
+    /// <summary>
+    /// The current JSON format version. 2 (T-096): an edition result may carry <c>AutoCorrection</c>, and then its spans
+    /// refer to the corrected string. Version 1 files read as they are.
+    /// </summary>
+    public const int JsonFormatVersion = 2;
 
-    /// <summary>The CSV header.</summary>
+    /// <summary>The CSV header (T-096 appended <c>verdict</c>, <c>corrected</c>, <c>autocorrections</c>).</summary>
     public static ImmutableArray<string> CsvColumns { get; } =
-        ["line", "id", "input", "edition", "status", "valid", "valid_contexts", "complete", "errors", "warnings", "infos", "conditional", "rules"];
+    [
+        "line", "id", "input", "edition", "status", "valid", "valid_contexts", "complete", "errors", "warnings", "infos", "conditional", "rules",
+        "verdict", "corrected", "autocorrections",
+    ];
+
+    /// <summary>The header of exports written before T-096; still read.</summary>
+    public static ImmutableArray<string> CsvColumnsV1 { get; } = [.. CsvColumns.Take(13)];
 
     private static readonly UTF8Encoding _utf8Bom = new(encoderShouldEmitUTF8Identifier: true);
 
@@ -126,7 +141,12 @@ public static class BatchExport
                 r.Counts.Warnings,
                 r.Counts.Infos,
                 r.Counts.Conditional,
-                string.Join(';', r.Diagnostics.Select(d => $"{d.Severity}:{d.RuleId}@{d.Span.Start}-{d.Span.End}"))))),
+                string.Join(';', r.Diagnostics.Select(d => $"{d.Severity}:{d.RuleId}@{d.Span.Start}-{d.Span.End}")),
+                r.Verdict,
+                r.AutoCorrection is { IsChanged: true } a ? a.Corrected : string.Empty,
+                r.AutoCorrection is { } c
+                    ? string.Join(';', c.Corrections.Select(x => $"{x.RuleId}@{x.OriginalSpan.Start}-{x.OriginalSpan.End}={x.NewText}"))
+                    : string.Empty))),
         ];
     }
 
@@ -142,6 +162,7 @@ public static class BatchExport
                 [
                     Num(row.Line), row.Id ?? string.Empty, row.Input, row.Edition, row.Status.ToString(), Bool(row.Valid), row.ValidContexts,
                     Bool(row.Complete), Num(row.Errors), Num(row.Warnings), Num(row.Infos), Num(row.Conditional), row.Rules,
+                    row.Verdict.ToString(), row.Corrected, row.AutoCorrections,
                 ],
                 ','));
         }
@@ -160,36 +181,43 @@ public static class BatchExport
             throw new InvalidDataException(string.Join("; ", warnings));
         }
 
-        if (records.Count == 0 || !records[0].Fields.SequenceEqual(CsvColumns, StringComparer.Ordinal))
+        if (records.Count == 0 || !IsExportHeader(records[0].Fields, StringComparer.Ordinal))
         {
             throw new InvalidDataException("Not a CytoLex batch CSV export (header: " + string.Join(',', CsvColumns) + ").");
         }
 
+        var columns = records[0].Fields.Count;
         var rows = ImmutableArray.CreateBuilder<BatchCsvRow>();
         foreach (var r in records.Skip(1))
         {
-            if (r.Fields.Count != CsvColumns.Length)
+            if (r.Fields.Count != columns)
             {
-                throw new InvalidDataException($"line {r.Line}: {r.Fields.Count} fields, expected {CsvColumns.Length}.");
+                throw new InvalidDataException($"line {r.Line}: {r.Fields.Count} fields, expected {columns}.");
             }
 
             var f = r.Fields;
             try
             {
+                var status = Enum.Parse<EditionStatus>(f[4]);
+                var valid = bool.Parse(f[5]);
+                var hasAutoCorrection = columns == CsvColumns.Length;
                 rows.Add(new BatchCsvRow(
                     int.Parse(f[0], CultureInfo.InvariantCulture),
                     f[1].Length > 0 ? f[1] : null,
                     f[2],
                     f[3],
-                    Enum.Parse<EditionStatus>(f[4]),
-                    bool.Parse(f[5]),
+                    status,
+                    valid,
                     f[6],
                     bool.Parse(f[7]),
                     int.Parse(f[8], CultureInfo.InvariantCulture),
                     int.Parse(f[9], CultureInfo.InvariantCulture),
                     int.Parse(f[10], CultureInfo.InvariantCulture),
                     int.Parse(f[11], CultureInfo.InvariantCulture),
-                    f[12]));
+                    f[12],
+                    hasAutoCorrection ? Enum.Parse<EditionVerdict>(f[13]) : VerdictOf(status, valid),
+                    hasAutoCorrection ? f[14] : string.Empty,
+                    hasAutoCorrection ? f[15] : string.Empty));
             }
             catch (Exception ex) when (ex is FormatException or ArgumentException or OverflowException)
             {
@@ -213,6 +241,13 @@ public static class BatchExport
             WriteCsv(stream, result);
         }
     }
+
+    /// <summary>Whether <paramref name="header"/> is the header of a CSV export (<see cref="CsvColumns"/> or <see cref="CsvColumnsV1"/>).</summary>
+    internal static bool IsExportHeader(IReadOnlyList<string> header, StringComparer comparer) =>
+        header.SequenceEqual(CsvColumns, comparer) || header.SequenceEqual(CsvColumnsV1, comparer);
+
+    private static EditionVerdict VerdictOf(EditionStatus status, bool valid) =>
+        status == EditionStatus.NotImplemented ? EditionVerdict.NotImplemented : valid ? EditionVerdict.Valid : EditionVerdict.NotValid;
 
     private static string Num(int value) => value.ToString(CultureInfo.InvariantCulture);
 

@@ -78,7 +78,7 @@ def _message(error: ValidationError) -> str:
         keys = [next(iter(alt["required"])) for alt in error.validator_value]
         return f"citation needs at least one of: {', '.join(keys)}"
     if error.validator == "not" and "else" in schema_path:
-        return "'kind' is only allowed with fix level 1"
+        return "'kind' and 'auto' are only allowed with fix level 1"
     if error.validator == "pattern" and isinstance(error.schema, dict):
         expected = error.schema.get("x-expected")
         if expected:

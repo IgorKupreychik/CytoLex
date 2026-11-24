@@ -99,6 +99,95 @@ public class BatchExportTests
         }
     }
 
+    // --- T-096: autocorrection ---
+
+    private static readonly BatchItem[] _autoItems =
+    [
+        new(1, "a", "47,XY, +21"),
+        new(2, null, "46,xy"),
+        new(3, "c", "46, xy,inv(3)(q27p21)"),
+        new(4, null, "46,XX"),
+    ];
+
+    private static readonly Lazy<BatchResult> _autoResult = new(() =>
+        BatchRunner.Run(Validator.Default, _autoItems, new ValidationOptions { Editions = EditionSelection.All, AutoCorrect = true }));
+
+    [Fact]
+    public void AutoCorrection_Csv_CarriesOriginalCorrectedAndCorrections()
+    {
+        var rows = BatchExport.CsvRows(_autoResult.Value).Where(r => r.Edition == "2016").ToList();
+
+        Assert.Equal(["47,XY, +21", "46,xy", "46, xy,inv(3)(q27p21)", "46,XX"], rows.Select(r => r.Input));
+        Assert.Equal(
+            [EditionVerdict.ValidAfterAutoCorrection, EditionVerdict.ValidAfterAutoCorrection, EditionVerdict.NotValid, EditionVerdict.Valid],
+            rows.Select(r => r.Verdict));
+        Assert.Equal(["47,XY,+21", "46,XY", "46,XY,inv(3)(q27p21)", string.Empty], rows.Select(r => r.Corrected));
+        Assert.Equal("SYM.NO_OTHER_SPACE@6-7=", rows[0].AutoCorrections);
+        Assert.Equal("SYM.LETTER_CASE@3-5=XY", rows[1].AutoCorrections);
+        Assert.Equal(string.Empty, rows[3].AutoCorrections);
+    }
+
+    [Fact]
+    public void AutoCorrection_Csv_RoundTrips_AndReadsBackAsBatchInput()
+    {
+        var csv = Bytes(s => BatchExport.WriteCsv(s, _autoResult.Value));
+        using var input = new MemoryStream(csv);
+
+        Assert.Equal(BatchExport.CsvRows(_autoResult.Value), BatchExport.ReadCsv(input));
+
+        var read = BatchReader.Read(csv, BatchFormat.Csv);
+        Assert.Empty(read.Warnings);
+        Assert.Equal(_autoItems, read.Items);
+    }
+
+    [Fact]
+    public void AutoCorrection_Json_RoundTrips()
+    {
+        var json = Bytes(s => BatchExport.WriteJson(s, _autoResult.Value));
+        using var input = new MemoryStream(json);
+
+        var back = BatchExport.ReadJson(input);
+
+        Assert.Equal(json, Bytes(s => BatchExport.WriteJson(s, back)));
+        var result = back.Items[0].Report.Results.Single(r => r.Edition == "2016");
+        Assert.Equal(EditionVerdict.ValidAfterAutoCorrection, result.Verdict);
+        Assert.Equal("47,XY,+21", result.AutoCorrection!.Corrected);
+        Assert.Equal("47,XY, +21", back.Items[0].Report.Input);
+        Assert.Contains("\"FormatVersion\": 2", Encoding.UTF8.GetString(json), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Json_ReadsVersion1()
+    {
+        using var v1 = new MemoryStream(Encoding.UTF8.GetBytes("{\"Format\":\"cytolex-batch\",\"FormatVersion\":1,\"Editions\":[\"2016\"],\"Items\":[]}"));
+
+        Assert.Empty(BatchExport.ReadJson(v1).Items);
+    }
+
+    [Fact]
+    public void Csv_ReadsPreAutoCorrectionExports()
+    {
+        var header = string.Join(',', BatchExport.CsvColumnsV1);
+        var text = header + "\n1,,\"46,XX\",2016,Implemented,true,Constitutional;Acquired,true,0,0,0,0,\n2,,\"46,XX\",2020,NotImplemented,false,,false,0,0,0,0,\n";
+        using var v1 = new MemoryStream(Encoding.UTF8.GetBytes(text));
+
+        var rows = BatchExport.ReadCsv(v1);
+
+        Assert.Equal([EditionVerdict.Valid, EditionVerdict.NotImplemented], rows.Select(r => r.Verdict));
+        Assert.All(rows, r => Assert.Equal(string.Empty, r.Corrected));
+        Assert.Equal(2, BatchReader.Read(Encoding.UTF8.GetBytes(text), BatchFormat.Csv).Items.Length);
+    }
+
+    [Fact]
+    public void AutoCorrection_Summary_CountsValidAfterAutoCorrection()
+    {
+        var s2016 = BatchSummary.Of(_autoResult.Value).Single(s => s.Edition == "2016");
+
+        Assert.Equal(1, s2016.Valid);
+        Assert.Equal(2, s2016.ValidAfterAutoCorrection);
+        Assert.Equal(1, s2016.NotValid);
+    }
+
     private static byte[] Bytes(Action<Stream> write)
     {
         using var stream = new MemoryStream();

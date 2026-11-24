@@ -82,11 +82,15 @@
       "properties": {
         "level": { "enum": [1, 3] },
         "kind": { "enum": ["replace", "insert", "delete", "reorder"] },
-        "hint": { "$ref": "common.schema.json#/$defs/text" }
+        "hint": { "$ref": "common.schema.json#/$defs/text" },
+        "auto": {
+          "description": "Autocorrection (T-096): the validator may apply this rule's level-1 fixes automatically. Only for fixes that keep the meaning, have a single alternative and don't depend on the sample context.",
+          "type": "boolean"
+        }
       },
       "if": { "properties": { "level": { "const": 1 } } },
       "then": { "required": ["kind"] },
-      "else": { "not": { "required": ["kind"] } }
+      "else": { "not": { "anyOf": [{ "required": ["kind"] }, { "required": ["auto"] }] } }
     },
     "review": {
       "type": "object",
