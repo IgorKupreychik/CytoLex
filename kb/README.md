@@ -1,6 +1,6 @@
 # Knowledge base (KB) — file format and conventions
 
-The KB is the single source for every validation decision. Its files live in two places (T-102): the files **people write, review or sign off** are in [`../curated/`](../curated/README.md) (rules, quotes, vocab, translation, band exceptions, the probe table, …); the **generated** band data, the extracted chunks and the JSON Schemas (draft 2020-12, [`schema/`](schema/)) are here in `kb/`. This file is the format reference for both. Check files with:
+The KB is the single source for every validation decision. Its files live in two places (T-102): the files **people write, review or sign off** are in [`../curated/`](../curated/README.md) (rules, quotes, vocab, translation, band exceptions, the probe table, the association rules, …); the **generated** band data, the extracted chunks and the JSON Schemas (draft 2020-12, [`schema/`](schema/)) are here in `kb/`. This file is the format reference for both. Check files with:
 
 ```sh
 uv run --directory tools kb check                 # all of curated/ that has a schema (YAML + the probe CSV)
@@ -25,6 +25,8 @@ uv run --directory tools kb check curated/rules/2016/ch09/09.02.17.01-reciprocal
 | No `bands.yaml` for the edition (`kb bands` not run): the runtime bundle has `bands: null` | warning |
 | Probe table (`curated/probes/probes.csv`, T-102; edition-independent, optional): header, row schema; band in every edition's band data and on the row's chromosome; start ≤ end; names and aliases unique (case-insensitive); no name a spreadsheet turned into a date (`9-Sep`, `Sep-09`, `2024-09-09`) | error |
 | Probe table: a build's coordinates outside the row's band, or GRCh37 and GRCh38 disagree (one inside the band, one not) | warning; **error** on a row with `reviewed: yes` |
+| Association rules (`curated/associations/associations.yaml`, T-108; edition-independent, optional): schema; IDs unique (case-insensitive); every band of an `exact`/`fusion`/`copy` leaf in every edition's band data (`pter`/`qter`/`cen`/`p10`/`q10` skipped); an `exact` form's band groups pair with its chromosomes; no `fusion` of a band with itself; `copy`: start ≤ end, `band` on `chrom`; no rule that matches by `not` alone | error |
+| Association rules: a `copy` region outside the GRCh38 range of its `band` | warning; **error** on a rule with `reviewed: true` |
 | Translation templates (T-057): file named `templates.<language>.yaml` with that `language`; `key` is an existing rule ID or vocab item of the edition, unique; `construct` unique, and every construct of the schema's list has a template; every `{placeholder}` is a declared slot, braces balanced; `when` unique, required when a template has several forms | error |
 | A declared template slot that no form uses | warning |
 | Golden file (T-057): named `golden.yaml`; inputs unique; each item `span` matches the input at `start` (UTF-16 offsets); every `kb` reference exists (rule, vocab item, band of `bands.yaml`); *with chunks:* `cite` as for rules | error |
@@ -39,9 +41,10 @@ Any error → exit 1 and nothing written. Otherwise it writes `build/kb.sqlite` 
   vocab: {<vocabulary>: {shared_tokens?, entries: [{label, kind, tokens, pair?, equivalent_forms?, meanings, cite: "<rendered>"}]}},
   bands: {levels_available, bands: [{name, chrom, arm, parent, levels, derived, book, grch37, grch38, stain}]} | null,
   translation?: {templates: {<language>: [<template as in the YAML file>]}}}},
- probes?: [{name, aliases, kind, chrom, band, grch37, grch38, source, reviewed}]}
+ probes?: [{name, aliases, kind, chrom, band, grch37, grch38, source, reviewed}],
+ associations?: [{id, condition: {name, ids?}, context, strength, defining?, source, citation, match, review: {reviewed}}]}
 ```
-`translation` (T-057) is present only when the edition has `curated/translation/<version>/`; it was added without a format bump because readers ignore unknown keys. Left out: the golden file, quotes, examples, `paraphrase_checked`, file paths, vocab `source`/`review`/`note`, band sources/counts. Band `stain` (gneg, gpos25…gpos100, acen, gvar, stalk; `null` for derived and book-only names) was added in T-101 without a format bump, for the desktop ideograms; a bundle without it reads as no stain. `probes` (T-102) is the probe table, edition-independent, present only when `curated/probes/probes.csv` exists; added without a format bump (`band`/`grch37`/`grch38` are `null` when empty; `reviewed` is a boolean; `reviewer`/`date`/`note` are only in `kb.json`, whose top level has `probes` too). Bump `RUNTIME_FORMAT_VERSION` in `tools/src/cytolex_tools/kb/build.py` on any incompatible change; the core checks it at load (T-028).
+`translation` (T-057) is present only when the edition has `curated/translation/<version>/`; it was added without a format bump because readers ignore unknown keys. Left out: the golden file, quotes, examples, `paraphrase_checked`, file paths, vocab `source`/`review`/`note`, band sources/counts. Band `stain` (gneg, gpos25…gpos100, acen, gvar, stalk; `null` for derived and book-only names) was added in T-101 without a format bump, for the desktop ideograms; a bundle without it reads as no stain. `probes` (T-102) is the probe table, edition-independent, present only when `curated/probes/probes.csv` exists; added without a format bump (`band`/`grch37`/`grch38` are `null` when empty; `reviewed` is a boolean; `reviewer`/`date`/`note` are only in `kb.json`, whose top level has `probes` too). `associations` (T-108) are the association rules, edition-independent, present only when `curated/associations/associations.yaml` exists; added without a format bump; each rule as in the YAML file, with `review` cut to `{reviewed}` (`kb.json` keeps `reviewer`/`date`/`note`, `null` when empty). Bump `RUNTIME_FORMAT_VERSION` in `tools/src/cytolex_tools/kb/build.py` on any incompatible change; the core checks it at load (T-028).
 
 ## Layout
 Paths from the repo root. In the rest of this file, `rules/`, `source-quotes/`, `vocab/`, `translation/` and `bands/<version>/exceptions.yaml` mean the folders under `curated/`.
@@ -67,6 +70,8 @@ Paths from the repo root. In the rest of this file, `rules/`, `source-quotes/`, 
 | `kb/schema/probes.schema.json` | One row of the probe table (T-102) |
 | `curated/probes/probes.csv` | Probe table: probe names with chromosome, band and GRCh37/38 positions, source and review columns (editing guide: `curated/probes/README.md`) |
 | `curated/probes/sources.yaml` | HGNC + NCBI download pins for `kb probes` |
+| `kb/schema/associations.schema.json` | Association rules (T-108) |
+| `curated/associations/associations.yaml` | Association rules: conditions associated in the literature, with a `match` tree (`exact`/`fusion`/`copy`, `all`/`any`/`not`), source, citation and review fields (editing guide: `curated/associations/README.md`; review list: `build/review/associations-review.md`) |
 
 - **One file per numbered section**, named like its chunk with `.yaml` instead of `.md`: chunk `source-text/2016/ch09/09.02.17.01-reciprocal-translocations.md` → `rules/2016/ch09/09.02.17.01-reciprocal-translocations.yaml`. A rule that draws on several sections lives in the file of its main section and cites the others.
 - **One directory per edition.** "A block per version" means the same rule ID appears in `rules/2016/…` and later in `rules/2020/…`, each with that edition's statement, citations and examples. The file's `version` must match its directory.

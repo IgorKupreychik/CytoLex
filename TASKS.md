@@ -116,7 +116,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-105 | done | 3 | T-034, T-058 | Literal translation of microarray results (templates, golden entries, renderer) |
 | T-106 | discussion | 4 | T-032 | What `idem`/`sl`/`sdl` refer to on the donor side of `//` (KB rule first, then the binder) |
 | T-107 | todo | 5 | T-089 | Settings outside a repo checkout (per-user settings file + build cache) for packaged installs |
-| T-108 | todo | 3 | T-102 | Association rules: `curated/associations/associations.yaml`, schema, `kb build` checks + review report, runtime bundle, cited seed rules |
+| T-108 | done | 3 | T-102 | Association rules: `curated/associations/associations.yaml`, schema, `kb build` checks + review report, runtime bundle, cited seed rules |
 | T-109 | todo | 3 | T-108, T-101, T-069 | Core: match association rules (`exact`/`fusion`/`copy`, all/any/not, context) → `EditionResult.Associations`; batch JSON/CSV |
 | T-110 | todo | 3 | T-109, T-098 | Desktop: "Associations" view tab (disclaimer, citations, unreviewed badges, span links) |
 | T-111 | todo | 4 | T-108 | `kb associations`: pre-fill constitutional rules from ClinGen dosage regions (CC0) + Orphanet names (CC BY 4.0) |
@@ -1131,10 +1131,10 @@ Outcome (2026-11-24, confirmed by the user after the check by hand): "Autocorrec
 **Notes:** Created 2026-11-24 from T-089 (user: repo checkouts only for the pilot).
 
 ### T-108 — Association rules: file, schema, checks, seed
-**Status:** todo
+**Status:** done
 **Description:** Per the T-104 decision: `curated/associations/associations.yaml` (edition-independent; person-maintained) with schema `kb/schema/associations.schema.json`. A rule has `id`, `condition` (name + Orphanet or other ID), `context` (`constitutional`/`neoplastic`/`any`), `strength`, optional `defining` criterion (e.g. a WHO-HAEM5/ICC defining abnormality, kept for a later diagnosis mode, T-112), `source` + `citation` (section of the classification or the dataset version; facts only, no copied text), review fields (`reviewed`, `reviewer`, `date`, `note`) and a `match` tree: leaves `exact` (an abnormality's short form, band-level tolerant: `q11.2` also matches `q11.21`), `fusion` (two bands joined by any rearrangement, incl. ish `con`), `copy` (gain/loss overlapping a GRCh38 region); combinators `all`/`any`/`not`. `kb check` validates the schema; `kb build` checks bands exist in every edition's band data, regions vs. bands, unique IDs, and writes `build/review/associations-review.md` (rules in plain words for non-technical reviewers, unreviewed first); the rules go into both bundles at the top level. Seed: hand-written, cited rules for the classic recurrent abnormalities (e.g. +21, t(9;22)(q34;q11.2), t(15;17)(q24;q21), t(8;21)(q22;q22), inv(16)(p13.1q22)/t(16;16)), `reviewed: no` until a person signs them off. Index entry in `curated/README.md`; CLAUDE.md/README updated.
 **Acceptance:** Schema + checks with tests in `tools/tests/`; review report; seed rules in the bundles; docs updated.
-**Notes:** Created 2026-11-27 from T-104.
+**Notes:** Created 2026-11-27 from T-104. Done 2026-11-27: `curated/associations/associations.yaml` (7 hand-typed seed rules: +21, t(9;22) CML + B-ALL, t(15;17), t(8;21), inv(16)/t(16;16), 22q11.2 loss; all `reviewed: false` with notes on what to verify) + editing guide `curated/associations/README.md`; schema `kb/schema/associations.schema.json` (registered in `kb check`, default dir added); checks `tools/src/cytolex_tools/associations/` (`forms.py`, `check.py`, `report.py`) wired into `kb build` → `build/review/associations-review.md` and top-level `associations` in `kb.json`/`kb-runtime.json` (runtime review = `{reviewed}`); tests `tools/tests/test_associations.py` (38). Format details logged in `docs/decisions.md`. Deviation: `p10`/`q10` in `exact` forms are skipped like `pter`/`qter`/`cen` (not entries in the band data). No C# changes.
 
 ### T-109 — Core: matching association rules
 **Status:** todo

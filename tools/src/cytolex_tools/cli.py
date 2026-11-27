@@ -164,6 +164,7 @@ def cmd_check(args: argparse.Namespace) -> int:
             "bands",
             "corpus",
             "probes",
+            "associations",
         )
     ]
     missing = [p for p in paths if not p.exists() and args.paths]

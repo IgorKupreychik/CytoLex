@@ -4,7 +4,8 @@ A file's kind is taken from its top-level key: `rules` → rules.schema.json,
 `quotes` → quotes.schema.json, `exceptions` → band-exceptions.schema.json (T-007),
 `entries` → vocab.schema.json (T-008), `templates` → translation-templates.schema.json and
 `golden` → translation-golden.schema.json (T-057); `corpus` → corpus.schema.json (test corpus
-in curated/corpus/, T-062). The probe table (`curated/probes/probes.csv`, T-102) is CSV:
+in curated/corpus/, T-062); `associations` → associations.schema.json (T-108).
+The probe table (`curated/probes/probes.csv`, T-102) is CSV:
 each row is checked against probes.schema.json (`probes.table.validate_csv`).
 Only the schema is checked here; cross-file checks
 (unique IDs, quote ↔ rule links, version vs directory) belong to `kb build` (T-005).
@@ -32,6 +33,7 @@ SCHEMA_FILES = {
     "templates": "translation-templates.schema.json",  # curated/translation/<version>/ (T-057)
     "golden": "translation-golden.schema.json",  # curated/translation/<version>/golden.yaml
     "corpus": "corpus.schema.json",  # curated/corpus/<type>.yaml (T-062)
+    "associations": "associations.schema.json",  # curated/associations/ (T-108)
 }
 YAML_SUFFIXES = {".yaml", ".yml"}
 

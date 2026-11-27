@@ -1,0 +1,139 @@
+# Association rules (T-104, T-108): conditions associated in the literature with abnormalities.
+# Shown next to a result with their source and review state; NOT a diagnosis or an
+# interpretation of the result. Edition-independent. How to edit: README.md in this folder.
+# Checked by `kb check` (schema kb/schema/associations.schema.json) and `kb build` (bands,
+# regions, IDs); plain-language review list: build/review/associations-review.md.
+#
+# Sources (T-104): neoplastic rules from WHO-HAEM5 / ICC 2022, cited by entry, facts only, no
+# copied text; constitutional rules from ClinGen dosage regions (CC0) with Orphanet names/IDs
+# (CC BY 4.0, attribution: "Orphanet, www.orpha.net"). OMIM is not used.
+#
+# Seed (T-108): typed in from memory as a starting point, every rule `reviewed: false`.
+
+associations:
+  - id: ASSOC.TRISOMY21_DOWN
+    condition:
+      name: Down syndrome
+      ids: [{system: orphanet, code: "ORPHA:870"}]
+    context: constitutional
+    strength: characteristic
+    source: Orphanet
+    citation: "Orphanet ORPHA:870, Down syndrome (cause: trisomy 21)"
+    match:
+      exact: "+21"
+    review:
+      reviewed: false
+      note: "seed (T-108), not checked against the source; Robertsonian and mosaic forms not covered yet"
+
+  - id: ASSOC.T9_22_CML
+    condition:
+      name: Chronic myeloid leukaemia, BCR::ABL1-positive
+      ids: [{system: orphanet, code: "ORPHA:521"}]
+    context: neoplastic
+    strength: characteristic
+    defining:
+      - source: WHO-HAEM5
+        citation: "Myeloproliferative neoplasms: chronic myeloid leukaemia"
+    source: WHO-HAEM5
+    citation: "WHO Classification of Haematolymphoid Tumours, 5th ed. (Khoury et al., Leukemia 2022), myeloproliferative neoplasms: chronic myeloid leukaemia"
+    match:
+      any:
+        - exact: t(9;22)(q34;q11.2)
+        - fusion: [9q34, 22q11.2]
+    review:
+      reviewed: false
+      note: "seed (T-108), not checked against the source; check the Orphanet ID"
+
+  - id: ASSOC.T9_22_BALL
+    condition:
+      name: B-lymphoblastic leukaemia/lymphoma with BCR::ABL1 fusion
+    context: neoplastic
+    strength: recurrent
+    defining:
+      - source: WHO-HAEM5
+        citation: "B-lymphoblastic leukaemia/lymphoma with defining genetic abnormalities: with BCR::ABL1 fusion"
+    source: WHO-HAEM5
+    citation: "WHO Classification of Haematolymphoid Tumours, 5th ed. (Alaggio et al., Leukemia 2022), precursor B-cell neoplasms: B-lymphoblastic leukaemia/lymphoma with BCR::ABL1 fusion"
+    match:
+      any:
+        - exact: t(9;22)(q34;q11.2)
+        - fusion: [9q34, 22q11.2]
+    review:
+      reviewed: false
+      note: "seed (T-108), not checked against the source; condition ID to add"
+
+  - id: ASSOC.T15_17_APL
+    condition:
+      name: Acute promyelocytic leukaemia with PML::RARA fusion
+      ids: [{system: orphanet, code: "ORPHA:520"}]
+    context: neoplastic
+    strength: characteristic
+    defining:
+      - source: WHO-HAEM5
+        citation: "Acute myeloid leukaemia with defining genetic abnormalities: APL with PML::RARA fusion"
+      - source: ICC-2022
+        citation: "AML with recurrent genetic abnormalities: APL with t(15;17)/PML::RARA"
+    source: WHO-HAEM5
+    citation: "WHO Classification of Haematolymphoid Tumours, 5th ed. (Khoury et al., Leukemia 2022), acute myeloid leukaemia with defining genetic abnormalities: acute promyelocytic leukaemia with PML::RARA fusion"
+    match:
+      any:
+        - exact: t(15;17)(q24;q21)
+        - fusion: [15q24, 17q21]
+    review:
+      reviewed: false
+      note: "seed (T-108), not checked against the source; check the Orphanet ID"
+
+  - id: ASSOC.T8_21_AML
+    condition:
+      name: Acute myeloid leukaemia with RUNX1::RUNX1T1 fusion
+    context: neoplastic
+    strength: characteristic
+    defining:
+      - source: WHO-HAEM5
+        citation: "Acute myeloid leukaemia with defining genetic abnormalities: AML with RUNX1::RUNX1T1 fusion"
+    source: WHO-HAEM5
+    citation: "WHO Classification of Haematolymphoid Tumours, 5th ed. (Khoury et al., Leukemia 2022), acute myeloid leukaemia with defining genetic abnormalities: AML with RUNX1::RUNX1T1 fusion"
+    match:
+      any:
+        - exact: t(8;21)(q22;q22)
+        - fusion: [8q22, 21q22]
+    review:
+      reviewed: false
+      note: "seed (T-108), not checked against the source; condition ID to add"
+
+  - id: ASSOC.INV16_AML
+    condition:
+      name: Acute myeloid leukaemia with CBFB::MYH11 fusion
+    context: neoplastic
+    strength: characteristic
+    defining:
+      - source: WHO-HAEM5
+        citation: "Acute myeloid leukaemia with defining genetic abnormalities: AML with CBFB::MYH11 fusion"
+    source: WHO-HAEM5
+    citation: "WHO Classification of Haematolymphoid Tumours, 5th ed. (Khoury et al., Leukemia 2022), acute myeloid leukaemia with defining genetic abnormalities: AML with CBFB::MYH11 fusion"
+    match:
+      any:
+        - exact: inv(16)(p13.1q22)
+        - exact: t(16;16)(p13.1;q22)
+        - fusion: [16p13.1, 16q22]
+    review:
+      reviewed: false
+      note: "seed (T-108), not checked against the source; condition ID to add"
+
+  - id: ASSOC.DEL22Q11_2
+    condition:
+      name: 22q11.2 deletion syndrome
+      ids: [{system: orphanet, code: "ORPHA:567"}]
+    context: constitutional
+    strength: characteristic
+    source: ClinGen
+    citation: "ClinGen Dosage Sensitivity, recurrent region 22q11.2 (proximal, A-D; DGS/VCFS), GRCh38; release to record at review"
+    match:
+      copy:
+        effect: loss
+        chrom: "22"
+        grch38: [18912231, 21465672]
+        band: 22q11.21
+    review:
+      reviewed: false
+      note: "seed (T-108), not checked against the source; region coordinates and ClinGen ID to verify against the current release"

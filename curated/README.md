@@ -20,6 +20,7 @@ Generated files stay outside this folder: band data (`kb/bands/<version>/bands.y
 | `extract/glyphs.yaml` | Repair map for symbols the PDF text layer gets wrong (`→` extracted as `]`), each checked against the page image | Maintainers | `kb extract` |
 | `probes/probes.csv` | **Probe table** (T-102): probe names with chromosome, band, GRCh37/GRCh38 positions, source and review columns | Medical reviewers and KB authors: see [`probes/README.md`](probes/README.md) | `kb build` (review report `build/review/probes-review.md`) |
 | `probes/sources.yaml` | HGNC + NCBI download pins for `kb probes` | Maintainers | `kb probes` |
+| `associations/associations.yaml` | **Association rules** (T-108): conditions associated in the literature with abnormalities (shown next to a result, never as a diagnosis), each with a match tree, source, citation and review fields. See [`associations/README.md`](associations/README.md) | Medical reviewers and KB authors | `kb check`, `kb build` (review list `build/review/associations-review.md`) |
 | `corpus/*.yaml` | Test corpus (T-062): realistic synthetic strings with the expected result per edition; labels are reviewed. See [`corpus/README.md`](corpus/README.md) | Testers, KB authors | `kb check`, `dotnet test` |
 | `comparison/cytogps-2016-triage.yaml` | Triage labels for the CytoLex vs. CytoGPS comparison (T-051); also edited in the desktop app's Batch tab. See [`comparison/README.md`](comparison/README.md) | Testers, KB authors | `dotnet test` |
 
@@ -27,7 +28,7 @@ Generated files stay outside this folder: band data (`kb/bands/<version>/bands.y
 
 | You changed | Run | Why |
 |---|---|---|
-| rules, quotes, vocab, translation, the probe table | `uv run --directory tools kb build`, then `dotnet build` | checks the files and rebuilds the bundle that the app embeds |
+| rules, quotes, vocab, translation, the probe table, the association rules | `uv run --directory tools kb build`, then `dotnet build` | checks the files and rebuilds the bundle that the app embeds |
 | KB examples | the above, then `kb samples` | regenerates the batch sample files |
 | `bands/<version>/exceptions.yaml` or `sources.yaml` | `kb bands`, then `kb build` | regenerates `kb/bands/<version>/bands.yaml` |
 | `extract/tables/<version>.yaml`, `extract/glyphs.yaml` | `kb extract`, then `kb build` | re-extracts the book text (needs the PDF) |

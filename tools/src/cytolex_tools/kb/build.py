@@ -22,17 +22,20 @@ Checks (errors fail the build; nothing is written then):
      inputs, spans match the input, KB references exist, cites match the chunks)
  11. (T-102) `curated/probes/probes.csv`, if present: header and row schema, then the checks of
      `probes.check` against every edition's band data (the table is edition-independent)
+ 12. (T-108) `curated/associations/associations.yaml`, if present: schema, then the checks of
+     `associations.check` (unique IDs, bands in every edition's band data, copy regions vs bands)
 Warnings: chunks missing (6-7 skipped); a valid example's text not found in its cited E block
 (whitespace ignored; typed forms of `equivalent_forms` vocab entries count as printed, T-053);
 no `bands.yaml` for an edition (its runtime bundle then has `bands: null`); a template slot no
-form uses; a conflict in an unreviewed probe-table row.
+form uses; a conflict in an unreviewed probe-table row or association rule.
 
 Inputs: the person-maintained files under `curated/` (rules, source-quotes, vocab, translation,
-band exceptions, probe table) and the generated `kb/bands/<version>/bands.yaml`.
+band exceptions, probe table, association rules) and the generated `kb/bands/<version>/bands.yaml`.
 
 Outputs: `kb.sqlite` (rule browser), `kb.json` (full KB, also read by the KB-example tests),
 `kb-runtime.json` (lean runtime bundle embedded in `CytoLex.Core`, T-060) and
-`review/kb-review.md` (+ `review/probes-review.md` with a probe table).
+`review/kb-review.md` (+ `review/probes-review.md` with a probe table,
+`review/associations-review.md` with association rules).
 """
 
 import json
@@ -43,6 +46,9 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from ..associations.check import CheckResult as AssociationCheck
+from ..associations.check import check as check_associations
+from ..associations.report import review_markdown as associations_review
 from ..probes import table as probe_table
 from ..probes.check import CheckResult
 from ..probes.check import check as check_probes
@@ -97,6 +103,8 @@ class BuildReport:
     outputs: list[Path] = field(default_factory=list)
     probes: probe_table.Table | None = None  # curated/probes/probes.csv (T-102)
     probe_check: CheckResult | None = None
+    associations: list[dict] | None = None  # curated/associations/associations.yaml (T-108)
+    association_check: AssociationCheck | None = None
 
     def rules(self) -> Iterable[tuple[str, KbFile, dict]]:
         for ed in self.editions:
@@ -955,6 +963,9 @@ def bundle(report: BuildReport) -> dict:
     probes = probes_bundle(report, full=True)
     if probes is not None:
         out["probes"] = probes  # edition-independent (T-102)
+    associations = associations_bundle(report, full=True)
+    if associations is not None:
+        out["associations"] = associations  # edition-independent (T-108)
     return out
 
 
@@ -1013,6 +1024,9 @@ def runtime_bundle(report: BuildReport) -> dict:
     probes = probes_bundle(report, full=False)
     if probes is not None:
         out["probes"] = probes  # edition-independent, added without a format bump (T-102)
+    associations = associations_bundle(report, full=False)
+    if associations is not None:
+        out["associations"] = associations  # edition-independent, no format bump (T-108)
     return out
 
 
@@ -1074,8 +1088,8 @@ def run(
 ) -> BuildReport:
     """Check the KB (person-maintained files in `curated_dir`, generated band data in
     `bands_dir`, default `kb/bands`) and, when there are no errors, write `kb.sqlite`,
-    `kb.json`, `kb-runtime.json` and `review/kb-review.md` (+ `review/probes-review.md`) into
-    `out_dir`."""
+    `kb.json`, `kb-runtime.json` and `review/kb-review.md` (+ `review/probes-review.md`,
+    `review/associations-review.md`) into `out_dir`."""
     from ..config import KB_DIR
 
     kb_dir = curated_dir
@@ -1098,6 +1112,7 @@ def run(
         _load_bands(ed, bands_dir, kb_dir / "bands", report)
         _check_translation(ed, report)
     _load_probes(kb_dir / "probes" / "probes.csv", report)
+    _load_associations(kb_dir / "associations" / "associations.yaml", report)
     if report.errors:
         return report
 
@@ -1118,6 +1133,10 @@ def run(
         pr = out_dir / "review" / "probes-review.md"
         _write_text(pr, probes_review(report.probes, report.probe_check, names))
         report.outputs.append(pr)
+    if report.associations is not None and report.association_check is not None:
+        ar = out_dir / "review" / "associations-review.md"
+        _write_text(ar, associations_review(report.associations, report.association_check))
+        report.outputs.append(ar)
     return report
 
 
@@ -1168,3 +1187,50 @@ def probes_bundle(report: BuildReport, full: bool) -> list[dict] | None:
     if report.probes is None:
         return None
     return [_probe_entry(r, full) for r in report.probes.rows]
+
+
+# --- association rules (T-108) -----------------------------------------------------------
+
+
+def _load_associations(path: Path, report: BuildReport) -> None:
+    """Read and check the association rules, if there are any; conflicts of unreviewed rules
+    warn."""
+    if not path.is_file():
+        return
+    problems = validate_file(path)
+    report.errors.extend(problems)
+    if problems:
+        return
+    rules = load_yaml(path)["associations"]
+    band_sets = {
+        ed.version: {b["name"]: b for b in ed.bands["bands"]}
+        for ed in report.editions
+        if ed.bands is not None
+    }
+    result = check_associations(path, rules, band_sets)
+    report.errors.extend(result.errors)
+    for c in result.conflicts:
+        if not c.rule["review"]["reviewed"]:
+            report.warnings.append(f"{path}:{c.where}: {c.message}")
+    report.associations, report.association_check = rules, result
+
+
+def _association_entry(rule: dict, full: bool) -> dict:
+    out = {k: rule[k] for k in ("id", "condition", "context", "strength") if k in rule}
+    if rule.get("defining"):
+        out["defining"] = rule["defining"]
+    out |= {"source": rule["source"], "citation": rule["citation"], "match": rule["match"]}
+    rv = rule["review"]
+    out["review"] = (
+        {"reviewed": rv["reviewed"], **{k: rv.get(k) or None for k in ("reviewer", "date", "note")}}
+        if full
+        else {"reviewed": rv["reviewed"]}
+    )
+    return out
+
+
+def associations_bundle(report: BuildReport, full: bool) -> list[dict] | None:
+    """The association rules for `kb.json` (`full`) or `kb-runtime.json`; None without a file."""
+    if report.associations is None:
+        return None
+    return [_association_entry(r, full) for r in report.associations]
