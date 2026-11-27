@@ -24,6 +24,11 @@ namespace CytoLex.Core.Batch;
 /// <param name="Verdict">The verdict (T-096); for a pre-T-096 export read back, derived from <paramref name="Status"/> and <paramref name="Valid"/>.</param>
 /// <param name="Corrected">The string after autocorrection when autocorrection changed it (T-096); else empty.</param>
 /// <param name="AutoCorrections">The applied corrections, <c>;</c>-separated, as <c>RULE.ID@start-end=new text</c> (spans in <paramref name="Input"/>).</param>
+/// <param name="Associations">
+/// The condition names of the matched association rules (T-109), <c>;</c>-separated, distinct, in rule order; empty when
+/// none matched, when associations were not included, or for an export written before T-109. Literature associations,
+/// not a diagnosis (T-104).
+/// </param>
 public sealed record BatchCsvRow(
     int Line,
     string? Id,
@@ -40,7 +45,8 @@ public sealed record BatchCsvRow(
     string Rules,
     EditionVerdict Verdict,
     string Corrected,
-    string AutoCorrections);
+    string AutoCorrections,
+    string Associations = "");
 
 /// <summary>The JSON export document.</summary>
 /// <param name="Format">Always <see cref="BatchExport.JsonFormat"/>.</param>
@@ -67,16 +73,20 @@ public static class BatchExport
     /// refer to the corrected string. 3 (T-070): a cell line written with <c>idem</c>/<c>sl</c>/<c>sdl</c> carries
     /// <c>Reference</c>, <c>Inherited</c> and <c>FullForm</c>. 4 (T-101): an edition result carries <c>Loci</c>.
     /// 5 (T-103): a locus placed from the probe table carries <c>ProbeRow</c> (source, reviewed).
-    /// Older files read as they are (no loci, no probe rows).
+    /// 6 (T-109): an edition result carries <c>Associations</c> (matched association rules with evidence).
+    /// Older files read as they are (no loci, no probe rows, no associations).
     /// </summary>
-    public const int JsonFormatVersion = 5;
+    public const int JsonFormatVersion = 6;
 
-    /// <summary>The CSV header (T-096 appended <c>verdict</c>, <c>corrected</c>, <c>autocorrections</c>).</summary>
+    /// <summary>The CSV header (T-096 appended <c>verdict</c>, <c>corrected</c>, <c>autocorrections</c>; T-109 <c>associations</c>).</summary>
     public static ImmutableArray<string> CsvColumns { get; } =
     [
         "line", "id", "input", "edition", "status", "valid", "valid_contexts", "complete", "errors", "warnings", "infos", "conditional", "rules",
-        "verdict", "corrected", "autocorrections",
+        "verdict", "corrected", "autocorrections", "associations",
     ];
+
+    /// <summary>The header of exports written from T-096 until T-109 (no <c>associations</c>); still read.</summary>
+    public static ImmutableArray<string> CsvColumnsV2 { get; } = [.. CsvColumns.Take(16)];
 
     /// <summary>The header of exports written before T-096; still read.</summary>
     public static ImmutableArray<string> CsvColumnsV1 { get; } = [.. CsvColumns.Take(13)];
@@ -149,7 +159,8 @@ public static class BatchExport
                 r.AutoCorrection is { IsChanged: true } a ? a.Corrected : string.Empty,
                 r.AutoCorrection is { } c
                     ? string.Join(';', c.Corrections.Select(x => $"{x.RuleId}@{x.OriginalSpan.Start}-{x.OriginalSpan.End}={x.NewText}"))
-                    : string.Empty))),
+                    : string.Empty,
+                string.Join(';', r.Associations.Select(m => m.Condition.Name).Distinct(StringComparer.Ordinal))))),
         ];
     }
 
@@ -165,7 +176,7 @@ public static class BatchExport
                 [
                     Num(row.Line), row.Id ?? string.Empty, row.Input, row.Edition, row.Status.ToString(), Bool(row.Valid), row.ValidContexts,
                     Bool(row.Complete), Num(row.Errors), Num(row.Warnings), Num(row.Infos), Num(row.Conditional), row.Rules,
-                    row.Verdict.ToString(), row.Corrected, row.AutoCorrections,
+                    row.Verdict.ToString(), row.Corrected, row.AutoCorrections, row.Associations,
                 ],
                 ','));
         }
@@ -203,7 +214,7 @@ public static class BatchExport
             {
                 var status = Enum.Parse<EditionStatus>(f[4]);
                 var valid = bool.Parse(f[5]);
-                var hasAutoCorrection = columns == CsvColumns.Length;
+                var hasAutoCorrection = columns >= CsvColumnsV2.Length;
                 rows.Add(new BatchCsvRow(
                     int.Parse(f[0], CultureInfo.InvariantCulture),
                     f[1].Length > 0 ? f[1] : null,
@@ -220,7 +231,8 @@ public static class BatchExport
                     f[12],
                     hasAutoCorrection ? Enum.Parse<EditionVerdict>(f[13]) : VerdictOf(status, valid),
                     hasAutoCorrection ? f[14] : string.Empty,
-                    hasAutoCorrection ? f[15] : string.Empty));
+                    hasAutoCorrection ? f[15] : string.Empty,
+                    columns == CsvColumns.Length ? f[16] : string.Empty));
             }
             catch (Exception ex) when (ex is FormatException or ArgumentException or OverflowException)
             {
@@ -245,9 +257,9 @@ public static class BatchExport
         }
     }
 
-    /// <summary>Whether <paramref name="header"/> is the header of a CSV export (<see cref="CsvColumns"/> or <see cref="CsvColumnsV1"/>).</summary>
+    /// <summary>Whether <paramref name="header"/> is the header of a CSV export (<see cref="CsvColumns"/>, <see cref="CsvColumnsV2"/> or <see cref="CsvColumnsV1"/>).</summary>
     internal static bool IsExportHeader(IReadOnlyList<string> header, StringComparer comparer) =>
-        header.SequenceEqual(CsvColumns, comparer) || header.SequenceEqual(CsvColumnsV1, comparer);
+        header.SequenceEqual(CsvColumns, comparer) || header.SequenceEqual(CsvColumnsV2, comparer) || header.SequenceEqual(CsvColumnsV1, comparer);
 
     private static EditionVerdict VerdictOf(EditionStatus status, bool valid) =>
         status == EditionStatus.NotImplemented ? EditionVerdict.NotImplemented : valid ? EditionVerdict.Valid : EditionVerdict.NotValid;

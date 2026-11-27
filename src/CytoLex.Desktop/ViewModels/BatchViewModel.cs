@@ -213,7 +213,13 @@ public partial class BatchViewModel : ObservableObject
     private async Task RunAsync(CancellationToken cancellationToken)
     {
         var choice = SelectedEditionChoice ?? EditionChoice.All;
-        var options = new ValidationOptions { Editions = choice.Edition is { } e ? EditionSelection.One(e) : EditionSelection.All, AutoCorrect = AutoCorrect };
+        // Associations (T-109) go into the batch exports; the view of them is T-110.
+        var options = new ValidationOptions
+        {
+            Editions = choice.Edition is { } e ? EditionSelection.One(e) : EditionSelection.All,
+            AutoCorrect = AutoCorrect,
+            IncludeAssociations = true,
+        };
         ClearResult();
         IsRunning = true;
         Progress = 0;

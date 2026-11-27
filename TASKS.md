@@ -117,7 +117,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-106 | discussion | 4 | T-032 | What `idem`/`sl`/`sdl` refer to on the donor side of `//` (KB rule first, then the binder) |
 | T-107 | todo | 5 | T-089 | Settings outside a repo checkout (per-user settings file + build cache) for packaged installs |
 | T-108 | done | 3 | T-102 | Association rules: `curated/associations/associations.yaml`, schema, `kb build` checks + review report, runtime bundle, cited seed rules |
-| T-109 | todo | 3 | T-108, T-101, T-069 | Core: match association rules (`exact`/`fusion`/`copy`, all/any/not, context) → `EditionResult.Associations`; batch JSON/CSV |
+| T-109 | done | 3 | T-108, T-101, T-069 | Core: match association rules (`exact`/`fusion`/`copy`, all/any/not, context) → `EditionResult.Associations`; batch JSON/CSV |
 | T-110 | todo | 3 | T-109, T-098 | Desktop: "Associations" view tab (disclaimer, citations, unreviewed badges, span links) |
 | T-111 | todo | 4 | T-108 | `kb associations`: pre-fill constitutional rules from ClinGen dosage regions (CC0) + Orphanet names (CC BY 4.0) |
 | T-112 | discussion | 5 | T-109 | Diagnosis-suggestion mode: intended use and regulatory check (MDR/IVDR, FDA) before any build |
@@ -1137,10 +1137,10 @@ Outcome (2026-11-24, confirmed by the user after the check by hand): "Autocorrec
 **Notes:** Created 2026-11-27 from T-104. Done 2026-11-27: `curated/associations/associations.yaml` (7 hand-typed seed rules: +21, t(9;22) CML + B-ALL, t(15;17), t(8;21), inv(16)/t(16;16), 22q11.2 loss; all `reviewed: false` with notes on what to verify) + editing guide `curated/associations/README.md`; schema `kb/schema/associations.schema.json` (registered in `kb check`, default dir added); checks `tools/src/cytolex_tools/associations/` (`forms.py`, `check.py`, `report.py`) wired into `kb build` → `build/review/associations-review.md` and top-level `associations` in `kb.json`/`kb-runtime.json` (runtime review = `{reviewed}`); tests `tools/tests/test_associations.py` (38). Format details logged in `docs/decisions.md`. Deviation: `p10`/`q10` in `exact` forms are skipped like `pter`/`qter`/`cen` (not entries in the band data). No C# changes.
 
 ### T-109 — Core: matching association rules
-**Status:** todo
+**Status:** done
 **Description:** Read the bundle's associations (`IEditionKb.Associations`) and match them against the abnormality entries (T-069) and loci (T-101): `exact` on the short form with band-level tolerance, `fusion` on the breakpoints of any rearrangement and on ish `con` signals, `copy` on gain/loss loci overlapping the region; `all`/`any`/`not`; `context` against the string's context (both readings when unknown, like the translation). Opt-in `ValidationOptions.IncludeAssociations` → `EditionResult.Associations` (rule ID, condition, context, strength, source, citation, matched entries and spans, `IsUnreviewed`). Batch JSON carries them (format bump); batch CSV gets a column of condition names. Never in the translation or diagnostics.
 **Acceptance:** Tests per leaf kind and combinator, context handling, every seed rule matched by a synthetic or book string; batch round-trip.
-**Notes:** Created 2026-11-27 from T-104.
+**Notes:** Created 2026-11-27 from T-104. Done 2026-11-27: `src/CytoLex.Core/Kb/AssociationRules.cs` (`IEditionKb.Associations`), matcher `src/CytoLex.Core/Associations/` (`AssociationMatcher`, `MatchScope`, `BandNesting`, `ExactPatterns` + `ExactMatcher`, `FusionMatcher`, `CopyMatcher`), result DTOs `Validation/Associations.cs` (`AssociationMatch`, `AssociationEvidence`), opt-in `ValidationOptions.IncludeAssociations` → `EditionResult.Associations`; batch JSON v6, CSV column `associations` (16-/13-column headers still read). Decided with the user: arr/in situ counts read against 2 on autosomes for matching only; any overlap + covered share (logged in `docs/decisions.md`). Tests `tests/CytoLex.Core.Tests/Associations/` (59) + batch export tests. Addition to the plan: the desktop Batch run includes associations so its exports carry them (view: T-110).
 
 ### T-110 — Desktop: "Associations" view tab
 **Status:** todo

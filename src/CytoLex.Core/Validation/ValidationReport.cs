@@ -75,6 +75,14 @@ public sealed record EditionResult(
     /// </summary>
     public ImmutableArray<LocusEntry> Loci { get; init; } = [];
 
+    /// <summary>
+    /// The association rules the string matches (T-109), in rule order: conditions associated in the literature, with
+    /// source, citation, review state and evidence; empty unless <see cref="ValidationOptions.IncludeAssociations"/>.
+    /// Not a diagnosis or an interpretation of the result (T-104); never in <see cref="Diagnostics"/> or <see cref="Translation"/>.
+    /// Spans refer to the same text as the other spans.
+    /// </summary>
+    public ImmutableArray<AssociationMatch> Associations { get; init; } = [];
+
     /// <summary>The verdict (T-096): valid as written, valid after autocorrection, not valid, or not implemented.</summary>
     public EditionVerdict Verdict => Status == EditionStatus.NotImplemented
         ? EditionVerdict.NotImplemented

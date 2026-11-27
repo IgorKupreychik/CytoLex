@@ -153,7 +153,7 @@ public class BatchExportTests
         Assert.Equal(EditionVerdict.ValidAfterAutoCorrection, result.Verdict);
         Assert.Equal("47,XY,+21", result.AutoCorrection!.Corrected);
         Assert.Equal("47,XY, +21", back.Items[0].Report.Input);
-        Assert.Contains("\"FormatVersion\": 5", Encoding.UTF8.GetString(json), StringComparison.Ordinal);
+        Assert.Contains("\"FormatVersion\": 6", Encoding.UTF8.GetString(json), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -207,11 +207,66 @@ public class BatchExportTests
         Assert.Empty(BatchExport.ReadJson(old).Items[0].Report.Results[0].Loci);
     }
 
+    private static BatchResult AssociationResult() => BatchRunner.Run(
+        Validator.Default,
+        [new BatchItem(1, "a", "46,XY,t(9;22)(q34;q11.2)[20]"), new BatchItem(2, "b", "46,XX")],
+        new ValidationOptions { Editions = EditionSelection.All, IncludeAssociations = true });
+
+    /// <summary>T-109: the associations go into the JSON export and a version 5 file (none) still reads.</summary>
+    [Fact]
+    public void Json_CarriesAssociations_ReadsVersion5()
+    {
+        var json = Bytes(s => BatchExport.WriteJson(s, AssociationResult()));
+        using var input = new MemoryStream(json);
+        var back = BatchExport.ReadJson(input);
+        var matches = back.Items[0].Report.Results.Single(r => r.Edition == "2016").Associations;
+        Assert.Contains(matches, m => m.RuleId == "ASSOC.T9_22_CML" && m.IsUnreviewed && !m.Evidence.IsEmpty);
+        Assert.Equal(json, Bytes(s => BatchExport.WriteJson(s, back)));
+
+        var doc = System.Text.Json.Nodes.JsonNode.Parse(json)!;
+        doc["FormatVersion"] = 5;
+        foreach (var edition in doc["Items"]![0]!["Report"]!["Results"]!.AsArray())
+        {
+            edition!.AsObject().Remove("Associations");
+        }
+
+        using var old = new MemoryStream(Encoding.UTF8.GetBytes(doc.ToJsonString()));
+        Assert.All(BatchExport.ReadJson(old).Items[0].Report.Results, r => Assert.Empty(r.Associations));
+    }
+
+    /// <summary>T-109: the CSV has a column of condition names, and round-trips.</summary>
+    [Fact]
+    public void Csv_CarriesAssociationNames_AndRoundTrips()
+    {
+        var result = AssociationResult();
+        var rows = BatchExport.CsvRows(result);
+        var cml = rows.Single(r => r.Line == 1 && r.Edition == "2016").Associations.Split(';');
+        Assert.Contains("Chronic myeloid leukaemia, BCR::ABL1-positive", cml);
+        Assert.Equal(cml.Length, cml.Distinct().Count());
+        Assert.Equal(string.Empty, rows.Single(r => r.Line == 2 && r.Edition == "2016").Associations);
+
+        using var csv = new MemoryStream(Bytes(s => BatchExport.WriteCsv(s, result)));
+        Assert.Equal(rows, BatchExport.ReadCsv(csv));
+    }
+
+    [Fact]
+    public void Csv_ReadsPreAssociationExports()
+    {
+        var header = string.Join(',', BatchExport.CsvColumnsV2);
+        var text = header + "\n1,,\"46,XX\",2016,Implemented,true,Constitutional;Acquired,true,0,0,0,0,,Valid,,\n";
+        using var v2 = new MemoryStream(Encoding.UTF8.GetBytes(text));
+
+        var row = Assert.Single(BatchExport.ReadCsv(v2));
+
+        Assert.Equal((EditionVerdict.Valid, string.Empty), (row.Verdict, row.Associations));
+        Assert.Single(BatchReader.Read(Encoding.UTF8.GetBytes(text), BatchFormat.Csv).Items);
+    }
+
     [Fact]
     public void Json_ReadsVersion2()
     {
         var json = Encoding.UTF8.GetString(Bytes(s => BatchExport.WriteJson(s, _autoResult.Value)))
-            .Replace("\"FormatVersion\": 5", "\"FormatVersion\": 2", StringComparison.Ordinal);
+            .Replace($"\"FormatVersion\": {BatchExport.JsonFormatVersion}", "\"FormatVersion\": 2", StringComparison.Ordinal);
         using var v2 = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
         Assert.Equal(_autoItems.Length, BatchExport.ReadJson(v2).Items.Length);

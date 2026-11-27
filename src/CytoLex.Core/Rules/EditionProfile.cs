@@ -1,5 +1,6 @@
 using System.Collections.Frozen;
 using System.Collections.Immutable;
+using CytoLex.Core.Associations;
 using CytoLex.Core.Kb;
 using CytoLex.Core.Segmentation;
 using CytoLex.Core.Semantics;
@@ -23,7 +24,14 @@ internal sealed record EditionProfile(
     Parser Parser,
     ImmutableHashSet<NotationType> ImplementedTypes,
     ImmutableArray<(KbRule Rule, IRuleCheck Check)> Checks,
-    Binder Binder);
+    Binder Binder)
+{
+    private readonly Lazy<AssociationMatcher> _associations = new(() =>
+        new AssociationMatcher(Kb.Associations, Kb.Bands, new ExactPatterns(Parser, Binder).Get));
+
+    /// <summary>The association matcher of the edition (T-109): the KB's rules, its bands, and <c>exact</c> forms read by its parser.</summary>
+    public AssociationMatcher Associations => _associations.Value;
+}
 
 /// <summary>The editions the core has a profile for, and what each implements (pilot: ISCN 2016 karyotypes, T-021; arr, T-034; the in situ types, T-033).</summary>
 internal static class EditionProfiles

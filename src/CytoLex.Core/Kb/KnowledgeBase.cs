@@ -39,6 +39,9 @@ public interface IEditionKb
 
     /// <summary>The probe table (T-102/T-103), shared by every edition; empty when the bundle has none.</summary>
     ProbeTable Probes { get; }
+
+    /// <summary>The association rules (T-108/T-109), shared by every edition; empty when the bundle has none.</summary>
+    AssociationRules Associations { get; }
 }
 
 /// <summary>Loads the runtime KB bundle (<c>build/kb-runtime.json</c>, format in kb/README.md).</summary>
@@ -74,6 +77,7 @@ public static class KnowledgeBase
         CheckFormat(root);
         var editions = new List<EditionKb>();
         var probes = root.TryGetProperty("probes", out var p) ? ProbeTable.FromBundle(p) : ProbeTable.Empty;
+        var associations = root.TryGetProperty("associations", out var a) ? AssociationRules.FromBundle(a) : AssociationRules.Empty;
         foreach (var ed in root.GetProperty("editions").EnumerateObject())
         {
             var rules = ed.Value.GetProperty("rules").EnumerateArray().Select(r => ReadRule(ed.Name, r)).ToImmutableArray();
@@ -81,7 +85,7 @@ public static class KnowledgeBase
             var translation = ed.Value.TryGetProperty("translation", out var t)
                 ? TemplateSet.FromBundle(t)
                 : ImmutableDictionary<string, TemplateSet>.Empty;
-            editions.Add(new EditionKb(ed.Name, rules, Vocabulary.FromBundle(root, ed.Name), bands, translation, probes));
+            editions.Add(new EditionKb(ed.Name, rules, Vocabulary.FromBundle(root, ed.Name), bands, translation, probes, associations));
         }
 
         editions.Sort((a, b) => string.CompareOrdinal(a.Edition, b.Edition));
@@ -154,7 +158,8 @@ public static class KnowledgeBase
         Vocabulary vocab,
         BandSet? bands,
         ImmutableDictionary<string, TemplateSet> translation,
-        ProbeTable probes) : IEditionKb
+        ProbeTable probes,
+        AssociationRules associations) : IEditionKb
     {
         private readonly FrozenDictionary<string, KbRule> _byId = rules.ToFrozenDictionary(r => r.Id, StringComparer.Ordinal);
 
@@ -169,6 +174,8 @@ public static class KnowledgeBase
         public IReadOnlyDictionary<string, TemplateSet> Translation => translation;
 
         public ProbeTable Probes => probes;
+
+        public AssociationRules Associations => associations;
 
         public KbRule? Rule(string id) => _byId.GetValueOrDefault(id);
     }

@@ -62,4 +62,10 @@ public sealed record ValidationOptions
     /// lists the corrections (<see cref="EditionResult.AutoCorrection"/>). Off by default.
     /// </summary>
     public bool AutoCorrect { get; init; }
+
+    /// <summary>
+    /// Also match the association rules (T-109; <see cref="EditionResult.Associations"/>): conditions associated in the
+    /// literature with what the string describes, with source and review state. Not a diagnosis (T-104). Off by default.
+    /// </summary>
+    public bool IncludeAssociations { get; init; }
 }
