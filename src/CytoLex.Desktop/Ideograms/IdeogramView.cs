@@ -18,7 +18,7 @@ public sealed class LocusEventArgs(RoutedEvent routedEvent, LocusItemViewModel? 
 
 /// <summary>
 /// Draws one chromosome of the Map view (T-101): the 850-level bands by stain (acen as a waist, gvar hatched, stalk narrow)
-/// and the markers of its loci in lanes to the right (breaks as ticks across the chromosome). Raises
+/// and the markers of its loci in lanes to the right (breaks as ticks across the chromosome; probe table rows not reviewed, T-103, hatched). Raises
 /// <see cref="LocusHoveredEvent"/> and <see cref="LocusPressedEvent"/> for the marker under the pointer.
 /// </summary>
 public sealed class IdeogramView : Control
@@ -338,6 +338,22 @@ public sealed class IdeogramView : Control
         }
 
         var bar = new Rect(x, y0, _laneWidth, Math.Max(2, y1 - y0));
+        if (locus.IsUnreviewed)
+        {
+            // A probe table row nobody has reviewed (T-103): a pale bar hatched in the effect colour.
+            context.DrawRectangle(new ImmutableSolidColorBrush(brush.Color, 0.25), locus.IsSelected ? _selectedPen : new ImmutablePen(brush, 1), bar, 1.5, 1.5);
+            using (context.PushClip(bar))
+            {
+                var hatch = new ImmutablePen(brush, 1);
+                for (var y = bar.Top - _laneWidth; y < bar.Bottom; y += 3)
+                {
+                    context.DrawLine(hatch, new Point(bar.Left, y + _laneWidth), new Point(bar.Right, y));
+                }
+            }
+
+            return;
+        }
+
         context.DrawRectangle(locus.Locus.IsUncertain ? new ImmutableSolidColorBrush(brush.Color, 0.45) : brush, locus.IsSelected ? _selectedPen : null, bar, 1.5, 1.5);
     }
 

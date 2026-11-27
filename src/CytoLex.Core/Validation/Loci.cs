@@ -48,7 +48,7 @@ public enum LocusExtent
     /// <summary>Nucleotide positions written in an arr result (<see cref="LocusEntry.PositionsBuild"/>).</summary>
     Positions,
 
-    /// <summary>No position known from the string (a probe name such as <c>ABL1</c>; probe table: T-103).</summary>
+    /// <summary>No position known: a probe name the string doesn't place and the probe table has no row for.</summary>
     Unplaced,
 }
 
@@ -57,6 +57,9 @@ public enum LocusSource
 {
     /// <summary>The string itself: bands, positions, chromosome numbers in paints and D-numbers.</summary>
     Written,
+
+    /// <summary>A probe table row (T-103): <see cref="LocusEntry.ProbeRow"/>, which may not be reviewed.</summary>
+    ProbeTable,
 }
 
 /// <summary>
@@ -86,6 +89,7 @@ public enum LocusSource
 /// <param name="Source">Where the placement comes from.</param>
 /// <param name="UnplacedReason">Why it is <see cref="LocusExtent.Unplaced"/>, or why it has no coordinates.</param>
 /// <param name="Kb">The KB entries of the item, plus <c>ISH.LOCUS_DESIGNATION</c> for a probe placed by its name.</param>
+/// <param name="ProbeRow">The probe table row that places the probe (<see cref="LocusSource.ProbeTable"/>); <c>null</c> otherwise.</param>
 public sealed record LocusEntry(
     int Index,
     int Abnormality,
@@ -109,8 +113,12 @@ public sealed record LocusEntry(
     bool IsAlternative,
     LocusSource Source,
     string? UnplacedReason,
-    ImmutableArray<KbRef> Kb)
+    ImmutableArray<KbRef> Kb,
+    ProbeRow? ProbeRow = null)
 {
+    /// <summary>Whether the placement comes from a probe table row nobody has reviewed yet.</summary>
+    public bool IsUnreviewed => ProbeRow is { Reviewed: false };
+
     /// <summary>Whether the locus has a chromosome.</summary>
     public bool IsPlaced => Extent != LocusExtent.Unplaced;
 

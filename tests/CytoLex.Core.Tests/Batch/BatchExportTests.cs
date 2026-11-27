@@ -153,7 +153,7 @@ public class BatchExportTests
         Assert.Equal(EditionVerdict.ValidAfterAutoCorrection, result.Verdict);
         Assert.Equal("47,XY,+21", result.AutoCorrection!.Corrected);
         Assert.Equal("47,XY, +21", back.Items[0].Report.Input);
-        Assert.Contains("\"FormatVersion\": 4", Encoding.UTF8.GetString(json), StringComparison.Ordinal);
+        Assert.Contains("\"FormatVersion\": 5", Encoding.UTF8.GetString(json), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -211,7 +211,7 @@ public class BatchExportTests
     public void Json_ReadsVersion2()
     {
         var json = Encoding.UTF8.GetString(Bytes(s => BatchExport.WriteJson(s, _autoResult.Value)))
-            .Replace("\"FormatVersion\": 4", "\"FormatVersion\": 2", StringComparison.Ordinal);
+            .Replace("\"FormatVersion\": 5", "\"FormatVersion\": 2", StringComparison.Ordinal);
         using var v2 = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
         Assert.Equal(_autoItems.Length, BatchExport.ReadJson(v2).Items.Length);

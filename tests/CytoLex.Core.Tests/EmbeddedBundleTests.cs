@@ -53,5 +53,11 @@ public class EmbeddedBundleTests
             Assert.False(string.IsNullOrEmpty(probe.GetProperty("source").GetString()));
             _ = probe.GetProperty("reviewed").GetBoolean();
         }
+
+        // Read by the core (T-103): by name or alias, ignoring case.
+        var table = KnowledgeBase.LoadEmbedded().ForEdition("2016")!.Probes;
+        Assert.Equal(probes.GetArrayLength(), table.Rows.Length);
+        Assert.Equal("ANOS1", table.Find("KAL1")?.Row.Name);
+        Assert.Equal("KMT2A", table.Find("mll")?.Row.Name);
     }
 }

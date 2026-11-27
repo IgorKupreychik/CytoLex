@@ -8,15 +8,16 @@ namespace CytoLex.Core.Validation;
 
 /// <summary>
 /// Builds <see cref="EditionResult.Loci"/> (T-101) from the abnormality list: karyotype breakpoints and del/dup
-/// segments, whole-chromosome gains and losses, arr regions and positions, in situ regions and probes placed by name.
-/// Coordinates come from the edition's band data; written arr positions win for their own build.
+/// segments, whole-chromosome gains and losses, arr regions and positions, in situ regions, probes placed by name
+/// and probes placed from the probe table (T-103). Coordinates come from the edition's band data; written arr
+/// positions win for their own build, and a probe table row gives its own positions.
 /// </summary>
-internal sealed class LocusList(string input, BandSet? bands, ImmutableArray<CellLineSummary> cellLines)
+internal sealed class LocusList(string input, BandSet? bands, ProbeTable probes, ImmutableArray<CellLineSummary> cellLines)
 {
     /// <summary>The rule that allows D-numbers and paints as locus names (§13.2 ¶1): the basis of placing a probe by its name.</summary>
     internal const string LocusDesignation = "ISH.LOCUS_DESIGNATION";
 
-    private const string _probeUnplaced = "probe position unknown (probe table: T-103)";
+    private const string _probeUnplaced = "probe not in the probe table";
 
     private static readonly FrozenSet<string> _losses = FrozenSet.Create(StringComparer.Ordinal, "del");
     private static readonly FrozenSet<string> _gains = FrozenSet.Create(StringComparer.Ordinal, "dup", "trp", "qdp");
@@ -24,9 +25,9 @@ internal sealed class LocusList(string input, BandSet? bands, ImmutableArray<Cel
     private readonly List<LocusEntry> _loci = [];
 
     /// <summary>The loci of <paramref name="entries"/>, in input order.</summary>
-    public static ImmutableArray<LocusEntry> Build(string input, BandSet? bands, ImmutableArray<CellLineSummary> cellLines, ImmutableArray<AbnormalityEntry> entries)
+    public static ImmutableArray<LocusEntry> Build(string input, BandSet? bands, ProbeTable probes, ImmutableArray<CellLineSummary> cellLines, ImmutableArray<AbnormalityEntry> entries)
     {
-        var list = new LocusList(input, bands, cellLines);
+        var list = new LocusList(input, bands, probes, cellLines);
         foreach (var entry in entries)
         {
             list.Add(entry, entry.Index, isAlternative: false);
@@ -389,6 +390,12 @@ internal sealed class LocusList(string input, BandSet? bands, ImmutableArray<Cel
                     continue;
                 }
 
+                if (probes.Find(locus.Name) is { Row: var row } && HasChromosome(row.Chromosome))
+                {
+                    AddProbeRow(ctx, locus.Span, row, effect, copy, locus.Name);
+                    continue;
+                }
+
                 AddUnplaced(ctx, locus.Span, effect, copy, locus.Name, _probeUnplaced);
             }
         }
@@ -419,6 +426,30 @@ internal sealed class LocusList(string input, BandSet? bands, ImmutableArray<Cel
         }
 
         return null;
+    }
+
+    /// <summary>A probe placed from its probe table row: the row's band and positions (band data where the row has none).</summary>
+    private void AddProbeRow(Context ctx, TextSpan span, ProbeRow row, LocusEffect effect, string? copy, string probe)
+    {
+        var to = row.ToBand;
+        var g37 = row.Grch37 ?? Union(BandRange(row.FromBand, ReferenceBuild.Grch37), to is null ? null : BandRange(to, ReferenceBuild.Grch37));
+        var g38 = row.Grch38 ?? Union(BandRange(row.FromBand, ReferenceBuild.Grch38), to is null ? null : BandRange(to, ReferenceBuild.Grch38));
+        AddLocus(
+            ctx,
+            span,
+            row.Chromosome,
+            to is null ? LocusExtent.Band : LocusExtent.BandRange,
+            row.FromBand,
+            to,
+            g37,
+            g38,
+            null,
+            effect,
+            copy,
+            probe,
+            ctx.Entry.Flags.IsUncertain,
+            NoCoordinates(g37, g38),
+            row);
     }
 
     private static string? Signal(LocusSummary locus, LocusGroupSummary group)
@@ -475,7 +506,8 @@ internal sealed class LocusList(string input, BandSet? bands, ImmutableArray<Cel
         string? copy,
         string? probe,
         bool uncertain,
-        string? reason)
+        string? reason,
+        ProbeRow? probeRow = null)
     {
         var cells = ctx.Entry.InSitu?.Cells is { } ic
             ? $"[{ic.Text}]"
@@ -501,9 +533,10 @@ internal sealed class LocusList(string input, BandSet? bands, ImmutableArray<Cel
             cells,
             uncertain,
             ctx.IsAlternative,
-            LocusSource.Written,
+            probeRow is null ? LocusSource.Written : LocusSource.ProbeTable,
             reason,
-            [.. ctx.Entry.Kb.Concat(ctx.ExtraKb).Distinct()]));
+            [.. ctx.Entry.Kb.Concat(ctx.ExtraKb).Distinct()],
+            probeRow));
     }
 
     // --- band data ---------------------------------------------------------------------------------------------------

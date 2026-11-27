@@ -233,22 +233,55 @@ public class LocusListTests
     }
 
     [Fact]
-    public void IshDeletion_SegmentAndUnplacedProbe()
+    public void IshDeletion_SegmentAndProbeFromTable()
     {
         var loci = Loci("46,XY.ish del(22)(q11.2q11.2)(HIRA–)");
         Assert.Equal((LocusEffect.Loss, LocusExtent.Band, "22q11.2"), (loci[0].Effect, loci[0].Extent, loci[0].From));
-        Assert.Equal((LocusExtent.Unplaced, "HIRA", "–"), (loci[1].Extent, loci[1].Probe, loci[1].Copy));
-        Assert.NotNull(loci[1].UnplacedReason);
+        Assert.Equal((LocusExtent.Band, "HIRA", "–", "22", "22q11.21"), (loci[1].Extent, loci[1].Probe, loci[1].Copy, loci[1].Chromosome, loci[1].From));
+        Assert.Equal(LocusSource.ProbeTable, loci[1].Source);
+        Assert.Null(loci[1].UnplacedReason);
     }
 
     [Fact]
-    public void GeneProbes_Unplaced()
+    public void GeneProbes_PlacedFromProbeTable()
     {
+        var table = KnowledgeBase.LoadEmbedded().ForEdition("2016")!.Probes;
         var loci = Loci("nuc ish(ABL1,BCR)×2(ABL1 con BCR×1)[200]");
         Assert.Equal(["ABL1", "BCR", "ABL1", "BCR"], loci.Select(l => l.Probe));
-        Assert.All(loci, l => Assert.Equal(LocusExtent.Unplaced, l.Extent));
-        Assert.All(loci, l => Assert.Contains("T-103", l.UnplacedReason, StringComparison.Ordinal));
+        Assert.Equal(["9", "22", "9", "22"], loci.Select(l => l.Chromosome));
+        Assert.All(loci, l => Assert.Equal((LocusSource.ProbeTable, LocusExtent.Band), (l.Source, l.Extent)));
+        var abl1 = table.Find("ABL1")!.Row;
+        Assert.Equal((abl1.Grch37, abl1.Grch38, "9q34.12"), (loci[0].Grch37, loci[0].Grch38, loci[0].From));
+        Assert.Equal(abl1, loci[0].ProbeRow);
+        Assert.Equal(!abl1.Reviewed, loci[0].IsUnreviewed);
         Assert.Equal(["×2", "×2", null, "×1"], loci.Select(l => l.Copy));
+    }
+
+    [Fact]
+    public void ProbeTable_AliasEndAndBandRange()
+    {
+        var loci = Loci("nuc ish(KAL1,DMD)×1,(5′MLL×2,3′MLL×1)[200]");
+        Assert.Equal(("X", "Xp22.31"), (loci[0].Chromosome, loci[0].From)); // KAL1 = ANOS1
+        Assert.Equal((LocusExtent.BandRange, "Xp21.2", "Xp21.1"), (loci[1].Extent, loci[1].From, loci[1].To));
+        Assert.Equal(("11", "11q23.3", "5′MLL"), (loci[2].Chromosome, loci[2].From, loci[2].Probe)); // MLL = KMT2A
+    }
+
+    [Fact]
+    public void ProbeNotInTable_Unplaced()
+    {
+        var loci = Loci("nuc ish(GLTSCR×1)[105/200]");
+        var locus = Assert.Single(loci);
+        Assert.Equal((LocusExtent.Unplaced, "GLTSCR", LocusSource.Written), (locus.Extent, locus.Probe, locus.Source));
+        Assert.Contains("probe table", locus.UnplacedReason, StringComparison.Ordinal);
+        Assert.Null(locus.ProbeRow);
+    }
+
+    [Fact]
+    public void WrittenRegion_WinsOverProbeTable()
+    {
+        var locus = Assert.Single(Loci("46,XX.ish 22q11.2(HIRA×2)"));
+        Assert.Equal((LocusSource.Written, "22q11.2"), (locus.Source, locus.From));
+        Assert.Null(locus.ProbeRow);
     }
 
     [Theory]

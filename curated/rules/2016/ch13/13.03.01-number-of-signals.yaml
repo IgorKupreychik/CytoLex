@@ -155,9 +155,11 @@ rules:
       paraphrase_checked: true
       needs_review: false
       note: >-
-        A check needs the chromosome of each locus, which the string gives only in the detailed
-        form; the KB has no locus positions. Both invalid examples are inferred; their loci's
-        chromosomes are the ones the book prints (E13's detailed line, E28's explanation).
+        The string gives the chromosome of each locus only in the detailed form; the check takes it
+        from the probe table (curated/probes/, T-103) or from a D-number/paint name. A finding that
+        relies on an unreviewed table row is a warning naming the row's source. Both invalid
+        examples are inferred; their loci's chromosomes are the ones the book prints (E13's
+        detailed line, E28's explanation).
     related: [ISH.LOCUS_ORDER_PTER_QTER, NUC_ISH.HYBRIDIZATION_GROUPS]
 
   - id: NUC_ISH.CELLS_SCORED

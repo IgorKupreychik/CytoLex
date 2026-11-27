@@ -195,7 +195,7 @@ public sealed class Validator
             : null;
         return new EditionResult(profile.Edition, EditionStatus.Implemented, null, validity, CountsOf(sorted), sorted, segs, cellLines, entries, translation)
         {
-            Loci = LocusList.Build(input, profile.Kb.Bands, cellLines, entries), // T-101
+            Loci = LocusList.Build(input, profile.Kb.Bands, profile.Kb.Probes, cellLines, entries), // T-101
         };
     }
 

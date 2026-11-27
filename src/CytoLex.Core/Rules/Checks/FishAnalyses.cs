@@ -16,8 +16,8 @@ internal sealed record FishFinding(string Rule, TextSpan Span, string Detail, Fi
 /// <summary>
 /// The in situ rules (ISCN 2016 ch. 13, T-033) that read one segment's <see cref="FishModel"/>: the keyword spacing, the
 /// ish abnormalities and normal chromosomes, the loci, fib/rev/cgh, and the nuc ish analyses (<see cref="NucIshAnalyses"/>).
-/// Each fault is found once and tagged with its rule. Not checked (no probe positions in the KB): the order of loci from
-/// pter to qter (ISH.LOCUS_ORDER_PTER_QTER) and of chromosomes in nuc ish (NUC_ISH.CHROMOSOME_ORDER).
+/// Each fault is found once and tagged with its rule. The order of loci from pter to qter (ISH.LOCUS_ORDER_PTER_QTER) and
+/// of chromosomes in nuc ish (NUC_ISH.CHROMOSOME_ORDER) needs probe positions: <see cref="ProbeOrder"/> (T-103).
 /// </summary>
 internal static class FishAnalyses
 {

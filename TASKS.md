@@ -111,7 +111,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-100 | discussion | 4 | T-072, T-092 | Link one event across techniques in combined strings (karyotype + ish + arr) |
 | T-101 | done | 3 | T-098, T-033, T-034 | Locus list from the string + desktop "Map" view (ideograms) |
 | T-102 | done | 3 | T-033 | Probe table: people-editable CSV with review flags, HGNC/NCBI pre-fill, `kb build` checks |
-| T-103 | todo | 3 | T-101, T-102 | Use the probe table: probe loci with "unreviewed" badges; locus/chromosome order checks (T-094) |
+| T-103 | done | 3 | T-101, T-102 | Use the probe table: probe loci with "unreviewed" badges; locus/chromosome order checks (T-094) |
 | T-104 | discussion | 3 | T-069, T-101 | Disease/condition associations from abnormalities: intended use, sources, format, review |
 | T-105 | todo | 3 | T-034, T-058 | Literal translation of microarray results (templates, golden entries, renderer) |
 | T-106 | discussion | 3 | T-032 | What `idem`/`sl`/`sdl` refer to on the donor side of `//` (KB rule first, then the binder) |
@@ -1085,10 +1085,16 @@ Outcome (2026-11-24, confirmed by the user after the check by hand): "Autocorrec
 - Both decisions are in `docs/decisions.md`.
 
 ### T-103 — Use the probe table
-**Status:** todo
+**Status:** done
 **Description:** Place probes through the T-102 table: loci in the T-101 list and the Map view, with an "unreviewed" badge and the source in a tooltip (hatched markers) for rows with `reviewed: no`. Implement `ISH.LOCUS_ORDER_PTER_QTER` and `NUC_ISH.CHROMOSOME_ORDER` (T-094) from the positions; a finding that relies on an unreviewed row is a warning naming the source.
 **Acceptance:** the invalid KB examples of both rules report them; no valid FISH KB example does; badges shown in the desktop; tests.
-**Notes:** Created 2026-11-24 (user).
+**Notes:** Created 2026-11-24 (user). **Outcome (2026-11-27):**
+- **Core:** `src/CytoLex.Core/Kb/ProbeTable.cs` (`IEditionKb.Probes`, read from the bundle's top-level `probes`; lookup by name/alias, any case, `5′`/`3′` set aside). Probes the string doesn't place are placed from their row (`LocusSource.ProbeTable`, `LocusEntry.ProbeRow`/`IsUnreviewed`, the row's band and positions; a written region wins). Batch JSON v5.
+- **Checks:** `Rules/Checks/ProbeOrder.cs` + `ProbeOrderCheck.cs` for `ISH.LOCUS_ORDER_PTER_QTER` and `NUC_ISH.CHROMOSOME_ORDER`. A finding relying on an unreviewed row is `Certainty.Uncertain` (warning) and names the source. D-number/paint chromosomes count as certain.
+- **Desktop:** "unreviewed" badge (tooltip: source) on Map locus rows, hatched ideogram markers, legend and unplaced header reworded.
+- **Tests:** `tests/CytoLex.Core.Tests/Rules/ProbeOrderTests.cs` (table lookup, both rules, skipped cases, sweep over every valid FISH KB example); `LocusListTests`, `MapViewTests`, `EmbeddedBundleTests`, `BatchExportTests` updated. `dotnet test`: 13,296 total, 0 failed, 98 skipped; `dotnet format` clean.
+- **Docs:** both rules' review notes, `docs/decisions.md`, `CLAUDE.md`, `README.md`, `docs/design/core.md`, `docs/research/cytogps-comparison.md`.
+- **Deviations from the plan's wording:** loci in equal or nested bands are not compared (the book's valid `nuc ish(KAL1,STS)×2` lists two Xp22.31 genes against their positions), nor two ends of one gene; ish abnormalities only for del/dup/trp/qdp/r.
 
 ### T-104 — Disease/condition associations from abnormalities
 **Status:** discussion

@@ -53,6 +53,14 @@ public sealed partial class LocusItemViewModel : ObservableObject, ISpanItem
     /// <summary>The marker and row tooltip.</summary>
     public string Tip { get; }
 
+    /// <summary>Placed from a probe table row nobody has reviewed yet (T-103): an "unreviewed" badge and a hatched marker.</summary>
+    public bool IsUnreviewed => Locus.IsUnreviewed;
+
+    /// <summary>The probe table row's source and review state, for the badge's tooltip; <c>null</c> when not from the table.</summary>
+    public string? ProbeSource => Locus.ProbeRow is { } row
+        ? $"Probe table row {row.Name}: {(row.Reviewed ? "reviewed" : "not reviewed by a person yet")}. Source: {row.Source}"
+        : null;
+
     /// <summary>The index of its abnormality entry.</summary>
     public int Abnormality => Locus.Abnormality;
 
@@ -114,6 +122,11 @@ public sealed partial class LocusItemViewModel : ObservableObject, ISpanItem
         {
             yield return "positions " + build;
         }
+
+        if (l.ProbeRow is not null)
+        {
+            yield return "probe table";
+        }
     }
 
     private static IImmutableSolidColorBrush BrushOf(LocusEffect effect) => effect switch
@@ -133,6 +146,12 @@ public sealed partial class LocusItemViewModel : ObservableObject, ISpanItem
         if (l.PositionsBuild is { } build)
         {
             lines.Add($"Positions as written ({build}); in the other build from the bands.");
+        }
+        else if (l.ProbeRow is { } row)
+        {
+            lines.Add(row.Reviewed
+                ? $"Position from the probe table (reviewed): {row.Source}."
+                : $"Position from the probe table, not reviewed by a person yet: {row.Source}.");
         }
         else if (l.IsPlaced)
         {

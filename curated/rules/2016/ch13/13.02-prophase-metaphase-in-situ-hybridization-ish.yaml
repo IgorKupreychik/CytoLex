@@ -176,9 +176,12 @@ rules:
       paraphrase_checked: true
       needs_review: false
       note: >-
-        Severity warning: the book says the loci "should be used in order". A check needs locus
-        positions, which the KB doesn't have; the invalid example is inferred from E10. T-016
-        added §13.3.1 ¶1 (nuc ish, 5′/3′ probes) and §13.4 ¶1 (fib ish).
+        Severity warning: the book says the loci "should be used in order". The check takes probe
+        positions from the probe table (curated/probes/, T-102/T-103); it compares only loci in
+        different, not nested bands (the book's valid nuc ish(KAL1,STS)×2 lists two Xp22.31 genes
+        against their positions) and not two ends of one gene (no strand in the table). The invalid
+        example is inferred from E10. T-016 added §13.3.1 ¶1 (nuc ish, 5′/3′ probes) and §13.4 ¶1
+        (fib ish).
     related: [ISH.LOCUS_LIST, ARR.PTER_TO_QTER]
 
   - id: ISH.BANDS_FROM_UCSC

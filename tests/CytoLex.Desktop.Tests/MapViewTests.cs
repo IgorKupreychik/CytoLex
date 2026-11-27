@@ -63,14 +63,33 @@ public class MapViewTests
     }
 
     [Fact]
-    public void UnplacedProbes_Listed()
+    public void ProbeTableProbes_Placed_UnreviewedBadge()
     {
         var map = Map(Vm("nuc ish(ABL1,BCR)×2(ABL1 con BCR×1)[200]"));
-        Assert.Empty(map.Loci);
-        Assert.Equal(["ABL1", "BCR", "ABL1", "BCR"], map.Unplaced.Select(u => u.Locus.Probe));
-        Assert.True(map.HasUnplaced);
-        Assert.All(map.Unplaced, u => Assert.Contains("probe table", u.Tip, StringComparison.Ordinal));
+        Assert.Equal(["ABL1", "BCR", "ABL1", "BCR"], map.Loci.Select(u => u.Locus.Probe));
+        Assert.Empty(map.Unplaced);
+        Assert.All(map.Loci, l => Assert.Equal(l.Locus.ProbeRow!.Reviewed, !l.IsUnreviewed));
+        var abl1 = map.Loci[0];
+        Assert.Equal("9q34.12", abl1.Place);
+        Assert.Contains("probe table", abl1.Details, StringComparison.Ordinal);
+        Assert.Contains(abl1.Locus.ProbeRow!.Source, abl1.Tip, StringComparison.Ordinal);
+        Assert.Contains(abl1.Locus.ProbeRow!.Source, abl1.ProbeSource, StringComparison.Ordinal);
+        Assert.Equal(2, map.Chromosomes.Single(c => c.Name == "9").Markers.Length);
+        Assert.Equal(2, map.Chromosomes.Single(c => c.Name == "22").Markers.Length);
         Assert.Equal("Map (4)", map.Header);
+    }
+
+    [Fact]
+    public void UnplacedProbes_Listed()
+    {
+        var map = Map(Vm("nuc ish(GLTSCR×1,ZNF443×2)[105/200]"));
+        var unplaced = Assert.Single(map.Unplaced);
+        Assert.Equal("GLTSCR", unplaced.Locus.Probe);
+        Assert.False(unplaced.IsUnreviewed);
+        Assert.Null(unplaced.ProbeSource);
+        Assert.Contains("probe table", unplaced.Tip, StringComparison.Ordinal);
+        Assert.Contains("probe table", map.UnplacedHeader, StringComparison.Ordinal);
+        Assert.Equal("ZNF443", Assert.Single(map.Loci).Locus.Probe);
     }
 
     [Fact]

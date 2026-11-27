@@ -43,7 +43,7 @@ public sealed partial class MapViewModel : ObservableObject
     public bool HasUnplaced => !Unplaced.IsEmpty;
 
     /// <summary>The unplaced section's header.</summary>
-    public string UnplacedHeader => $"Unplaced ({Unplaced.Length}): no position in the string; probe positions come with the probe table";
+    public string UnplacedHeader => $"Unplaced ({Unplaced.Length}): no position in the string and no row in the probe table";
 
     /// <summary>Whether the string has loci at all.</summary>
     public bool HasLoci => !All.IsEmpty;

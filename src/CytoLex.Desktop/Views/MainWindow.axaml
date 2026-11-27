@@ -406,7 +406,7 @@
                     </DataTemplate>
                   </ComboBox.ItemTemplate>
                 </ComboBox>
-                <TextBlock Text="850-band ideograms · gain/loss only where the symbol states it (del, dup, +/–) · arr copy numbers as written"
+                <TextBlock Text="850-band ideograms · gain/loss only where the symbol states it (del, dup, +/–) · arr copy numbers as written · hatched = probe table row not reviewed"
                            FontSize="11" Opacity="0.6" VerticalAlignment="Center" TextWrapping="Wrap" />
               </StackPanel>
               <TextBlock DockPanel.Dock="Top" Text="No band data for this edition." Opacity="0.6" IsVisible="{Binding !HasBands}" />
@@ -1099,7 +1099,12 @@
             <TextBlock Text="{Binding EffectLabel}" Foreground="White" FontSize="11" HorizontalAlignment="Center" />
           </Border>
           <StackPanel Grid.Column="1" Spacing="0">
-            <TextBlock Text="{Binding Place}" FontFamily="Cascadia Mono,Consolas,monospace" FontSize="12" TextWrapping="Wrap" />
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="{Binding Place}" FontFamily="Cascadia Mono,Consolas,monospace" FontSize="12" TextWrapping="Wrap" />
+              <Border Classes="tag" IsVisible="{Binding IsUnreviewed}" VerticalAlignment="Center" ToolTip.Tip="{Binding ProbeSource}">
+                <TextBlock Text="unreviewed" FontSize="11" />
+              </Border>
+            </StackPanel>
             <TextBlock Text="{Binding Details}" FontSize="11" Opacity="0.65" TextWrapping="Wrap" />
           </StackPanel>
         </Grid>
