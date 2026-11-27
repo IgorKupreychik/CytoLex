@@ -112,10 +112,16 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-101 | done | 3 | T-098, T-033, T-034 | Locus list from the string + desktop "Map" view (ideograms) |
 | T-102 | done | 3 | T-033 | Probe table: people-editable CSV with review flags, HGNC/NCBI pre-fill, `kb build` checks |
 | T-103 | done | 3 | T-101, T-102 | Use the probe table: probe loci with "unreviewed" badges; locus/chromosome order checks (T-094) |
-| T-104 | discussion | 3 | T-069, T-101 | Disease/condition associations from abnormalities: intended use, sources, format, review |
+| T-104 | done | 3 | T-069, T-101 | Disease/condition associations from abnormalities: intended use, sources, format, review |
 | T-105 | todo | 3 | T-034, T-058 | Literal translation of microarray results (templates, golden entries, renderer) |
 | T-106 | discussion | 3 | T-032 | What `idem`/`sl`/`sdl` refer to on the donor side of `//` (KB rule first, then the binder) |
 | T-107 | todo | 5 | T-089 | Settings outside a repo checkout (per-user settings file + build cache) for packaged installs |
+| T-108 | todo | 3 | T-102 | Association rules: `curated/associations/associations.yaml`, schema, `kb build` checks + review report, runtime bundle, cited seed rules |
+| T-109 | todo | 3 | T-108, T-101, T-069 | Core: match association rules (`exact`/`fusion`/`copy`, all/any/not, context) → `EditionResult.Associations`; batch JSON/CSV |
+| T-110 | todo | 3 | T-109, T-098 | Desktop: "Associations" view tab (disclaimer, citations, unreviewed badges, span links) |
+| T-111 | todo | 4 | T-108 | `kb associations`: pre-fill constitutional rules from ClinGen dosage regions (CC0) + Orphanet names (CC BY 4.0) |
+| T-112 | discussion | 5 | T-109 | Diagnosis-suggestion mode: intended use and regulatory check (MDR/IVDR, FDA) before any build |
+| T-113 | discussion | 5 | – | Mitelman database: licence check, usable as an association source? |
 
 ---
 
@@ -926,7 +932,7 @@ Deviations from the plan: no CLI (user); new label `severity-policy` and CytoLex
 **Status:** todo
 **Description:** A web service exposing single/batch validation from the core library, plus a browser page on top of it (no install): single-string check with highlights, diagnostics with citations and fixes, and batch upload with CSV/JSON export, like the desktop app.
 **Acceptance:** Same results as the desktop app for the KB example suite; the browser page checks a string and a batch file end to end.
-**Notes:** 2026-11-20: browser page added from the CytoGPS comparison (T-047, user). 2026-11-20: priority 3 → 4 (user): the ISCN 2016 core and the desktop app come first. Data policy for uploaded strings (T-048): keep them in memory only — no storage and no logging of strings — unless a later decision changes it (CytoGPS has no policy, `docs/research/cytogps.md` §6).
+**Notes:** 2026-11-20: browser page added from the CytoGPS comparison (T-047, user). 2026-11-20: priority 3 → 4 (user): the ISCN 2016 core and the desktop app come first. Data policy for uploaded strings (T-048): keep them in memory only — no storage and no logging of strings — unless a later decision changes it (CytoGPS has no policy, `docs/research/cytogps.md` §6). 2026-11-27 (T-104): disease associations (T-109) stay off in the web service until reviewed rules exist and the intended-use text is checked; decide here.
 
 ### T-045 — ISCN 2020 KB + version profile
 **Status:** todo
@@ -949,7 +955,7 @@ Deviations from the plan: no CLI (user); new label `severity-policy` and CytoLex
 - Copyright: what book content may appear on slides (paraphrases and citations only, no verbatim quotes or idiogram images; see T-043).
 - Timing: what can be drafted now (architecture, KB pipeline) and what needs the finished pilot (demo, screenshots).
 **Acceptance:** Decision in `docs/decisions.md` (audiences, deliverables, formats, location, copyright limits); follow-up `todo` task(s) for producing the material added with Pri and Depends (the demo-dependent ones depending on the pilot desktop tasks, e.g. T-040).
-**Notes:** Raised 2026-11-18 by the user, at the end of T-023.
+**Notes:** Raised 2026-11-18 by the user, at the end of T-023. 2026-11-27 (T-104): if disease associations (T-108–T-110) are shown, present them as "conditions associated in the literature, not a diagnosis", with the disclaimer.
 
 ### T-065 — Binder: syntax tree → semantic model
 **Status:** done
@@ -1097,14 +1103,14 @@ Outcome (2026-11-24, confirmed by the user after the check by hand): "Autocorrec
 - **Deviations from the plan's wording:** loci in equal or nested bands are not compared (the book's valid `nuc ish(KAL1,STS)×2` lists two Xp22.31 genes against their positions), nor two ends of one gene; ish abnormalities only for del/dup/trp/qdp/r.
 
 ### T-104 — Disease/condition associations from abnormalities
-**Status:** discussion
+**Status:** done
 **Description:** Abnormalities often point to a condition (`+21` → Down syndrome, `t(9;22)(q34;q11.2)` → BCR::ABL1 in CML/ALL, `t(15;17)` → APL). Decide in an interview:
 - **Intended use and wording:** "associated conditions (literature)" vs. a diagnosis suggestion; regulatory consequences (clinical decision support, EU MDR/IVDR, FDA); disclaimer; effect on T-044 and T-061.
 - **Sources and licences:** this is not ISCN; candidates WHO-HAEM5 / ICC 2022 (neoplasms), ClinGen dosage regions (CC0), Orphanet (CC BY 4.0), the Mitelman database (licence to check); avoid OMIM (licensed).
 - **Format:** a people-editable CSV with review flags like T-102 (pattern, context constitutional/neoplastic, condition, strength, source citation, reviewed, reviewer, note); a pattern language (exact abnormality, any break in a band, copy-number overlap with a region via T-101 loci).
 - **Display:** an "Associations" view (T-098) with citations, unreviewed badges and the disclaimer.
 **Acceptance:** Decision in `docs/decisions.md`; follow-up `todo` tasks.
-**Notes:** Created 2026-11-24 (user). The framing (associations vs. diagnosis) is left open for this discussion (user).
+**Notes:** Created 2026-11-24 (user). The framing (associations vs. diagnosis) is left open for this discussion (user). **Outcome (2026-11-27):** decided with the user in the interview: literature associations with citations and a disclaimer, not a diagnosis (a switchable diagnosis mode is deferred to T-112, which waits for a regulatory check); sources: WHO-HAEM5/ICC hand-curated (facts cited), ClinGen (CC0) + Orphanet (CC BY 4.0) pre-fill, Mitelman after a licence check (T-113), no OMIM; format: YAML `curated/associations/associations.yaml` with nested match rules (`exact`/`fusion`/`copy`, all/any/not), chosen by the user over the suggested CSV; unreviewed rules shown with a badge (as T-103); opt-in core result + desktop "Associations" tab + batch export; web service decided at T-044. Logged in `docs/decisions.md`; notes added to T-044 and T-061; follow-ups T-108–T-113. No deviations from the plan.
 
 ### T-105 — Literal translation of microarray results
 **Status:** todo
@@ -1123,3 +1129,39 @@ Outcome (2026-11-24, confirmed by the user after the check by hand): "Autocorrec
 **Description:** The Settings tab (T-089) edits `config/local.yaml` only when the app runs from a repo checkout; the CytoGPS build cache (`build/cache/cytogps/`) and the opt-in result cache are repo-bound too. For a packaged desktop app (no `CytoLex.slnx` above it), keep the CytoGPS settings in a per-user file (e.g. `%APPDATA%/CytoLex/settings.yaml`, same keys and environment overrides) with a per-user cache directory, and decide how it combines with `config/local.yaml` in a checkout (the repo file overriding the per-user one was the option discussed in T-089).
 **Acceptance:** Decision on location and precedence in `docs/decisions.md`; `CytoGpsConfig`/`CytoGpsConfigFile` read and write the per-user file when there is no repo root; the Settings tab is editable there; tests on temp directories; README updated.
 **Notes:** Created 2026-11-24 from T-089 (user: repo checkouts only for the pilot).
+
+### T-108 — Association rules: file, schema, checks, seed
+**Status:** todo
+**Description:** Per the T-104 decision: `curated/associations/associations.yaml` (edition-independent; person-maintained) with schema `kb/schema/associations.schema.json`. A rule has `id`, `condition` (name + Orphanet or other ID), `context` (`constitutional`/`neoplastic`/`any`), `strength`, optional `defining` criterion (e.g. a WHO-HAEM5/ICC defining abnormality, kept for a later diagnosis mode, T-112), `source` + `citation` (section of the classification or the dataset version; facts only, no copied text), review fields (`reviewed`, `reviewer`, `date`, `note`) and a `match` tree: leaves `exact` (an abnormality's short form, band-level tolerant: `q11.2` also matches `q11.21`), `fusion` (two bands joined by any rearrangement, incl. ish `con`), `copy` (gain/loss overlapping a GRCh38 region); combinators `all`/`any`/`not`. `kb check` validates the schema; `kb build` checks bands exist in every edition's band data, regions vs. bands, unique IDs, and writes `build/review/associations-review.md` (rules in plain words for non-technical reviewers, unreviewed first); the rules go into both bundles at the top level. Seed: hand-written, cited rules for the classic recurrent abnormalities (e.g. +21, t(9;22)(q34;q11.2), t(15;17)(q24;q21), t(8;21)(q22;q22), inv(16)(p13.1q22)/t(16;16)), `reviewed: no` until a person signs them off. Index entry in `curated/README.md`; CLAUDE.md/README updated.
+**Acceptance:** Schema + checks with tests in `tools/tests/`; review report; seed rules in the bundles; docs updated.
+**Notes:** Created 2026-11-27 from T-104.
+
+### T-109 — Core: matching association rules
+**Status:** todo
+**Description:** Read the bundle's associations (`IEditionKb.Associations`) and match them against the abnormality entries (T-069) and loci (T-101): `exact` on the short form with band-level tolerance, `fusion` on the breakpoints of any rearrangement and on ish `con` signals, `copy` on gain/loss loci overlapping the region; `all`/`any`/`not`; `context` against the string's context (both readings when unknown, like the translation). Opt-in `ValidationOptions.IncludeAssociations` → `EditionResult.Associations` (rule ID, condition, context, strength, source, citation, matched entries and spans, `IsUnreviewed`). Batch JSON carries them (format bump); batch CSV gets a column of condition names. Never in the translation or diagnostics.
+**Acceptance:** Tests per leaf kind and combinator, context handling, every seed rule matched by a synthetic or book string; batch round-trip.
+**Notes:** Created 2026-11-27 from T-104.
+
+### T-110 — Desktop: "Associations" view tab
+**Status:** todo
+**Description:** A `ResultView.Associations` tab (T-098): the fixed disclaimer at the top ("Conditions associated with these abnormalities in the cited literature. Not a diagnosis or an interpretation of this result."), then one card per association: condition (+ ID), strength, context, source citation, the matched abnormality (click selects / hover marks its span), an "unreviewed" badge naming the rule's source (as in T-103). Batch tab: the condition column.
+**Acceptance:** View-model tests in `tests/CytoLex.Desktop.Tests/`; disclaimer always visible; unreviewed badge shown.
+**Notes:** Created 2026-11-27 from T-104.
+
+### T-111 — Pre-fill constitutional associations from ClinGen + Orphanet
+**Status:** todo
+**Description:** `kb associations` (like `kb probes`): download the pinned ClinGen dosage-sensitivity regions (CC0) and Orphanet names/IDs (CC BY 4.0, attribution recorded) into `build/cache/associations/`, sha256 pins in `curated/associations/sources.yaml`; add or refresh `copy` rules marked `(auto)` + `reviewed: no`, never touching other rules.
+**Acceptance:** Pinned downloads, idempotent re-runs, attribution in the review report and the app's about/licence text; tests on fixtures.
+**Notes:** Created 2026-11-27 from T-104.
+
+### T-112 — Diagnosis-suggestion mode: intended use and regulatory check
+**Status:** discussion
+**Description:** T-104 deferred a switchable "diagnosis suggestion" mode ("consistent with …" from the whole string, combining abnormalities and context). Decide whether to build it at all: intended-use statement, classification as clinical decision support / medical device software (EU MDR/IVDR, FDA), whether a research-only build is acceptable, which criteria (WHO-HAEM5/ICC defining abnormalities, the `defining` field of T-108) it would use, and who signs off the rules.
+**Acceptance:** Decision in `docs/decisions.md`; follow-up tasks if adopted.
+**Notes:** Created 2026-11-27 from T-104 (user: associations now, mode later).
+
+### T-113 — Mitelman database as an association source
+**Status:** discussion
+**Description:** Check the licence and terms of the Mitelman Database of Chromosome Aberrations and Gene Fusions in Cancer: may its recurrent-aberration/disease data be redistributed in the KB bundles (and the web service), with what attribution? If yes, plan a pre-fill like T-111.
+**Acceptance:** Licence finding with source in `docs/decisions.md`; follow-up `todo` task if usable.
+**Notes:** Created 2026-11-27 from T-104.
