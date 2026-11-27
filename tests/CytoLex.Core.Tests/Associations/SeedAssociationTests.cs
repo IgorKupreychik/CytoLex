@@ -41,6 +41,26 @@ public class SeedAssociationTests
         Assert.NotEmpty(match.Evidence);
     }
 
+    // T-110: in situ results reach the seed rules through con fusions and signal counts (probes placed by the probe table).
+    [Theory]
+    [InlineData("nuc ish(ABL1,BCR)×3(ABL1 con BCR×1)[400]", "ASSOC.T9_22_CML")]
+    [InlineData("nuc ish(PML,RARA)×3(PML con RARA×2)[200]", "ASSOC.T15_17_APL")]
+    [InlineData("nuc ish(RUNX1T1,RUNX1)×3(RUNX1T1 con RUNX1×2)[200]", "ASSOC.T8_21_AML")] // RUNX1T1 at 8q21.3
+    [InlineData("nuc ish(TBX1×1)[30]", "ASSOC.DEL22Q11_2")]
+    [InlineData("nuc ish(RUNX1×3)[50]", "ASSOC.TRISOMY21_DOWN")] // a 21q22 gene ×3: gain in 21q22
+    [InlineData("arr[GRCh38] 21q22.13(36500000_37500000)×3", "ASSOC.TRISOMY21_DOWN")]
+    public void InSituAndArrayResults_MatchTheSeedRules(string input, string ruleId) =>
+        Assert.NotEmpty(Assert.Single(Result(input).Associations, m => m.RuleId == ruleId).Evidence);
+
+    [Fact]
+    public void CentromereProbeOf21_IsAWholeChromosomeGain()
+    {
+        // A Z D-number is placed by its chromosome only (T-101), so ×3 is a gain of all of 21 and covers 21q22 (kept, T-110).
+        var evidence = Assert.Single(Assert.Single(Result("nuc ish(D21Z1×3)[100]").Associations, m => m.RuleId == "ASSOC.TRISOMY21_DOWN").Evidence);
+        Assert.Equal(1.0, evidence.Overlap);
+        Assert.Equal("×3 read as gain", evidence.Reading);
+    }
+
     [Fact]
     public void EveryExactForm_Parses()
     {

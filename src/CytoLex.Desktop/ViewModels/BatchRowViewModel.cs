@@ -36,7 +36,27 @@ public sealed class BatchRowViewModel
             Corrected = auto.Corrected.ReplaceLineEndings(" ");
             CorrectedTip = $"ISCN {corrected.Edition}: " + string.Join("; ", auto.Corrections.Select(c => $"{c.RuleId} {Highlighting.HighlightBuilder.ChangeOf(c)}"));
         }
+
+        // T-110: the condition names of the matched association rules over the implemented editions (as the CSV column).
+        var matches = implemented.SelectMany(r => r.Associations).DistinctBy(m => m.RuleId).ToList();
+        Associations = string.Join("; ", matches.Select(m => m.Condition.Name).Distinct(StringComparer.Ordinal));
+        AssociationsTip = matches.Count == 0
+            ? null
+            : string.Join(Environment.NewLine, matches.Select(m => $"{m.Condition.Name} ({m.RuleId}{(m.IsUnreviewed ? ", unreviewed" : string.Empty)})"))
+                + Environment.NewLine + AssociationsViewModel.DisclaimerText;
     }
+
+    /// <summary>
+    /// The conditions associated in the literature with the string (T-110), <c>; </c>-separated; empty when no rule matched.
+    /// Not a diagnosis.
+    /// </summary>
+    public string Associations { get; } = string.Empty;
+
+    /// <summary>The matched rules with their review state and the disclaimer; <c>null</c> when none matched.</summary>
+    public string? AssociationsTip { get; }
+
+    /// <summary>Whether an association rule matched.</summary>
+    public bool HasAssociations => Associations.Length > 0;
 
     /// <summary>The comparison with the external checker (T-052); <c>null</c> without a comparison view.</summary>
     public ComparisonRowViewModel? Comparison { get; }

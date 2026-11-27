@@ -10,7 +10,7 @@ namespace CytoLex.Desktop.ViewModels;
 
 /// <summary>
 /// The result of one edition (T-037): verdict, counts, segment notes, diagnostics, abnormalities and editor highlights.
-/// One chip of the edition strip (T-098); the view tabs (Diagnostics, Abnormalities, Translation) show the selected panel.
+/// One chip of the edition strip (T-098); the view tabs (Diagnostics, Abnormalities, Translation, Map, Associations) show the selected panel.
 /// A single-edition check has one panel, "All editions" one per known edition.
 /// </summary>
 public partial class EditionPanelViewModel : ObservableObject
@@ -55,6 +55,7 @@ public partial class EditionPanelViewModel : ObservableObject
         }
 
         Map = IsNotImplemented ? null : new MapViewModel(result, MapBands.For(result.Edition), build, text.ToEditor);
+        Associations = IsNotImplemented ? null : new AssociationsViewModel(result, text.ToEditor);
         Highlights = IsNotImplemented ? [] : HighlightBuilder.Build(text, result, report.Context.Effective);
         if (text.IsCorrected)
         {
@@ -99,6 +100,12 @@ public partial class EditionPanelViewModel : ObservableObject
     /// <summary>The Map tab header: <c>Map (3)</c>.</summary>
     public string MapHeader => Map?.Header ?? "Map";
 
+    /// <summary>The Associations view (T-110): literature associations with the disclaimer; <c>null</c> for a not-implemented edition.</summary>
+    public AssociationsViewModel? Associations { get; }
+
+    /// <summary>The Associations tab header: <c>Associations (2)</c>.</summary>
+    public string AssociationsHeader => Associations?.Header ?? "Associations";
+
     /// <summary>
     /// Marks what a selection of <paramref name="span"/> (a clicked marker, row, card or diagnostic) is about: the loci on the
     /// Map and the abnormality cards holding it or inside it (T-101).
@@ -106,6 +113,7 @@ public partial class EditionPanelViewModel : ObservableObject
     public void MarkSelection(TextSpan span)
     {
         Map?.SelectSpan(span);
+        Associations?.SelectSpan(span); // T-110: the evidence rows
         foreach (var card in CellLineGroups.SelectMany(g => g.Items))
         {
             card.IsMarked = span.Length > 0

@@ -299,7 +299,12 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     // The Map marks the loci of the span under the mouse: an editor position, a card, a translation part (T-101).
-    partial void OnHoverSpanChanged(TextSpan? value) => SelectedPanel?.Map?.HighlightSpan(value);
+    // The Associations view (T-110) marks the evidence rows of that span.
+    partial void OnHoverSpanChanged(TextSpan? value)
+    {
+        SelectedPanel?.Map?.HighlightSpan(value);
+        SelectedPanel?.Associations?.HighlightSpan(value);
+    }
 
     /// <summary>A Map marker or locus row is under the mouse (<paramref name="item"/>), or the mouse left it (<c>null</c>): marks it and its span.</summary>
     public void HoverLocus(LocusItemViewModel? item)
@@ -577,7 +582,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         var editions = choice.Edition is { } edition ? EditionSelection.One(edition) : EditionSelection.All;
-        var options = new ValidationOptions { Editions = editions, IncludeTranslation = true, IncludeCoordinates = ShowCoordinates, AutoCorrect = AutoCorrect };
+        var options = new ValidationOptions { Editions = editions, IncludeTranslation = true, IncludeCoordinates = ShowCoordinates, AutoCorrect = AutoCorrect, IncludeAssociations = true };
         var report = _validator.Validate(input, options);
         Report = report;
         foreach (var result in report.Results)
@@ -632,6 +637,9 @@ public enum ResultView
 
     /// <summary>The loci on the ideograms (T-101).</summary>
     Map,
+
+    /// <summary>Conditions associated in the literature with what the string describes (T-110); never a diagnosis.</summary>
+    Associations,
 
     /// <summary>The optional CytoGPS check (T-081).</summary>
     CytoGps,

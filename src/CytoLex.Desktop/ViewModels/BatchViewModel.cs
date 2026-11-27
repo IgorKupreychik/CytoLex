@@ -25,6 +25,9 @@ public enum BatchFilter
     /// <summary>Autocorrection changed the string in at least one edition (T-097).</summary>
     AutoCorrected,
 
+    /// <summary>An association rule matched in an implemented edition (T-110).</summary>
+    WithAssociations,
+
     /// <summary>CytoLex and the external checker disagree (T-052).</summary>
     Disagreements,
 
@@ -84,6 +87,7 @@ public partial class BatchViewModel : ObservableObject
         new(BatchFilter.Valid, "Valid"),
         new(BatchFilter.Incomplete, "Valid as far as implemented / partly validated"),
         new(BatchFilter.AutoCorrected, "Autocorrected"),
+        new(BatchFilter.WithAssociations, "With literature associations"),
         new(BatchFilter.Disagreements, "Disagrees with CytoGPS"),
         new(BatchFilter.Untriaged, "Disagrees with CytoGPS, not triaged"),
     ];
@@ -98,6 +102,13 @@ public partial class BatchViewModel : ObservableObject
     /// <summary>Whether some row of the result was autocorrected (shows the "Corrected" column).</summary>
     [ObservableProperty]
     public partial bool HasCorrectedRows { get; set; }
+
+    /// <summary>Whether some row has a literature association (shows the "Associations" column, T-110).</summary>
+    [ObservableProperty]
+    public partial bool HasAssociationRows { get; set; }
+
+    /// <summary>The tooltip of the "Associations" column header: the disclaimer.</summary>
+    public static string AssociationsColumnTip => AssociationsViewModel.DisclaimerText;
 
     /// <summary>The edition selector entries.</summary>
     public IReadOnlyList<EditionChoice> EditionChoices { get; }
@@ -325,6 +336,7 @@ public partial class BatchViewModel : ObservableObject
         _allRows = [.. result.Items.Select(i => new BatchRowViewModel(i, Comparison))];
         Comparison.Attach(_allRows);
         HasCorrectedRows = _allRows.Any(r => r.IsAutoCorrected);
+        HasAssociationRows = _allRows.Any(r => r.HasAssociations);
         ApplyFilter();
     }
 
@@ -358,6 +370,7 @@ public partial class BatchViewModel : ObservableObject
         _allRows = [];
         Comparison.Attach([]);
         HasCorrectedRows = false;
+        HasAssociationRows = false;
         SelectedRow = null;
         Rows.Clear();
         Progress = 0;
@@ -374,6 +387,7 @@ public partial class BatchViewModel : ObservableObject
             BatchFilter.Valid => r.IsValid,
             BatchFilter.Incomplete => r.IsIncomplete,
             BatchFilter.AutoCorrected => r.IsAutoCorrected,
+            BatchFilter.WithAssociations => r.HasAssociations,
             BatchFilter.Disagreements => r.Comparison?.IsDisagreement ?? false,
             BatchFilter.Untriaged => r.Comparison?.IsUntriaged ?? false,
             _ => true,

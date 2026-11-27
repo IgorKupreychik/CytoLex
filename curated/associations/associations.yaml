@@ -20,10 +20,16 @@ associations:
     source: Orphanet
     citation: "Orphanet ORPHA:870, Down syndrome (cause: trisomy 21)"
     match:
-      exact: "+21"
+      any:
+        - exact: "+21"
+        - copy:
+            effect: gain
+            chrom: "21"
+            grch38: [30200001, 46709983]
+            band: 21q22
     review:
       reviewed: false
-      note: "seed (T-108), not checked against the source; Robertsonian and mosaic forms not covered yet"
+      note: "seed (T-108), not checked against the source; Robertsonian and mosaic forms not covered yet. T-110: copy leaf = gain overlapping 21q22 (band data, GRCh38), the region trisomy 21 FISH probes usually target, so in situ and arr gains there match; a chromosome-21 probe placed by chromosome only (D21Z1×3) counts as a whole-chromosome gain and matches too; check the region at review"
 
   - id: ASSOC.T9_22_CML
     condition:
@@ -97,9 +103,10 @@ associations:
       any:
         - exact: t(8;21)(q22;q22)
         - fusion: [8q22, 21q22]
+        - fusion: [8q21.3, 21q22]
     review:
       reviewed: false
-      note: "seed (T-108), not checked against the source; condition ID to add"
+      note: "seed (T-108), not checked against the source; condition ID to add. T-110: fusion 8q21.3+21q22 added because the band data places RUNX1T1 at 8q21.3 (karyotypes write the break as 8q22), so gene-placed FISH (RUNX1T1 con RUNX1) matches"
 
   - id: ASSOC.INV16_AML
     condition:

@@ -17,7 +17,7 @@ public class MapViewTests
     [Fact]
     public void MapTab_BeforeCytoGps()
     {
-        Assert.Equal([ResultView.Diagnostics, ResultView.Abnormalities, ResultView.Translation, ResultView.Map, ResultView.CytoGps], Enum.GetValues<ResultView>());
+        Assert.Equal([ResultView.Diagnostics, ResultView.Abnormalities, ResultView.Translation, ResultView.Map, ResultView.Associations, ResultView.CytoGps], Enum.GetValues<ResultView>());
         var vm = Vm("47,XY,+8");
         vm.SelectedViewIndex = (int)ResultView.Map;
         Assert.Equal(ResultView.Map, vm.SelectedView);

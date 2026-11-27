@@ -265,10 +265,10 @@ public partial class MainWindow : Window
         }
     }
 
-    // An inherited row (T-070) marks its source span.
+    // An inherited row (T-070) marks its source span; an association evidence row (T-110) its own span.
     private void OnCardPointerEntered(object? sender, PointerEventArgs e)
     {
-        if (_viewModel is not null && sender is Control { DataContext: AbnormalityItemViewModel or InheritedItemViewModel } control)
+        if (_viewModel is not null && sender is Control { DataContext: AbnormalityItemViewModel or InheritedItemViewModel or AssociationEvidenceViewModel } control)
         {
             _viewModel.HoverSpan = ((ISpanItem)control.DataContext!).Span;
         }
@@ -276,7 +276,7 @@ public partial class MainWindow : Window
 
     private void OnCardPointerExited(object? sender, PointerEventArgs e)
     {
-        if (_viewModel is not null && sender is Control { DataContext: AbnormalityItemViewModel or InheritedItemViewModel } control
+        if (_viewModel is not null && sender is Control { DataContext: AbnormalityItemViewModel or InheritedItemViewModel or AssociationEvidenceViewModel } control
             && _viewModel.HoverSpan == ((ISpanItem)control.DataContext!).Span)
         {
             _viewModel.HoverSpan = null;

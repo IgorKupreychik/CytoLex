@@ -118,7 +118,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-107 | todo | 5 | T-089 | Settings outside a repo checkout (per-user settings file + build cache) for packaged installs |
 | T-108 | done | 3 | T-102 | Association rules: `curated/associations/associations.yaml`, schema, `kb build` checks + review report, runtime bundle, cited seed rules |
 | T-109 | done | 3 | T-108, T-101, T-069 | Core: match association rules (`exact`/`fusion`/`copy`, all/any/not, context) → `EditionResult.Associations`; batch JSON/CSV |
-| T-110 | todo | 3 | T-109, T-098 | Desktop: "Associations" view tab (disclaimer, citations, unreviewed badges, span links) |
+| T-110 | done | 3 | T-109, T-098 | Desktop: "Associations" view tab (disclaimer, citations, unreviewed badges, span links) |
 | T-111 | todo | 4 | T-108 | `kb associations`: pre-fill constitutional rules from ClinGen dosage regions (CC0) + Orphanet names (CC BY 4.0) |
 | T-112 | discussion | 5 | T-109 | Diagnosis-suggestion mode: intended use and regulatory check (MDR/IVDR, FDA) before any build |
 | T-113 | discussion | 5 | – | Mitelman database: licence check, usable as an association source? |
@@ -1143,10 +1143,10 @@ Outcome (2026-11-24, confirmed by the user after the check by hand): "Autocorrec
 **Notes:** Created 2026-11-27 from T-104. Done 2026-11-27: `src/CytoLex.Core/Kb/AssociationRules.cs` (`IEditionKb.Associations`), matcher `src/CytoLex.Core/Associations/` (`AssociationMatcher`, `MatchScope`, `BandNesting`, `ExactPatterns` + `ExactMatcher`, `FusionMatcher`, `CopyMatcher`), result DTOs `Validation/Associations.cs` (`AssociationMatch`, `AssociationEvidence`), opt-in `ValidationOptions.IncludeAssociations` → `EditionResult.Associations`; batch JSON v6, CSV column `associations` (16-/13-column headers still read). Decided with the user: arr/in situ counts read against 2 on autosomes for matching only; any overlap + covered share (logged in `docs/decisions.md`). Tests `tests/CytoLex.Core.Tests/Associations/` (59) + batch export tests. Addition to the plan: the desktop Batch run includes associations so its exports carry them (view: T-110).
 
 ### T-110 — Desktop: "Associations" view tab
-**Status:** todo
+**Status:** done
 **Description:** A `ResultView.Associations` tab (T-098): the fixed disclaimer at the top ("Conditions associated with these abnormalities in the cited literature. Not a diagnosis or an interpretation of this result."), then one card per association: condition (+ ID), strength, context, source citation, the matched abnormality (click selects / hover marks its span), an "unreviewed" badge naming the rule's source (as in T-103). Batch tab: the condition column.
 **Acceptance:** View-model tests in `tests/CytoLex.Desktop.Tests/`; disclaimer always visible; unreviewed badge shown.
-**Notes:** Created 2026-11-27 from T-104.
+**Notes:** Created 2026-11-27 from T-104. Done 2026-11-27: `ResultView.Associations` (after Map, before CytoGps); `ViewModels/AssociationsViewModel.cs` (disclaimer always shown, outside the scroll area; note when not valid; hover/selection marks), `AssociationItemViewModel.cs` (condition + codes, strength, context + reading note when the context is unknown, source, "unreviewed" badge naming the source; defining criteria not shown, T-112), `AssociationEvidenceViewModel.cs` (one row per satisfied leaf, `ISpanItem`, span mapped through `EditionText.ToEditor`, overlap share + copy reading); the single-string check validates with `IncludeAssociations`. Batch: Associations column (`BatchRowViewModel.Associations`/`AssociationsTip`, shown with `HasAssociationRows`) and filter `BatchFilter.WithAssociations`. Tests `tests/CytoLex.Desktop.Tests/AssociationsViewTests.cs` (15). Additions decided with the user while testing (logged in `docs/decisions.md`): condition names keep the source's spelling; `RUNX1T1`/`TBX1` probe rows (`kb probes --add`, unreviewed); `ASSOC.TRISOMY21_DOWN` + gain overlapping 21q22 (D21Z1×3 matches as a whole-chromosome gain, kept); `ASSOC.T8_21_AML` + fusion 8q21.3+21q22; FISH/arr seed tests in `SeedAssociationTests`. Deviation: separate hover/selection marks on evidence rows; amber disclaimer style instead of the red banner.
 
 ### T-111 — Pre-fill constitutional associations from ClinGen + Orphanet
 **Status:** todo

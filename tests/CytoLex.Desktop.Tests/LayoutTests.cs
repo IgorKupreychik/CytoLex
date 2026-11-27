@@ -46,6 +46,7 @@ public sealed class LayoutTests
     [InlineData(ResultView.Abnormalities)]
     [InlineData(ResultView.Translation)]
     [InlineData(ResultView.Map)]
+    [InlineData(ResultView.Associations)]
     [InlineData(ResultView.CytoGps)]
     public void View_KeptWhenTheEditionTheSelectorOrTheInputChanges(ResultView view)
     {

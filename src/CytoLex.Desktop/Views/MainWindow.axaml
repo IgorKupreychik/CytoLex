@@ -441,6 +441,68 @@
           </Panel>
         </Panel>
       </TabItem>
+      <!-- Associations (T-110): literature associations, never a diagnosis (T-104); the disclaimer is always shown -->
+      <TabItem Header="{Binding SelectedPanel.AssociationsHeader, FallbackValue=Associations}">
+        <Panel DataContext="{Binding SelectedPanel}" x:DataType="vm:EditionPanelViewModel">
+          <TextBlock Text="{Binding NotImplementedText}" IsVisible="{Binding IsNotImplemented}" Opacity="0.6" Margin="0,6" />
+          <DockPanel IsVisible="{Binding IsImplemented}" Margin="0,6,0,0">
+            <Border DockPanel.Dock="Top" Classes="disclaimer" Margin="0,0,14,6">
+              <TextBlock Text="{x:Static vm:AssociationsViewModel.DisclaimerText}" FontWeight="SemiBold" TextWrapping="Wrap" FontSize="13" />
+            </Border>
+            <TextBlock DockPanel.Dock="Top" Text="{Binding Associations.Note, FallbackValue=''}"
+                       IsVisible="{Binding Associations.HasNote, FallbackValue=False}" FontSize="12" Opacity="0.75" TextWrapping="Wrap"
+                       Margin="0,0,0,6" />
+            <TextBlock DockPanel.Dock="Top" Text="{x:Static vm:AssociationsViewModel.EmptyText}" Opacity="0.6"
+                       IsVisible="{Binding !Associations.HasItems, FallbackValue=True}" />
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+              <ItemsControl ItemsSource="{Binding Associations.Items, FallbackValue={x:Null}}" Margin="0,0,14,8">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:AssociationItemViewModel">
+                    <Border Classes="card" Cursor="Arrow">
+                      <StackPanel Spacing="3">
+                        <WrapPanel Orientation="Horizontal">
+                          <SelectableTextBlock Text="{Binding Condition}" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,8,2" />
+                          <Border Classes="tag" VerticalAlignment="Center" ToolTip.Tip="{Binding StrengthTip}">
+                            <TextBlock Text="{Binding StrengthLabel}" FontSize="11" />
+                          </Border>
+                          <Border Classes="tag" VerticalAlignment="Center" ToolTip.Tip="Where the association holds, per the rule">
+                            <TextBlock Text="{Binding ContextLabel}" FontSize="11" />
+                          </Border>
+                          <Border Classes="tag" IsVisible="{Binding IsUnreviewed}" VerticalAlignment="Center" ToolTip.Tip="{Binding UnreviewedTip}">
+                            <TextBlock Text="unreviewed" FontSize="11" />
+                          </Border>
+                        </WrapPanel>
+                        <SelectableTextBlock Text="{Binding ConditionIds}" IsVisible="{Binding HasConditionIds}" FontSize="12" Opacity="0.75"
+                                             TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding ContextNote}" IsVisible="{Binding HasContextNote}" FontSize="12" Opacity="0.75"
+                                   TextWrapping="Wrap" />
+                        <SelectableTextBlock Text="{Binding SourceText}" FontSize="12" Opacity="0.75" TextWrapping="Wrap" />
+                        <ItemsControl ItemsSource="{Binding Evidence}" Margin="0,2,0,0">
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:AssociationEvidenceViewModel">
+                              <Border Classes="locus" Classes.highlighted="{Binding IsHighlighted}" Classes.selected="{Binding IsSelected}"
+                                      Tapped="OnSpanItemTapped" PointerEntered="OnCardPointerEntered" PointerExited="OnCardPointerExited"
+                                      ToolTip.Tip="Click to select it in the editor">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                  <TextBlock Text="{Binding Text}" FontFamily="Cascadia Mono,Consolas,monospace" FontSize="12" />
+                                  <TextBlock Text="{Binding LeafText}" FontSize="11" Opacity="0.65" VerticalAlignment="Center" />
+                                  <TextBlock Text="{Binding Detail}" IsVisible="{Binding HasDetail}" FontSize="11" Opacity="0.65"
+                                             VerticalAlignment="Center" />
+                                </StackPanel>
+                              </Border>
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="{Binding RuleId}" FontSize="11" Opacity="0.5" />
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+          </DockPanel>
+        </Panel>
+      </TabItem>
       <!-- CytoGPS (T-081): on demand, in the background; its result never changes the CytoLex views -->
       <TabItem Header="{Binding CytoGps.Header}">
         <Panel DataContext="{Binding CytoGps}" x:DataType="vm:CytoGpsPanelViewModel">
@@ -617,7 +679,7 @@
       </StackPanel>
 
       <!-- Table header -->
-      <Grid DockPanel.Dock="Top" ColumnDefinitions="60,90,2*,Auto,Auto,Auto,*" Margin="4,0,4,2" IsVisible="{Binding HasResult}">
+      <Grid DockPanel.Dock="Top" ColumnDefinitions="60,90,2*,Auto,Auto,Auto,Auto,*" Margin="4,0,4,2" IsVisible="{Binding HasResult}">
         <TextBlock Grid.Column="0" Text="Line" FontWeight="SemiBold" />
         <TextBlock Grid.Column="1" Text="ID" FontWeight="SemiBold" />
         <TextBlock Grid.Column="2" Text="ISCN string" FontWeight="SemiBold" />
@@ -634,11 +696,13 @@
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <StackPanel Grid.Column="5" Orientation="Horizontal" IsVisible="{Binding Comparison.HasResult}">
+        <TextBlock Grid.Column="5" Text="Associations" FontWeight="SemiBold" Width="220" IsVisible="{Binding HasAssociationRows}"
+                   ToolTip.Tip="{x:Static vm:BatchViewModel.AssociationsColumnTip}" />
+        <StackPanel Grid.Column="6" Orientation="Horizontal" IsVisible="{Binding Comparison.HasResult}">
           <TextBlock Text="CytoGPS" Width="100" FontWeight="SemiBold" ToolTip.Tip="Agreement with CytoGPS (ISCN 2016; with autocorrection when Autocorrect is ticked)" />
           <TextBlock Text="Triage" Width="150" FontWeight="SemiBold" />
         </StackPanel>
-        <TextBlock Grid.Column="6" Text="First problem" FontWeight="SemiBold" Margin="8,0,0,0" />
+        <TextBlock Grid.Column="7" Text="First problem" FontWeight="SemiBold" Margin="8,0,0,0" />
       </Grid>
 
       <!-- Comparison detail of the selected row (T-052): CytoLex | CytoGPS, triage editor -->
@@ -680,7 +744,7 @@
                IsVisible="{Binding HasResult}" DoubleTapped="OnBatchRowDoubleTapped">
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="vm:BatchRowViewModel">
-            <Grid ColumnDefinitions="60,90,2*,Auto,Auto,Auto,*">
+            <Grid ColumnDefinitions="60,90,2*,Auto,Auto,Auto,Auto,*">
               <TextBlock Grid.Column="0" Text="{Binding Line}" Opacity="0.7" />
               <TextBlock Grid.Column="1" Text="{Binding Id}" Opacity="0.7" TextTrimming="CharacterEllipsis" />
               <TextBlock Grid.Column="2" Text="{Binding Input}" FontFamily="Cascadia Mono,Consolas,monospace"
@@ -701,14 +765,17 @@
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
-              <StackPanel Grid.Column="5" Orientation="Horizontal"
+              <TextBlock Grid.Column="5" Text="{Binding Associations}" Width="220" TextTrimming="CharacterEllipsis"
+                         ToolTip.Tip="{Binding AssociationsTip}" Margin="0,0,8,0"
+                         IsVisible="{Binding $parent[ListBox].((vm:BatchViewModel)DataContext).HasAssociationRows}" />
+              <StackPanel Grid.Column="6" Orientation="Horizontal"
                           IsVisible="{Binding $parent[ListBox].((vm:BatchViewModel)DataContext).Comparison.HasResult}">
                 <TextBlock Text="{Binding Comparison.AgreementText}" Width="100" ToolTip.Tip="{Binding Comparison.AgreementTip}"
                            Classes.valid="{Binding Comparison.IsAgreement}" Classes.invalid="{Binding Comparison.IsDisagreement}" />
                 <TextBlock Text="{Binding Comparison.TriageText}" Width="150" TextTrimming="CharacterEllipsis"
                            ToolTip.Tip="{Binding Comparison.Item.Triage.Note}" />
               </StackPanel>
-              <TextBlock Grid.Column="6" Text="{Binding FirstProblem}" TextTrimming="CharacterEllipsis"
+              <TextBlock Grid.Column="7" Text="{Binding FirstProblem}" TextTrimming="CharacterEllipsis"
                          ToolTip.Tip="{Binding FirstProblem}" Margin="8,0,0,0" Opacity="0.85" />
             </Grid>
           </DataTemplate>
@@ -1307,6 +1374,14 @@
     <Style Selector="Border.banner">
       <Setter Property="Background" Value="#33C42B1C" />
       <Setter Property="BorderBrush" Value="#C42B1C" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Padding" Value="8,4" />
+    </Style>
+    <!-- Associations (T-110): the disclaimer, neutral (not an error banner) -->
+    <Style Selector="Border.disclaimer">
+      <Setter Property="Background" Value="#26E3A21A" />
+      <Setter Property="BorderBrush" Value="#E3A21A" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="4" />
       <Setter Property="Padding" Value="8,4" />
