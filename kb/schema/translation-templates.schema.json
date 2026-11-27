@@ -85,7 +85,7 @@
       }
     },
     "construct": {
-      "description": "A karyotype construct (ch. 2–9) of the core's semantic model (docs/design/core.md §5). kb build requires a template for each. List and meaning: kb/README.md → Translation.",
+      "description": "A karyotype (ch. 2–9) or in situ (ch. 13, T-093) construct of the core's semantic model (docs/design/core.md §5). kb build requires a template for each. List and meaning: kb/README.md → Translation.",
       "enum": [
         "summary", "chromosome_count", "ploidy", "sex_chromosomes", "cell_count", "composite", "cell_line_separator", "clone_reference",
         "mosaic", "chimera", "transplant_chimera", "endoreduplication",
@@ -98,7 +98,10 @@
         "questionable_item", "unknown_designation", "approximate_interval", "alternative",
         "band", "region_only", "centromere_band", "short_arm", "long_arm", "short_arm_end", "long_arm_end", "arm_end", "centromere",
         "band_composition", "break_reunion", "break", "segment",
-        "heterochromatin", "satellite", "stalk", "short_arm_satellite", "long_arm_satellite", "variant_region", "length_change"
+        "heterochromatin", "satellite", "stalk", "short_arm_satellite", "long_arm_satellite", "variant_region", "length_change",
+        "in_situ", "in_situ_cell_line", "cells_scored", "probe_results", "locus_status", "signal_count", "normal_chromosome",
+        "connected", "separated", "amplified", "diminished", "enhanced", "subtelomeric", "whole_chromosome_paint",
+        "partial_chromosome_paint", "reverse_ish", "fiber_ish", "cgh_region"
       ]
     }
   }

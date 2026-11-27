@@ -1,5 +1,6 @@
 using System.Text.Json;
 using CytoLex.Core.Context;
+using CytoLex.Core.Segmentation;
 using CytoLex.Core.Translation;
 using CytoLex.Core.Validation;
 using KbCatalog = CytoLex.Core.Tests.KbExamples.KbCatalog;
@@ -137,10 +138,10 @@ public class TranslationTests
     [Fact]
     public void NotImplementedSegment_IsAnUntranslatedPart()
     {
-        var t = Translate("46,XX.ish del(22)(q11.2q11.2)(HIRA-)");
-        var ish = Assert.Single(t.Items);
-        Assert.False(ish.IsTranslated);
-        Assert.Equal("Not translated: ish translation is not implemented.", ish.Sentence);
+        var t = Translate("46,XX.arr(1–22,X)×2");
+        var arr = Assert.Single(t.Items);
+        Assert.False(arr.IsTranslated);
+        Assert.Equal("Not translated: arr translation is not implemented.", arr.Sentence);
         Assert.Equal("46 chromosomes; sex chromosomes XX; no abnormality.", t.Summary.Text);
         Assert.True(t.IsPartial);
     }
@@ -218,6 +219,13 @@ public class TranslationTests
             Assert.All(t.Items, i => Assert.False(string.IsNullOrWhiteSpace(i.Sentence)));
             Assert.All(t.Items, i => Assert.DoesNotContain("{", i.Sentence, StringComparison.Ordinal));
             Assert.All(t.Items, i => Assert.DoesNotContain("no wording", i.Sentence, StringComparison.Ordinal));
+
+            // T-093: a valid string of karyotype and in situ segments is translated in full.
+            if (c.Kind == KbExamples.ExampleKind.Valid && result.Validity.IsValid
+                && result.Segments.All(s => s.Segment.Type is NotationType.Karyotype or NotationType.Ish or NotationType.NucIsh or NotationType.FibIsh or NotationType.RevIsh or NotationType.Cgh))
+            {
+                Assert.All(t.Items, i => Assert.True(i.IsTranslated, $"'{i.Text}': {i.Sentence}"));
+            }
         }
     }
 }

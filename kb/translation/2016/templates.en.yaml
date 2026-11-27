@@ -1034,3 +1034,240 @@ templates:
       - when: plain
         text: "Variant: {feature}"
     review: {checked: false}
+
+  # ── In situ hybridization (ch. 13, T-093) ──────────────────────────────────────────────────
+  # The technique is named in the summary only; items carry the results. An ish abnormality is the karyotype sentence
+  # of its symbol + "; probe(s) …" (probe_results). Locus lists, runs of one status and "each" come from the renderer.
+  - construct: in_situ
+    key: "vocab:symbols/ish"
+    slots: [technique, results, side, relation, n]
+    forms:
+      - when: ish
+        text: "Metaphase FISH (ish)"
+      - when: nuc_ish
+        text: "Interphase FISH (nuc ish)"
+      - when: fib_ish
+        text: "FISH on extended DNA fibers (fib ish)"
+      - when: rev_ish
+        text: "Reverse in situ hybridization (rev ish)"
+      - when: cgh
+        text: "Comparative genomic hybridization (cgh)"
+      - when: summary
+        text: "{technique}: {results}."
+      - when: summary_side
+        text: "{technique}, {side} cells only: {results}."
+      - when: lines
+        text: "{technique} with {n} cell lines: {results}."
+      - when: lines_relation
+        text: "{technique} of a {relation} with {n} cell lines: {results}."
+      - when: relation_mosaic
+        text: "mosaic"
+      - when: relation_chimera
+        text: "chimera"
+      - when: relation_transplant
+        text: "transplant chimera"
+      - when: no_result
+        text: "no result"
+      - when: one_result
+        text: "1 result"
+      - when: results
+        text: "{n} results"
+    note: "side = transplant_chimera.donor/recipient (a leading or trailing // with one cell line)."
+    review: {checked: false}
+  - construct: in_situ_cell_line
+    key: "rule:ISH.CELL_LINES"
+    slots: [index, role, text]
+    forms:
+      - when: line
+        text: "Cell line {index}: {text}"
+      - when: role
+        text: "{role}: {text}"
+    note: "role = transplant_chimera.donor/recipient, capitalized."
+    review: {checked: false}
+  - construct: cells_scored
+    key: "rule:NUC_ISH.ABNORMAL_OVER_TOTAL"
+    slots: [cells, total, text]
+    forms:
+      - when: cells
+        text: "in {cells} cells"
+      - when: one
+        text: "in 1 cell"
+      - when: of_total
+        text: "in {cells} of {total} cells"
+      - when: percent
+        text: "in {text} of cells"
+      - when: written
+        text: "cells: {text}"
+    review: {checked: false}
+  - construct: probe_results
+    key: "rule:ISH.STRUCTURAL_FORMAT"
+    slots: [loci, chromosome, band, part]
+    forms:
+      - when: one
+        text: "probe {loci}"
+      - when: several
+        text: "probes {loci}"
+      - when: on_derivative
+        text: "on the derivative chromosome {chromosome}: {loci}"
+      - when: for_chromosome
+        text: "for chromosome {chromosome}: {loci}"
+      - when: at_band
+        text: "at {band}: {loci}"
+      - when: for_part
+        text: "for {part}: {loci}"
+    note: "on_derivative: the ;-separated locus lists of a translocation or insertion, one per chromosome; at_band: loci after each breakpoint (inversions); for_part: loci after one part of a derivative."
+    review: {checked: false}
+  - construct: locus_status
+    key: "rule:ISH.LOCUS_STATUS"
+    slots: [loci, n]
+    forms:
+      - when: present
+        text: "{loci} present"
+      - when: absent
+        text: "{loci} absent"
+      - when: twice
+        text: "{loci} present twice"
+      - when: times
+        text: "{loci} present {n} times"
+    review: {checked: false}
+  - construct: signal_count
+    key: "rule:NUC_ISH.SIGNAL_COUNT_FORMAT"
+    slots: [count, locus, loci, low, high]
+    forms:
+      - when: none
+        text: "no signal for {locus}"
+      - when: one
+        text: "1 signal for {locus}"
+      - when: signals
+        text: "{count} signals for {locus}"
+      - when: none_each
+        text: "no signal for {loci}"
+      - when: one_each
+        text: "1 signal each for {loci}"
+      - when: signals_each
+        text: "{count} signals each for {loci}"
+      - when: range
+        text: "{low} to {high}"
+      - when: open_range
+        text: "{low} to more than {high}"
+    review: {checked: false}
+  - construct: normal_chromosome
+    key: "rule:ISH.NORMAL_CHROMOSOME_FORMAT"
+    slots: [band, chromosome, results]
+    forms:
+      - when: band
+        text: "At {band}: {results}"
+      - when: chromosome
+        text: "Chromosome {chromosome}: {results}"
+    review: {checked: false}
+  - construct: connected
+    key: "vocab:symbols/con"
+    slots: [count, loci]
+    forms:
+      - when: one
+        text: "1 connected (fusion) signal of {loci}"
+      - when: many
+        text: "{count} connected (fusion) signals of {loci}"
+      - when: uncounted
+        text: "connected (fusion) signals of {loci}"
+    review: {checked: false}
+  - construct: separated
+    key: "vocab:symbols/sep"
+    slots: [count, loci]
+    forms:
+      - when: one
+        text: "1 pair of separated signals of {loci}"
+      - when: many
+        text: "{count} pairs of separated signals of {loci}"
+      - when: uncounted
+        text: "separated signals of {loci}"
+    review: {checked: false}
+  - construct: amplified
+    key: "vocab:symbols/amp"
+    slots: [locus, phrase]
+    forms:
+      - when: locus
+        text: "{locus} amplified"
+      - when: name
+        text: "amplified {locus}"
+      - when: group
+        text: "{phrase}, amplified"
+    review: {checked: false}
+  - construct: diminished
+    key: "vocab:symbols/dim"
+    slots: [locus, phrase, region]
+    forms:
+      - when: locus
+        text: "{locus} with a diminished signal"
+      - when: name
+        text: "diminished {locus}"
+      - when: signals
+        text: "{phrase} of diminished intensity"
+      - when: group
+        text: "{phrase}, diminished"
+      - when: cgh
+        text: "Loss (diminished signal) of {region}"
+    review: {checked: false}
+  - construct: enhanced
+    key: "vocab:symbols/enh"
+    slots: [locus, phrase, region]
+    forms:
+      - when: locus
+        text: "{locus} with an enhanced signal"
+      - when: name
+        text: "enhanced {locus}"
+      - when: signals
+        text: "{phrase} of enhanced intensity"
+      - when: group
+        text: "{phrase}, enhanced"
+      - when: cgh
+        text: "Gain (enhanced signal) of {region}"
+    review: {checked: false}
+  - construct: subtelomeric
+    key: "vocab:symbols/subtel"
+    slots: [count, regions, band]
+    forms:
+      - when: panel
+        text: "Subtelomeric probe panel: {count} signals for each of the {regions} subtelomeric regions"
+      - when: band
+        text: "the subtelomeric region {band}"
+    review: {checked: false}
+  - construct: whole_chromosome_paint
+    key: "vocab:symbols/wcp"
+    slots: [chromosome]
+    forms:
+      - text: "whole chromosome paint {chromosome}"
+    review: {checked: false}
+  - construct: partial_chromosome_paint
+    key: "vocab:symbols/pcp"
+    slots: [region]
+    forms:
+      - text: "partial chromosome paint {region}"
+    review: {checked: false}
+  - construct: reverse_ish
+    key: "rule:REV_ISH.FORMAT"
+    slots: [region]
+    forms:
+      - when: region
+        text: "Material from {region}"
+    review: {checked: false}
+  - construct: fiber_ish
+    key: "rule:FIB_ISH.FORMAT"
+    slots: [band, results]
+    forms:
+      - when: band
+        text: "At {band}, in order from pter to qter: {results}"
+    review: {checked: false}
+  - construct: cgh_region
+    key: "rule:CGH.FORMAT"
+    slots: [chromosome, arm, from, to, band]
+    forms:
+      - when: chromosome
+        text: "chromosome {chromosome}"
+      - when: arm
+        text: "the {arm} of chromosome {chromosome}"
+      - when: segment
+        text: "{from} to {to}"
+      - when: band
+        text: "{band}"
+    review: {checked: false}

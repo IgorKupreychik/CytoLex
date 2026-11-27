@@ -5,7 +5,7 @@ namespace CytoLex.Core.Tests.Translation;
 
 /// <summary>
 /// T-057: the translation golden file stays consistent with the parser and binder, so the renderer (T-058) can be
-/// tested against it: every input binds to one karyotype segment, its items are exactly the translated items of the
+/// tested against it: every input binds to karyotype and in situ segments (T-093), its items are exactly the translated items of the
 /// model (same spans, same order), and each item's KB refs are refs of that part of the model.
 /// </summary>
 public class GoldenFileTests
@@ -23,11 +23,14 @@ public class GoldenFileTests
     public void Entry_MatchesTheModel(string input)
     {
         var entry = GoldenFile.Entries2016[input];
-        var model = GoldenFile.Model(input, entry.IsFragment);
-        Assert.True(model is not null, $"'{input}' is not a single karyotype segment.");
-        Assert.False(model.IsPartial, $"'{input}' has syntax errors: {string.Join("; ", model.Issues.Select(i => i.Message))}");
+        var models = GoldenFile.Models(input, entry.IsFragment);
+        Assert.True(models is not null, $"'{input}' has a segment that is neither a karyotype nor in situ.");
+        foreach (var model in models)
+        {
+            Assert.False(model.IsPartial, $"'{input}' has syntax errors: {string.Join("; ", model.Issues.Select(i => i.Message))}");
+        }
 
-        var expected = GoldenFile.Items(model).ToList();
+        var expected = GoldenFile.Items(models).ToList();
         var expectedSpans = expected.Select(e => $"{e.Span.Start}:{input.Substring(e.Span.Start, e.Span.Length)}");
         var actualSpans = entry.Items.Select(i => $"{i.Start}:{i.Text}");
         Assert.Equal(expectedSpans, actualSpans);

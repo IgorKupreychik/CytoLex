@@ -4239,3 +4239,1310 @@ golden:
     summary: "92 chromosomes; sex chromosomes XXYY; no abnormality."
     items: []
     review: {checked: false}
+
+  # ── In situ hybridization (ch. 13, T-093): rendered first, then checked against the book explanations ──────────
+  - input: "nuc ish(DXZ1×2)[400]//"
+    cite: {section: "13.3.1", page: 108, example: "E18"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish), recipient cells only: 1 result."
+    items:
+      - span: {start: 7, text: "(DXZ1×2)[400]"}
+        sentence: "2 signals for DXZ1; in 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "//nuc ish(DXZ1,DYZ3)×1[400]"
+    cite: {section: "13.3.1", page: 108, example: "E19"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish), donor cells only: 1 result."
+    items:
+      - span: {start: 9, text: "(DXZ1,DYZ3)×1[400]"}
+        sentence: "1 signal each for DXZ1 and DYZ3; in 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(DXZ1×2)[50]//(DXZ1,DYZ3)×1[350]"
+    cite: {section: "13.3.1", page: 108, example: "E20"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish) of a transplant chimera with 2 cell lines: 2 results."
+    items:
+      - span: {start: 7, text: "(DXZ1×2)[50]"}
+        sentence: "Recipient: 2 signals for DXZ1; in 50 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+      - span: {start: 21, text: "(DXZ1,DYZ3)×1[350]"}
+        sentence: "Donor: 1 signal each for DXZ1 and DYZ3; in 350 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(DXZ1×2)[50]//(DXZ1,DYZ3)×1[300]/(DXZ1×1)[10]"
+    cite: {section: "13.3.1", page: 108, example: "E21"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish) of a transplant chimera with 3 cell lines: 3 results."
+    items:
+      - span: {start: 7, text: "(DXZ1×2)[50]"}
+        sentence: "Recipient: 2 signals for DXZ1; in 50 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+      - span: {start: 21, text: "(DXZ1,DYZ3)×1[300]"}
+        sentence: "Donor: 1 signal each for DXZ1 and DYZ3; in 300 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+      - span: {start: 40, text: "(DXZ1×1)[10]"}
+        sentence: "Donor: 1 signal for DXZ1; in 10 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "46,XX.ish der(4)t(4;11)(p16.3;p15)mat(wcp11+,D4F26–,D4S96+,D4Z1+)"
+    cite: {section: "13.2", page: 103, example: "E24"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; no abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 10, text: "der(4)t(4;11)(p16.3;p15)mat(wcp11+,D4F26–,D4S96+,D4Z1+)"}
+        sentence: "Derivative chromosome 4, resulting from a translocation between chromosomes 4 and 11 with breaks at 4p16.3 and 11p15; inherited from the mother; probes whole chromosome paint 11 present, D4F26 absent, D4S96 and D4Z1 present."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:4p16.3", "band:11p15", "vocab:symbols/mat", "rule:KARYO.PARENTAL_ORIGIN", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "ish del(14)(q21.2q21.2)(RP11-453F20–)dn[6]/14q21.2(RP11-453F20×2)[4]"
+    cite: {section: "13.2", page: 105, example: "E49"}
+    context: unknown
+    summary: "Metaphase FISH (ish) with 2 cell lines: 2 results."
+    items:
+      - span: {start: 4, text: "del(14)(q21.2q21.2)(RP11-453F20–)dn[6]"}
+        sentence: "Cell line 1: Interstitial deletion of a small segment within band 14q21.2; de novo (not inherited); probe RP11-453F20 absent; in 6 cells."
+        kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:14q21.2", "vocab:symbols/dn", "rule:KARYO.PARENTAL_ORIGIN", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "rule:ISH.CELL_LINES"]
+      - span: {start: 43, text: "14q21.2(RP11-453F20×2)[4]"}
+        sentence: "Cell line 2: At 14q21.2: 2 signals for RP11-453F20; in 4 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "vocab:symbols/q", "band:14q21.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "46,XX.ish del(22)(q11.2q11.2)(D22S75–)"
+    cite: {section: "13.2", page: 101, example: "E2"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; no abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 10, text: "del(22)(q11.2q11.2)(D22S75–)"}
+        sentence: "Interstitial deletion of a small segment within band 22q11.2; probe D22S75 absent."
+        kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:22q11.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XX.ish t(4;11)(p16.3;p15)(wcp11+,D4F26–,D4S96+,D4Z1+;D4F26+,wcp11+)"
+    cite: {section: "13.2", page: 103, example: "E23"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; no abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 10, text: "t(4;11)(p16.3;p15)(wcp11+,D4F26–,D4S96+,D4Z1+;D4F26+,wcp11+)"}
+        sentence: "Translocation between chromosomes 4 and 11, with breaks at 4p16.3 and 11p15; the segments distal to the breaks are exchanged; on the derivative chromosome 4: whole chromosome paint 11 present, D4F26 absent, D4S96 and D4Z1 present; on the derivative chromosome 11: D4F26 and whole chromosome paint 11 present."
+        kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:4p16.3", "band:11p15", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XX.ish ins(15;17)(q22;q21q21)(PML+,RARA+;RARA+)"
+    cite: {section: "13.2", page: 103, example: "E28"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; no abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 10, text: "ins(15;17)(q22;q21q21)(PML+,RARA+;RARA+)"}
+        sentence: "Direct insertion of the segment 17q21 to 17q21 of chromosome 17 into chromosome 15 at 15q22; on the derivative chromosome 15: PML and RARA present; on the derivative chromosome 17: RARA present."
+        kb: ["vocab:symbols/ins", "rule:INS.ORIENTATION", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:15q22", "band:17q21", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "45,XY,dic(14;21)(p11.2;p11.2).ish dic(14;21)(p11.2;p11.2)(D14Z1/D22Z1+;D13Z1/D21Z1+)"
+    cite: {section: "13.2", page: 103, example: "E22"}
+    context: unknown
+    summary: "45 chromosomes; sex chromosomes XY; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "dic(14;21)(p11.2;p11.2)"}
+        sentence: "Dicentric chromosome formed from chromosomes 14 and 21, with breaks at 14p11.2 and 21p11.2."
+        kb: ["vocab:symbols/dic", "rule:DIC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:14p11.2", "band:21p11.2"]
+      - span: {start: 34, text: "dic(14;21)(p11.2;p11.2)(D14Z1/D22Z1+;D13Z1/D21Z1+)"}
+        sentence: "Dicentric chromosome formed from chromosomes 14 and 21, with breaks at 14p11.2 and 21p11.2; for chromosome 14: D14Z1/D22Z1 present; for chromosome 21: D13Z1/D21Z1 present."
+        kb: ["vocab:symbols/dic", "rule:DIC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:14p11.2", "band:21p11.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XY.ish 22q11.2(D22S75×2)"
+    cite: {section: "13.2", page: 101, example: "E1"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XY; no abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 10, text: "22q11.2(D22S75×2)"}
+        sentence: "At 22q11.2: 2 signals for D22S75."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "vocab:symbols/q", "band:22q11.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+    review: {checked: false}
+  - input: "ish del(22)(q11.2q11.2)(D22S75–)"
+    cite: {section: "13.2", page: 101, example: "E3"}
+    context: unknown
+    summary: "Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 4, text: "del(22)(q11.2q11.2)(D22S75–)"}
+        sentence: "Interstitial deletion of a small segment within band 22q11.2; probe D22S75 absent."
+        kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:22q11.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XX,del(15)(q11.2q13).ish del(15)(q11.2q11.2)(SNRPN–,D15S10–)"
+    cite: {section: "13.2", page: 102, example: "E8"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "del(15)(q11.2q13)"}
+        sentence: "Interstitial deletion of chromosome 15: the segment between 15q11.2 and 15q13 is lost."
+        kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:15q11.2", "band:15q13"]
+      - span: {start: 28, text: "del(15)(q11.2q11.2)(SNRPN–,D15S10–)"}
+        sentence: "Interstitial deletion of a small segment within band 15q11.2; probes SNRPN and D15S10 absent."
+        kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:15q11.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XY[20].nuc ish(TP53×2)[400]"
+    cite: {section: "13.3.1", page: 108, example: "E16"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XY; no abnormality. Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 17, text: "(TP53×2)[400]"}
+        sentence: "2 signals for TP53; in 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "46,XY[20].ish 9q34(ABL1×2),22q11.2(BCR×2)[20].nuc ish(TP53×2)[400]"
+    cite: {section: "13.3.1", page: 108, example: "E17"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XY; no abnormality. Metaphase FISH (ish): 2 results. Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 14, text: "9q34(ABL1×2)"}
+        sentence: "At 9q34: 2 signals for ABL1."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "vocab:symbols/q", "band:9q34", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+      - span: {start: 27, text: "22q11.2(BCR×2)[20]"}
+        sentence: "At 22q11.2: 2 signals for BCR; in 20 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "vocab:symbols/q", "band:22q11.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+      - span: {start: 53, text: "(TP53×2)[400]"}
+        sentence: "2 signals for TP53; in 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "46,XY.ish del(15)(q11.2q12)(D15S11+,SNRPN–,D15S10–,GABRB3+)"
+    cite: {section: "13.2", page: 102, example: "E10"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XY; no abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 10, text: "del(15)(q11.2q12)(D15S11+,SNRPN–,D15S10–,GABRB3+)"}
+        sentence: "Interstitial deletion of chromosome 15: the segment between 15q11.2 and 15q12 is lost; probes D15S11 present, SNRPN and D15S10 absent, GABRB3 present."
+        kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:15q11.2", "band:15q12", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XX,add(4)(p16.3).ish dup(4)(p15.2p16.3)(RP11-1076P8+,WHS+,wcp4+)"
+    cite: {section: "13.2", page: 102, example: "E13"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "add(4)(p16.3)"}
+        sentence: "Additional material of unknown origin attached to chromosome 4 at 4p16.3, replacing the segment from 4p16.3 to the end of the short arm."
+        kb: ["vocab:symbols/add", "rule:ADD.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:4p16.3"]
+      - span: {start: 24, text: "dup(4)(p15.2p16.3)(RP11-1076P8+,WHS+,wcp4+)"}
+        sentence: "Direct duplication of chromosome 4: the segment from 4p15.2 to 4p16.3 is present twice, in the same orientation; probes RP11-1076P8, WHS and whole chromosome paint 4 present."
+        kb: ["vocab:symbols/dup", "rule:DUP.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:4p15.2", "band:4p16.3", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,X,r(X).ish r(X)(p22.3q21)(KAL+,DXZ1+,XIST+,DXZ4–)"
+    cite: {section: "13.2", page: 102, example: "E15"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosome X; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 5, text: "r(X)"}
+        sentence: "Ring chromosome X; breakpoints not given."
+        kb: ["vocab:symbols/r", "rule:RING.FORMAT"]
+      - span: {start: 14, text: "r(X)(p22.3q21)(KAL+,DXZ1+,XIST+,DXZ4–)"}
+        sentence: "Ring chromosome X: breaks at Xp22.3 and Xq21, the ends joined to form a ring; probes KAL, DXZ1 and XIST present, DXZ4 absent."
+        kb: ["vocab:symbols/r", "rule:RING.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:Xp22.3", "vocab:symbols/q", "band:Xq21", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XX,inv(16)(p13.1q22)[20].ish inv(16)(p13.1)(RP11-620P11+)(q22)(RP11-620P11+)[20]"
+    cite: {section: "13.2", page: 104, example: "E36"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "inv(16)(p13.1q22)"}
+        sentence: "Pericentric inversion of chromosome 16: the segment between 16p13.1 and 16q22, which includes the centromere, is reversed."
+        kb: ["vocab:symbols/inv", "rule:INV.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:16p13.1", "vocab:symbols/q", "band:16q22"]
+      - span: {start: 32, text: "inv(16)(p13.1)(RP11-620P11+)(q22)(RP11-620P11+)[20]"}
+        sentence: "Pericentric inversion of chromosome 16: the segment between 16p13.1 and 16q22, which includes the centromere, is reversed; at 16p13.1: RP11-620P11 present; at 16q22: RP11-620P11 present; in 20 cells."
+        kb: ["vocab:symbols/inv", "rule:INV.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:16p13.1", "vocab:symbols/q", "band:16q22", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "46,XX,t(2;17)(q32;q24)[20].ish t(2;17)(AC005181+;AC005181+)[20]"
+    cite: {section: "13.2", page: 104, example: "E39"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "t(2;17)(q32;q24)"}
+        sentence: "Translocation between chromosomes 2 and 17, with breaks at 2q32 and 17q24; the segments distal to the breaks are exchanged."
+        kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:2q32", "band:17q24"]
+      - span: {start: 31, text: "t(2;17)(AC005181+;AC005181+)[20]"}
+        sentence: "Translocation between chromosomes 2 and 17; breakpoints as given at its first mention; on the derivative chromosome 2: AC005181 present; on the derivative chromosome 17: AC005181 present; in 20 cells."
+        kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "46,XX,t(2;17)(q32;q24)[20].ish t(2;17)(CTD-3115L8+;RP11-959M22+)[20]"
+    cite: {section: "13.2", page: 104, example: "E40"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "t(2;17)(q32;q24)"}
+        sentence: "Translocation between chromosomes 2 and 17, with breaks at 2q32 and 17q24; the segments distal to the breaks are exchanged."
+        kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:2q32", "band:17q24"]
+      - span: {start: 31, text: "t(2;17)(CTD-3115L8+;RP11-959M22+)[20]"}
+        sentence: "Translocation between chromosomes 2 and 17; breakpoints as given at its first mention; on the derivative chromosome 2: CTD-3115L8 present; on the derivative chromosome 17: RP11-959M22 present; in 20 cells."
+        kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(DXZ1×2,DYZ3×1,D18Z1×3),(RB1,D21S259/D21S341/D21S342)×3"
+    cite: {section: "13.3.1", page: 107, example: "E12"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 2 results."
+    items:
+      - span: {start: 7, text: "(DXZ1×2,DYZ3×1,D18Z1×3)"}
+        sentence: "2 signals for DXZ1, 1 signal for DYZ3 and 3 signals for D18Z1."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+      - span: {start: 31, text: "(RB1,D21S259/D21S341/D21S342)×3"}
+        sentence: "3 signals each for RB1 and D21S259/D21S341/D21S342."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+    review: {checked: false}
+  - input: "nuc ish(3′IGH×2,5′IGH×3)(3′IGH con 5′IGH×1)[210/237]"
+    cite: {section: "13.3.2.4", page: 112, example: "E6"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(3′IGH×2,5′IGH×3)(3′IGH con 5′IGH×1)[210/237]"}
+        sentence: "2 signals for 3′IGH and 3 signals for 5′IGH; 1 connected (fusion) signal of 3′IGH and 5′IGH; in 210 of 237 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "45,XY,der(14;21)(q10;q10).ish dic(14;21)(p11.2;p11.2)(D14Z1/D22Z1+;D13Z1/D21Z1+)"
+    cite: {section: "13.2", page: 103, example: "E21"}
+    context: unknown
+    summary: "45 chromosomes; sex chromosomes XY; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "der(14;21)(q10;q10)"}
+        sentence: "Derivative chromosome formed from the long arms of chromosomes 14 and 21, joined at the centromere (14q10 and 21q10)."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q"]
+      - span: {start: 30, text: "dic(14;21)(p11.2;p11.2)(D14Z1/D22Z1+;D13Z1/D21Z1+)"}
+        sentence: "Dicentric chromosome formed from chromosomes 14 and 21, with breaks at 14p11.2 and 21p11.2; for chromosome 14: D14Z1/D22Z1 present; for chromosome 21: D13Z1/D21Z1 present."
+        kb: ["vocab:symbols/dic", "rule:DIC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:14p11.2", "band:21p11.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XX,t(9;22)(q34;q11.2)[20].ish t(9;22)(ABL1+,BCR+;BCR+,ABL1+)[20]"
+    cite: {section: "13.2", page: 104, example: "E32"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "t(9;22)(q34;q11.2)"}
+        sentence: "Translocation between chromosomes 9 and 22, with breaks at 9q34 and 22q11.2; the segments distal to the breaks are exchanged."
+        kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:9q34", "band:22q11.2"]
+      - span: {start: 33, text: "t(9;22)(ABL1+,BCR+;BCR+,ABL1+)[20]"}
+        sentence: "Translocation between chromosomes 9 and 22; breakpoints as given at its first mention; on the derivative chromosome 9: ABL1 and BCR present; on the derivative chromosome 22: BCR and ABL1 present; in 20 cells."
+        kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "46,XX,t(16;16)(p13.1;q22)[20].ish t(16;16)(3′CBFB+;3′CBFB–)[20]"
+    cite: {section: "13.2", page: 104, example: "E38"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "t(16;16)(p13.1;q22)"}
+        sentence: "Translocation between two chromosomes 16, with breaks at 16p13.1 and 16q22; the segments distal to the breaks are exchanged."
+        kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:16p13.1", "vocab:symbols/q", "band:16q22"]
+      - span: {start: 34, text: "t(16;16)(3′CBFB+;3′CBFB–)[20]"}
+        sentence: "Translocation between two chromosomes 16; breakpoints as given at its first mention; on the derivative chromosome 16: 3′CBFB present; on the derivative chromosome 16: 3′CBFB absent; in 20 cells."
+        kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(KAL1,GK,DMD)×1"
+    cite: {section: "13.3.1", page: 107, example: "E15"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(KAL1,GK,DMD)×1"}
+        sentence: "1 signal each for KAL1, GK and DMD."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+    review: {checked: false}
+  - input: "fib ish 15q11.2(D15S11+,SNRPN+,GABRB3+)"
+    cite: {section: "13.4", page: 112, example: "E1"}
+    context: unknown
+    summary: "FISH on extended DNA fibers (fib ish): 1 result."
+    items:
+      - span: {start: 8, text: "15q11.2(D15S11+,SNRPN+,GABRB3+)"}
+        sentence: "At 15q11.2, in order from pter to qter: D15S11, SNRPN and GABRB3 present."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "vocab:symbols/q", "band:15q11.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XY.ish 17p11.2(RAI1×2)"
+    cite: {section: "13.2", page: 102, example: "E12"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XY; no abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 10, text: "17p11.2(RAI1×2)"}
+        sentence: "At 17p11.2: 2 signals for RAI1."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "vocab:symbols/p", "band:17p11.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+    review: {checked: false}
+  - input: "ish del(22)(q11.2q11.2)(D22S75–),del(22)(q11.2q11.2)(D22S75–)"
+    cite: {section: "13.2", page: 101, example: "E4"}
+    context: unknown
+    summary: "Metaphase FISH (ish): 2 results."
+    items:
+      - span: {start: 4, text: "del(22)(q11.2q11.2)(D22S75–)"}
+        sentence: "Interstitial deletion of a small segment within band 22q11.2; probe D22S75 absent."
+        kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:22q11.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+      - span: {start: 33, text: "del(22)(q11.2q11.2)(D22S75–)"}
+        sentence: "Interstitial deletion of a small segment within band 22q11.2; probe D22S75 absent."
+        kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:22q11.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "ish del(22)(q13.3q13.3)(ARSA–)"
+    cite: {section: "13.2", page: 101, example: "E5"}
+    context: unknown
+    summary: "Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 4, text: "del(22)(q13.3q13.3)(ARSA–)"}
+        sentence: "Interstitial deletion of a small segment within band 22q13.3; probe ARSA absent."
+        kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:22q13.3", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XX.ish del(7)(q11.23q11.23)(ELN–)"
+    cite: {section: "13.2", page: 102, example: "E7"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; no abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 10, text: "del(7)(q11.23q11.23)(ELN–)"}
+        sentence: "Interstitial deletion of a small segment within band 7q11.23; probe ELN absent."
+        kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:7q11.23", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XY.ish del(15)(q11.2q11.2)(SNRPN–,D15S10–)"
+    cite: {section: "13.2", page: 102, example: "E9"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XY; no abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 10, text: "del(15)(q11.2q11.2)(SNRPN–,D15S10–)"}
+        sentence: "Interstitial deletion of a small segment within band 15q11.2; probes SNRPN and D15S10 absent."
+        kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:15q11.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XX,add(4)(q31).ish der(4)dup(4)(q31q34)(wcp4+)add(4)(q34)(wcp4–)"
+    cite: {section: "13.2", page: 102, example: "E14"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "add(4)(q31)"}
+        sentence: "Additional material of unknown origin attached to chromosome 4 at 4q31, replacing the segment from 4q31 to the end of the long arm."
+        kb: ["vocab:symbols/add", "rule:ADD.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:4q31"]
+      - span: {start: 22, text: "der(4)dup(4)(q31q34)(wcp4+)add(4)(q34)(wcp4–)"}
+        sentence: "Derivative chromosome 4, resulting from a direct duplication of chromosome 4 between 4q31 and 4q34, and additional material of unknown origin attached at 4q34; for dup(4)(q31q34): whole chromosome paint 4 present; for add(4)(q34): whole chromosome paint 4 absent."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/dup", "rule:DUP.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:4q31", "band:4q34", "vocab:symbols/add", "rule:ADD.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XX.ish der(X)t(X;Y)(p22.3;p11.3)(SRY+)"
+    cite: {section: "13.2", page: 102, example: "E18"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; no abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 10, text: "der(X)t(X;Y)(p22.3;p11.3)(SRY+)"}
+        sentence: "Derivative chromosome X, resulting from a translocation between chromosomes X and Y with breaks at Xp22.3 and Yp11.3; probe SRY present."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:Xp22.3", "band:Yp11.3", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XX.ish X(DXZ1×2),der(7)(q3?)(SRY+)"
+    cite: {section: "13.2", page: 103, example: "E20"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; no abnormality. Metaphase FISH (ish): 2 results."
+    items:
+      - span: {start: 10, text: "X(DXZ1×2)"}
+        sentence: "Chromosome X: 2 signals for DXZ1."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+      - span: {start: 20, text: "der(7)(q3?)(SRY+)"}
+        sentence: "Derivative chromosome 7; its rearrangements are not given; probe SRY present."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "rule:UNCERTAIN.QUESTION_MARK_DESIGNATION", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XX,t(9;22)(q34;q11.2)[20].ish der(9)t(9;22)del(9)(q34q34)(ABL1–,BCR+),der(22)t(9;22)(BCR+,ABL1+)[20]"
+    cite: {section: "13.2", page: 104, example: "E33"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; 1 abnormality. Metaphase FISH (ish): 2 results."
+    items:
+      - span: {start: 6, text: "t(9;22)(q34;q11.2)"}
+        sentence: "Translocation between chromosomes 9 and 22, with breaks at 9q34 and 22q11.2; the segments distal to the breaks are exchanged."
+        kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:9q34", "band:22q11.2"]
+      - span: {start: 33, text: "der(9)t(9;22)del(9)(q34q34)(ABL1–,BCR+)"}
+        sentence: "Derivative chromosome 9, resulting from a translocation between chromosomes 9 and 22; breakpoints as given at its first mention, and an interstitial deletion of chromosome 9 between 9q34 and 9q34; probes ABL1 absent, BCR present."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:9q34", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+      - span: {start: 73, text: "der(22)t(9;22)(BCR+,ABL1+)[20]"}
+        sentence: "Derivative chromosome 22 from the same translocation between chromosomes 9 and 22; breakpoints as given at its first mention; probes BCR and ABL1 present; in 20 cells."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "46,XX,t(9;22)(q34;q11.2)[20].ish der(9)t(9;22)del(9)(q34q34)(ASS1–,ABL1–,BCR+),der(22)t(9;22)(BCR+,ABL1+)[20]"
+    cite: {section: "13.2", page: 104, example: "E34"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; 1 abnormality. Metaphase FISH (ish): 2 results."
+    items:
+      - span: {start: 6, text: "t(9;22)(q34;q11.2)"}
+        sentence: "Translocation between chromosomes 9 and 22, with breaks at 9q34 and 22q11.2; the segments distal to the breaks are exchanged."
+        kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:9q34", "band:22q11.2"]
+      - span: {start: 33, text: "der(9)t(9;22)del(9)(q34q34)(ASS1–,ABL1–,BCR+)"}
+        sentence: "Derivative chromosome 9, resulting from a translocation between chromosomes 9 and 22; breakpoints as given at its first mention, and an interstitial deletion of chromosome 9 between 9q34 and 9q34; probes ASS1 and ABL1 absent, BCR present."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:9q34", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+      - span: {start: 79, text: "der(22)t(9;22)(BCR+,ABL1+)[20]"}
+        sentence: "Derivative chromosome 22 from the same translocation between chromosomes 9 and 22; breakpoints as given at its first mention; probes BCR and ABL1 present; in 20 cells."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "47,XY,+mar.ish add(17)(p12)(wcp17+,CMT1A+,D17Z1+)"
+    cite: {section: "13.2", page: 105, example: "E44"}
+    context: unknown
+    summary: "47 chromosomes; sex chromosomes XY; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "+mar"}
+        sentence: "A marker chromosome (structurally abnormal, origin unknown)."
+        kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/mar", "rule:MAR.PLUS_SIGN"]
+      - span: {start: 15, text: "add(17)(p12)(wcp17+,CMT1A+,D17Z1+)"}
+        sentence: "Additional material of unknown origin attached to chromosome 17 at 17p12, replacing the segment from 17p12 to the end of the short arm; probes whole chromosome paint 17, CMT1A and D17Z1 present."
+        kb: ["vocab:symbols/add", "rule:ADD.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:17p12", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "47,XX,+mar.ish add(16)(p or q)(wcp16+,D16Z1+)"
+    cite: {section: "13.2", page: 105, example: "E45"}
+    context: unknown
+    summary: "47 chromosomes; sex chromosomes XX; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "+mar"}
+        sentence: "A marker chromosome (structurally abnormal, origin unknown)."
+        kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/mar", "rule:MAR.PLUS_SIGN"]
+      - span: {start: 15, text: "add(16)(p or q)(wcp16+,D16Z1+)"}
+        sentence: "Additional material of unknown origin attached to chromosome 16 at either 16p or 16q; probes whole chromosome paint 16 and D16Z1 present."
+        kb: ["vocab:symbols/add", "rule:ADD.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "rule:UNCERTAIN.OR_ALTERNATIVE", "vocab:symbols/q", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,X,+r.ish r(X)(wcpX+,DXZ1+)"
+    cite: {section: "13.2", page: 102, example: "E16"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosome X; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 5, text: "+r"}
+        sentence: "An additional ring chromosome of unknown origin."
+        kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/r", "rule:RING.FORMAT"]
+      - span: {start: 12, text: "r(X)(wcpX+,DXZ1+)"}
+        sentence: "Ring chromosome X; breakpoints not given; probes whole chromosome paint X and DXZ1 present."
+        kb: ["vocab:symbols/r", "rule:RING.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XX,ins(2)(p13q21q31).ish ins(2)(wcp2+)"
+    cite: {section: "13.2", page: 103, example: "E26"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "ins(2)(p13q21q31)"}
+        sentence: "Direct insertion of the long-arm segment 2q21 to 2q31 of chromosome 2 into its short arm at 2p13."
+        kb: ["vocab:symbols/ins", "rule:INS.ORIENTATION", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:2p13", "vocab:symbols/q", "band:2q21", "band:2q31"]
+      - span: {start: 28, text: "ins(2)(wcp2+)"}
+        sentence: "Insertion within chromosome 2; breakpoints as given at its first mention; probe whole chromosome paint 2 present."
+        kb: ["vocab:symbols/ins", "rule:INS.ORIENTATION", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XY,ins(5;2)(p14;q32q22).ish ins(5;2)(wcp2+)"
+    cite: {section: "13.2", page: 103, example: "E27"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XY; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "ins(5;2)(p14;q32q22)"}
+        sentence: "Inverted insertion of the segment 2q22 to 2q32 of chromosome 2 into chromosome 5 at 5p14; the inserted segment is reversed."
+        kb: ["vocab:symbols/ins", "rule:INS.ORIENTATION", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:5p14", "vocab:symbols/q", "band:2q32", "band:2q22"]
+      - span: {start: 31, text: "ins(5;2)(wcp2+)"}
+        sentence: "Insertion of a segment of chromosome 2 into chromosome 5; breakpoints as given at its first mention; probe whole chromosome paint 2 present."
+        kb: ["vocab:symbols/ins", "rule:INS.ORIENTATION", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XY,t(9;22)(q34;q11.2)[20].ish t(9;22)(ABL1–;BCR+,ABL1+)[20]"
+    cite: {section: "13.2", page: 103, example: "E30"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XY; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "t(9;22)(q34;q11.2)"}
+        sentence: "Translocation between chromosomes 9 and 22, with breaks at 9q34 and 22q11.2; the segments distal to the breaks are exchanged."
+        kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:9q34", "band:22q11.2"]
+      - span: {start: 33, text: "t(9;22)(ABL1–;BCR+,ABL1+)[20]"}
+        sentence: "Translocation between chromosomes 9 and 22; breakpoints as given at its first mention; on the derivative chromosome 9: ABL1 absent; on the derivative chromosome 22: BCR and ABL1 present; in 20 cells."
+        kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "47,XY,t(9;22)(q34;q11.2),+der(22)t(9;22)[20].ish t(9;22)(ABL1–;BCR+,ABL1+),der(22)(BCR+,ABL1+)[20]"
+    cite: {section: "13.2", page: 103, example: "E31"}
+    context: unknown
+    summary: "47 chromosomes; sex chromosomes XY; 2 abnormalities. Metaphase FISH (ish): 2 results."
+    items:
+      - span: {start: 6, text: "t(9;22)(q34;q11.2)"}
+        sentence: "Translocation between chromosomes 9 and 22, with breaks at 9q34 and 22q11.2; the segments distal to the breaks are exchanged."
+        kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:9q34", "band:22q11.2"]
+      - span: {start: 25, text: "+der(22)t(9;22)"}
+        sentence: "An additional derivative chromosome 22 from the same translocation between chromosomes 9 and 22; breakpoints as given at its first mention."
+        kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT"]
+      - span: {start: 49, text: "t(9;22)(ABL1–;BCR+,ABL1+)"}
+        sentence: "Translocation between chromosomes 9 and 22; breakpoints as given at its first mention; on the derivative chromosome 9: ABL1 absent; on the derivative chromosome 22: BCR and ABL1 present."
+        kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+      - span: {start: 75, text: "der(22)(BCR+,ABL1+)[20]"}
+        sentence: "Derivative chromosome 22; its rearrangements are not given; probes BCR and ABL1 present; in 20 cells."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "47,XY,+mar.ish der(8)(D8Z1+)"
+    cite: {section: "13.2", page: 104, example: "E41"}
+    context: unknown
+    summary: "47 chromosomes; sex chromosomes XY; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "+mar"}
+        sentence: "A marker chromosome (structurally abnormal, origin unknown)."
+        kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/mar", "rule:MAR.PLUS_SIGN"]
+      - span: {start: 15, text: "der(8)(D8Z1+)"}
+        sentence: "Derivative chromosome 8; its rearrangements are not given; probe D8Z1 present."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "47,XY,+mar.ish der(17)(wcp17+,D17Z1+)"
+    cite: {section: "13.2", page: 104, example: "E42"}
+    context: unknown
+    summary: "47 chromosomes; sex chromosomes XY; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "+mar"}
+        sentence: "A marker chromosome (structurally abnormal, origin unknown)."
+        kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/mar", "rule:MAR.PLUS_SIGN"]
+      - span: {start: 15, text: "der(17)(wcp17+,D17Z1+)"}
+        sentence: "Derivative chromosome 17; its rearrangements are not given; probes whole chromosome paint 17 and D17Z1 present."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "47,XX,+mar.ish der(18)t(18;19)(wcp18+,D18Z1+,wcp19+)"
+    cite: {section: "13.2", page: 104, example: "E43"}
+    context: unknown
+    summary: "47 chromosomes; sex chromosomes XX; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "+mar"}
+        sentence: "A marker chromosome (structurally abnormal, origin unknown)."
+        kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/mar", "rule:MAR.PLUS_SIGN"]
+      - span: {start: 15, text: "der(18)t(18;19)(wcp18+,D18Z1+,wcp19+)"}
+        sentence: "Derivative chromosome 18, resulting from a translocation between chromosomes 18 and 19; breakpoints not given; probes whole chromosome paint 18, D18Z1 and whole chromosome paint 19 present."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XY.ish dup(17)(p11.2p11.2)(RAI1++)"
+    cite: {section: "13.2", page: 102, example: "E11"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XY; no abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 10, text: "dup(17)(p11.2p11.2)(RAI1++)"}
+        sentence: "Direct duplication of chromosome 17: the segment from 17p11.2 to 17p11.2 is present twice, in the same orientation; probe RAI1 present twice."
+        kb: ["vocab:symbols/dup", "rule:DUP.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:17p11.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,X,?i(Y)(p10).ish idic(Y)(q11)(DYZ3++,DYZ1–)"
+    cite: {section: "13.2", page: 102, example: "E17"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosome X; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 5, text: "?i(Y)(p10)"}
+        sentence: "Questionable identification: Isochromosome of the short arm of chromosome Y: both arms are copies of the short arm."
+        kb: ["vocab:symbols/question mark (?)", "rule:UNCERTAIN.QUESTIONABLE_ITEM", "vocab:symbols/i", "rule:ISO.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p"]
+      - span: {start: 20, text: "idic(Y)(q11)(DYZ3++,DYZ1–)"}
+        sentence: "Isodicentric chromosome Y: two copies of chromosome Y joined at Yq11, mirror images of each other, with two centromeres; probes DYZ3 present twice, DYZ1 absent."
+        kb: ["vocab:symbols/idic", "rule:DIC.FORMAT", "rule:ISO.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:Yq11", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "ish dmin(MYCN×20~50)[20]"
+    cite: {section: "13.2", page: 105, example: "E50"}
+    context: unknown
+    summary: "Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 4, text: "dmin(MYCN×20~50)[20]"}
+        sentence: "Double minutes (small acentric fragments, not counted in the chromosome number); 20 to 50 signals for MYCN; in 20 cells."
+        kb: ["vocab:symbols/dmin", "rule:DMIN.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "ish ider(21)(q10)dup(21)(q22q22)(RUNX1×4)"
+    cite: {section: "13.2", page: 105, example: "E51"}
+    context: unknown
+    summary: "Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 4, text: "ider(21)(q10)dup(21)(q22q22)(RUNX1×4)"}
+        sentence: "Isochromosome of the long arm of a derivative chromosome 21 that results from a direct duplication of chromosome 21 between 21q22 and 21q22; 4 signals for RUNX1."
+        kb: ["vocab:symbols/ider", "rule:DER.ISODERIVATIVE", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "vocab:symbols/dup", "rule:DUP.FORMAT", "band:21q22", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+    review: {checked: false}
+  - input: "ish 22q11.2(HIRA×2),del(22)(q13.3)(ARSA–)"
+    cite: {section: "13.2", page: 101, example: "E6"}
+    context: unknown
+    summary: "Metaphase FISH (ish): 2 results."
+    items:
+      - span: {start: 4, text: "22q11.2(HIRA×2)"}
+        sentence: "At 22q11.2: 2 signals for HIRA."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "vocab:symbols/q", "band:22q11.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+      - span: {start: 20, text: "del(22)(q13.3)(ARSA–)"}
+        sentence: "Terminal deletion of chromosome 22: break at 22q13.3; the segment from there to the end of the long arm is lost; probe ARSA absent."
+        kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:22q13.3", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XX.ish X(DXZ1×2,SRY×0)"
+    cite: {section: "13.2", page: 102, example: "E19"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; no abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 10, text: "X(DXZ1×2,SRY×0)"}
+        sentence: "Chromosome X: 2 signals for DXZ1 and no signal for SRY."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+    review: {checked: false}
+  - input: "46,XY.ish 4p16.3(D4F26,D4S96)×2"
+    cite: {section: "13.2", page: 103, example: "E25"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XY; no abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 10, text: "4p16.3(D4F26,D4S96)×2"}
+        sentence: "At 4p16.3: 2 signals each for D4F26 and D4S96."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "vocab:symbols/p", "band:4p16.3", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+    review: {checked: false}
+  - input: "46,XX.ish inv(21)(q11.2q22.1)(q11.2)(RUNX1+)(q22.1)(RUNX1–)"
+    cite: {section: "13.2", page: 103, example: "E29"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; no abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 10, text: "inv(21)(q11.2q22.1)(q11.2)(RUNX1+)(q22.1)(RUNX1–)"}
+        sentence: "Paracentric inversion of chromosome 21: the segment between 21q11.2 and 21q22.1, within one arm, is reversed; at 21q11.2: RUNX1 present; at 21q22.1: RUNX1 absent."
+        kb: ["vocab:symbols/inv", "rule:INV.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:21q11.2", "band:21q22.1", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XX,inv(16)(p13.1q22)[20].ish inv(16)(p13.1)(5′CBFB+)(q22)(3′CBFB+)[20]"
+    cite: {section: "13.2", page: 104, example: "E35"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "inv(16)(p13.1q22)"}
+        sentence: "Pericentric inversion of chromosome 16: the segment between 16p13.1 and 16q22, which includes the centromere, is reversed."
+        kb: ["vocab:symbols/inv", "rule:INV.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:16p13.1", "vocab:symbols/q", "band:16q22"]
+      - span: {start: 32, text: "inv(16)(p13.1)(5′CBFB+)(q22)(3′CBFB+)[20]"}
+        sentence: "Pericentric inversion of chromosome 16: the segment between 16p13.1 and 16q22, which includes the centromere, is reversed; at 16p13.1: 5′CBFB present; at 16q22: 3′CBFB present; in 20 cells."
+        kb: ["vocab:symbols/inv", "rule:INV.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:16p13.1", "vocab:symbols/q", "band:16q22", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "46,XX,inv(16)(p13.1q22).ish inv(16)(p13.1)(MYH11+,CBFB+)(q22)(MYH11+,CBFB+)"
+    cite: {section: "13.2", page: 104, example: "E37"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "inv(16)(p13.1q22)"}
+        sentence: "Pericentric inversion of chromosome 16: the segment between 16p13.1 and 16q22, which includes the centromere, is reversed."
+        kb: ["vocab:symbols/inv", "rule:INV.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:16p13.1", "vocab:symbols/q", "band:16q22"]
+      - span: {start: 28, text: "inv(16)(p13.1)(MYH11+,CBFB+)(q22)(MYH11+,CBFB+)"}
+        sentence: "Pericentric inversion of chromosome 16: the segment between 16p13.1 and 16q22, which includes the centromere, is reversed; at 16p13.1: MYH11 and CBFB present; at 16q22: MYH11 and CBFB present."
+        kb: ["vocab:symbols/inv", "rule:INV.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:16p13.1", "vocab:symbols/q", "band:16q22", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "mos 46,X,+r[15]/45,X[10].ish r(X)(wcpX+,DXZ1+)"
+    cite: {section: "13.2", page: 105, example: "E46"}
+    context: unknown
+    summary: "Mosaic with 2 cell lines. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 4, text: "46,X"}
+        sentence: "Cell line 1 (15 cells): 46 chromosomes; sex chromosome X."
+        kb: ["rule:KARYO.COUNT_SEX_ORDER"]
+      - span: {start: 9, text: "+r"}
+        sentence: "An additional ring chromosome of unknown origin."
+        kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/r", "rule:RING.FORMAT"]
+      - span: {start: 16, text: "45,X"}
+        sentence: "Cell line 2 (10 cells): 45 chromosomes; sex chromosome X."
+        kb: ["rule:KARYO.COUNT_SEX_ORDER"]
+      - span: {start: 29, text: "r(X)(wcpX+,DXZ1+)"}
+        sentence: "Ring chromosome X; breakpoints not given; probes whole chromosome paint X and DXZ1 present."
+        kb: ["vocab:symbols/r", "rule:RING.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,X,+r.ish r(X)(wcpX+,DXZ1+)[15]/r(X)(wcpX+,DXZ1++)[10]"
+    cite: {section: "13.2", page: 105, example: "E47"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosome X; 1 abnormality. Metaphase FISH (ish) with 2 cell lines: 2 results."
+    items:
+      - span: {start: 5, text: "+r"}
+        sentence: "An additional ring chromosome of unknown origin."
+        kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/r", "rule:RING.FORMAT"]
+      - span: {start: 12, text: "r(X)(wcpX+,DXZ1+)[15]"}
+        sentence: "Cell line 1: Ring chromosome X; breakpoints not given; probes whole chromosome paint X and DXZ1 present; in 15 cells."
+        kb: ["vocab:symbols/r", "rule:RING.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "rule:ISH.CELL_LINES"]
+      - span: {start: 34, text: "r(X)(wcpX+,DXZ1++)[10]"}
+        sentence: "Cell line 2: Ring chromosome X; breakpoints not given; probes whole chromosome paint X present, DXZ1 present twice; in 10 cells."
+        kb: ["vocab:symbols/r", "rule:RING.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "mos 45,X[3]/46,XY[12].ish X(DXZ1×1,SRY×0)[32]/X(DXZ1×1),Y(SRY×1)[68]"
+    cite: {section: "13.2", page: 105, example: "E48"}
+    context: unknown
+    summary: "Mosaic with 2 cell lines. Metaphase FISH (ish) with 2 cell lines: 3 results."
+    items:
+      - span: {start: 4, text: "45,X"}
+        sentence: "Cell line 1 (3 cells): 45 chromosomes; sex chromosome X."
+        kb: ["rule:KARYO.COUNT_SEX_ORDER"]
+      - span: {start: 12, text: "46,XY"}
+        sentence: "Cell line 2 (12 cells): 46 chromosomes; sex chromosomes XY."
+        kb: ["rule:KARYO.COUNT_SEX_ORDER"]
+      - span: {start: 26, text: "X(DXZ1×1,SRY×0)[32]"}
+        sentence: "Cell line 1: Chromosome X: 1 signal for DXZ1 and no signal for SRY; in 32 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+      - span: {start: 46, text: "X(DXZ1×1)"}
+        sentence: "Cell line 2: Chromosome X: 1 signal for DXZ1."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+      - span: {start: 56, text: "Y(SRY×1)[68]"}
+        sentence: "Cell line 2: Chromosome Y: 1 signal for SRY; in 68 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(D17Z1×2~3,ERBB2 amp)[100/200]/(D17Z1,ERBB2)×3[20/200]"
+    cite: {section: "13.3.1", page: 107, example: "E9"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish) with 2 cell lines: 2 results."
+    items:
+      - span: {start: 7, text: "(D17Z1×2~3,ERBB2 amp)[100/200]"}
+        sentence: "Cell line 1: 2 to 3 signals for D17Z1 and ERBB2 amplified; in 100 of 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+      - span: {start: 38, text: "(D17Z1,ERBB2)×3[20/200]"}
+        sentence: "Cell line 2: 3 signals each for D17Z1 and ERBB2; in 20 of 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(D13S319×0)[100/400]/(D13S319×1)[50/400]"
+    cite: {section: "13.3.1", page: 108, example: "E26"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish) with 2 cell lines: 2 results."
+    items:
+      - span: {start: 7, text: "(D13S319×0)[100/400]"}
+        sentence: "Cell line 1: No signal for D13S319; in 100 of 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+      - span: {start: 28, text: "(D13S319×1)[50/400]"}
+        sentence: "Cell line 2: 1 signal for D13S319; in 50 of 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(D13S319×0,LAMP1×2)[100/400]/(D13S319×1,LAMP1×2)[50/400]"
+    cite: {section: "13.3.1", page: 109, example: "E27"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish) with 2 cell lines: 2 results."
+    items:
+      - span: {start: 7, text: "(D13S319×0,LAMP1×2)[100/400]"}
+        sentence: "Cell line 1: No signal for D13S319 and 2 signals for LAMP1; in 100 of 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+      - span: {start: 36, text: "(D13S319×1,LAMP1×2)[50/400]"}
+        sentence: "Cell line 2: 1 signal for D13S319 and 2 signals for LAMP1; in 50 of 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "ish der(21)(RUNX1 amp)"
+    cite: {section: "13.2", page: 105, example: "E52"}
+    context: unknown
+    summary: "Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 4, text: "der(21)(RUNX1 amp)"}
+        sentence: "Derivative chromosome 21; its rearrangements are not given; probe RUNX1 amplified."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,Y,del(X)(p11.2p11.4).ish del(X)(p11.2p11.4)(RP1-112K5 dim,RP11-265P11 dim)"
+    cite: {section: "13.2.1", page: 105, example: "E1"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosome Y; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 5, text: "del(X)(p11.2p11.4)"}
+        sentence: "Interstitial deletion of chromosome X: the segment between Xp11.2 and Xp11.4 is lost."
+        kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:Xp11.2", "band:Xp11.4"]
+      - span: {start: 28, text: "del(X)(p11.2p11.4)(RP1-112K5 dim,RP11-265P11 dim)"}
+        sentence: "Interstitial deletion of chromosome X: the segment between Xp11.2 and Xp11.4 is lost; probes RP1-112K5 with a diminished signal, RP11-265P11 with a diminished signal."
+        kb: ["vocab:symbols/del", "rule:DEL.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:Xp11.2", "band:Xp11.4", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XX.ish 17p11.2(RAI1 enh)"
+    cite: {section: "13.2.1", page: 105, example: "E2"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; no abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 10, text: "17p11.2(RAI1 enh)"}
+        sentence: "At 17p11.2: RAI1 with an enhanced signal."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "vocab:symbols/p", "band:17p11.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "nuc ish(MYCN amp)[200]"
+    cite: {section: "13.3.1", page: 107, example: "E5"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(MYCN amp)[200]"}
+        sentence: "MYCN amplified; in 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(D13S319×1,D13S319 dim×1,LAMP1×2)[197/200]"
+    cite: {section: "13.3.1", page: 107, example: "E10"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(D13S319×1,D13S319 dim×1,LAMP1×2)[197/200]"}
+        sentence: "1 signal for D13S319, 1 signal for D13S319 of diminished intensity and 2 signals for LAMP1; in 197 of 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(IGH×3,BCL2×2,BCL2 amp)(IGH con BCL2×1)(IGH con BCL2 amp×1)"
+    cite: {section: "13.3.2", page: 110, example: "E10"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(IGH×3,BCL2×2,BCL2 amp)(IGH con BCL2×1)(IGH con BCL2 amp×1)"}
+        sentence: "3 signals for IGH, 2 signals for BCL2 and BCL2 amplified; 1 connected (fusion) signal of IGH and BCL2; 1 connected (fusion) signal of IGH and amplified BCL2."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT"]
+    review: {checked: false}
+  - input: "ish subtel(41×2)"
+    cite: {section: "13.2.2", page: 106, example: "E1"}
+    context: unknown
+    summary: "Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 4, text: "subtel(41×2)"}
+        sentence: "Subtelomeric probe panel: 2 signals for each of the 41 subtelomeric regions."
+        kb: ["vocab:symbols/subtel", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+    review: {checked: false}
+  - input: "ish t(13;20)(q34–,p13+;p13–,q34+)(RP11-63L17–,RP5-1103G7+;RP5-1103G7–,RP11-63L17+)"
+    cite: {section: "13.2.2", page: 106, example: "E2"}
+    context: unknown
+    summary: "Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 4, text: "t(13;20)(q34–,p13+;p13–,q34+)(RP11-63L17–,RP5-1103G7+;RP5-1103G7–,RP11-63L17+)"}
+        sentence: "Translocation between chromosomes 13 and 20; breakpoints not given; on the derivative chromosome 13: the subtelomeric region q34 absent, the subtelomeric region p13 present, RP11-63L17 absent, RP5-1103G7 present; on the derivative chromosome 20: the subtelomeric region p13 absent, the subtelomeric region q34 present, RP5-1103G7 absent, RP11-63L17 present."
+        kb: ["vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "ish der(13)t(13;20)(q34–,p13+)(RP11-63L17–,RP5-1103G7+)"
+    cite: {section: "13.2.2", page: 106, example: "E3"}
+    context: unknown
+    summary: "Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 4, text: "der(13)t(13;20)(q34–,p13+)(RP11-63L17–,RP5-1103G7+)"}
+        sentence: "Derivative chromosome 13, resulting from a translocation between chromosomes 13 and 20; breakpoints not given; probes the subtelomeric region q34 absent, the subtelomeric region p13 present, RP11-63L17 absent, RP5-1103G7 present."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "nuc ish(D21S65×2)"
+    cite: {section: "13.3.1", page: 107, example: "E1"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(D21S65×2)"}
+        sentence: "2 signals for D21S65."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+    review: {checked: false}
+  - input: "nuc ish 21q22(D21S65×2)"
+    cite: {section: "13.3.1", page: 107, example: "E1"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 8, text: "21q22(D21S65×2)"}
+        sentence: "At 21q22: 2 signals for D21S65."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "vocab:symbols/q", "band:21q22", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+    review: {checked: false}
+  - input: "nuc ish(D21S65×3)"
+    cite: {section: "13.3.1", page: 107, example: "E2"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(D21S65×3)"}
+        sentence: "3 signals for D21S65."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+    review: {checked: false}
+  - input: "nuc ish 21q22(D21S65×3)"
+    cite: {section: "13.3.1", page: 107, example: "E2"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 8, text: "21q22(D21S65×3)"}
+        sentence: "At 21q22: 3 signals for D21S65."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "vocab:symbols/q", "band:21q22", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+    review: {checked: false}
+  - input: "nuc ish(ABL1,BCR)×2[400]"
+    cite: {section: "13.3.1", page: 107, example: "E13"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(ABL1,BCR)×2[400]"}
+        sentence: "2 signals each for ABL1 and BCR; in 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish 9q34(ABL1×2),22q11.2(BCR×2)[400]"
+    cite: {section: "13.3.1", page: 107, example: "E13"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 2 results."
+    items:
+      - span: {start: 8, text: "9q34(ABL1×2)"}
+        sentence: "At 9q34: 2 signals for ABL1."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "vocab:symbols/q", "band:9q34", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+      - span: {start: 21, text: "22q11.2(BCR×2)[400]"}
+        sentence: "At 22q11.2: 2 signals for BCR; in 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "vocab:symbols/q", "band:22q11.2", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(DXZ1×3)"
+    cite: {section: "13.3.1", page: 107, example: "E3"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(DXZ1×3)"}
+        sentence: "3 signals for DXZ1."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+    review: {checked: false}
+  - input: "nuc ish(MYCN×12~>50)[200]"
+    cite: {section: "13.3.1", page: 107, example: "E4"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(MYCN×12~>50)[200]"}
+        sentence: "12 to more than 50 signals for MYCN; in 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(D13S319×0)[100/400]"
+    cite: {section: "13.3.1", page: 108, example: "E25"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(D13S319×0)[100/400]"}
+        sentence: "No signal for D13S319; in 100 of 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(D20Z1×2,D20S108×1)[100/200]"
+    cite: {section: "13.3.1", page: 109, example: "E29"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(D20Z1×2,D20S108×1)[100/200]"}
+        sentence: "2 signals for D20Z1 and 1 signal for D20S108; in 100 of 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(D17Z1,ERBB2)×2[100]"
+    cite: {section: "13.3.1", page: 107, example: "E6"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(D17Z1,ERBB2)×2[100]"}
+        sentence: "2 signals each for D17Z1 and ERBB2; in 100 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(D17Z1,ERBB2)×4~5[100/200]"
+    cite: {section: "13.3.1", page: 107, example: "E7"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(D17Z1,ERBB2)×4~5[100/200]"}
+        sentence: "4 to 5 signals each for D17Z1 and ERBB2; in 100 of 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(D17Z1×2,ERBB2×10~20)[100/200]"
+    cite: {section: "13.3.1", page: 107, example: "E8"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(D17Z1×2,ERBB2×10~20)[100/200]"}
+        sentence: "2 signals for D17Z1 and 10 to 20 signals for ERBB2; in 100 of 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(D21S65,D21S64)×3"
+    cite: {section: "13.3.1", page: 107, example: "E11"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(D21S65,D21S64)×3"}
+        sentence: "3 signals each for D21S65 and D21S64."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+    review: {checked: false}
+  - input: "nuc ish(KAL1,D21S65)×2"
+    cite: {section: "13.3.1", page: 107, example: "E14"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(KAL1,D21S65)×2"}
+        sentence: "2 signals each for KAL1 and D21S65."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+    review: {checked: false}
+  - input: "nuc ish(ATM,D12Z3,D13S319,LAMP1,TP53)×2[200]"
+    cite: {section: "13.3.1", page: 108, example: "E22"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(ATM,D12Z3,D13S319,LAMP1,TP53)×2[200]"}
+        sentence: "2 signals each for ATM, D12Z3, D13S319, LAMP1 and TP53; in 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(ATM,TP53)×2[200],(D12Z3×3,D13S319×2,LAMP1×2)[100/200]"
+    cite: {section: "13.3.1", page: 108, example: "E23"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 2 results."
+    items:
+      - span: {start: 7, text: "(ATM,TP53)×2[200]"}
+        sentence: "2 signals each for ATM and TP53; in 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+      - span: {start: 25, text: "(D12Z3×3,D13S319×2,LAMP1×2)[100/200]"}
+        sentence: "3 signals for D12Z3, 2 signals for D13S319 and 2 signals for LAMP1; in 100 of 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(ATM×1,TP53×2)[200/400],(D12Z3×3,D13S319×2,LAMP1×2)[100/400]"
+    cite: {section: "13.3.1", page: 108, example: "E24"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 2 results."
+    items:
+      - span: {start: 7, text: "(ATM×1,TP53×2)[200/400]"}
+        sentence: "1 signal for ATM and 2 signals for TP53; in 200 of 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+      - span: {start: 31, text: "(D12Z3×3,D13S319×2,LAMP1×2)[100/400]"}
+        sentence: "3 signals for D12Z3, 2 signals for D13S319 and 2 signals for LAMP1; in 100 of 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(TP73×1,ANGPTL×2)[107/200],(ZNF443×2,GLTSCR×1)[105/200]"
+    cite: {section: "13.3.1", page: 109, example: "E28"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 2 results."
+    items:
+      - span: {start: 7, text: "(TP73×1,ANGPTL×2)[107/200]"}
+        sentence: "1 signal for TP73 and 2 signals for ANGPTL; in 107 of 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+      - span: {start: 34, text: "(ZNF443×2,GLTSCR×1)[105/200]"}
+        sentence: "2 signals for ZNF443 and 1 signal for GLTSCR; in 105 of 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(D8Z1×2,MYC×3,IGH×3)(MYC con IGH×2)[100/200],(IGH×3,BCL2×2)[100/200]"
+    cite: {section: "13.3.2.3", page: 111, example: "E2"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 2 results."
+    items:
+      - span: {start: 7, text: "(D8Z1×2,MYC×3,IGH×3)(MYC con IGH×2)[100/200]"}
+        sentence: "2 signals for D8Z1, 3 signals for MYC and 3 signals for IGH; 2 connected (fusion) signals of MYC and IGH; in 100 of 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT", "rule:ISH.CELL_LINES"]
+      - span: {start: 52, text: "(IGH×3,BCL2×2)[100/200]"}
+        sentence: "3 signals for IGH and 2 signals for BCL2; in 100 of 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(ABL1,BCR)×2(ABL1 con BCR×1)[400]"
+    cite: {section: "13.3.2", page: 109, example: "E2"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(ABL1,BCR)×2(ABL1 con BCR×1)[400]"}
+        sentence: "2 signals each for ABL1 and BCR; 1 connected (fusion) signal of ABL1 and BCR; in 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(ABL1,BCR)×3(ABL1 con BCR×2)[400]"
+    cite: {section: "13.3.2", page: 109, example: "E3"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(ABL1,BCR)×3(ABL1 con BCR×2)[400]"}
+        sentence: "3 signals each for ABL1 and BCR; 2 connected (fusion) signals of ABL1 and BCR; in 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(ABL1,BCR)×3(ABL1 con BCR×1)(ABL1 con BCR con ABL1×1)[400]"
+    cite: {section: "13.3.2", page: 110, example: "E4"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(ABL1,BCR)×3(ABL1 con BCR×1)(ABL1 con BCR con ABL1×1)[400]"}
+        sentence: "3 signals each for ABL1 and BCR; 1 connected (fusion) signal of ABL1 and BCR; 1 connected (fusion) signal of ABL1, BCR and ABL1; in 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(ABL1×2,BCR×3)(ABL1 con BCR×1)[400]"
+    cite: {section: "13.3.2", page: 110, example: "E6"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(ABL1×2,BCR×3)(ABL1 con BCR×1)[400]"}
+        sentence: "2 signals for ABL1 and 3 signals for BCR; 1 connected (fusion) signal of ABL1 and BCR; in 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(ABL1,BCR)×4(ABL1 con BCR×3)[198]"
+    cite: {section: "13.3.2", page: 110, example: "E7"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(ABL1,BCR)×4(ABL1 con BCR×3)[198]"}
+        sentence: "4 signals each for ABL1 and BCR; 3 connected (fusion) signals of ABL1 and BCR; in 198 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(KAL1,STS)×2"
+    cite: {section: "13.3.2", page: 110, example: "E8"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(KAL1,STS)×2"}
+        sentence: "2 signals each for KAL1 and STS."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)"]
+    review: {checked: false}
+  - input: "nuc ish(KAL1,STS)×2(KAL1 sep STS×1)"
+    cite: {section: "13.3.2", page: 110, example: "E9"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(KAL1,STS)×2(KAL1 sep STS×1)"}
+        sentence: "2 signals each for KAL1 and STS; 1 pair of separated signals of KAL1 and STS."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT"]
+    review: {checked: false}
+  - input: "nuc ish(IGH×3,BCL2×2,BCL2 amp)(IGH con BCL2×2)"
+    cite: {section: "13.3.2", page: 111, example: "E11"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(IGH×3,BCL2×2,BCL2 amp)(IGH con BCL2×2)"}
+        sentence: "3 signals for IGH, 2 signals for BCL2 and BCL2 amplified; 2 connected (fusion) signals of IGH and BCL2."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT"]
+    review: {checked: false}
+  - input: "nuc ish(PAX7×1,PAX7 amp,FOXO1×1,FOXO1 amp)(PAX7 con FOXO1)amp"
+    cite: {section: "13.3.2", page: 111, example: "E12"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(PAX7×1,PAX7 amp,FOXO1×1,FOXO1 amp)(PAX7 con FOXO1)amp"}
+        sentence: "1 signal for PAX7, PAX7 amplified, 1 signal for FOXO1 and FOXO1 amplified; connected (fusion) signals of PAX7 and FOXO1, amplified."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT"]
+    review: {checked: false}
+  - input: "nuc ish(ETV6×2,RUNX1×3)(ETV6 con RUNX1×1)[300/400]"
+    cite: {section: "13.3.2.2", page: 111, example: "E1"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(ETV6×2,RUNX1×3)(ETV6 con RUNX1×1)[300/400]"}
+        sentence: "2 signals for ETV6 and 3 signals for RUNX1; 1 connected (fusion) signal of ETV6 and RUNX1; in 300 of 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(ETV6×1,RUNX1×3)(ETV6 con RUNX1×1)[300/400]"
+    cite: {section: "13.3.2.2", page: 111, example: "E2"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(ETV6×1,RUNX1×3)(ETV6 con RUNX1×1)[300/400]"}
+        sentence: "1 signal for ETV6 and 3 signals for RUNX1; 1 connected (fusion) signal of ETV6 and RUNX1; in 300 of 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(MYH11,CBFB)×3(MYH11 con CBFB×2)"
+    cite: {section: "13.3.2.3", page: 111, example: "E3"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(MYH11,CBFB)×3(MYH11 con CBFB×2)"}
+        sentence: "3 signals each for MYH11 and CBFB; 2 connected (fusion) signals of MYH11 and CBFB."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT"]
+    review: {checked: false}
+  - input: "nuc ish(MLL×2)[400]"
+    cite: {section: "13.3.2.4", page: 112, example: "E1"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(MLL×2)[400]"}
+        sentence: "2 signals for MLL; in 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(5′MLL,3′MLL)×2(5′MLL con 3′MLL×2)[400]"
+    cite: {section: "13.3.2.4", page: 112, example: "E1"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(5′MLL,3′MLL)×2(5′MLL con 3′MLL×2)[400]"}
+        sentence: "2 signals each for 5′MLL and 3′MLL; 2 connected (fusion) signals of 5′MLL and 3′MLL; in 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(CBFB×2)[400]"
+    cite: {section: "13.3.2.4", page: 112, example: "E2"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(CBFB×2)[400]"}
+        sentence: "2 signals for CBFB; in 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(5′CBFB,3′CBFB)×2(5′CBFB con 3′CBFB×2)[400]"
+    cite: {section: "13.3.2.4", page: 112, example: "E2"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(5′CBFB,3′CBFB)×2(5′CBFB con 3′CBFB×2)[400]"}
+        sentence: "2 signals each for 5′CBFB and 3′CBFB; 2 connected (fusion) signals of 5′CBFB and 3′CBFB; in 400 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(MLL×2)(5′MLL sep 3′MLL×1)[200]"
+    cite: {section: "13.3.2.4", page: 112, example: "E3"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(MLL×2)(5′MLL sep 3′MLL×1)[200]"}
+        sentence: "2 signals for MLL; 1 pair of separated signals of 5′MLL and 3′MLL; in 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(5′MLL×2,3′MLL×1)(5′MLL con 3′MLL×1)[200]"
+    cite: {section: "13.3.2.4", page: 112, example: "E4"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(5′MLL×2,3′MLL×1)(5′MLL con 3′MLL×1)[200]"}
+        sentence: "2 signals for 5′MLL and 1 signal for 3′MLL; 1 connected (fusion) signal of 5′MLL and 3′MLL; in 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(CBFB×2)(5′CBFB sep 3′CBFB×1)[200]"
+    cite: {section: "13.3.2.4", page: 112, example: "E5"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(CBFB×2)(5′CBFB sep 3′CBFB×1)[200]"}
+        sentence: "2 signals for CBFB; 1 pair of separated signals of 5′CBFB and 3′CBFB; in 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "nuc ish(3′DDIT3×2,5′DDIT3×1,5′DDIT3 amp)(3′DDIT3 con 5′DDIT3×1)(3′DDIT3 con 5′DDIT3 amp×1)[192/200]"
+    cite: {section: "13.3.2.4", page: 112, example: "E7"}
+    context: unknown
+    summary: "Interphase FISH (nuc ish): 1 result."
+    items:
+      - span: {start: 7, text: "(3′DDIT3×2,5′DDIT3×1,5′DDIT3 amp)(3′DDIT3 con 5′DDIT3×1)(3′DDIT3 con 5′DDIT3 amp×1)[192/200]"}
+        sentence: "2 signals for 3′DDIT3, 1 signal for 5′DDIT3 and 5′DDIT3 amplified; 1 connected (fusion) signal of 3′DDIT3 and 5′DDIT3; 1 connected (fusion) signal of 3′DDIT3 and amplified 5′DDIT3; in 192 of 200 cells."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION", "vocab:symbols/multiplication sign (×)", "rule:NUC_ISH.SIGNAL_POSITION_FORMAT", "rule:ISH.CELL_LINES"]
+    review: {checked: false}
+  - input: "47,XX,+mar.rev ish 15q"
+    cite: {section: "13.5.1", page: 113, example: "E1"}
+    context: unknown
+    summary: "47 chromosomes; sex chromosomes XX; 1 abnormality. Reverse in situ hybridization (rev ish): 1 result."
+    items:
+      - span: {start: 6, text: "+mar"}
+        sentence: "A marker chromosome (structurally abnormal, origin unknown)."
+        kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/mar", "rule:MAR.PLUS_SIGN"]
+      - span: {start: 19, text: "15q"}
+        sentence: "Material from 15q."
+        kb: ["rule:ISH.NORMAL_CHROMOSOME_FORMAT", "vocab:symbols/q"]
+    review: {checked: false}
+  - input: "46,XY,add(5)(p15).rev ish der(5)t(5;10)(p15;q22)"
+    cite: {section: "13.5.1", page: 113, example: "E2"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XY; 1 abnormality. Reverse in situ hybridization (rev ish): 1 result."
+    items:
+      - span: {start: 6, text: "add(5)(p15)"}
+        sentence: "Additional material of unknown origin attached to chromosome 5 at 5p15, replacing the segment from 5p15 to the end of the short arm."
+        kb: ["vocab:symbols/add", "rule:ADD.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:5p15"]
+      - span: {start: 26, text: "der(5)t(5;10)(p15;q22)"}
+        sentence: "Derivative chromosome 5, resulting from a translocation between chromosomes 5 and 10 with breaks at 5p15 and 10q22."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:5p15", "vocab:symbols/q", "band:10q22"]
+    review: {checked: false}
+  - input: "47,XX,+mar.ish cgh enh(10)(p)"
+    cite: {section: "13.6", page: 113, example: "E1"}
+    context: unknown
+    summary: "47 chromosomes; sex chromosomes XX; 1 abnormality. Comparative genomic hybridization (cgh): 1 result."
+    items:
+      - span: {start: 6, text: "+mar"}
+        sentence: "A marker chromosome (structurally abnormal, origin unknown)."
+        kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/mar", "rule:MAR.PLUS_SIGN"]
+      - span: {start: 19, text: "enh(10)(p)"}
+        sentence: "Gain (enhanced signal) of the short arm of chromosome 10."
+        kb: ["vocab:symbols/enh", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p"]
+    review: {checked: false}
+  - input: "46,XX,add(7)(q36).ish cgh der(7)t(7;21)(q36;q22)enh(21)(q22)"
+    cite: {section: "13.6", page: 113, example: "E2"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; 1 abnormality. Comparative genomic hybridization (cgh): 1 result."
+    items:
+      - span: {start: 6, text: "add(7)(q36)"}
+        sentence: "Additional material of unknown origin attached to chromosome 7 at 7q36, replacing the segment from 7q36 to the end of the long arm."
+        kb: ["vocab:symbols/add", "rule:ADD.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:7q36"]
+      - span: {start: 26, text: "der(7)t(7;21)(q36;q22)enh(21)(q22)"}
+        sentence: "Derivative chromosome 7, resulting from a translocation between chromosomes 7 and 21 with breaks at 7q36 and 21q22, and a gain (enhanced signal) of 21q22."
+        kb: ["vocab:symbols/der", "rule:DER.DEFINITION", "vocab:symbols/t", "rule:TRANSLOC.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:7q36", "band:21q22", "vocab:symbols/enh"]
+    review: {checked: false}
+  - input: "47,XY,+r.ish cgh enh(1)(q32q43),enh(12)(q13)"
+    cite: {section: "13.6", page: 113, example: "E3"}
+    context: unknown
+    summary: "47 chromosomes; sex chromosomes XY; 1 abnormality. Comparative genomic hybridization (cgh): 2 results."
+    items:
+      - span: {start: 6, text: "+r"}
+        sentence: "An additional ring chromosome of unknown origin."
+        kb: ["vocab:symbols/plus sign, single (+)", "vocab:symbols/r", "rule:RING.FORMAT"]
+      - span: {start: 17, text: "enh(1)(q32q43)"}
+        sentence: "Gain (enhanced signal) of 1q32 to 1q43."
+        kb: ["vocab:symbols/enh", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:1q32", "band:1q43"]
+      - span: {start: 32, text: "enh(12)(q13)"}
+        sentence: "Gain (enhanced signal) of 12q13."
+        kb: ["vocab:symbols/enh", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:12q13"]
+    review: {checked: false}
+  - input: "ish cgh enh(21)"
+    cite: {section: "13.6", page: 113, example: "E4"}
+    context: unknown
+    summary: "Comparative genomic hybridization (cgh): 1 result."
+    items:
+      - span: {start: 8, text: "enh(21)"}
+        sentence: "Gain (enhanced signal) of chromosome 21."
+        kb: ["vocab:symbols/enh"]
+    review: {checked: false}
+  - input: "ish cgh dim(7)(q21qter)"
+    cite: {section: "13.6", page: 113, example: "E5"}
+    context: unknown
+    summary: "Comparative genomic hybridization (cgh): 1 result."
+    items:
+      - span: {start: 8, text: "dim(7)(q21qter)"}
+        sentence: "Loss (diminished signal) of 7q21 to 7qter."
+        kb: ["vocab:symbols/dim", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:7q21", "vocab:symbols/qter"]
+    review: {checked: false}
+  - input: "ish cgh dim(18)(q21qter)"
+    cite: {section: "13.6", page: 113, example: "E6"}
+    context: unknown
+    summary: "Comparative genomic hybridization (cgh): 1 result."
+    items:
+      - span: {start: 8, text: "dim(18)(q21qter)"}
+        sentence: "Loss (diminished signal) of 18q21 to 18qter."
+        kb: ["vocab:symbols/dim", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/q", "band:18q21", "vocab:symbols/qter"]
+    review: {checked: false}
+  - input: "46,XX,?dup(18)(p11.2p11.3).ish dup(18)(pcp18p11.2+)"
+    cite: {section: "13.8", page: 114, example: "E1"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XX; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "?dup(18)(p11.2p11.3)"}
+        sentence: "Questionable identification: Direct duplication of chromosome 18: the segment from 18p11.2 to 18p11.3 is present twice, in the same orientation."
+        kb: ["vocab:symbols/question mark (?)", "rule:UNCERTAIN.QUESTIONABLE_ITEM", "vocab:symbols/dup", "rule:DUP.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:18p11.2", "band:18p11.3"]
+      - span: {start: 31, text: "dup(18)(pcp18p11.2+)"}
+        sentence: "Duplication of chromosome 18; breakpoints as given at its first mention; probe partial chromosome paint 18p11.2 present."
+        kb: ["vocab:symbols/dup", "rule:DUP.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}
+  - input: "46,XY,inv(8)(p21q13).ish inv(8)(pcp8p++)"
+    cite: {section: "13.8", page: 114, example: "E2"}
+    context: unknown
+    summary: "46 chromosomes; sex chromosomes XY; 1 abnormality. Metaphase FISH (ish): 1 result."
+    items:
+      - span: {start: 6, text: "inv(8)(p21q13)"}
+        sentence: "Pericentric inversion of chromosome 8: the segment between 8p21 and 8q13, which includes the centromere, is reversed."
+        kb: ["vocab:symbols/inv", "rule:INV.FORMAT", "rule:STRUCT.BREAKPOINT_GROUPS", "vocab:symbols/p", "band:8p21", "vocab:symbols/q", "band:8q13"]
+      - span: {start: 25, text: "inv(8)(pcp8p++)"}
+        sentence: "Inversion of chromosome 8; breakpoints as given at its first mention; probe partial chromosome paint 8p present twice."
+        kb: ["vocab:symbols/inv", "rule:INV.FORMAT", "rule:ISH.LOCUS_LIST", "rule:ISH.LOCUS_DESIGNATION"]
+    review: {checked: false}

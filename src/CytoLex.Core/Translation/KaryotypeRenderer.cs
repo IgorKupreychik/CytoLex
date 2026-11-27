@@ -5,8 +5,8 @@ using CytoLex.Core.Semantics;
 namespace CytoLex.Core.Translation;
 
 /// <summary>
-/// Renders the literal translation of a string's karyotype parts from the edition's templates (T-058; decisions → Literal
-/// translation, T-054). A thin entry point: it wires the phrase renderers around one <see cref="RenderContext"/> and
+/// Renders the literal translation of a string's karyotype and in situ parts (T-058, T-093) from the edition's templates
+/// (decisions → Literal translation, T-054). A thin entry point: it wires the phrase renderers around one <see cref="RenderContext"/> and
 /// renders each sentence once per reading. One instance per string (the context tracks state across items).
 /// </summary>
 internal sealed class KaryotypeRenderer
@@ -15,6 +15,7 @@ internal sealed class KaryotypeRenderer
     private readonly HeaderRenderer _header;
     private readonly ItemRenderer _items;
     private readonly CompositionLine _compositionLine;
+    private readonly InSituRenderer _inSitu;
 
     public KaryotypeRenderer(TemplateSet templates, SampleContext? context, string input)
     {
@@ -27,6 +28,7 @@ internal sealed class KaryotypeRenderer
         _header = new HeaderRenderer(_ctx);
         _items = new ItemRenderer(_ctx, bands, composition, symbols, derivatives);
         _compositionLine = new CompositionLine(_ctx, chromosomes, composition);
+        _inSitu = new InSituRenderer(_ctx, bands, _items, new LocusPhrases(_ctx));
     }
 
     /// <summary>The composition line of an item (T-086), or <c>null</c> when it has no computed composition.</summary>
@@ -55,6 +57,22 @@ internal sealed class KaryotypeRenderer
             return _items.Text(item) + ".";
         });
         _ctx.Remember(item);
+        return sentence;
+    }
+
+    /// <summary>The summary sentence of an in situ segment (T-093).</summary>
+    public RenderedSentence InSituSummary(FishModel model) => _ctx.Render(() => _inSitu.Summary(model));
+
+    /// <summary>The sentence of one in situ result of cell line <paramref name="lineIndex"/> (T-093).</summary>
+    public RenderedSentence InSituItem(FishModel model, int lineIndex, FishItem item)
+    {
+        _ctx.Line = null;
+        var sentence = _ctx.Render(() => _inSitu.Item(model, lineIndex, item) + ".");
+        if (item.Abnormality is { } abnormality)
+        {
+            _ctx.Remember(abnormality);
+        }
+
         return sentence;
     }
 

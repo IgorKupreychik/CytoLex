@@ -84,14 +84,33 @@ internal static class GoldenFile
         }
     }
 
+    /// <summary>
+    /// The translated items of an in situ model (T-093): one per result, its span including the cells, in input order;
+    /// text the parser skipped gets no item.
+    /// </summary>
+    public static IEnumerable<(TextSpan Span, IReadOnlyList<MeaningNode> Nodes)> Items(FishModel model) =>
+        model.CellLines.SelectMany(l => l.Items).Select(i => (i.Span, (IReadOnlyList<MeaningNode>)[i]));
+
+    /// <summary>The translated items of a string's segments, in segment order.</summary>
+    public static IEnumerable<(TextSpan Span, IReadOnlyList<MeaningNode> Nodes)> Items(IReadOnlyList<SegmentModel> models) =>
+        models.SelectMany(m => m switch
+        {
+            KaryotypeModel k => Items(k),
+            FishModel f => Items(f),
+            _ => [],
+        });
+
     /// <summary>The KB refs of nodes and everything below them, in first-seen order.</summary>
     public static IReadOnlyList<string> Refs(IEnumerable<MeaningNode> nodes) =>
         [.. nodes.SelectMany(n => n.DescendantsAndSelf()).SelectMany(n => n.Kb).Select(k => k.ToString()).Distinct(StringComparer.Ordinal)];
 
-    /// <summary>The karyotype model of a golden input, or <c>null</c> when it isn't a single karyotype segment.</summary>
-    public static KaryotypeModel? Model(string input, bool fragment)
+    /// <summary>
+    /// The segment models of a golden input: karyotype and in situ segments (T-093); <c>null</c> when a segment is of
+    /// another type (arr: T-105) or the string has none.
+    /// </summary>
+    public static IReadOnlyList<SegmentModel>? Models(string input, bool fragment)
     {
         var models = BindHelper.BindAll(input, fragment);
-        return models.Count == 1 ? models[0] as KaryotypeModel : null;
+        return models.Count > 0 && models.All(m => m is KaryotypeModel or FishModel) ? [.. models.Cast<SegmentModel>()] : null;
     }
 }

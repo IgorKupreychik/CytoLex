@@ -86,6 +86,13 @@ internal sealed class SymbolDescriber(RenderContext ctx, ChromosomePhrases chrom
                     return new Desc(P("additional_material", "none_head", ("chromosome", c)), "; " + ctx.NoneGiven(p));
                 }
 
+                if (!bps[0].Alternatives.IsEmpty)
+                {
+                    // add(16)(p or q): the arm is not known, so no segment is named (§13.2 E45).
+                    var either = P("alternative", "phrase", ("first", bands.Band(bps[0])), ("second", bands.Band(bps[0].Alternatives[0])));
+                    return new Desc(P("additional_material", "head", ("chromosome", c), ("band", either)));
+                }
+
                 return new Desc(
                     P("additional_material", "head", ("chromosome", c), ("band", bands.Band(bps[0]))),
                     bps[0].Arm is null ? "" : P("additional_material", "rest", ("band", bands.Band(bps[0])), ("arm", bands.Arm(bps[0].Arm))));
@@ -121,10 +128,23 @@ internal sealed class SymbolDescriber(RenderContext ctx, ChromosomePhrases chrom
             case "inc":
                 return new Desc(P("incomplete", null));
 
+            case "enh":
+            case "dim":
+                return new Desc(P(p.Head == "enh" ? "enhanced" : "diminished", "cgh", ("region", CghRegion(c, bps))));
+
             default:
                 return new Desc(ctx.Written(p));
         }
     }
+
+    /// <summary>The region of a cgh <c>enh</c>/<c>dim</c> part (T-093): <c>chromosome 21</c>, <c>the short arm of chromosome 10</c>, <c>1q32 to 1q43</c>.</summary>
+    private string CghRegion(string c, List<Breakpoint> bps) => bps switch
+    {
+        [] => P("cgh_region", "chromosome", ("chromosome", c)),
+        [{ BandNumber: null, Landmark: null, Arm: { } arm }] => P("cgh_region", "arm", ("arm", bands.Arm(arm)), ("chromosome", c)),
+        [var b] => P("cgh_region", "band", ("band", bands.Band(b))),
+        [var from, .., var to] => P("cgh_region", "segment", ("from", bands.Band(from)), ("to", bands.Band(to))),
+    };
 
     /// <summary><c>r(7)(p22q36)</c>, <c>r(1;3)(…)</c>, <c>dic r(…)</c>, <c>+r</c>, <c>+5r</c>, <c>r1</c>.</summary>
     public Desc Ring(AbnormalityPart p)

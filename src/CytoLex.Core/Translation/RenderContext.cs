@@ -152,7 +152,10 @@ internal sealed class RenderContext(TemplateSet templates, SampleContext? contex
     };
 
     /// <summary>The text of the input at a node.</summary>
-    public string Written(MeaningNode n) => input.Substring(n.Span.Start, n.Span.Length);
+    public string Written(MeaningNode n) => Written(n.Span);
+
+    /// <summary>The text of the input at a span.</summary>
+    public string Written(Text.TextSpan span) => input.Substring(span.Start, span.Length);
 
     private static string Key(AbnormalityPart part) =>
         part.Head + "(" + string.Join(";", part.Chromosomes.Select(c => c.Name + (c.IsUnderlined ? "_" : ""))) + ")";

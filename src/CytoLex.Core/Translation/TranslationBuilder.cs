@@ -9,7 +9,7 @@ using CytoLex.Core.Validation;
 namespace CytoLex.Core.Translation;
 
 /// <summary>
-/// Builds the <see cref="TranslationResult"/> of one edition (T-058) from the segments' semantic models: the summary,
+/// Builds the <see cref="TranslationResult"/> of one edition (T-058; in situ segments T-093) from the segments' semantic models: the summary,
 /// one item per translated part (the item list of the golden file, T-057), KB links with titles, the diagnostics inside
 /// each part, and the optional coordinates. Parts with recovered or skipped input are not translated.
 /// </summary>
@@ -36,25 +36,31 @@ internal static class TranslationBuilder
         var renderer = new KaryotypeRenderer(templates, context.Effective, input);
         var items = ImmutableArray.CreateBuilder<TranslationItem>();
         RenderedSentence? summary = null;
-        ImmutableArray<KbLink> summaryLinks = [];
+        RenderedSentence? notImplemented = null;
+        var summaryLinks = new List<KbLink>();
         var untranslated = false;
 
         foreach (var (segment, model) in segments)
         {
+            if (model is FishModel fish)
+            {
+                summary = Join(summary, renderer.InSituSummary(fish));
+                summaryLinks.AddRange(fish.Kb.Concat(Refs(fish.Prefixes)).Distinct().Select(r => new KbLink(r, Title(kb, r))));
+                untranslated |= AddInSituParts(renderer, kb, input, fish, diagnostics, includeCoordinates, items);
+                continue;
+            }
+
             if (model is not KaryotypeModel karyotype)
             {
                 var sentence = renderer.NotImplemented(segment.Type.ToKbName());
-                summary ??= sentence;
+                notImplemented ??= sentence;
                 items.Add(Untranslated(segment.Span, input, sentence, diagnostics));
                 untranslated = true;
                 continue;
             }
 
-            if (summary is null)
-            {
-                summary = renderer.Summary(karyotype);
-                summaryLinks = SummaryLinks(kb, karyotype);
-            }
+            summary = Join(summary, renderer.Summary(karyotype));
+            summaryLinks.AddRange(SummaryLinks(kb, karyotype));
 
             foreach (var (span, nodes, line, index) in Parts(karyotype))
             {
@@ -83,18 +89,105 @@ internal static class TranslationBuilder
             }
         }
 
-        summary ??= renderer.NotImplemented("?");
+        summary ??= notImplemented ?? renderer.NotImplemented("?");
         var partialResult = untranslated || !isValid;
         var basis = context.Effective is null ? ReadingBasis.Unknown : context.Hint is not null ? ReadingBasis.Hint : ReadingBasis.Inferred;
         var s = summary.Value;
         return new TranslationResult(
             Language,
-            new TranslationSummary(s.Text, s.Readings, summaryLinks, s.IsDraft),
+            new TranslationSummary(s.Text, s.Readings, [.. summaryLinks.DistinctBy(l => l.Ref)], s.IsDraft),
             items.ToImmutable(),
             partialResult,
             isValid ? null : renderer.Banner(kb.Edition),
             basis,
             renderer.UsedDraft);
+    }
+
+    /// <summary>
+    /// Adds the parts of an in situ segment (T-093): one per result, in input order, then the text the parser skipped.
+    /// Returns whether any part was left untranslated.
+    /// </summary>
+    private static bool AddInSituParts(
+        KaryotypeRenderer renderer,
+        IEditionKb kb,
+        string input,
+        FishModel model,
+        ImmutableArray<Diagnostic> diagnostics,
+        bool includeCoordinates,
+        ImmutableArray<TranslationItem>.Builder items)
+    {
+        var untranslated = false;
+        foreach (var (span, nodes, index) in Parts(model))
+        {
+            var inside = Inside(diagnostics, span);
+            if (nodes.Any(n => n.IsPartial || n is UnboundItem) || nodes is not [FishItem item])
+            {
+                var ids = inside.Select(i => diagnostics[i].RuleId).Distinct(StringComparer.Ordinal).ToList();
+                items.Add(new TranslationItem(span, Text(input, span), renderer.NotTranslated(ids).Text, null, Links(kb, nodes), false, false, inside, null));
+                untranslated = true;
+                continue;
+            }
+
+            RenderedSentence sentence;
+            try
+            {
+                sentence = renderer.InSituItem(model, index, item);
+            }
+            catch (Exception ex) when (ex is IndexOutOfRangeException or ArgumentException or InvalidOperationException or NullReferenceException)
+            {
+                sentence = renderer.RenderFailed();
+            }
+
+            items.Add(new TranslationItem(
+                span,
+                Text(input, span),
+                sentence.Text,
+                sentence.Readings,
+                Links(kb, nodes),
+                true,
+                sentence.IsDraft,
+                inside,
+                includeCoordinates ? Coordinates(kb, nodes) : null,
+                item.Abnormality is { } abnormality ? RenderCompositionLine(renderer, [abnormality]) : null));
+        }
+
+        return untranslated;
+    }
+
+    /// <summary>
+    /// The translated parts of an in situ model (T-093), in input order: one per result (its span includes the cells),
+    /// with the index of its cell line; then the text the parser skipped (untranslated).
+    /// </summary>
+    public static IEnumerable<(TextSpan Span, IReadOnlyList<MeaningNode> Nodes, int Line)> Parts(FishModel model)
+    {
+        for (var index = 0; index < model.CellLines.Length; index++)
+        {
+            foreach (var item in model.CellLines[index].Items)
+            {
+                yield return (item.Span, [item], index);
+            }
+        }
+
+        foreach (var unbound in model.Unbound)
+        {
+            yield return (unbound.Span, [unbound], -1);
+        }
+    }
+
+    /// <summary>Two summary sentences joined with a space, readings included (a karyotype and its in situ segments).</summary>
+    private static RenderedSentence Join(RenderedSentence? first, RenderedSentence second)
+    {
+        if (first is not { } a)
+        {
+            return second;
+        }
+
+        ContextReadings? readings = a.Readings is null && second.Readings is null
+            ? null
+            : new ContextReadings(
+                (a.Readings?.Constitutional ?? a.Text) + " " + (second.Readings?.Constitutional ?? second.Text),
+                (a.Readings?.Acquired ?? a.Text) + " " + (second.Readings?.Acquired ?? second.Text));
+        return new RenderedSentence(a.Text + " " + second.Text, readings, a.IsDraft || second.IsDraft);
     }
 
     /// <summary>
