@@ -193,7 +193,10 @@ public sealed class Validator
         var translation = options.IncludeTranslation
             ? TranslationBuilder.Build(profile.Kb, input, models, sorted, context, validity.IsValid, options.IncludeCoordinates)
             : null;
-        return new EditionResult(profile.Edition, EditionStatus.Implemented, null, validity, CountsOf(sorted), sorted, segs, cellLines, entries, translation);
+        return new EditionResult(profile.Edition, EditionStatus.Implemented, null, validity, CountsOf(sorted), sorted, segs, cellLines, entries, translation)
+        {
+            Loci = LocusList.Build(input, profile.Kb.Bands, cellLines, entries), // T-101
+        };
     }
 
     /// <summary>

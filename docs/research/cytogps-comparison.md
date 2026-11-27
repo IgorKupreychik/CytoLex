@@ -72,7 +72,7 @@ Status as of 2026-11-20. "CytoLex today" means the `feature/task-47` branch (aft
 | **Analysis output** | | | |
 | Loss–Gain–Fusion per band | ✅ (916 bands, JSON/CSV) | ❌ | 🗓 T-050 (deferred, priority 3) |
 | Aggregate statistics over a batch | ✅ (per-band loss/gain/fusion share, aggregate LGF table) | ◐ (summary per edition and rule) | 🗓 per-band statistics and aggregate LGF table (T-077) |
-| Ideogram view | ✅ | ❌ | 🗓 desktop "Map" view of the loci, linked to the abnormality list (T-101); LGF colouring (T-078, low priority) |
+| Ideogram view | ✅ | ✅ | desktop "Map" view (T-101): 850-band ideograms with the loci of the string (breaks, del/dup, ±chromosomes, arr copy numbers as written, in situ regions and paint/D-number probes), linked both ways with the input and the abnormality list; LGF colouring per band and clone still to do (T-078, low priority) |
 | R package | ✅ (RCytoGPS) | ❌ | 🗓 export in CytoGPS's JSON format, readable by RCytoGPS (T-079, low priority) |
 | Comparison with CytoGPS built in | – | ✅ (adapter: runs the local CytoGPS build on a batch, T-049; comparison engine: 2×2 verdict matrix, not-supported notation kept out, triage labels, KB-example drafts, report in `build/review/comparison/`, T-051; desktop CytoGPS tab in the single-string check with an agreement badge, T-081; desktop Batch tab comparison: matrix, agreement column and filters, side-by-side detail, triage editing saved to the YAML, report export, T-052) | 🗓 Loss–Gain–Fusion differences (T-050) |
 | **Batch** | | | |

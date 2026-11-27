@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using CytoLex.Core.Text;
 using CytoLex.Desktop.Editing;
 using CytoLex.Desktop.Highlighting;
+using CytoLex.Desktop.Ideograms;
 using CytoLex.Desktop.ViewModels;
 
 namespace CytoLex.Desktop.Views;
@@ -40,6 +41,47 @@ public partial class MainWindow : Window
         // Editor → translation part under the mouse (T-059).
         Input.TextArea.TextView.PointerMoved += OnEditorPointerMoved;
         Input.TextArea.TextView.PointerExited += OnEditorPointerExited;
+
+        // Map (T-101): a marker under the mouse or clicked on any ideogram.
+        AddHandler(IdeogramView.LocusHoveredEvent, OnIdeogramLocusHovered);
+        AddHandler(IdeogramView.LocusPressedEvent, OnIdeogramLocusPressed);
+    }
+
+    private void OnIdeogramLocusHovered(object? sender, LocusEventArgs e) => _viewModel?.HoverLocus(e.Locus);
+
+    private void OnIdeogramLocusPressed(object? sender, LocusEventArgs e)
+    {
+        if (e.Locus is { } locus)
+        {
+            _viewModel?.SelectLocus(locus);
+        }
+    }
+
+    // Map (T-101): a locus row under the mouse marks it, its marker and its span.
+    private void OnLocusPointerEntered(object? sender, PointerEventArgs e)
+    {
+        if (sender is Control { DataContext: LocusItemViewModel locus })
+        {
+            _viewModel?.HoverLocus(locus);
+        }
+    }
+
+    private void OnLocusPointerExited(object? sender, PointerEventArgs e)
+    {
+        if (sender is Control { DataContext: LocusItemViewModel { IsHighlighted: true } })
+        {
+            _viewModel?.HoverLocus(null);
+        }
+    }
+
+    // Abnormalities panel (T-101): "Map" on a card shows its loci on the Map.
+    private void OnShowOnMap(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Control { DataContext: AbnormalityItemViewModel card })
+        {
+            _viewModel?.ShowOnMap(card);
+            e.Handled = true;
+        }
     }
 
     /// <summary>Stops a running CytoGPS check (T-081) and batch comparison (T-052) with the window.</summary>

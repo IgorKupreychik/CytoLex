@@ -482,8 +482,10 @@ def test_runtime_bundle_content(kb):
         "book": True,
         "grch37": [1, 7200000],
         "grch38": [1, 7100000],
+        "stain": "gneg",
     }
     assert by_name["6p24.1"]["book"] is False
+    assert by_name["6p24.1"]["stain"] == "gpos25" and by_name["1p36"]["stain"] is None
     assert by_name["1q32.11"]["grch37"] is None and by_name["1q32.11"]["grch38"] is None
     full = json.loads((kb[2] / "kb.json").read_text(encoding="utf-8"))
     assert full["format_version"] == 2  # the full KB keeps its own format

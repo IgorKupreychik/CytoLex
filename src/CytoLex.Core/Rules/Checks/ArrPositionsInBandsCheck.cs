@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using CytoLex.Core.Kb;
 using CytoLex.Core.Semantics;
 using CytoLex.Core.Text;
@@ -91,11 +90,8 @@ internal sealed record ArrPositionFitResult(ImmutableArray<ArrPositionFailure> F
 /// <summary>Compares arr positions with the band coordinates of one build (<c>ARR.POSITIONS_IN_BANDS</c>, T-088).</summary>
 internal static class ArrPositionFit
 {
-    private static readonly ConditionalWeakTable<BandSet, ChromosomeEnds> _ends = [];
-
     public static ArrPositionFitResult Evaluate(IReadOnlyList<ArrReading> readings, BandSet bands, string build)
     {
-        var ends = _ends.GetValue(bands, b => new ChromosomeEnds(b));
         var failures = ImmutableArray.CreateBuilder<ArrPositionFailure>();
         var tested = 0;
         foreach (var reading in readings)
@@ -107,7 +103,7 @@ internal static class ArrPositionFit
                 continue;
             }
 
-            var length = ends.Of(chromosome.Name, build);
+            var length = bands.ChromosomeRange(chromosome.Name, Build(build))?.End;
             var endSpan = reading.Last.EndSpan ?? reading.Last.StartSpan;
             var firstBand = reading.Region.First;
             var lastBand = reading.Region.Last ?? firstBand;
@@ -154,7 +150,9 @@ internal static class ArrPositionFit
         return new(failures.ToImmutable(), tested);
     }
 
-    private static GenomicRange? Range(Band band, string build) => build == ArrPositionsInBandsCheck.Grch37 ? band.Grch37 : band.Grch38;
+    private static GenomicRange? Range(Band band, string build) => band.In(Build(build));
+
+    private static ReferenceBuild Build(string build) => build == ArrPositionsInBandsCheck.Grch37 ? ReferenceBuild.Grch37 : ReferenceBuild.Grch38;
 
     /// <summary>
     /// The band that holds the position at the lowest band level the written band exists at (<c>17p12</c> → level 300 →
@@ -194,20 +192,4 @@ internal static class ArrPositionFit
     private static string Shape(string number) => new([.. number.Select(c => c == '.' ? '.' : '9')]);
 
     private static string N(long value) => value.ToString(CultureInfo.InvariantCulture);
-
-    /// <summary>The chromosome lengths per build: the largest band end of each chromosome.</summary>
-    private sealed class ChromosomeEnds(BandSet bands)
-    {
-        private readonly Dictionary<string, long> _grch37 = Max(bands, b => b.Grch37);
-        private readonly Dictionary<string, long> _grch38 = Max(bands, b => b.Grch38);
-
-        public long? Of(string chromosome, string build) =>
-            (build == ArrPositionsInBandsCheck.Grch37 ? _grch37 : _grch38).TryGetValue(chromosome, out var l) ? l : null;
-
-        private static Dictionary<string, long> Max(BandSet bands, Func<Band, GenomicRange?> range) =>
-            bands.Bands
-                .Where(b => range(b) is not null)
-                .GroupBy(b => b.Chromosome, StringComparer.Ordinal)
-                .ToDictionary(g => g.Key, g => g.Max(b => range(b)!.End), StringComparer.Ordinal);
-    }
 }

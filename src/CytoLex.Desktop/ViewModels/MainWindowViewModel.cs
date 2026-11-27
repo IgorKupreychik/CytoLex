@@ -282,20 +282,45 @@ public partial class MainWindowViewModel : ObservableObject
     {
         EditorToolTip = ToolTipAt(value);
         var translation = SelectedPanel?.Translation;
-        if (translation is null)
+        var map = SelectedPanel?.Map;
+        if (translation is null && map is null)
         {
             return;
         }
 
-        if (value is { } offset && translation.HighlightAt(offset) is { } span)
+        // The translation part at the offset, else the locus there (T-101: an arr result has no translation part yet).
+        var span = value is { } offset ? translation?.HighlightAt(offset) ?? map?.SpanAt(offset) : null;
+        if (span is null)
         {
-            HoverSpan = span;
+            translation?.Highlight(null);
         }
-        else
-        {
-            translation.Highlight(null);
-            HoverSpan = null;
-        }
+
+        HoverSpan = span;
+    }
+
+    // The Map marks the loci of the span under the mouse: an editor position, a card, a translation part (T-101).
+    partial void OnHoverSpanChanged(TextSpan? value) => SelectedPanel?.Map?.HighlightSpan(value);
+
+    /// <summary>A Map marker or locus row is under the mouse (<paramref name="item"/>), or the mouse left it (<c>null</c>): marks it and its span.</summary>
+    public void HoverLocus(LocusItemViewModel? item)
+    {
+        HoverSpan = item?.Span;
+        SelectedPanel?.Map?.Highlight(item);
+    }
+
+    /// <summary>A Map marker or locus row was clicked: selects its span in the editor and marks its abnormality card.</summary>
+    public void SelectLocus(LocusItemViewModel item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        SelectSpan(item.Span);
+    }
+
+    /// <summary>"Show on map" on an abnormality card (T-101): switches to the Map view and selects the card's loci.</summary>
+    public void ShowOnMap(AbnormalityItemViewModel card)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        SelectedView = ResultView.Map;
+        SelectSpan(card.Span);
     }
 
     partial void OnShowCoordinatesChanged(bool value) => Validate();
@@ -305,6 +330,7 @@ public partial class MainWindowViewModel : ObservableObject
         foreach (var panel in Panels)
         {
             panel.Translation?.SetBuild(value.Build);
+            panel.Map?.SetBuild(value.Build);
         }
     }
 
@@ -470,6 +496,7 @@ public partial class MainWindowViewModel : ObservableObject
     public void SelectSpan(TextSpan span)
     {
         SelectedSpan = span;
+        SelectedPanel?.MarkSelection(span); // T-101: the loci on the Map and the abnormality cards
         OnPropertyChanged(nameof(SelectedSpan));
     }
 
@@ -591,7 +618,7 @@ public partial class MainWindowViewModel : ObservableObject
     }
 }
 
-/// <summary>The view tabs of the single-string check (T-098), in tab order; later views (Map, T-101) are added here.</summary>
+/// <summary>The view tabs of the single-string check (T-098), in tab order; a new view adds a value here and a tab at the same place.</summary>
 public enum ResultView
 {
     /// <summary>Verdict, Fix all, segments and diagnostics with fixes (the default).</summary>
@@ -602,6 +629,9 @@ public enum ResultView
 
     /// <summary>The literal translation (T-059).</summary>
     Translation,
+
+    /// <summary>The loci on the ideograms (T-101).</summary>
+    Map,
 
     /// <summary>The optional CytoGPS check (T-081).</summary>
     CytoGps,

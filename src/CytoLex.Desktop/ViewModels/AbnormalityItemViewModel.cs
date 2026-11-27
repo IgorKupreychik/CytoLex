@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text;
 using Avalonia.Media;
 using Avalonia.Media.Immutable;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CytoLex.Core.Segmentation;
 using CytoLex.Core.Semantics;
 using CytoLex.Core.Text;
@@ -35,7 +36,7 @@ public sealed record AbnormalityPartViewModel(TextSpan Span, string Text, string
 }
 
 /// <summary>One card of the abnormalities panel (T-069): an <see cref="AbnormalityEntry"/> rendered for display.</summary>
-public sealed class AbnormalityItemViewModel : ISpanItem
+public sealed partial class AbnormalityItemViewModel : ObservableObject, ISpanItem
 {
     private static readonly IImmutableSolidColorBrush _gain = Brush(0x10, 0x7C, 0x10);
     private static readonly IImmutableSolidColorBrush _loss = Brush(0xB1, 0x46, 0xC2);
@@ -115,6 +116,13 @@ public sealed class AbnormalityItemViewModel : ISpanItem
 
     /// <summary>Whether there is a detailed form that differs from the written text (a string already in the detailed system isn't shown twice).</summary>
     public bool ShowDetailed => Detailed is not null && !string.Equals(Detailed, Text, StringComparison.Ordinal);
+
+    /// <summary>Whether the Map view has loci of this entry (T-101): the card shows "Show on map".</summary>
+    public bool IsOnMap { get; internal set; }
+
+    /// <summary>Marked because a locus of it (or a span inside it) was selected, e.g. on the Map (T-101).</summary>
+    [ObservableProperty]
+    public partial bool IsMarked { get; set; }
 
     /// <summary>The kind chip: <c>gain</c>, <c>loss</c>, the symbol (<c>del</c>, <c>der</c>), <c>variant</c>, <c>or</c>, <c>clone</c>, <c>?</c>.</summary>
     public string KindLabel { get; }

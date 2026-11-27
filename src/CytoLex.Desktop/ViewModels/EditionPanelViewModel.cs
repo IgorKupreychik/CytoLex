@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CytoLex.Core.Context;
 using CytoLex.Core.Semantics;
+using CytoLex.Core.Text;
 using CytoLex.Core.Validation;
 using CytoLex.Desktop.Highlighting;
 
@@ -47,6 +48,13 @@ public partial class EditionPanelViewModel : ObservableObject
         Diagnostics = [.. result.Diagnostics.Select((d, i) => new DiagnosticItemViewModel(text, d, i, result.Edition, applyFix))];
         FixAll = FixAllViewModel.From(text, result, report.Context.Effective, applyFix);
         CellLineGroups = CellLineGroupViewModel.From(result, text.ToEditor);
+        var withLoci = result.Loci.Select(l => l.Abnormality).ToHashSet();
+        foreach (var card in CellLineGroups.SelectMany(g => g.Items))
+        {
+            card.IsOnMap = withLoci.Contains(card.Entry.Index);
+        }
+
+        Map = IsNotImplemented ? null : new MapViewModel(result, MapBands.For(result.Edition), build, text.ToEditor);
         Highlights = IsNotImplemented ? [] : HighlightBuilder.Build(text, result, report.Context.Effective);
         if (text.IsCorrected)
         {
@@ -84,6 +92,26 @@ public partial class EditionPanelViewModel : ObservableObject
 
     /// <summary>The literal translation (T-059); <c>null</c> when the edition has none (not implemented, or not requested).</summary>
     public TranslationViewModel? Translation { get; }
+
+    /// <summary>The Map view (T-101): ideograms with the loci of the string; <c>null</c> for a not-implemented edition.</summary>
+    public MapViewModel? Map { get; }
+
+    /// <summary>The Map tab header: <c>Map (3)</c>.</summary>
+    public string MapHeader => Map?.Header ?? "Map";
+
+    /// <summary>
+    /// Marks what a selection of <paramref name="span"/> (a clicked marker, row, card or diagnostic) is about: the loci on the
+    /// Map and the abnormality cards holding it or inside it (T-101).
+    /// </summary>
+    public void MarkSelection(TextSpan span)
+    {
+        Map?.SelectSpan(span);
+        foreach (var card in CellLineGroups.SelectMany(g => g.Items))
+        {
+            card.IsMarked = span.Length > 0
+                && ((span.Start >= card.Span.Start && span.End <= card.Span.End) || (card.Span.Start >= span.Start && card.Span.End <= span.End));
+        }
+    }
 
     /// <summary>Whether there is a translation to show.</summary>
     public bool HasTranslation => Translation is not null;

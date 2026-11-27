@@ -65,9 +65,10 @@ public static class BatchExport
     /// <summary>
     /// The current JSON format version. 2 (T-096): an edition result may carry <c>AutoCorrection</c>, and then its spans
     /// refer to the corrected string. 3 (T-070): a cell line written with <c>idem</c>/<c>sl</c>/<c>sdl</c> carries
-    /// <c>Reference</c>, <c>Inherited</c> and <c>FullForm</c>. Older files read as they are.
+    /// <c>Reference</c>, <c>Inherited</c> and <c>FullForm</c>. 4 (T-101): an edition result carries <c>Loci</c>.
+    /// Older files read as they are (no loci).
     /// </summary>
-    public const int JsonFormatVersion = 3;
+    public const int JsonFormatVersion = 4;
 
     /// <summary>The CSV header (T-096 appended <c>verdict</c>, <c>corrected</c>, <c>autocorrections</c>).</summary>
     public static ImmutableArray<string> CsvColumns { get; } =

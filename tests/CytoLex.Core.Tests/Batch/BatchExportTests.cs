@@ -153,7 +153,7 @@ public class BatchExportTests
         Assert.Equal(EditionVerdict.ValidAfterAutoCorrection, result.Verdict);
         Assert.Equal("47,XY,+21", result.AutoCorrection!.Corrected);
         Assert.Equal("47,XY, +21", back.Items[0].Report.Input);
-        Assert.Contains("\"FormatVersion\": 3", Encoding.UTF8.GetString(json), StringComparison.Ordinal);
+        Assert.Contains("\"FormatVersion\": 4", Encoding.UTF8.GetString(json), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -186,11 +186,32 @@ public class BatchExportTests
         Assert.Empty(back.Items[0].Report.Results[0].CellLines[0].Inherited);
     }
 
+    /// <summary>T-101: the loci go into the export and a version 3 file (no loci) still reads.</summary>
+    [Fact]
+    public void Json_CarriesLoci_ReadsVersion3()
+    {
+        var result = BatchRunner.Run(Validator.Default, [new BatchItem(1, null, "46,XX,del(5)(q13q33)")], new ValidationOptions { Editions = EditionSelection.One("2016") });
+        var text = Encoding.UTF8.GetString(Bytes(s => BatchExport.WriteJson(s, result)));
+        using var input = new MemoryStream(Encoding.UTF8.GetBytes(text));
+        Assert.Equal("5q13", Assert.Single(BatchExport.ReadJson(input).Items[0].Report.Results[0].Loci).From);
+
+        var doc = System.Text.Json.Nodes.JsonNode.Parse(text)!;
+        doc["FormatVersion"] = 3;
+        foreach (var edition in doc["Items"]![0]!["Report"]!["Results"]!.AsArray())
+        {
+            edition!.AsObject().Remove("Loci");
+        }
+
+        var v3 = doc.ToJsonString();
+        using var old = new MemoryStream(Encoding.UTF8.GetBytes(v3));
+        Assert.Empty(BatchExport.ReadJson(old).Items[0].Report.Results[0].Loci);
+    }
+
     [Fact]
     public void Json_ReadsVersion2()
     {
         var json = Encoding.UTF8.GetString(Bytes(s => BatchExport.WriteJson(s, _autoResult.Value)))
-            .Replace("\"FormatVersion\": 3", "\"FormatVersion\": 2", StringComparison.Ordinal);
+            .Replace("\"FormatVersion\": 4", "\"FormatVersion\": 2", StringComparison.Ordinal);
         using var v2 = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
         Assert.Equal(_autoItems.Length, BatchExport.ReadJson(v2).Items.Length);

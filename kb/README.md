@@ -35,10 +35,10 @@ Any error → exit 1 and nothing written. Otherwise it writes `build/kb.sqlite` 
   rules: [{id, section, title, severity, statement, applies_to, context?, related?, fix?,
            review: {needs_review, note?}, cite: [{section, page, para?|example?|float?, rendered}]}],
   vocab: {<vocabulary>: {shared_tokens?, entries: [{label, kind, tokens, pair?, equivalent_forms?, meanings, cite: "<rendered>"}]}},
-  bands: {levels_available, bands: [{name, chrom, arm, parent, levels, derived, book, grch37, grch38}]} | null,
+  bands: {levels_available, bands: [{name, chrom, arm, parent, levels, derived, book, grch37, grch38, stain}]} | null,
   translation?: {templates: {<language>: [<template as in the YAML file>]}}}}}
 ```
-`translation` (T-057) is present only when the edition has `kb/translation/<version>/`; it was added without a format bump because readers ignore unknown keys. Left out: the golden file, quotes, examples, `paraphrase_checked`, file paths, vocab `source`/`review`/`note`, band `stain`/sources/counts. Bump `RUNTIME_FORMAT_VERSION` in `tools/src/cytolex_tools/kb/build.py` on any incompatible change; the core checks it at load (T-028).
+`translation` (T-057) is present only when the edition has `kb/translation/<version>/`; it was added without a format bump because readers ignore unknown keys. Left out: the golden file, quotes, examples, `paraphrase_checked`, file paths, vocab `source`/`review`/`note`, band sources/counts. Band `stain` (gneg, gpos25…gpos100, acen, gvar, stalk; `null` for derived and book-only names) was added in T-101 without a format bump, for the desktop ideograms; a bundle without it reads as no stain. Bump `RUNTIME_FORMAT_VERSION` in `tools/src/cytolex_tools/kb/build.py` on any incompatible change; the core checks it at load (T-028).
 
 ## Layout
 | Path | Content |

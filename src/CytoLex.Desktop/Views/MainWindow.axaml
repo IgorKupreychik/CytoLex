@@ -5,6 +5,7 @@
         xmlns:vm="using:CytoLex.Desktop.ViewModels"
         xmlns:rules="using:CytoLex.Desktop.Rules"
         xmlns:hl="using:CytoLex.Desktop.Highlighting"
+        xmlns:ideo="using:CytoLex.Desktop.Ideograms"
         xmlns:ext="using:CytoLex.External"
         x:Class="CytoLex.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -232,10 +233,10 @@
                       <ItemsControl ItemsSource="{Binding Items}">
                         <ItemsControl.ItemTemplate>
                           <DataTemplate x:DataType="vm:AbnormalityItemViewModel">
-                            <Border Classes="card" Opacity="{Binding Opacity}"
+                            <Border Classes="card" Classes.marked="{Binding IsMarked}" Opacity="{Binding Opacity}"
                                     Tapped="OnSpanItemTapped" PointerEntered="OnCardPointerEntered" PointerExited="OnCardPointerExited">
                               <StackPanel Spacing="4">
-                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                                   <Border Grid.Column="0" Background="{Binding KindBrush}" CornerRadius="3" Padding="6,1"
                                           VerticalAlignment="Center" Margin="0,0,8,0">
                                     <TextBlock Text="{Binding KindLabel}" Foreground="White" FontSize="12" />
@@ -248,6 +249,9 @@
                                   <Ellipse Grid.Column="2" Width="10" Height="10" Fill="{Binding DiagnosticsBrush}"
                                            IsVisible="{Binding HasDiagnostics}" VerticalAlignment="Center"
                                            ToolTip.Tip="{Binding DiagnosticsTip}" />
+                                  <Button Grid.Column="3" Content="Map" Click="OnShowOnMap" IsVisible="{Binding IsOnMap}"
+                                          Padding="6,0" Margin="8,0,0,0" FontSize="12" VerticalAlignment="Center"
+                                          ToolTip.Tip="Show its loci on the Map" />
                                 </Grid>
                                 <TextBlock Text="{Binding Detailed}" IsVisible="{Binding ShowDetailed}" Opacity="0.65" TextWrapping="Wrap"
                                            FontFamily="Cascadia Mono,Consolas,monospace"
@@ -381,6 +385,60 @@
               </StackPanel>
             </ScrollViewer>
           </DockPanel>
+        </Panel>
+      </TabItem>
+      <!-- Map (T-101): ideograms (850 level) with the loci of the string; links both ways with the editor and the cards -->
+      <TabItem Header="{Binding SelectedPanel.MapHeader, FallbackValue=Map}">
+        <Panel DataContext="{Binding SelectedPanel}" x:DataType="vm:EditionPanelViewModel">
+          <TextBlock Text="{Binding NotImplementedText}" IsVisible="{Binding IsNotImplemented}" Opacity="0.6" Margin="0,6" />
+          <Panel IsVisible="{Binding IsImplemented}">
+            <DockPanel Margin="0,6,0,0" DataContext="{Binding Map}" x:DataType="vm:MapViewModel">
+              <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12" Margin="0,0,0,6">
+                <CheckBox Content="All chromosomes" FontSize="13" IsChecked="{Binding ShowAllChromosomes}"
+                          ToolTip.Tip="Draw all 24 chromosomes, or only those with loci" />
+                <ComboBox FontSize="13" MinWidth="100"
+                          ItemsSource="{x:Static vm:MainWindowViewModel.CoordinateBuilds}"
+                          SelectedItem="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SelectedCoordinateBuild}"
+                          ToolTip.Tip="Genome build the loci are placed in (band coordinates from NCBI/UCSC; arr positions as written)">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:CoordinateBuildChoice">
+                      <TextBlock Text="{Binding Label}" />
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+                <TextBlock Text="850-band ideograms · gain/loss only where the symbol states it (del, dup, +/–) · arr copy numbers as written"
+                           FontSize="11" Opacity="0.6" VerticalAlignment="Center" TextWrapping="Wrap" />
+              </StackPanel>
+              <TextBlock DockPanel.Dock="Top" Text="No band data for this edition." Opacity="0.6" IsVisible="{Binding !HasBands}" />
+              <!-- Locus list (right) -->
+              <Border DockPanel.Dock="Right" Width="300" Margin="8,0,0,0" Classes="panel">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                  <StackPanel Margin="6" Spacing="2">
+                    <TextBlock Text="No loci in this string." Opacity="0.6" IsVisible="{Binding !HasLoci}" TextWrapping="Wrap" />
+                    <ItemsControl ItemsSource="{Binding Loci}" ItemTemplate="{StaticResource LocusRowTemplate}" />
+                    <TextBlock Text="{Binding UnplacedHeader}" IsVisible="{Binding HasUnplaced}" FontWeight="SemiBold" Opacity="0.85"
+                               Margin="0,8,0,2" TextWrapping="Wrap" FontSize="12" />
+                    <ItemsControl ItemsSource="{Binding Unplaced}" ItemTemplate="{StaticResource LocusRowTemplate}" />
+                  </StackPanel>
+                </ScrollViewer>
+              </Border>
+              <!-- Ideograms -->
+              <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Chromosomes}" Margin="0,0,8,8">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:IdeogramChromosomeViewModel">
+                      <ideo:IdeogramView Chromosome="{Binding}" MaxBodyHeight="280" Margin="2,0,2,10" Cursor="Hand" />
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </ScrollViewer>
+            </DockPanel>
+          </Panel>
         </Panel>
       </TabItem>
       <!-- CytoGPS (T-081): on demand, in the background; its result never changes the CytoLex views -->
@@ -1030,6 +1088,24 @@
       </Grid>
     </DataTemplate>
 
+    <!-- One locus of the Map's list (T-101): click selects its span, hover marks it in the editor and on the ideogram -->
+    <DataTemplate x:Key="LocusRowTemplate" x:DataType="vm:LocusItemViewModel">
+      <Border Classes="locus" Classes.highlighted="{Binding IsHighlighted}" Classes.selected="{Binding IsSelected}"
+              Tapped="OnSpanItemTapped" PointerEntered="OnLocusPointerEntered" PointerExited="OnLocusPointerExited"
+              ToolTip.Tip="{Binding Tip}">
+        <Grid ColumnDefinitions="Auto,*">
+          <Border Grid.Column="0" Background="{Binding Brush}" CornerRadius="3" Padding="5,0" VerticalAlignment="Top"
+                  Margin="0,1,6,0" MinWidth="44">
+            <TextBlock Text="{Binding EffectLabel}" Foreground="White" FontSize="11" HorizontalAlignment="Center" />
+          </Border>
+          <StackPanel Grid.Column="1" Spacing="0">
+            <TextBlock Text="{Binding Place}" FontFamily="Cascadia Mono,Consolas,monospace" FontSize="12" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding Details}" FontSize="11" Opacity="0.65" TextWrapping="Wrap" />
+          </StackPanel>
+        </Grid>
+      </Border>
+    </DataTemplate>
+
     <!-- The summary or one part of a translation (T-059): text, sentence, readings, KB links, diagnostics, coordinates -->
     <DataTemplate x:Key="TranslationItemTemplate" x:DataType="vm:TranslationItemViewModel">
       <Border Classes="card" Classes.highlighted="{Binding IsHighlighted}" Classes.summary="{Binding IsSummary}"
@@ -1158,6 +1234,25 @@
       <Setter Property="Margin" Value="0,0,0,6" />
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <!-- T-101: a card marked by a selection on the Map; a locus row highlighted or selected -->
+    <Style Selector="Border.card.marked">
+      <Setter Property="BorderBrush" Value="#0078D4" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+    <Style Selector="Border.locus">
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="Padding" Value="4,3" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Border.locus:pointerover, Border.locus.highlighted">
+      <Setter Property="Background" Value="#22FFC800" />
+    </Style>
+    <Style Selector="Border.locus.selected">
+      <Setter Property="BorderBrush" Value="#0078D4" />
     </Style>
     <Style Selector="Border.card:pointerover">
       <Setter Property="BorderBrush" Value="#0078D4" />

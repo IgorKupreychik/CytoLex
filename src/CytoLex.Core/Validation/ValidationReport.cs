@@ -69,6 +69,12 @@ public sealed record EditionResult(
     TranslationResult? Translation = null,
     AutoCorrection? AutoCorrection = null)
 {
+    /// <summary>
+    /// The loci of the string on the chromosomes (T-101), in input order: from <see cref="Abnormalities"/> and the
+    /// edition's band data; empty for a not-implemented edition. Spans refer to the same text as the other spans.
+    /// </summary>
+    public ImmutableArray<LocusEntry> Loci { get; init; } = [];
+
     /// <summary>The verdict (T-096): valid as written, valid after autocorrection, not valid, or not implemented.</summary>
     public EditionVerdict Verdict => Status == EditionStatus.NotImplemented
         ? EditionVerdict.NotImplemented

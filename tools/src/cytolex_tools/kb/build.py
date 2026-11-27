@@ -45,6 +45,7 @@ from .schema import SCHEMA_DIR, Problem, iter_yaml_files, load_yaml, validate_fi
 FORMAT_VERSION = 2  # 2: `vocab` (T-008)
 RUNTIME_FORMAT_VERSION = 1  # kb-runtime.json (T-060); independent of FORMAT_VERSION
 BAND_KEYS = ("name", "chrom", "arm", "parent", "levels", "derived", "book", "grch37", "grch38")
+RUNTIME_BAND_KEYS = (*BAND_KEYS, "stain")  # stain added without a format bump (T-101: ideograms)
 EDITION_RE = re.compile(r"^[0-9]{4}$")
 FILE_SECTION_RE = re.compile(r"^(\d+(?:\.\d+)*)-")
 SEPARATOR_RE = re.compile(r"^\|(\s*:?-+:?\s*\|)+$")
@@ -986,7 +987,7 @@ def runtime_bundle(report: BuildReport) -> dict:
         if ed.bands is not None:
             bands = {
                 "levels_available": ed.bands.get("levels_available") or [],
-                "bands": [{k: b[k] for k in BAND_KEYS} for b in ed.bands["bands"]],
+                "bands": [{k: b.get(k) for k in RUNTIME_BAND_KEYS} for b in ed.bands["bands"]],
             }
         editions[v] = {"rules": rules, "vocab": vocab, "bands": bands}
         translation = _translation(ed, golden=False)
