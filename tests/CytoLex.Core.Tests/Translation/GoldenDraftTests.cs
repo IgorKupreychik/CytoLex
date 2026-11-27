@@ -9,7 +9,7 @@ using CytoLex.Core.Validation;
 namespace CytoLex.Core.Tests.Translation;
 
 /// <summary>
-/// Opt-in (T-057): writes a skeleton of the translation golden file for the book examples of ch. 4, 8, 9 and 13 (T-093) to
+/// Opt-in (T-057): writes a skeleton of the translation golden file for the book examples of ch. 4, 8, 9, 13 (T-093) and 14 (T-105) to
 /// <c>build/review/translation/golden-draft-2016.yaml</c>: input, cite, fragment flag, the item spans and KB refs the
 /// binder gives, and empty summary/sentences to fill in by hand; plus non-book strings from the file named by
 /// <c>CYTOLEX_GOLDEN_DRAFT_INPUTS</c> (origin synthetic). Strings already in <c>golden.yaml</c> are left out.
@@ -20,7 +20,7 @@ public class GoldenDraftTests
 {
     public const string RelativePath = "build/review/translation/golden-draft-2016.yaml";
 
-    private static readonly string[] _chapters = ["ch04/", "ch08/", "ch09/", "ch13/"];
+    private static readonly string[] _chapters = ["ch04/", "ch08/", "ch09/", "ch13/", "ch14/"];
 
     private static readonly JsonSerializerOptions _json = new() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
 
@@ -83,7 +83,7 @@ public class GoldenDraftTests
 
         foreach (var s in skipped)
         {
-            sb.Append(CultureInfo.InvariantCulture, $"# a segment that is neither a karyotype nor in situ, or with syntax errors: {Q(s)}\n");
+            sb.Append(CultureInfo.InvariantCulture, $"# a segment that is not a karyotype, in situ or microarray segment, or with syntax errors: {Q(s)}\n");
         }
 
         var path = Path.Combine(RuleCoverageReport.RepoRoot(), RelativePath);
@@ -103,7 +103,7 @@ public class GoldenDraftTests
             : [.. File.ReadAllLines(path).Select(l => l.Trim()).Where(l => l.Length > 0).Select(l => (l, (string?)null))];
     }
 
-    /// <summary>The cited valid examples of ch. 4, 8 and 9, first occurrence of each string, with the cite as flow YAML.</summary>
+    /// <summary>The cited valid examples of ch. 4, 8, 9, 13 and 14, first occurrence of each string, with the cite as flow YAML.</summary>
     private static List<(string Text, string? Cite)> BookExamples()
     {
         using var stream = typeof(KbCatalog).Assembly.GetManifestResourceStream(KbCatalog.ResourceName)!;

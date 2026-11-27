@@ -1192,6 +1192,9 @@ templates:
         text: "amplified {locus}"
       - when: group
         text: "{phrase}, amplified"
+      - when: arr
+        text: "amplification of {locus}"
+    note: "arr: amp in the place of the copy number (§14.2 E47, T-105)."
     review: {checked: false}
   - construct: diminished
     key: "vocab:symbols/dim"
@@ -1270,4 +1273,101 @@ templates:
         text: "{from} to {to}"
       - when: band
         text: "{band}"
+    review: {checked: false}
+
+  # ── Microarray (ch. 14, T-105) ─────────────────────────────────────────────────────────────
+  - construct: microarray
+    key: "vocab:symbols/arr"
+    slots: [build, technique, results, n]
+    forms:
+      - when: technique
+        text: "Microarray (arr)"
+      - when: technique_build
+        text: "Microarray (arr, {build})"
+      - when: summary
+        text: "{technique}: {results}."
+      - when: no_result
+        text: "no result"
+      - when: one_result
+        text: "1 result"
+      - when: results
+        text: "{n} results"
+    note: "The technique is named in the summary only (T-093 pattern); one sentence per comma-separated result."
+    review: {checked: false}
+  - construct: arr_result
+    key: "rule:ARR.REGION_FORMAT"
+    slots: [copies, what, region, details, chromosome, chromosomes, arm, from, to, band, phrase, positions]
+    forms:
+      - when: copies_of
+        text: "{copies} of {what}"
+      - when: detailed
+        text: "{region}: {details}"
+      - when: chromosome
+        text: "chromosome {chromosome}"
+      - when: chromosomes
+        text: "chromosomes {chromosomes}"
+      - when: range
+        text: "{from} to {to}"
+      - when: arm
+        text: "the {arm} of chromosome {chromosome}"
+      - when: band
+        text: "band {band}"
+      - when: segment
+        text: "the segment from {from} to {to}"
+      - when: with_positions
+        text: "{phrase} ({positions})"
+    note: "Copy numbers as written (T-105, as T-072/T-101): no gain/loss reading, which needs the sex and ploidy."
+    review: {checked: false}
+  - construct: arr_copy_number
+    key: "rule:ARR.COPY_NUMBER"
+    slots: [n, low, high]
+    forms:
+      - when: none
+        text: "no copy"
+      - when: one
+        text: "1 copy"
+      - when: n
+        text: "{n} copies"
+      - when: range
+        text: "{low} to {high} copies"
+    review: {checked: false}
+  - construct: nucleotide_positions
+    key: "rule:ARR.NUCLEOTIDE_FORMAT"
+    slots: [position, from, to, copies]
+    forms:
+      - when: position
+        text: "position {position}"
+      - when: span
+        text: "positions {from} to {to}"
+      - when: with_copies
+        text: "{position}, {copies}"
+    review: {checked: false}
+  - construct: zygosity
+    key: "rule:ARR.ZYGOSITY"
+    forms:
+      - when: hmz
+        text: "homozygous"
+      - when: htz
+        text: "heterozygous"
+    review: {checked: false}
+  - construct: complex_cx
+    key: "vocab:symbols/cx"
+    slots: [what]
+    forms:
+      - text: "multiple complex rearrangements in {what}"
+    review: {checked: false}
+  - construct: chromothripsis
+    key: "vocab:symbols/cth"
+    slots: [what]
+    forms:
+      - text: "chromothripsis (alternating copy number changes) in {what}"
+    review: {checked: false}
+  - construct: cell_proportion
+    key: "rule:ARR.MOSAIC_PROPORTION"
+    slots: [proportion]
+    forms:
+      - when: fraction
+        text: "in a proportion of {proportion} of cells"
+      - when: written
+        text: "proportion of cells: {proportion}"
     review: {checked: false}

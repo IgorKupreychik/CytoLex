@@ -91,12 +91,17 @@ internal static class GoldenFile
     public static IEnumerable<(TextSpan Span, IReadOnlyList<MeaningNode> Nodes)> Items(FishModel model) =>
         model.CellLines.SelectMany(l => l.Items).Select(i => (i.Span, (IReadOnlyList<MeaningNode>)[i]));
 
+    /// <summary>The translated items of a microarray model (T-105): one per result, in input order; text the parser skipped gets no item.</summary>
+    public static IEnumerable<(TextSpan Span, IReadOnlyList<MeaningNode> Nodes)> Items(ArrModel model) =>
+        model.Aberrations.Select(a => (a.Span, (IReadOnlyList<MeaningNode>)[a]));
+
     /// <summary>The translated items of a string's segments, in segment order.</summary>
     public static IEnumerable<(TextSpan Span, IReadOnlyList<MeaningNode> Nodes)> Items(IReadOnlyList<SegmentModel> models) =>
         models.SelectMany(m => m switch
         {
             KaryotypeModel k => Items(k),
             FishModel f => Items(f),
+            ArrModel a => Items(a),
             _ => [],
         });
 
@@ -105,12 +110,12 @@ internal static class GoldenFile
         [.. nodes.SelectMany(n => n.DescendantsAndSelf()).SelectMany(n => n.Kb).Select(k => k.ToString()).Distinct(StringComparer.Ordinal)];
 
     /// <summary>
-    /// The segment models of a golden input: karyotype and in situ segments (T-093); <c>null</c> when a segment is of
-    /// another type (arr: T-105) or the string has none.
+    /// The segment models of a golden input: karyotype, in situ (T-093) and microarray (T-105) segments; <c>null</c> when
+    /// a segment is of another type or the string has none.
     /// </summary>
     public static IReadOnlyList<SegmentModel>? Models(string input, bool fragment)
     {
         var models = BindHelper.BindAll(input, fragment);
-        return models.Count > 0 && models.All(m => m is KaryotypeModel or FishModel) ? [.. models.Cast<SegmentModel>()] : null;
+        return models.Count > 0 && models.All(m => m is KaryotypeModel or FishModel or ArrModel) ? [.. models.Cast<SegmentModel>()] : null;
     }
 }

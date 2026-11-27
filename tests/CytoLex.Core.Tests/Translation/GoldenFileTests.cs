@@ -24,7 +24,7 @@ public class GoldenFileTests
     {
         var entry = GoldenFile.Entries2016[input];
         var models = GoldenFile.Models(input, entry.IsFragment);
-        Assert.True(models is not null, $"'{input}' has a segment that is neither a karyotype nor in situ.");
+        Assert.True(models is not null, $"'{input}' has a segment that is not a karyotype, in situ or microarray segment.");
         foreach (var model in models)
         {
             Assert.False(model.IsPartial, $"'{input}' has syntax errors: {string.Join("; ", model.Issues.Select(i => i.Message))}");

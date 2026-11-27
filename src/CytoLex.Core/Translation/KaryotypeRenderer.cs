@@ -5,7 +5,7 @@ using CytoLex.Core.Semantics;
 namespace CytoLex.Core.Translation;
 
 /// <summary>
-/// Renders the literal translation of a string's karyotype and in situ parts (T-058, T-093) from the edition's templates
+/// Renders the literal translation of a string's karyotype, in situ and microarray parts (T-058, T-093, T-105) from the edition's templates
 /// (decisions → Literal translation, T-054). A thin entry point: it wires the phrase renderers around one <see cref="RenderContext"/> and
 /// renders each sentence once per reading. One instance per string (the context tracks state across items).
 /// </summary>
@@ -16,6 +16,7 @@ internal sealed class KaryotypeRenderer
     private readonly ItemRenderer _items;
     private readonly CompositionLine _compositionLine;
     private readonly InSituRenderer _inSitu;
+    private readonly ArrRenderer _arr;
 
     public KaryotypeRenderer(TemplateSet templates, SampleContext? context, string input)
     {
@@ -29,6 +30,7 @@ internal sealed class KaryotypeRenderer
         _items = new ItemRenderer(_ctx, bands, composition, symbols, derivatives);
         _compositionLine = new CompositionLine(_ctx, chromosomes, composition);
         _inSitu = new InSituRenderer(_ctx, bands, _items, new LocusPhrases(_ctx));
+        _arr = new ArrRenderer(_ctx, bands);
     }
 
     /// <summary>The composition line of an item (T-086), or <c>null</c> when it has no computed composition.</summary>
@@ -74,6 +76,16 @@ internal sealed class KaryotypeRenderer
         }
 
         return sentence;
+    }
+
+    /// <summary>The summary sentence of a microarray segment (T-105).</summary>
+    public RenderedSentence ArrSummary(ArrModel model) => _ctx.Render(() => _arr.Summary(model));
+
+    /// <summary>The sentence of one microarray result (T-105).</summary>
+    public RenderedSentence ArrItem(ArrAberration aberration)
+    {
+        _ctx.Line = null;
+        return _ctx.Render(() => _arr.Item(aberration) + ".");
     }
 
     /// <summary>The sentence of an untranslated part.</summary>

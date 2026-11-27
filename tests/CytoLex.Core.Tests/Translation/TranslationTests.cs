@@ -138,10 +138,10 @@ public class TranslationTests
     [Fact]
     public void NotImplementedSegment_IsAnUntranslatedPart()
     {
-        var t = Translate("46,XX.arr(1–22,X)×2");
-        var arr = Assert.Single(t.Items);
-        Assert.False(arr.IsTranslated);
-        Assert.Equal("Not translated: arr translation is not implemented.", arr.Sentence);
+        var t = Translate("46,XX.rsa[GRCh38] 1p36.33(849466_2432509)×1");
+        var rsa = Assert.Single(t.Items);
+        Assert.False(rsa.IsTranslated);
+        Assert.Equal("Not translated: rsa translation is not implemented.", rsa.Sentence);
         Assert.Equal("46 chromosomes; sex chromosomes XX; no abnormality.", t.Summary.Text);
         Assert.True(t.IsPartial);
     }
@@ -220,9 +220,9 @@ public class TranslationTests
             Assert.All(t.Items, i => Assert.DoesNotContain("{", i.Sentence, StringComparison.Ordinal));
             Assert.All(t.Items, i => Assert.DoesNotContain("no wording", i.Sentence, StringComparison.Ordinal));
 
-            // T-093: a valid string of karyotype and in situ segments is translated in full.
+            // T-093, T-105: a valid string of karyotype, in situ and microarray segments is translated in full.
             if (c.Kind == KbExamples.ExampleKind.Valid && result.Validity.IsValid
-                && result.Segments.All(s => s.Segment.Type is NotationType.Karyotype or NotationType.Ish or NotationType.NucIsh or NotationType.FibIsh or NotationType.RevIsh or NotationType.Cgh))
+                && result.Segments.All(s => s.Segment.Type is NotationType.Karyotype or NotationType.Ish or NotationType.NucIsh or NotationType.FibIsh or NotationType.RevIsh or NotationType.Cgh or NotationType.Arr))
             {
                 Assert.All(t.Items, i => Assert.True(i.IsTranslated, $"'{i.Text}': {i.Sentence}"));
             }

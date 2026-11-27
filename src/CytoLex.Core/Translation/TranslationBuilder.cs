@@ -9,7 +9,7 @@ using CytoLex.Core.Validation;
 namespace CytoLex.Core.Translation;
 
 /// <summary>
-/// Builds the <see cref="TranslationResult"/> of one edition (T-058; in situ segments T-093) from the segments' semantic models: the summary,
+/// Builds the <see cref="TranslationResult"/> of one edition (T-058; in situ segments T-093, microarray segments T-105) from the segments' semantic models: the summary,
 /// one item per translated part (the item list of the golden file, T-057), KB links with titles, the diagnostics inside
 /// each part, and the optional coordinates. Parts with recovered or skipped input are not translated.
 /// </summary>
@@ -47,6 +47,14 @@ internal static class TranslationBuilder
                 summary = Join(summary, renderer.InSituSummary(fish));
                 summaryLinks.AddRange(fish.Kb.Concat(Refs(fish.Prefixes)).Distinct().Select(r => new KbLink(r, Title(kb, r))));
                 untranslated |= AddInSituParts(renderer, kb, input, fish, diagnostics, includeCoordinates, items);
+                continue;
+            }
+
+            if (model is ArrModel arr)
+            {
+                summary = Join(summary, renderer.ArrSummary(arr));
+                summaryLinks.AddRange(arr.Kb.Concat(Refs(new MeaningNode?[] { arr.Build }.OfType<MeaningNode>())).Distinct().Select(r => new KbLink(r, Title(kb, r))));
+                untranslated |= AddArrParts(renderer, kb, input, arr, diagnostics, includeCoordinates, items);
                 continue;
             }
 
@@ -152,6 +160,70 @@ internal static class TranslationBuilder
         }
 
         return untranslated;
+    }
+
+    /// <summary>
+    /// Adds the parts of a microarray segment (T-105): one per result, in input order, then the text the parser skipped.
+    /// Returns whether any part was left untranslated.
+    /// </summary>
+    private static bool AddArrParts(
+        KaryotypeRenderer renderer,
+        IEditionKb kb,
+        string input,
+        ArrModel model,
+        ImmutableArray<Diagnostic> diagnostics,
+        bool includeCoordinates,
+        ImmutableArray<TranslationItem>.Builder items)
+    {
+        var untranslated = false;
+        foreach (var (span, nodes) in Parts(model))
+        {
+            var inside = Inside(diagnostics, span);
+            if (nodes.Any(n => n.IsPartial || n is UnboundItem) || nodes is not [ArrAberration aberration])
+            {
+                var ids = inside.Select(i => diagnostics[i].RuleId).Distinct(StringComparer.Ordinal).ToList();
+                items.Add(new TranslationItem(span, Text(input, span), renderer.NotTranslated(ids).Text, null, Links(kb, nodes), false, false, inside, null));
+                untranslated = true;
+                continue;
+            }
+
+            RenderedSentence sentence;
+            try
+            {
+                sentence = renderer.ArrItem(aberration);
+            }
+            catch (Exception ex) when (ex is IndexOutOfRangeException or ArgumentException or InvalidOperationException or NullReferenceException)
+            {
+                sentence = renderer.RenderFailed();
+            }
+
+            items.Add(new TranslationItem(
+                span,
+                Text(input, span),
+                sentence.Text,
+                sentence.Readings,
+                Links(kb, nodes),
+                true,
+                sentence.IsDraft,
+                inside,
+                includeCoordinates ? Coordinates(kb, nodes) : null));
+        }
+
+        return untranslated;
+    }
+
+    /// <summary>The translated parts of a microarray model (T-105), in input order: one per result, then the text the parser skipped.</summary>
+    public static IEnumerable<(TextSpan Span, IReadOnlyList<MeaningNode> Nodes)> Parts(ArrModel model)
+    {
+        foreach (var aberration in model.Aberrations)
+        {
+            yield return (aberration.Span, [aberration]);
+        }
+
+        foreach (var unbound in model.Unbound)
+        {
+            yield return (unbound.Span, [unbound]);
+        }
     }
 
     /// <summary>
