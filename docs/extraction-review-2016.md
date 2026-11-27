@@ -18,7 +18,7 @@ Two independent channels, plus a person:
 2. **Page images (verification only).** Pages were rendered to PNG (pdfplumber, deterministic)
    and compared by eye with the extracted chunks. Images never supply characters.
 3. **Person.** Tables are signed off by a person against the printed book
-   (`review.human` in `tools/src/cytolex_tools/extract/tables/2016.yaml`). Run
+   (`review.human` in `curated/extract/tables/2016.yaml`). Run
    `uv run --directory tools kb tables` to get one PNG per table region plus an index that
    names the chunk to compare it with (`build/review/tables/2016/`).
 
@@ -202,5 +202,5 @@ the page images.
 1. `uv run --directory tools kb extract --version 2016` (if not run since the last change).
 2. `uv run --directory tools kb tables` → open `build/review/tables/2016/index.md`.
 3. For each table, compare the image with the Markdown table in the named chunk.
-4. Set `review.human: ok` in `tools/src/cytolex_tools/extract/tables/2016.yaml` (or `mismatch`
+4. Set `review.human: ok` in `curated/extract/tables/2016.yaml` (or `mismatch`
    plus a note, and apply the backup plan), then rerun `kb extract`.

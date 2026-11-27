@@ -1,6 +1,6 @@
 # Test corpus
 
-Realistic ISCN strings that complement the KB examples (T-062). The KB examples (`kb/rules/`) stay the reference suite: short, book-cited, one rule each. The corpus adds:
+Realistic ISCN strings that complement the KB examples (T-062). The KB examples (`curated/rules/`) stay the reference suite: short, book-cited, one rule each. The corpus adds:
 
 - combined strings: several abnormalities, clones with `[n]`, `idem`/`sl`/`sdl`, composite karyotypes, mosaics, chimeras, segments joined by `.`;
 - volume for batch runs (T-038) and the CytoGPS comparison (T-051);

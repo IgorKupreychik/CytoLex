@@ -1,4 +1,4 @@
-# Test fixture: an excerpt of kb/bands/2016/exceptions.yaml (T-007), read by `kb build` for kb.sqlite (T-084).
+# Test fixture: an excerpt of curated/bands/2016/exceptions.yaml (T-007), read by `kb build` for kb.sqlite (T-084).
 version: '2016'
 exceptions:
   - level: 850

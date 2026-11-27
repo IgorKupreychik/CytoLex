@@ -1,4 +1,4 @@
-"""Tables: per-edition column layouts (tables/<version>.yaml) -> Markdown tables.
+"""Tables: per-edition column layouts (curated/extract/tables/<version>.yaml) -> Markdown tables.
 
 The PDF text layer has every character of a table, but `page_lines` reads it as plain lines, so
 the cell structure is lost. For each configured table region, the region's lines are taken out
@@ -11,9 +11,10 @@ from pathlib import Path
 
 from ruamel.yaml import YAML
 
+from ..config import CURATED_DIR
 from .layout import Line
 
-TABLES_DIR = Path(__file__).parent / "tables"
+TABLES_DIR = CURATED_DIR / "extract" / "tables"
 X_TOLERANCE = 2.0  # pt; a word may start this far left of its column's x
 
 

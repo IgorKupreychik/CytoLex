@@ -257,7 +257,7 @@ def test_translation_schema_rejects(data, where):
 
 # --- Test corpus (T-062) -------------------------------------------------------------------------
 
-CORPUS_DIR = SCHEMA_DIR.parents[1] / "tests" / "data" / "corpus"
+CORPUS_DIR = SCHEMA_DIR.parents[1] / "curated" / "corpus"
 
 
 def test_corpus_schema_is_valid_draft_2020_12():

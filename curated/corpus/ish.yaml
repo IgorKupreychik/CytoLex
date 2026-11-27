@@ -1,4 +1,4 @@
-# Test corpus (T-062): metaphase in situ hybridization (ch. 13; parse-only until T-015/T-033). Format and label policy: tests/data/corpus/README.md.
+# Test corpus (T-062): metaphase in situ hybridization (ch. 13; parse-only until T-015/T-033). Format and label policy: curated/corpus/README.md.
 # Synthetic strings only (data policy T-048); labels trace to the KB rules named in `rules`/`fires`.
 format: cytolex-corpus
 version: 1

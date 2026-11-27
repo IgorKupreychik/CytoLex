@@ -2,30 +2,35 @@
 
 The ISCN 2016 PDF draws several notation symbols with symbol fonts whose text layer maps to
 unrelated ASCII characters (e.g. the arrow `→` extracts as `]`). The same character in the body
-font is genuine (`[25]`), so the mapping is keyed by (font, char).
+font is genuine (`[25]`), so the mapping is keyed by (font, char). The mapping itself is
+person-checked data in `curated/extract/glyphs.yaml`.
 """
 
 from collections import Counter, defaultdict
+from pathlib import Path
 
-# (font base name, extracted char) -> real char
-GLYPH_MAP: dict[tuple[str, str], str] = {
-    ("GeneralSymbolsPB", "]"): "→",
-    ("GeneralSymbolsPB", "s"): "→",  # p.106 `pter→qter` (checked against the page image, T-003)
-    ("GeneralSymbolsPE", "P"): "●",  # filled FISH signal in nucleus-diagram legends (pp.109-112)
-    ("GeneralSymbolsPE", "S"): "○",  # open FISH signal in the same legends
-    ("MathTechnicalPD", "~"): "×",
-    ("MathTechnicalPD", "8"): "±",
-    ("MathTechnicalPA", "!"): "<",
-    ("MathTechnicalPA", "1"): ">",
-    ("MathTechnicalPA", "^"): "≤",  # pp.90, 100; checked against the page images (T-003)
-    ("MathematicalPi-Three", ","): "~",  # approximate sign, written `~` in ISCN strings
-    ("MathematicalPi-Three", ""): "~",
-    ("MathematicalPi-Four", ""): "′",
-    ("MathematicalPi-One", ""): "′",
-    ("MathematicalPi-One", "a"): "α",
-}
+from ruamel.yaml import YAML
 
-UNCERTAIN: set[tuple[str, str]] = set()  # mappings not yet checked against the page image
+from ..config import CURATED_DIR
+
+GLYPHS_FILE = CURATED_DIR / "extract" / "glyphs.yaml"
+
+
+def load_glyphs(
+    path: Path = GLYPHS_FILE,
+) -> tuple[dict[tuple[str, str], str], set[tuple[str, str]]]:
+    """(font base name, extracted char) -> real char, and the mappings marked `uncertain`."""
+    data = YAML(typ="safe").load(path.read_text(encoding="utf-8"))
+    mapping, uncertain = {}, set()
+    for g in data["glyphs"]:
+        key = (str(g["font"]), str(g["char"]))
+        mapping[key] = str(g["to"])
+        if g.get("uncertain"):
+            uncertain.add(key)
+    return mapping, uncertain
+
+
+GLYPH_MAP, UNCERTAIN = load_glyphs()  # UNCERTAIN: not yet checked against the page image
 
 # Fonts whose characters can't be trusted unless they are in GLYPH_MAP.
 SYMBOL_FONT_MARKERS = ("Math", "Symbol", "Pi-")

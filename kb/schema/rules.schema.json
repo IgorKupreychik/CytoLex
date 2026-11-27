@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cytolex.local/schema/rules.schema.json",
   "title": "CytoLex KB — rule file",
-  "description": "One file per ISCN section: kb/rules/<version>/chNN/<section-slug>.yaml. Conventions: kb/README.md.",
+  "description": "One file per ISCN section: curated/rules/<version>/chNN/<section-slug>.yaml. Conventions: kb/README.md.",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "section", "rules"],

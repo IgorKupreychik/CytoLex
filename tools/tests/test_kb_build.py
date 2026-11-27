@@ -26,7 +26,7 @@ def kb(tmp_path):
 
 
 def build(kb, versions=None):
-    return run(*kb, versions)
+    return run(*kb, versions, kb[0] / "bands")  # the fixture keeps curated + generated together
 
 
 def edit(path: Path, old: str, new: str, count: int = 1) -> None:
@@ -306,6 +306,8 @@ def test_cli_build(kb, monkeypatch, capsys):
     root = kb[0].parent
     assert kb[1] == root / "kb" / "source-text"  # same layout as the repo
     monkeypatch.setattr(cli, "REPO_ROOT", root)
+    monkeypatch.setattr(cli, "CURATED_DIR", root / "kb")  # the fixture keeps both in one tree
+    monkeypatch.setattr(cli, "KB_DIR", root / "kb")
     assert cli.main(["build"]) == 0
     out = capsys.readouterr().out
     assert (

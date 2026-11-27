@@ -9,7 +9,7 @@ namespace CytoLex.Core.Tests.Translation;
 /// <summary>One item of a golden entry: where it is, its sentence and readings, and the KB entries it links to.</summary>
 internal sealed record GoldenItem(int Start, string Text, IReadOnlyList<string> Kb, string Sentence = "", string? Constitutional = null, string? Neoplastic = null);
 
-/// <summary>One entry of <c>kb/translation/&lt;version&gt;/golden.yaml</c> (T-057), as embedded in <c>kb.json</c>.</summary>
+/// <summary>One entry of <c>curated/translation/&lt;version&gt;/golden.yaml</c> (T-057), as embedded in <c>kb.json</c>.</summary>
 internal sealed record GoldenEntry(string Input, bool IsFragment, bool IsSynthetic, string Context, IReadOnlyList<GoldenItem> Items, string Summary = "");
 
 /// <summary>

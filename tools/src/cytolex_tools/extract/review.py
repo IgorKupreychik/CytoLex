@@ -2,7 +2,8 @@
 
 Writes `<out>/<table>-<n>.png` (the page area of each region) and `<out>/index.md`, which lists
 every table with its review status and the chunk file holding its extracted Markdown. A person
-compares the image with that Markdown and records the result in `tables/<version>.yaml`.
+compares the image with that Markdown and records the result in
+`curated/extract/tables/<version>.yaml`.
 """
 
 import re

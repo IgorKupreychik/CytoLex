@@ -6,7 +6,7 @@ using Microsoft.Data.Sqlite;
 
 namespace CytoLex.Desktop.Rules;
 
-/// <summary>A cited book-vs-NCBI decision on a band group (<c>kb/bands/&lt;version&gt;/exceptions.yaml</c>, T-007).</summary>
+/// <summary>A cited book-vs-NCBI decision on a band group (<c>curated/bands/&lt;version&gt;/exceptions.yaml</c>, T-007).</summary>
 /// <param name="Level">The band level compared (400, 550 or 850).</param>
 /// <param name="Region">The shortest name of the group.</param>
 /// <param name="Resolution"><c>book</c> (the level follows the book) or <c>ncbi</c>.</param>

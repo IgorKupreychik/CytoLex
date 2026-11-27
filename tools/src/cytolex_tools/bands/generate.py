@@ -1,4 +1,5 @@
-"""Build kb/bands/<version>/bands.yaml from the pinned NCBI GDP + UCSC sources.
+"""Build kb/bands/<version>/bands.yaml from the pinned NCBI GDP + UCSC sources
+(curated/bands/<version>/sources.yaml).
 
 Every band name of the 400/550/850 sets is kept, plus every nesting ancestor
 (9q34.11 -> 9q34.1 -> 9q34). Names not in any source set are marked `derived`.
@@ -160,9 +161,10 @@ def render(
     if extra_sources:
         lines += [
             "# Book (T-007): the idiogram labels (kb/bands/<version>/ideograms.yaml) give levels",
-            "# 300/700, and every book vs NCBI difference is decided in exceptions.yaml (the book",
-            "# wins unless an exception says otherwise). book = the name is shown in the book's",
-            "# idiograms or is an ancestor of one; book-only names have no coordinates or stain.",
+            "# 300/700, and every book vs NCBI difference is decided in",
+            "# curated/bands/<version>/exceptions.yaml (the book wins unless an exception says",
+            "# otherwise). book = the name is shown in the book's idiograms or is an ancestor of",
+            "# one; book-only names have no coordinates or stain.",
         ]
     lines += [
         f"version: '{version}'",
@@ -205,7 +207,8 @@ def run(
     book_dir: Path | None = None,
     review_dir: Path | None = None,
 ) -> Report:
-    """`book_dir` holds ideograms.yaml + exceptions.yaml (default kb/bands/<version>);
+    """`book_dir` holds ideograms.yaml (default kb/bands/<version>) and, when given, also
+    exceptions.yaml (default curated/bands/<version>/exceptions.yaml);
     `review_dir` receives exceptions-draft.yaml on unexplained differences
     (default build/review/bands/<version>)."""
     report = Report()
@@ -262,13 +265,14 @@ def run(
 
     levels, extra = LEVELS, None
     if cfg.get("ideograms"):
-        from ..config import REPO_ROOT
+        from ..config import CURATED_DIR, KB_DIR, REPO_ROOT
         from .book import apply, load_book
         from .ideograms import LEVELS as BOOK_LEVELS
 
-        book_dir = book_dir or REPO_ROOT / "kb" / "bands" / version
+        exc_path = (book_dir or CURATED_DIR / "bands" / version) / "exceptions.yaml"
+        book_dir = book_dir or KB_DIR / "bands" / version
         try:
-            book = load_book(book_dir, version)
+            book = load_book(book_dir, version, exc_path)
         except (FileNotFoundError, ValueError) as exc:
             report.problems.append(str(exc))
             return report
@@ -283,15 +287,18 @@ def run(
             return report
         entries, levels = applied.entries, BOOK_LEVELS
         extra = []
-        for name, kind in (("ideograms.yaml", "book_ideograms"), ("exceptions.yaml", "exceptions")):
-            f = book_dir / name
+        book_files = (
+            ("ideograms.yaml", "book_ideograms", book_dir / "ideograms.yaml", "kb"),
+            ("exceptions.yaml", "exceptions", exc_path, "curated"),
+        )
+        for name, kind, f, root in book_files:
             if f.exists():
                 raw = f.read_bytes().replace(b"\r\n", b"\n")  # checkout-independent
                 extra.append(
                     {
                         "id": f"book-{name.removesuffix('.yaml')}",
                         "kind": kind,
-                        "file": f"kb/bands/{version}/{name}",
+                        "file": f"{root}/bands/{version}/{name}",
                         "sha256": sha256(raw),
                         "bytes": len(raw),
                     }

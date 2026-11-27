@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cytolex.local/schema/translation-templates.schema.json",
   "title": "CytoLex KB — literal translation templates",
-  "description": "Phrase templates of the literal translation (T-054, T-057) for one edition and language: kb/translation/<version>/templates.<language>.yaml. Each template is keyed by a KB entry and renders one construct of the core's semantic model. kb build checks that every key exists, every construct is covered and every placeholder is a declared slot. Conventions: kb/README.md → Translation.",
+  "description": "Phrase templates of the literal translation (T-054, T-057) for one edition and language: curated/translation/<version>/templates.<language>.yaml. Each template is keyed by a KB entry and renders one construct of the core's semantic model. kb build checks that every key exists, every construct is covered and every placeholder is a declared slot. Conventions: kb/README.md → Translation.",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "language", "templates"],

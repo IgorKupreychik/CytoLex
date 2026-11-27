@@ -151,8 +151,8 @@ def run(version: str, pdf_path: Path, out_dir: Path, cap: int = TOKEN_CAP) -> Re
             "(front matter `stray_spaces`)",
             "float": "figure/table captions are labelled `[Fig. N p.X]` / `[Table N p.X]` and "
             "not counted as ¶; a table and its footnotes follow its caption",
-            "table": "configured tables (tables/<version>.yaml) are Markdown tables built from "
-            "word positions; front matter `tables` gives their review status",
+            "table": "configured tables (curated/extract/tables/<version>.yaml) are Markdown "
+            "tables built from word positions; front matter `tables` gives their review status",
             "underline": "an underlined character is followed by U+0332 COMBINING LOW LINE "
             "(e.g. `der(1` + U+0332 + `)`); front matter `underlined` lists the labels",
             "changed": "front matter `changed` lists labels next to a margin change bar "

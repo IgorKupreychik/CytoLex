@@ -7,7 +7,7 @@ rules:
     severity: error
     statement: >-
       Chapter 3 lists every symbol and abbreviated term used to describe chromosomes and their
-      abnormalities (vocabulary `symbols`, kb/vocab/2016/ch03/03-symbols.yaml). A symbol or
+      abnormalities (vocabulary `symbols`, curated/vocab/2016/ch03/03-symbols.yaml). A symbol or
       abbreviation outside that list is not ISCN. Chromosome and band names, numbers, cell
       counts, probe and locus names and coordinates are not symbols.
     cite:

@@ -99,7 +99,7 @@ public partial class ComparisonViewModel : ObservableObject
 
     /// <summary>The committed triage file of the CytoGPS 2016 comparison, if the app runs from the repo.</summary>
     public static string? DefaultTriagePath() =>
-        RepoLocator.Find() is { } root ? Path.Combine(root, "tests", "data", "comparison", "cytogps-2016-triage.yaml") : null;
+        RepoLocator.Find() is { } root ? Path.Combine(root, "curated", "comparison", "cytogps-2016-triage.yaml") : null;
 
     /// <summary>The checker's name.</summary>
     public string CheckerName { get; }

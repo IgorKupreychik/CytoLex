@@ -43,5 +43,15 @@ public class EmbeddedBundleTests
 
         Assert.True(edition.GetProperty("vocab").TryGetProperty("symbols", out _));
         Assert.NotEqual(0, edition.GetProperty("bands").GetProperty("bands").GetArrayLength());
+
+        // The probe table (T-102): edition-independent, top level; every row names its source.
+        var probes = root.GetProperty("probes");
+        Assert.NotEqual(0, probes.GetArrayLength());
+        foreach (var probe in probes.EnumerateArray())
+        {
+            Assert.False(string.IsNullOrEmpty(probe.GetProperty("name").GetString()));
+            Assert.False(string.IsNullOrEmpty(probe.GetProperty("source").GetString()));
+            _ = probe.GetProperty("reviewed").GetBoolean();
+        }
     }
 }

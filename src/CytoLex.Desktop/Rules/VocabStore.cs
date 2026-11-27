@@ -22,7 +22,7 @@ public sealed record VocabMeaning(string Text, ImmutableArray<string> Sections);
 /// <param name="Meanings">The meanings, in book order.</param>
 /// <param name="Note">A note, if any.</param>
 /// <param name="Citation">The rendered citation of the printed row.</param>
-/// <param name="File">The vocab file, relative to <c>kb/vocab/</c>.</param>
+/// <param name="File">The vocab file, relative to <c>curated/vocab/</c>.</param>
 public sealed record VocabDetail(
     string Edition,
     string Vocabulary,

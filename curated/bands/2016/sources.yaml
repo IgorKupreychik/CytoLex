@@ -62,7 +62,7 @@ files:
 
 # Book idiograms (T-007): `kb ideograms` decodes the band labels of Fig. 5 from the PDF text
 # layer into kb/bands/2016/ideograms.yaml; `kb bands` compares them with the NCBI sets and
-# applies kb/bands/2016/exceptions.yaml. Labels use a figure-only font whose glyphs map to
+# applies curated/bands/2016/exceptions.yaml. Labels use a figure-only font whose glyphs map to
 # private-use code points; every mapping below was checked against rendered pages.
 ideograms:
   figure: Fig. 5

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cytolex.local/schema/quotes.schema.json",
   "title": "CytoLex KB — verbatim quote file",
-  "description": "Same relative path as the rule file, under kb/source-quotes/<version>/. Removable before public release (T-043).",
+  "description": "Same relative path as the rule file, under curated/source-quotes/<version>/. Removable before public release (T-043).",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "section", "quotes"],

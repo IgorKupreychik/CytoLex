@@ -51,7 +51,7 @@ rules:
         - text: "9q34.11"
           note: >-
             Not in the book's idiograms, but kept from NCBI with book: false
-            (kb/bands/2016/exceptions.yaml; §15.3 uses it). Accepted here; the info note comes
+            (curated/bands/2016/exceptions.yaml; §15.3 uses it). Accepted here; the info note comes
             from BAND.GENOME_ASSEMBLY_ONLY.
       invalid:
         - text: "9q35"

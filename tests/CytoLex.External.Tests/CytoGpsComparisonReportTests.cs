@@ -9,7 +9,7 @@ namespace CytoLex.External.Tests;
 /// The CytoLex vs. CytoGPS comparison report (T-051 acceptance), against the real local CytoGPS build. Skips with the
 /// "not configured" reason without a <c>cytogps</c> setup in <c>config/local.yaml</c>. Input: every distinct string of the
 /// KB sample batch <c>all.csv</c> (book strings only, T-048); triage: the committed
-/// <c>tests/data/comparison/cytogps-2016-triage.yaml</c>. Writes <c>build/review/comparison/cytogps-2016.*</c>.
+/// <c>curated/comparison/cytogps-2016-triage.yaml</c>. Writes <c>build/review/comparison/cytogps-2016.*</c>.
 /// </summary>
 public sealed class CytoGpsComparisonReportTests
 {

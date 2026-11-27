@@ -1,4 +1,4 @@
-# Triage labels of the CytoLex vs. CytoGPS comparison, ISCN 2016 (T-051). Format: tests/data/comparison/README.md.
+# Triage labels of the CytoLex vs. CytoGPS comparison, ISCN 2016 (T-051). Format: curated/comparison/README.md.
 # Book or synthetic strings only (decision T-048). First triage 2026-11-21 (user): 64 book-invalid examples CytoGPS
 # accepts and 3 book-valid examples it can't read = checker-limitation; 5 book-invalid examples CytoLex reports below
 # error = severity-policy.

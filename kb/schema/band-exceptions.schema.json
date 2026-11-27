@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cytolex.local/schema/band-exceptions.schema.json",
-  "title": "CytoLex — band exceptions (kb/bands/<version>/exceptions.yaml)",
+  "title": "CytoLex — band exceptions (curated/bands/<version>/exceptions.yaml)",
   "description": "Every difference between the book's idiograms (kb/bands/<version>/ideograms.yaml) and the NCBI band sets, per level, decided and cited (T-007). `kb bands` fails on a difference without an entry and on an entry that no longer matches a difference.",
   "type": "object",
   "additionalProperties": false,

@@ -2,7 +2,7 @@
 
 The labels are drawn in a figure-only font whose glyphs map to private-use code points
 (U+F001 = '3', U+F003 = '.', …); the map is configured per edition in
-`bands/sources/<version>.yaml` → `ideograms.glyphs`. Layout per page: one chromosome per
+`curated/bands/<version>/sources.yaml` → `ideograms.glyphs`. Layout per page: one chromosome per
 row, its number in bold below the row; five idiograms per row, left to right
 300/400/550/700/850 bands; each label sits left of its idiogram (or further left with a
 leader line). Output: `kb/bands/<version>/ideograms.yaml` (committed) + review crops.

@@ -4,17 +4,21 @@ import argparse
 import sys
 from pathlib import Path
 
-from .config import REPO_ROOT, iscn_pdf_path
+from .config import CURATED_DIR, KB_DIR, REPO_ROOT, iscn_pdf_path
 
 # subcommand -> (help text, task that implements it)
 SUBCOMMANDS = {
     "extract": ("Extract per-section source text from the ISCN PDF", "T-002"),
     "tables": ("Render the configured table regions to PNG for review", "T-003"),
-    "check": ("Check KB and test-corpus YAML files against the schemas in kb/schema/", "T-004"),
+    "check": (
+        "Check the curated files (YAML, probe CSV) against the schemas in kb/schema/",
+        "T-004",
+    ),
     "build": ("Validate the KB and build SQLite (FTS5) + JSON bundle", "T-005"),
     "bands": ("Generate band data from NCBI GDP ideograms + UCSC cytoBand", "T-006"),
     "ideograms": ("Decode the band labels of the book's idiograms from the ISCN PDF", "T-007"),
     "samples": ("Write batch sample files from the KB examples to tests/data/batch/", "T-038"),
+    "probes": ("Pre-fill gene rows of curated/probes/probes.csv from HGNC + NCBI", "T-102"),
 }
 
 
@@ -28,8 +32,36 @@ def build_parser() -> argparse.ArgumentParser:
                 "paths",
                 nargs="*",
                 type=Path,
-                help="files or directories (default: kb/rules/, kb/source-quotes/ and kb/vocab/)",
+                help="files or directories (default: all of curated/)",
             )
+            continue
+        if name == "probes":
+            p.add_argument(
+                "--add",
+                nargs="+",
+                default=[],
+                metavar="NAME",
+                help="gene symbols (or previous symbols) to add",
+            )
+            p.add_argument(
+                "--from-kb-examples",
+                action="store_true",
+                help="add the genes named in the in situ KB examples",
+            )
+            p.add_argument(
+                "--cache", type=Path, help="download cache (default: build/cache/probes)"
+            )
+            p.add_argument(
+                "--cache-only", action="store_true", help="don't download; use the cache only"
+            )
+            p.add_argument(
+                "--update-pins",
+                action="store_true",
+                help="accept the current source files and rewrite their sha256 pins",
+            )
+            p.add_argument("--table", type=Path, help=argparse.SUPPRESS)  # tests
+            p.add_argument("--sources", type=Path, help=argparse.SUPPRESS)  # tests
+            p.add_argument("--rules", type=Path, help=argparse.SUPPRESS)  # tests
             continue
         if name == "build":
             p.add_argument(
@@ -119,20 +151,31 @@ def cmd_tables(args: argparse.Namespace) -> int:
 
 def cmd_check(args: argparse.Namespace) -> int:
     from .kb.schema import iter_yaml_files, validate_file
+    from .probes.table import validate_csv
 
     # `uv run --directory tools` runs in tools/, so relative paths fall back to the repo root.
     paths = [p if p.is_absolute() or p.exists() else REPO_ROOT / p for p in args.paths] or [
-        REPO_ROOT / "kb" / "rules",
-        REPO_ROOT / "kb" / "source-quotes",
-        REPO_ROOT / "kb" / "vocab",
-        REPO_ROOT / "kb" / "translation",
-        REPO_ROOT / "tests" / "data" / "corpus",
+        CURATED_DIR / sub
+        for sub in (
+            "rules",
+            "source-quotes",
+            "vocab",
+            "translation",
+            "bands",
+            "corpus",
+            "probes",
+        )
     ]
     missing = [p for p in paths if not p.exists() and args.paths]
     for p in missing:
         print(f"kb check: not found: {p}", file=sys.stderr)
-    files = list(iter_yaml_files(p for p in paths if p.exists()))
-    problems = [pr for f in files for pr in validate_file(f)]
+    existing = [p for p in paths if p.exists()]
+    files = [
+        f for f in iter_yaml_files(existing, {".yaml", ".yml", ".csv"}) if f.name != "sources.yaml"
+    ]  # download pins have no schema
+    problems = [
+        pr for f in files for pr in (validate_csv(f) if f.suffix == ".csv" else validate_file(f))
+    ]
     for pr in problems:
         print(f"  {pr}", file=sys.stderr)
     bad = len({pr.file for pr in problems})
@@ -147,13 +190,14 @@ def cmd_build(args: argparse.Namespace) -> int:
         if hasattr(stream, "reconfigure"):
             stream.reconfigure(errors="replace")
     report = run(
-        REPO_ROOT / "kb",
-        REPO_ROOT / "kb" / "source-text",
+        CURATED_DIR,
+        KB_DIR / "source-text",
         REPO_ROOT / "build",
         [args.version] if args.version else None,
+        KB_DIR / "bands",
     )
     if not report.editions:
-        print("kb build: no editions under kb/rules/, kb/source-quotes/ or kb/vocab/ (empty KB)")
+        print("kb build: no editions under curated/rules/, source-quotes/ or vocab/ (empty KB)")
     for ed in report.editions:
         n_rules = sum(len(f.data["rules"]) for f in ed.rule_files)
         n_quotes = sum(len(f.data["quotes"]) for f in ed.quote_files)
@@ -290,6 +334,49 @@ def cmd_samples(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_probes(args: argparse.Namespace) -> int:
+    from .probes import prefill
+    from .probes.table import PROBES_FILE
+
+    if not args.add and not args.from_kb_examples and not (args.table or PROBES_FILE).exists():
+        print(
+            "kb probes: no table yet; name genes with --add or use --from-kb-examples",
+            file=sys.stderr,
+        )
+        return 1
+    report = prefill.run(
+        args.add,
+        args.from_kb_examples,
+        args.table or PROBES_FILE,
+        args.cache or prefill.CACHE_DIR,
+        args.cache_only,
+        args.update_pins,
+        args.sources or prefill.SOURCES_FILE,
+        args.rules or CURATED_DIR / "rules",
+    )
+    for pid in report.pinned:
+        print(f"  pinned: {pid}")
+    for n in report.notes:
+        print(f"  note: {n}")
+    if report.not_found:
+        print(f"  not an HGNC symbol (add a row by hand): {', '.join(report.not_found)}")
+    if report.kept:
+        print(f"  left alone (reviewed or a person's row): {', '.join(sorted(report.kept))}")
+    for pr in report.problems:
+        print(f"  PROBLEM: {pr}", file=sys.stderr)
+    if report.problems:
+        print(
+            f"kb probes: FAILED, {len(report.problems)} problem(s); nothing written",
+            file=sys.stderr,
+        )
+        return 1
+    print(
+        f"kb probes: {len(report.added)} added, {len(report.refreshed)} refreshed -> {report.out}"
+        " (run `kb build` to check the table)"
+    )
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "extract":
@@ -304,6 +391,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_ideograms(args)
     if args.command == "samples":
         return cmd_samples(args)
+    if args.command == "probes":
+        return cmd_probes(args)
     return cmd_bands(args)
 
 

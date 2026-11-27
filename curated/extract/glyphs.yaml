@@ -1,0 +1,23 @@
+# Glyph repair for the ISCN PDF text layer (T-002, T-003); read by `kb extract`.
+#
+# Several notation symbols are drawn with symbol fonts whose text layer maps to unrelated
+# ASCII characters (e.g. the arrow `→` extracts as `]`). The same character in the body font
+# is genuine (`[25]`), so a mapping is keyed by (font, char). Private-use characters are written
+# as "\uXXXX". Every mapping was checked against the rendered page; mark a new mapping
+# `uncertain: true` until it has been checked.
+# After a change, run `kb extract` (then `kb build`).
+glyphs:
+  - {font: GeneralSymbolsPB, char: ']', to: '→'}
+  - {font: GeneralSymbolsPB, char: 's', to: '→', note: 'p.106 `pter→qter` (checked against the page image, T-003)'}
+  - {font: GeneralSymbolsPE, char: 'P', to: '●', note: 'filled FISH signal in nucleus-diagram legends (pp.109-112)'}
+  - {font: GeneralSymbolsPE, char: 'S', to: '○', note: 'open FISH signal in the same legends'}
+  - {font: MathTechnicalPD, char: '~', to: '×'}
+  - {font: MathTechnicalPD, char: '8', to: '±'}
+  - {font: MathTechnicalPA, char: '!', to: '<'}
+  - {font: MathTechnicalPA, char: '1', to: '>'}
+  - {font: MathTechnicalPA, char: '^', to: '≤', note: 'pp.90, 100; checked against the page images (T-003)'}
+  - {font: MathematicalPi-Three, char: ',', to: '~', note: 'approximate sign, written `~` in ISCN strings'}
+  - {font: MathematicalPi-Three, char: "", to: '~'}
+  - {font: MathematicalPi-Four, char: "", to: '′'}
+  - {font: MathematicalPi-One, char: "", to: '′'}
+  - {font: MathematicalPi-One, char: 'a', to: 'α'}

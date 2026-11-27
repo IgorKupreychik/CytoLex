@@ -1,4 +1,4 @@
-# Test corpus (T-062): karyotypes (constitutional, acquired, mosaics/chimeras, structural, uncertainty, clones). Format and label policy: tests/data/corpus/README.md.
+# Test corpus (T-062): karyotypes (constitutional, acquired, mosaics/chimeras, structural, uncertainty, clones). Format and label policy: curated/corpus/README.md.
 # Synthetic strings only (data policy T-048); labels trace to the KB rules named in `rules`/`fires`.
 format: cytolex-corpus
 version: 1

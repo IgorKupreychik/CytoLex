@@ -4,7 +4,7 @@
 # current differences is written to build/review/bands/2016/exceptions-draft.yaml.
 # Policy (decided 2026-11-16/17): the book wins (resolution: book), each case cited. NCBI names
 # that no book level shows stay valid only when listed under `keep` (flagged book: false).
-# Schema: kb/schema/band-exceptions.schema.json; check with `kb check kb/bands/2016/exceptions.yaml`.
+# Schema: kb/schema/band-exceptions.schema.json; check with `kb check curated/bands/2016/exceptions.yaml`.
 version: '2016'
 exceptions:
   - level: 400

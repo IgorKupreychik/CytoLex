@@ -5,7 +5,7 @@
   "description": "Rule IDs, citations and vocabularies shared by rule and quote files. Conventions: kb/README.md.",
   "$defs": {
     "version": {
-      "description": "ISCN edition year; must equal the version directory (kb/rules/<version>/).",
+      "description": "ISCN edition year; must equal the version directory (curated/rules/<version>/).",
       "type": "string",
       "pattern": "^[0-9]{4}$",
       "x-expected": "an edition year in quotes, e.g. \"2016\""

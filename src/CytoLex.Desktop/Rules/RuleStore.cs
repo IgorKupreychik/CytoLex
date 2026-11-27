@@ -102,7 +102,7 @@ public sealed record RuleDetail(
 /// Read-only access to <c>build/kb.sqlite</c> (written by <c>kb build</c>; tables and FTS5 indexes in kb/README.md) for the
 /// rule browser (T-039), rules and vocab items (T-059, via <see cref="VocabStore"/>), and of the Bands tab (T-084, via <see cref="BandStore"/>). User queries are turned into safe FTS5 queries: every whitespace-separated word becomes a prefix
 /// phrase of its letter/digit tokens (<c>t(9;22)</c> → <c>"t 9 22"*</c>), words are ANDed. Quotes are optional: an empty
-/// <c>quotes</c> table is a normal KB build without <c>kb/source-quotes/</c>.
+/// <c>quotes</c> table is a normal KB build without <c>curated/source-quotes/</c>.
 /// </summary>
 public sealed class RuleStore : IDisposable
 {

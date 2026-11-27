@@ -20,7 +20,7 @@ internal enum CorpusVerdict
 /// <summary>The expected result of a corpus entry in one edition: verdict, optional context hint, rules that must fire.</summary>
 internal sealed record CorpusExpectation(CorpusVerdict Verdict, SampleContext? Context, ImmutableArray<string> Fires);
 
-/// <summary>One entry of a corpus file (<c>tests/data/corpus/&lt;type&gt;.yaml</c>; schema <c>kb/schema/corpus.schema.json</c>).</summary>
+/// <summary>One entry of a corpus file (<c>curated/corpus/&lt;type&gt;.yaml</c>; schema <c>kb/schema/corpus.schema.json</c>).</summary>
 internal sealed record CorpusEntry(
     string File,
     string Id,
@@ -36,7 +36,7 @@ internal sealed record CorpusEntry(
 }
 
 /// <summary>
-/// The test corpus (T-062): every <c>*.yaml</c> file in <c>data/corpus/</c> (copied from <c>tests/data/corpus/</c>).
+/// The test corpus (T-062): every <c>*.yaml</c> file in <c>data/corpus/</c> (copied from <c>curated/corpus/</c>).
 /// The schema is checked by <c>kb check</c>; this loader reads the fields the harness needs and rejects what it can't read.
 /// </summary>
 internal static class CorpusData

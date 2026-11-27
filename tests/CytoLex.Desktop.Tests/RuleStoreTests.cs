@@ -238,7 +238,7 @@ public sealed class RuleStoreTests : IDisposable
 }
 
 /// <summary>
-/// A temp copy of the KB database without source quotes, as <c>kb build</c> writes it when <c>kb/source-quotes/</c> is gone
+/// A temp copy of the KB database without source quotes, as <c>kb build</c> writes it when <c>curated/source-quotes/</c> is gone
 /// (T-043 cleanup); optionally with more SQL applied.
 /// </summary>
 internal sealed class NoQuotesCopy : IDisposable

@@ -1,10 +1,11 @@
-"""Validate KB rule and quote YAML files against the JSON Schemas in `kb/schema/`.
+"""Validate curated KB files (YAML, and the probe CSV) against the JSON Schemas in `kb/schema/`.
 
 A file's kind is taken from its top-level key: `rules` → rules.schema.json,
 `quotes` → quotes.schema.json, `exceptions` → band-exceptions.schema.json (T-007),
 `entries` → vocab.schema.json (T-008), `templates` → translation-templates.schema.json and
 `golden` → translation-golden.schema.json (T-057); `corpus` → corpus.schema.json (test corpus
-in tests/data/corpus/, T-062).
+in curated/corpus/, T-062). The probe table (`curated/probes/probes.csv`, T-102) is CSV:
+each row is checked against probes.schema.json (`probes.table.validate_csv`).
 Only the schema is checked here; cross-file checks
 (unique IDs, quote ↔ rule links, version vs directory) belong to `kb build` (T-005).
 """
@@ -26,11 +27,11 @@ SCHEMA_DIR = REPO_ROOT / "kb" / "schema"
 SCHEMA_FILES = {
     "rules": "rules.schema.json",
     "quotes": "quotes.schema.json",
-    "exceptions": "band-exceptions.schema.json",  # kb/bands/<version>/exceptions.yaml (T-007)
-    "entries": "vocab.schema.json",  # kb/vocab/<version>/*.yaml (T-008)
-    "templates": "translation-templates.schema.json",  # kb/translation/<version>/ (T-057)
-    "golden": "translation-golden.schema.json",  # kb/translation/<version>/golden.yaml (T-057)
-    "corpus": "corpus.schema.json",  # tests/data/corpus/<type>.yaml (T-062)
+    "exceptions": "band-exceptions.schema.json",  # curated/bands/<version>/exceptions.yaml (T-007)
+    "entries": "vocab.schema.json",  # curated/vocab/<version>/*.yaml (T-008)
+    "templates": "translation-templates.schema.json",  # curated/translation/<version>/ (T-057)
+    "golden": "translation-golden.schema.json",  # curated/translation/<version>/golden.yaml
+    "corpus": "corpus.schema.json",  # curated/corpus/<type>.yaml (T-062)
 }
 YAML_SUFFIXES = {".yaml", ".yml"}
 
@@ -57,11 +58,16 @@ def _registry(schema_dir: Path) -> Registry:
 
 
 @cache
-def validator(kind: str, schema_dir: Path = SCHEMA_DIR) -> Draft202012Validator:
-    """Validator for `kind` (a key of SCHEMA_FILES), with `$ref`s to sibling schemas resolved."""
-    schema = json.loads((schema_dir / SCHEMA_FILES[kind]).read_text(encoding="utf-8"))
+def schema_validator(file_name: str, schema_dir: Path = SCHEMA_DIR) -> Draft202012Validator:
+    """Validator for the schema `file_name`, with `$ref`s to sibling schemas resolved."""
+    schema = json.loads((schema_dir / file_name).read_text(encoding="utf-8"))
     Draft202012Validator.check_schema(schema)
     return Draft202012Validator(schema, registry=_registry(schema_dir))
+
+
+def validator(kind: str, schema_dir: Path = SCHEMA_DIR) -> Draft202012Validator:
+    """Validator for `kind` (a key of SCHEMA_FILES)."""
+    return schema_validator(SCHEMA_FILES[kind], schema_dir)
 
 
 def _where(error: ValidationError) -> str:
@@ -123,10 +129,11 @@ def validate_file(file: Path, schema_dir: Path = SCHEMA_DIR) -> list[Problem]:
     return validate_data(data, file, schema_dir)
 
 
-def iter_yaml_files(paths: Iterable[Path]) -> Iterator[Path]:
-    """Expand directories (recursively) into their YAML files, in sorted order."""
+def iter_yaml_files(paths: Iterable[Path], suffixes=YAML_SUFFIXES) -> Iterator[Path]:
+    """Expand directories (recursively) into their files with `suffixes` (default: YAML), in
+    sorted order; files given directly are kept."""
     for p in paths:
         if p.is_dir():
-            yield from sorted(f for f in p.rglob("*") if f.suffix in YAML_SUFFIXES)
+            yield from sorted(f for f in p.rglob("*") if f.suffix in suffixes)
         else:
             yield p

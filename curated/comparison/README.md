@@ -35,7 +35,7 @@ The loader rejects unknown keys or labels, a duplicate `iscn`, and `expected` wi
 2. Read `build/review/comparison/cytogps-2016.md`. The untriaged disagreements are in `build/review/comparison/cytogps-2016-triage-draft.yaml`, with a suggested label (`checker-limitation` when only CytoLex rejects and every error belongs to a rule family CytoGPS doesn't check; `severity-policy` when only CytoGPS rejects and CytoLex has warnings/infos), else `TODO`.
 3. Review each draft entry, set its label and `confirmed: true`, and copy it into the triage file here.
 4. Entries listed as **stale** in the report no longer disagree (e.g. after a fix); remove them.
-5. Confirmed entries with `expected` + `kb_rule` are written to `build/review/comparison/cytogps-2016-kb-examples-draft.yaml`. Paste them into `kb/rules/` by hand with a citation, then run `kb check` and `kb build`. Nothing edits the KB automatically.
+5. Confirmed entries with `expected` + `kb_rule` are written to `build/review/comparison/cytogps-2016-kb-examples-draft.yaml`. Paste them into `curated/rules/` by hand with a citation, then run `kb check` and `kb build`. Nothing edits the KB automatically.
 
 ## Triage in the desktop app (T-052)
 

@@ -8,7 +8,7 @@ namespace CytoLex.Core.Tests.Translation;
 
 /// <summary>
 /// T-058 acceptance: the renderer reproduces every entry of the translation golden file (T-057,
-/// <c>kb/translation/2016/golden.yaml</c>; drafts count too): summary, items (span and text), sentences, readings and KB links.
+/// <c>curated/translation/2016/golden.yaml</c>; drafts count too): summary, items (span and text), sentences, readings and KB links.
 /// </summary>
 public class RendererGoldenTests
 {

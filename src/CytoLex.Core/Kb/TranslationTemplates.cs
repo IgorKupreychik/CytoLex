@@ -16,7 +16,7 @@ public sealed record TemplateForm(string? When, string Text, string? Constitutio
     public bool HasReadings => Constitutional is not null || Neoplastic is not null;
 }
 
-/// <summary>A phrase template of the literal translation (kb/translation/&lt;version&gt;/templates.&lt;language&gt;.yaml, T-057).</summary>
+/// <summary>A phrase template of the literal translation (curated/translation/&lt;version&gt;/templates.&lt;language&gt;.yaml, T-057).</summary>
 /// <param name="Construct">The construct of the semantic model it renders (<c>deletion</c>, <c>summary</c>, …).</param>
 /// <param name="Key">The KB entry the phrase renders (a rule or vocab item).</param>
 /// <param name="Slots">The placeholders the renderer fills.</param>

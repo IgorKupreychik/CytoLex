@@ -5,9 +5,10 @@
 # derived = nesting ancestor only; stain = finest source level with the name;
 # grch37/grch38 = [start, end] in bp, 1-based closed.
 # Book (T-007): the idiogram labels (kb/bands/<version>/ideograms.yaml) give levels
-# 300/700, and every book vs NCBI difference is decided in exceptions.yaml (the book
-# wins unless an exception says otherwise). book = the name is shown in the book's
-# idiograms or is an ancestor of one; book-only names have no coordinates or stain.
+# 300/700, and every book vs NCBI difference is decided in
+# curated/bands/<version>/exceptions.yaml (the book wins unless an exception says
+# otherwise). book = the name is shown in the book's idiograms or is an ancestor of
+# one; book-only names have no coordinates or stain.
 version: '2016'
 generator_version: 2
 levels_available: [300, 400, 550, 700, 850]
@@ -22,7 +23,7 @@ sources:
   - {id: ucsc-hg19, kind: ucsc_cytoband, assembly: GRCh37, level: 850, url: 'https://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/cytoBand.txt.gz', sha256: f9b82309b2bca1eb9d91a5cb2c6aa0528351158e6e20b51d82cca36d01735cba, bytes: 6609}
   - {id: ucsc-hg38, kind: ucsc_cytoband, assembly: GRCh38, level: 850, url: 'https://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/cytoBand.txt.gz', sha256: e514e48b0a12a516fd5231b44241a20a282f290bdd6131cadcddc6276ee26082, bytes: 12118}
   - {id: book-ideograms, kind: book_ideograms, file: 'kb/bands/2016/ideograms.yaml', sha256: '4190988c7d59fc0b092652503e51db16ccb3892c8f8e7a21eaa4a2457a81a912', bytes: 179581}
-  - {id: book-exceptions, kind: exceptions, file: 'kb/bands/2016/exceptions.yaml', sha256: '14114206cefa29e26c86228d7326652a74a8d224d6e53f35cb6fb6c6e28c3871', bytes: 8942}
+  - {id: book-exceptions, kind: exceptions, file: 'curated/bands/2016/exceptions.yaml', sha256: '14114206cefa29e26c86228d7326652a74a8d224d6e53f35cb6fb6c6e28c3871', bytes: 8942}
 counts: {bands: 1165, derived: 38, level_300: 375, level_400: 398, level_550: 566, level_700: 758, level_850: 874, not_in_book: 6, no_coordinates: 15}
 bands:
   - {name: '1p36', chrom: '1', arm: p, parent: null, levels: [], derived: true, stain: null, grch37: [1, 28000000], grch38: [1, 27600000], book: true}

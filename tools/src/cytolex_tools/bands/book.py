@@ -58,9 +58,11 @@ def book_levels(labels: list[dict]) -> dict[str, set[int]]:
     return out
 
 
-def load_book(book_dir: Path, version: str) -> Book:
+def load_book(book_dir: Path, version: str, exc_path: Path | None = None) -> Book:
+    """`book_dir` holds the generated ideograms.yaml; the person-written exceptions.yaml is
+    `exc_path` (default: next to it)."""
     yaml = YAML(typ="safe")
-    ide_path, exc_path = book_dir / "ideograms.yaml", book_dir / "exceptions.yaml"
+    ide_path, exc_path = book_dir / "ideograms.yaml", exc_path or book_dir / "exceptions.yaml"
     if not ide_path.exists():
         raise FileNotFoundError(f"{ide_path} missing; run `kb ideograms --version {version}`")
     ide = yaml.load(ide_path.read_text(encoding="utf-8"))
@@ -104,7 +106,7 @@ def differences(book: dict[str, set[int]], ncbi: dict[int, set[str]]) -> list[di
 def draft_exceptions(version: str, groups: list[dict], book: Book) -> str:
     lines = [
         f"# Draft: every idiogram (ISCN {version} {book.figure}) vs NCBI difference, as found by",
-        "# `kb bands`. Copy entries into kb/bands/<version>/exceptions.yaml and decide them.",
+        "# `kb bands`. Copy entries into curated/bands/<version>/exceptions.yaml and decide them.",
         f"version: '{version}'",
         "exceptions:",
     ]

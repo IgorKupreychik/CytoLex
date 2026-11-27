@@ -1,0 +1,35 @@
+# Sources of `kb probes` (T-102): gene rows of curated/probes/probes.csv. Committed; cached in
+# build/cache/probes/.
+#
+# - HGNC complete set (HUGO Gene Nomenclature Committee; licence CC0, free to reuse): approved
+#   symbol, previous symbols (aliases), location (band), NCBI Gene ID. A dated quarterly
+#   archive file, so the bytes don't change under the pin.
+# - NCBI RefSeq annotation releases (NCBI data are public domain, US government work): the
+#   `gene` feature of each Gene ID on a primary chromosome gives the GRCh38/GRCh37 positions
+#   (1-based, closed). Annotation-release paths are immutable.
+#
+# sha256 pins the exact bytes; a mismatch fails the run. To move to newer releases, change the
+# URLs and labels, run `kb probes --update-pins`, and review the diff of probes.csv.
+# Vendor probe names are never taken from a catalogue: they are typed in from datasheets with
+# the datasheet cited in the `source` column (see README.md).
+files:
+  - id: hgnc
+    kind: hgnc
+    label: HGNC 2026-10-06
+    url: 
+      https://storage.googleapis.com/public-download-files/hgnc/archive/archive/quarterly/tsv/hgnc_complete_set_2026-10-06.tsv
+    sha256: '8bf6f686e640dbc864a346484626953621b0500d900d26cd085a35c2782d725d'
+  - id: ncbi-grch38
+    kind: ncbi_gff
+    build: GRCh38
+    label: NCBI RS_2025_08 (GRCh38)
+    url: 
+      https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.40-RS_2025_08/GCF_000001405.40_GRCh38.p14_genomic.gff.gz
+    sha256: '4920f0eae7e2197c50b67a201e06d657387137b49dd60f474b4f1d5b29334051'
+  - id: ncbi-grch37
+    kind: ncbi_gff
+    build: GRCh37
+    label: NCBI RS_2024_09 (GRCh37)
+    url: 
+      https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/9606/GCF_000001405.25-RS_2024_09/GCF_000001405.25_GRCh37.p13_genomic.gff.gz
+    sha256: '5fcadac26be5d82a1f1c52e33cc5047247f719a60b50182c6ba298bda77cc80f'

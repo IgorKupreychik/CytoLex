@@ -1,10 +1,10 @@
 # Knowledge base (KB) — file format and conventions
 
-The KB is the single source for every validation decision. Rules are YAML, checked against the JSON Schemas (draft 2020-12) in [`schema/`](schema/). Check files with:
+The KB is the single source for every validation decision. Its files live in two places (T-102): the files **people write, review or sign off** are in [`../curated/`](../curated/README.md) (rules, quotes, vocab, translation, band exceptions, the probe table, …); the **generated** band data, the extracted chunks and the JSON Schemas (draft 2020-12, [`schema/`](schema/)) are here in `kb/`. This file is the format reference for both. Check files with:
 
 ```sh
-uv run --directory tools kb check                 # all of kb/rules/, kb/source-quotes/, kb/vocab/ and kb/translation/
-uv run --directory tools kb check kb/rules/2016/ch09/09.02.17.01-reciprocal-translocations.yaml
+uv run --directory tools kb check                 # all of curated/ that has a schema (YAML + the probe CSV)
+uv run --directory tools kb check curated/rules/2016/ch09/09.02.17.01-reciprocal-translocations.yaml
 ```
 
 `kb check` checks each file against the schema only. `uv run --directory tools kb build` runs the schema check on every file and then, per edition:
@@ -23,6 +23,8 @@ uv run --directory tools kb check kb/rules/2016/ch09/09.02.17.01-reciprocal-tran
 | No chunks for the edition (`kb extract` not run): the chunk checks above are skipped | warning |
 | Bands (`kb/bands/<version>/bands.yaml`, T-060): `version` = edition, every band has `name`, `chrom`, `arm`, `parent`, `levels`, `derived`, `book`, `grch37`, `grch38`, names unique | error |
 | No `bands.yaml` for the edition (`kb bands` not run): the runtime bundle has `bands: null` | warning |
+| Probe table (`curated/probes/probes.csv`, T-102; edition-independent, optional): header, row schema; band in every edition's band data and on the row's chromosome; start ≤ end; names and aliases unique (case-insensitive); no name a spreadsheet turned into a date (`9-Sep`, `Sep-09`, `2024-09-09`) | error |
+| Probe table: a build's coordinates outside the row's band, or GRCh37 and GRCh38 disagree (one inside the band, one not) | warning; **error** on a row with `reviewed: yes` |
 | Translation templates (T-057): file named `templates.<language>.yaml` with that `language`; `key` is an existing rule ID or vocab item of the edition, unique; `construct` unique, and every construct of the schema's list has a template; every `{placeholder}` is a declared slot, braces balanced; `when` unique, required when a template has several forms | error |
 | A declared template slot that no form uses | warning |
 | Golden file (T-057): named `golden.yaml`; inputs unique; each item `span` matches the input at `start` (UTF-16 offsets); every `kb` reference exists (rule, vocab item, band of `bands.yaml`); *with chunks:* `cite` as for rules | error |
@@ -36,28 +38,35 @@ Any error → exit 1 and nothing written. Otherwise it writes `build/kb.sqlite` 
            review: {needs_review, note?}, cite: [{section, page, para?|example?|float?, rendered}]}],
   vocab: {<vocabulary>: {shared_tokens?, entries: [{label, kind, tokens, pair?, equivalent_forms?, meanings, cite: "<rendered>"}]}},
   bands: {levels_available, bands: [{name, chrom, arm, parent, levels, derived, book, grch37, grch38, stain}]} | null,
-  translation?: {templates: {<language>: [<template as in the YAML file>]}}}}}
+  translation?: {templates: {<language>: [<template as in the YAML file>]}}}},
+ probes?: [{name, aliases, kind, chrom, band, grch37, grch38, source, reviewed}]}
 ```
-`translation` (T-057) is present only when the edition has `kb/translation/<version>/`; it was added without a format bump because readers ignore unknown keys. Left out: the golden file, quotes, examples, `paraphrase_checked`, file paths, vocab `source`/`review`/`note`, band sources/counts. Band `stain` (gneg, gpos25…gpos100, acen, gvar, stalk; `null` for derived and book-only names) was added in T-101 without a format bump, for the desktop ideograms; a bundle without it reads as no stain. Bump `RUNTIME_FORMAT_VERSION` in `tools/src/cytolex_tools/kb/build.py` on any incompatible change; the core checks it at load (T-028).
+`translation` (T-057) is present only when the edition has `curated/translation/<version>/`; it was added without a format bump because readers ignore unknown keys. Left out: the golden file, quotes, examples, `paraphrase_checked`, file paths, vocab `source`/`review`/`note`, band sources/counts. Band `stain` (gneg, gpos25…gpos100, acen, gvar, stalk; `null` for derived and book-only names) was added in T-101 without a format bump, for the desktop ideograms; a bundle without it reads as no stain. `probes` (T-102) is the probe table, edition-independent, present only when `curated/probes/probes.csv` exists; added without a format bump (`band`/`grch37`/`grch38` are `null` when empty; `reviewed` is a boolean; `reviewer`/`date`/`note` are only in `kb.json`, whose top level has `probes` too). Bump `RUNTIME_FORMAT_VERSION` in `tools/src/cytolex_tools/kb/build.py` on any incompatible change; the core checks it at load (T-028).
 
 ## Layout
+Paths from the repo root. In the rest of this file, `rules/`, `source-quotes/`, `vocab/`, `translation/` and `bands/<version>/exceptions.yaml` mean the folders under `curated/`.
+
 | Path | Content |
 |---|---|
-| `schema/common.schema.json` | Shared definitions: rule ID, citation, vocabularies |
-| `schema/rules.schema.json` | Rule files |
-| `schema/quotes.schema.json` | Quote files |
-| `rules/<version>/chNN/<section-file>.yaml` | Rules for one ISCN section |
-| `source-quotes/<version>/chNN/<section-file>.yaml` | Verbatim quotes for the same section (same relative path) |
-| `schema/vocab.schema.json` | Vocabulary files |
-| `vocab/<version>/chNN/<section>-<name>.yaml` | A printed list as a parser vocabulary (ch. 3 symbols, Table 2 banding codes) |
-| `source-text/<version>/` | Extracted chunks (gitignored; `kb extract`) |
-| `schema/band-exceptions.schema.json` | `bands/<version>/exceptions.yaml` |
-| `bands/<version>/bands.yaml` | Generated band data (`kb bands`; committed, don't edit by hand) |
-| `bands/<version>/ideograms.yaml` | Band labels of the book's idiograms (`kb ideograms`; committed, don't edit by hand) |
-| `bands/<version>/exceptions.yaml` | Cited decisions on every book-vs-NCBI band difference (hand-written; `kb check`) |
-| `schema/translation-templates.schema.json`, `schema/translation-golden.schema.json` | Translation templates and golden file (T-057) |
-| `translation/<version>/templates.<language>.yaml` | Literal translation phrase templates, keyed by KB entry (English: `templates.en.yaml`) |
-| `translation/<version>/golden.yaml` | Expected translations (string → summary, items with spans and KB refs): the renderer's test set |
+| `kb/schema/common.schema.json` | Shared definitions: rule ID, citation, vocabularies |
+| `kb/schema/rules.schema.json` | Rule files |
+| `kb/schema/quotes.schema.json` | Quote files |
+| `curated/rules/<version>/chNN/<section-file>.yaml` | Rules for one ISCN section |
+| `curated/source-quotes/<version>/chNN/<section-file>.yaml` | Verbatim quotes for the same section (same relative path) |
+| `kb/schema/vocab.schema.json` | Vocabulary files |
+| `curated/vocab/<version>/chNN/<section>-<name>.yaml` | A printed list as a parser vocabulary (ch. 3 symbols, Table 2 banding codes) |
+| `kb/source-text/<version>/` | Extracted chunks (gitignored; `kb extract`) |
+| `kb/schema/band-exceptions.schema.json` | `curated/bands/<version>/exceptions.yaml` |
+| `kb/bands/<version>/bands.yaml` | Generated band data (`kb bands`; committed, don't edit by hand) |
+| `kb/bands/<version>/ideograms.yaml` | Band labels of the book's idiograms (`kb ideograms`; committed, don't edit by hand) |
+| `curated/bands/<version>/exceptions.yaml` | Cited decisions on every book-vs-NCBI band difference (hand-written; `kb check`) |
+| `curated/bands/<version>/sources.yaml` | Band download pins (sha256), the idiogram glyph map and spot-check sign-off (read by `kb bands`, `kb ideograms`) |
+| `kb/schema/translation-templates.schema.json`, `kb/schema/translation-golden.schema.json` | Translation templates and golden file (T-057) |
+| `curated/translation/<version>/templates.<language>.yaml` | Literal translation phrase templates, keyed by KB entry (English: `templates.en.yaml`) |
+| `curated/translation/<version>/golden.yaml` | Expected translations (string → summary, items with spans and KB refs): the renderer's test set |
+| `kb/schema/probes.schema.json` | One row of the probe table (T-102) |
+| `curated/probes/probes.csv` | Probe table: probe names with chromosome, band and GRCh37/38 positions, source and review columns (editing guide: `curated/probes/README.md`) |
+| `curated/probes/sources.yaml` | HGNC + NCBI download pins for `kb probes` |
 
 - **One file per numbered section**, named like its chunk with `.yaml` instead of `.md`: chunk `source-text/2016/ch09/09.02.17.01-reciprocal-translocations.md` → `rules/2016/ch09/09.02.17.01-reciprocal-translocations.yaml`. A rule that draws on several sections lives in the file of its main section and cites the others.
 - **One directory per edition.** "A block per version" means the same rule ID appears in `rules/2016/…` and later in `rules/2020/…`, each with that edition's statement, citations and examples. The file's `version` must match its directory.
@@ -202,7 +211,7 @@ entries:
 - `note`: hints for parser authors (e.g. the en dash vs hyphen question).
 
 ## Band data (`bands/<version>/`)
-`bands.yaml` is generated by `kb bands` (T-006, T-007) from the NCBI Genome Decoration Page ideograms (400/550/850 band sets), UCSC cytoBand and the book's idiograms; sources and sha256 pins are in `tools/src/cytolex_tools/bands/sources/<version>.yaml`. Don't edit it by hand; book-based decisions go in `exceptions.yaml`.
+`bands.yaml` is generated by `kb bands` (T-006, T-007) from the NCBI Genome Decoration Page ideograms (400/550/850 band sets), UCSC cytoBand and the book's idiograms; sources and sha256 pins are in `curated/bands/<version>/sources.yaml`. Don't edit it by hand; book-based decisions go in `exceptions.yaml`.
 - Header: `version`, `generator_version`, `levels_available` (300, 400, 550, 700, 850), `levels_unavailable` (none for 2016), `sources` (URL or file, sha256, bytes; the last two are `ideograms.yaml` and `exceptions.yaml`), `counts`.
 - `bands`: one entry per valid band name, in chromosome order (pter → qter), parents before children:
   - `name` (`9q34.1`), `chrom`, `arm`, `parent` (`9q34`; `null` at band level);
@@ -275,3 +284,20 @@ golden:
 - **Book entries** cover every cited valid example of ch. 4, 8 and 9 that is a karyotype (372; the 4 `arr` strings of ch. 4 are left out) and, since T-093, of ch. 13 made of karyotype and in situ segments (123; strings with an `arr` segment wait for T-105); the sentence paraphrases the book's printed explanation (cite, never quote). **Synthetic entries** (26) cover what the book lacks: both readings with the context unknown, `mos`/`chi`/`//`, `~`, `?`.
 - **Exact match (T-058):** `RendererGoldenTests` requires the renderer's summary, items, sentences, readings and KB links to equal each entry. Where the first drafts contradicted each other or added book interpretation, the sentence was changed to the renderer's wording and the old one kept in `review.note` ("T-058: wording normalized for the renderer; was: …") for T-082. To list mismatches after a change: `CYTOLEX_GOLDEN_DIFF=<file>` with `dotnet test --project tests/CytoLex.Core.Tests --filter-method "*WriteDifferenceReport"` writes a report (and `<file>.json`).
 - **Skeleton for new entries:** `CYTOLEX_GOLDEN_DRAFT=1` (and optionally `CYTOLEX_GOLDEN_DRAFT_INPUTS=<file>`, one non-book string per line) with `dotnet test --project tests/CytoLex.Core.Tests --filter-class "CytoLex.Core.Tests.Translation.GoldenDraftTests"` writes `build/review/translation/golden-draft-2016.yaml`: the inputs not yet in the golden file (book examples of ch. 4, 8, 9 and 13), with their spans and KB refs from the binder and empty sentences to fill in. With `CYTOLEX_GOLDEN_DRAFT_RENDER=1` too (T-093), the summary, sentences, readings and KB links are the renderer's output, to be checked by hand against the book before they go into the golden file.
+
+## Probe table (`curated/probes/probes.csv`, T-102)
+A CSV that people edit (also in Excel/LibreOffice; how-to for non-technical editors: [`curated/probes/README.md`](../curated/probes/README.md)). UTF-8, LF; the reader accepts a BOM and CRLF. One row per probe name, every cell text:
+
+| Column | Content |
+|---|---|
+| `probe` | The name as written in ISCN strings (`ABL1`, `RP11-265P11`, `D21S65`); unique, no spaces |
+| `aliases` | Other names, `;`-separated (gene rows: HGNC previous symbols such as `MLL` for `KMT2A`); unique across names and aliases |
+| `kind` | `gene` · `centromere` · `clone` · `paint` · `commercial` · `other` |
+| `chromosome` | 1–22, X, Y |
+| `band` | One band (`9q34.12`) or a range (`22q11.21-q11.22`), in the band data of every edition; may be empty |
+| `grch37`, `grch38` | `start-end` in bp, 1-based closed (as in `bands.yaml`); may be empty |
+| `source` | Where the row comes from; rows written by `kb probes` end with `(auto)`. Vendor probes cite their datasheet (names typed in, never copied as a catalogue) |
+| `reviewed` | `yes` / `no`; `yes` needs `reviewer` and `date` (`YYYY-MM-DD`) |
+| `note` | Free text |
+
+`kb probes` (sources in `curated/probes/sources.yaml`: HGNC complete set, CC0; NCBI RefSeq annotation GFFs, public domain) adds gene rows and refreshes rows that are still `(auto)` and unreviewed; it never changes any other row. `kb build` checks the table (see the checks table above) and writes `build/review/probes-review.md`: conflicts, unreviewed rows, and probe names of the in situ KB examples without a row (D-numbers listed apart: they name their chromosome, T-101). Data of unreviewed rows is still used; T-103 shows it with an "unreviewed" badge.

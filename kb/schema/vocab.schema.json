@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cytolex.local/schema/vocab.schema.json",
   "title": "CytoLex KB — vocabulary file",
-  "description": "A list printed in the book (ch. 3 symbols, Table 2 banding codes) as a machine-usable vocabulary: kb/vocab/<version>/<section-file>.yaml. kb build checks that the entry labels equal the first column of the cited source table. Conventions: kb/README.md.",
+  "description": "A list printed in the book (ch. 3 symbols, Table 2 banding codes) as a machine-usable vocabulary: curated/vocab/<version>/<section-file>.yaml. kb build checks that the entry labels equal the first column of the cited source table. Conventions: kb/README.md.",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "section", "vocabulary", "source", "review", "entries"],

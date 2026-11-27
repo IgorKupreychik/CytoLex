@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cytolex.local/schema/translation-golden.schema.json",
   "title": "CytoLex KB — literal translation golden file",
-  "description": "Expected literal translations for one edition: kb/translation/<version>/golden.yaml (T-057). Test data of the renderer (T-058): string → summary and one sentence per item, with spans and KB references. Book entries paraphrase the printed explanation of the cited example (never quoted). Conventions: kb/README.md → Translation.",
+  "description": "Expected literal translations for one edition: curated/translation/<version>/golden.yaml (T-057). Test data of the renderer (T-058): string → summary and one sentence per item, with spans and KB references. Book entries paraphrase the printed explanation of the cited example (never quoted). Conventions: kb/README.md → Translation.",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "golden"],

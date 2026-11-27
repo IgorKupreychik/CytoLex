@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cytolex.local/schema/corpus.schema.json",
   "title": "CytoLex — test corpus of ISCN strings",
-  "description": "One corpus file per notation type: tests/data/corpus/<type>.yaml (T-062). Realistic strings that complement the KB examples: combined strings, volume, robustness inputs. Strings are synthetic or adapted from the book: never real patient strings (data policy T-048), so there is no 'lab' source. Format and label policy: tests/data/corpus/README.md.",
+  "description": "One corpus file per notation type: curated/corpus/<type>.yaml (T-062). Realistic strings that complement the KB examples: combined strings, volume, robustness inputs. Strings are synthetic or adapted from the book: never real patient strings (data policy T-048), so there is no 'lab' source. Format and label policy: curated/corpus/README.md.",
   "type": "object",
   "additionalProperties": false,
   "required": ["format", "version", "corpus"],

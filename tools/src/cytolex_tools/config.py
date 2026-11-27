@@ -8,6 +8,10 @@ from ruamel.yaml import YAML
 # tools/src/cytolex_tools/config.py -> repo root
 REPO_ROOT = Path(__file__).resolve().parents[3]
 LOCAL_CONFIG = REPO_ROOT / "config" / "local.yaml"
+# Every file a person writes, fills in, reviews or signs off (T-102); generated data and the
+# schemas stay in kb/.
+CURATED_DIR = REPO_ROOT / "curated"
+KB_DIR = REPO_ROOT / "kb"
 
 
 def iscn_pdf_path(version: str, config_file: Path = LOCAL_CONFIG) -> Path:
