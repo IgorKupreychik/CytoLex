@@ -150,6 +150,7 @@ The KB is the single source for all validation decisions.
 ## Copyright
 - Private, personal project for now: verbatim quotes are kept (in separate, removable files) to audit validator decisions.
 - Before any public deployment: paraphrase-only KB — T-043.
+- Presentation material (T-061): citations, paraphrased rules and short ISCN notation examples only; no verbatim quotes, no book idiogram images.
 
 ## Decision log
 _(entries added by `discussion` tasks: date — task — decision — rationale)_
@@ -636,3 +637,12 @@ _(entries added by `discussion` tasks: date — task — decision — rationale)
   - **+21 copy leaf (user):** `ASSOC.TRISOMY21_DOWN` became `any` of `exact +21` and a gain overlapping 21q22 (GRCh38 30,200,001–46,709,983 from the band data), the region trisomy 21 FISH probes usually target. Rejected: the whole of chromosome 21 (any small gain on 21 would match) and no copy leaf (FISH/arr trisomy 21 unmatched). A probe placed by chromosome only (`D21Z1×3`) is a whole-chromosome gain and matches; kept (user), since three signals of a chromosome-21 probe is how FISH shows trisomy 21.
   - **t(8;21) band (user):** `ASSOC.T8_21_AML` also accepts `fusion 8q21.3+21q22`, because the band data places RUNX1T1 at 8q21.3 while karyotypes write the break as 8q22. Rejected: replacing 8q22 (karyotype fusions written q22 would rely on the exact leaf only).
   - All still `reviewed: false`; the review notes say what was added and why.
+- **2026-11-28 — T-061 — Presentation & documentation material.** Decided with the user in the interview:
+  - **Audiences:** (1) business people — not medical, some medical knowledge; the aim is to get the idea "bought" and to show that an app can be built from a book using AI; strengths first, limits mentioned briefly; light build details (the book as source of truth, band data, citations), high-level diagrams only. (2) technical people — main ideas and concepts with more detailed diagrams, still at presentation depth.
+  - **Deliverables (one task each, T-114–T-121):** demo string list, quick start guide, shared diagrams + screenshots, FAQ, business deck, technical deck, one-page handout, demo script (no recording, user).
+  - **Business deck contents:** the app today and future improvements; an objective CytoGPS comparison (from the T-051/T-052 data and `docs/research/cytogps-comparison.md`, both tools' strengths and scope, no cherry-picking); a dedicated "How it was built with AI" section (book → AI-written cited rules → human review → book examples as tests, with numbers from the repo); associations, if shown, as literature associations with the disclaimer (T-104).
+  - **Format:** `.pptx` committed in the repo (user, over a claude.ai Slides artifact and Markdown slides), built with the pptx skill, generator source/outline next to each deck; diagrams as Mermaid/SVG sources in git with rendered images.
+  - **Location:** `docs/presentation/` (`business/`, `technical/`, `handout/`, `diagrams/`, `screenshots/`, `demo-strings.md`, `demo-script.md`, `faq.md`, `README.md` index); the demo list data in `curated/demo/demo-strings.yaml` (person-maintained, T-102 rule), rendered into `docs/presentation/demo-strings.md` and checked by a C# test of the expected verdicts; the quick start in `docs/quickstart.md` (for any new developer, linked from README).
+  - **Copyright:** citations, our own paraphrased rule statements and short ISCN notation examples only; no verbatim book quotes and no book idiogram images (ideograms are drawn from the NCBI band data). Demo and screenshot strings are synthetic or book strings (T-048).
+  - **Process:** every follow-up task starts by agreeing a content outline with the user in its plan step.
+  - Rationale: two audiences need different depth but share diagrams, screenshots and demo strings, so those are produced once first; a test-checked demo list keeps a live demo from breaking as the core changes; committed `.pptx` files can be edited offline and shared as files.

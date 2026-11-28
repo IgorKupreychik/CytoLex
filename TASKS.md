@@ -70,7 +70,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-058 | done | 2 | T-030, T-031, T-057 | Literal translation renderer in the core library |
 | T-059 | done | 2 | T-058, T-036, T-039 | Desktop: translation view |
 | T-060 | done | 1 | T-023 | `kb build`: lean runtime bundle (rules metadata, vocab, bands) for the core |
-| T-061 | discussion | 4 | – | Presentation & documentation material for the pilot: define what to prepare |
+| T-061 | done | 4 | – | Presentation & documentation material for the pilot: define what to prepare |
 | T-062 | done | 2 | T-026 | Test corpus of ISCN strings per notation type (review-flagged) + mutation generator |
 | T-063 | done | 1 | T-053 | KB: typed symbol forms (`-`/`x`/`->`) in the ch. 3 vocab + rule `SYM.TYPED_SYMBOL_FORMS` |
 | T-064 | done | 3 | – | Merged into T-055 (line endings of generated committed files) |
@@ -103,18 +103,18 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-092 | done | 2 | T-033, T-069, T-098 | Abnormality list: in situ results (core API + desktop panel) |
 | T-093 | done | 3 | T-033, T-058 | Literal translation of in situ results (templates, golden entries, renderer) |
 | T-094 | done | 4 | T-033 | Probe positions for locus and chromosome order in FISH (`ISH.LOCUS_ORDER_PTER_QTER`, `NUC_ISH.CHROMOSOME_ORDER`) |
-| T-095 | discussion | 4 | T-033 | Apply karyotype rules (STRUCT.*, symbol formats) to the abnormalities of ish results? |
+| T-095 | discussion | 5 | T-033 | Apply karyotype rules (STRUCT.*, symbol formats) to the abnormalities of ish results? |
 | T-096 | done | 2 | T-074, T-035 | Autocorrection: core + KB flag `fix.auto` (meaning-preserving level-1 fixes applied automatically, original kept) |
 | T-097 | done | 2 | T-096, T-098, T-038 | Autocorrection: desktop (checkbox, corrected line, highlights on the original) + batch tab |
 | T-098 | done | 2 | T-037, T-059, T-081 | Desktop: single-string layout redesign (edition verdict strip + full-width view tabs) |
-| T-099 | todo | 4 | T-098 | Desktop: pin a view tab to a side pane |
-| T-100 | discussion | 4 | T-072, T-092 | Link one event across techniques in combined strings (karyotype + ish + arr) |
+| T-099 | todo | 5 | T-098 | Desktop: pin a view tab to a side pane |
+| T-100 | discussion | 5 | T-072, T-092 | Link one event across techniques in combined strings (karyotype + ish + arr) |
 | T-101 | done | 3 | T-098, T-033, T-034 | Locus list from the string + desktop "Map" view (ideograms) |
 | T-102 | done | 3 | T-033 | Probe table: people-editable CSV with review flags, HGNC/NCBI pre-fill, `kb build` checks |
 | T-103 | done | 3 | T-101, T-102 | Use the probe table: probe loci with "unreviewed" badges; locus/chromosome order checks (T-094) |
 | T-104 | done | 3 | T-069, T-101 | Disease/condition associations from abnormalities: intended use, sources, format, review |
 | T-105 | done | 3 | T-034, T-058 | Literal translation of microarray results (templates, golden entries, renderer) |
-| T-106 | discussion | 4 | T-032 | What `idem`/`sl`/`sdl` refer to on the donor side of `//` (KB rule first, then the binder) |
+| T-106 | discussion | 5 | T-032 | What `idem`/`sl`/`sdl` refer to on the donor side of `//` (KB rule first, then the binder) |
 | T-107 | todo | 5 | T-089 | Settings outside a repo checkout (per-user settings file + build cache) for packaged installs |
 | T-108 | done | 3 | T-102 | Association rules: `curated/associations/associations.yaml`, schema, `kb build` checks + review report, runtime bundle, cited seed rules |
 | T-109 | done | 3 | T-108, T-101, T-069 | Core: match association rules (`exact`/`fusion`/`copy`, all/any/not, context) → `EditionResult.Associations`; batch JSON/CSV |
@@ -122,6 +122,14 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-111 | todo | 4 | T-108 | `kb associations`: pre-fill constitutional rules from ClinGen dosage regions (CC0) + Orphanet names (CC BY 4.0) |
 | T-112 | discussion | 5 | T-109 | Diagnosis-suggestion mode: intended use and regulatory check (MDR/IVDR, FDA) before any build |
 | T-113 | discussion | 5 | – | Mitelman database: licence check, usable as an association source? |
+| T-114 | todo | 4 | – | Demo string list: `curated/demo/demo-strings.yaml` + rendered `docs/presentation/demo-strings.md` + test of expected verdicts |
+| T-115 | todo | 4 | – | Quick start guide for a fresh clone (`docs/quickstart.md`) |
+| T-116 | todo | 4 | T-114 | Shared presentation diagrams + app screenshots (`docs/presentation/diagrams/`, `screenshots/`) |
+| T-117 | todo | 4 | – | FAQ for presentations (`docs/presentation/faq.md`) |
+| T-118 | todo | 4 | T-114, T-116, T-117 | Business presentation (.pptx) |
+| T-119 | todo | 4 | T-116, T-118 | Technical presentation (.pptx) |
+| T-120 | todo | 4 | T-118 | One-page business handout (PDF) |
+| T-121 | todo | 4 | T-114, T-118 | Demo script (`docs/presentation/demo-script.md`) |
 
 ---
 
@@ -947,7 +955,7 @@ Deviations from the plan: no CLI (user); new label `severity-policy` and CytoLex
 **Notes:**
 
 ### T-061 — Presentation & documentation material for the pilot
-**Status:** discussion
+**Status:** done
 **Description:** Once the pilot works, the user will present CytoLex to colleagues. Decide what material to prepare, for whom and in what form, then create the `todo` tasks to produce it. Questions for the interview:
 - Audience(s) and setting: cytogeneticists/lab staff, management, developers; talk length; live demo or not.
 - Deliverables, e.g. a slide deck (claude.ai Slides artifact or `.pptx`), architecture and pipeline diagrams (from `docs/design/core.md`: segment → parse → bind → rules → result; KB build pipeline book → chunks → rules → bundle), a one-page overview/handout, a demo script with prepared example strings (valid, invalid with fixes, conditional context, multi-edition), screenshots or a short screen recording of the desktop app, an FAQ (scope, ISCN editions, limits, copyright).
@@ -955,7 +963,7 @@ Deviations from the plan: no CLI (user); new label `severity-policy` and CytoLex
 - Copyright: what book content may appear on slides (paraphrases and citations only, no verbatim quotes or idiogram images; see T-043).
 - Timing: what can be drafted now (architecture, KB pipeline) and what needs the finished pilot (demo, screenshots).
 **Acceptance:** Decision in `docs/decisions.md` (audiences, deliverables, formats, location, copyright limits); follow-up `todo` task(s) for producing the material added with Pri and Depends (the demo-dependent ones depending on the pilot desktop tasks, e.g. T-040).
-**Notes:** Raised 2026-11-18 by the user, at the end of T-023. 2026-11-27 (T-104): if disease associations (T-108–T-110) are shown, present them as "conditions associated in the literature, not a diagnosis", with the disclaimer.
+**Notes:** Raised 2026-11-18 by the user, at the end of T-023. 2026-11-27 (T-104): if disease associations (T-108–T-110) are shown, present them as "conditions associated in the literature, not a diagnosis", with the disclaimer. **Outcome (2026-11-28):** decided with the user in the interview: two audiences (business people first: strengths, a "How it was built with AI" section and an objective CytoGPS comparison; then technical people at concept depth); `.pptx` decks committed in `docs/presentation/` (user, over a Slides artifact); copyright: citations + paraphrase + short notation examples, no verbatim quotes or book idiograms; demo list data in `curated/demo/demo-strings.yaml`, rendered to `docs/presentation/demo-strings.md` and test-checked; quick start in `docs/quickstart.md`; each follow-up task starts by agreeing its outline. Logged in `docs/decisions.md` (+ pointer under Copyright); follow-ups T-114–T-121. Deviations from the first plan: the screen recording became a demo script only (T-121, Pri 4, user); FAQ, handout and shared diagrams/screenshots added as their own tasks (user).
 
 ### T-065 — Binder: syntax tree → semantic model
 **Status:** done
@@ -1165,3 +1173,51 @@ Outcome (2026-11-24, confirmed by the user after the check by hand): "Autocorrec
 **Description:** Check the licence and terms of the Mitelman Database of Chromosome Aberrations and Gene Fusions in Cancer: may its recurrent-aberration/disease data be redistributed in the KB bundles (and the web service), with what attribution? If yes, plan a pre-fill like T-111.
 **Acceptance:** Licence finding with source in `docs/decisions.md`; follow-up `todo` task if usable.
 **Notes:** Created 2026-11-27 from T-104.
+
+### T-114 — Demo string list
+**Status:** todo
+**Description:** A list of ISCN strings for demonstrating CytoLex features, each with the feature to show, talking points and other details. Data in `curated/demo/demo-strings.yaml` (person-maintained, T-102 rule; schema in `kb/schema/`, checked by `kb check`): string, feature(s), what to point out, expected verdict per edition (and key rule IDs where useful). Rendered into `docs/presentation/demo-strings.md` (generated, LF). A C# test checks that each string still gives its expected result, so the demo never breaks unnoticed. Cover at least: valid karyotype, invalid with level-1 fixes / Fix all, autocorrection, did-you-mean suggestions, conditional context, multi-edition view, clones (idem/sl), arr, ish/nuc ish, combined strings, translation, abnormality list, map, associations (with the "not a diagnosis" framing), CytoGPS comparison, batch. Synthetic or ISCN-book strings only (T-048).
+**Acceptance:** Step 1 (plan mode): agree the content outline with the user before producing anything (T-061). YAML + schema + `kb check` coverage; rendered Markdown; passing test of expected verdicts; `docs/presentation/README.md` started (index); CLAUDE.md + README updated for the new `curated/demo/` and `docs/presentation/` folders and any command.
+**Notes:** Created 2026-11-28 from T-061.
+
+### T-115 — Quick start guide
+**Status:** todo
+**Description:** `docs/quickstart.md`: how to set up a new machine after cloning the repo — prerequisites (.NET 10 SDK, Python/uv, ISCN PDF outside the repo), `config/local.yaml` from the example, the commands in order and from where (`uv sync --directory tools`, `kb extract`, `kb build`, `dotnet build`, `dotnet test`, `dotnet run --project src/CytoLex.Desktop`), what each produces, common errors (e.g. "KB bundle not found"), optional CytoGPS setup. Short; links to README for details.
+**Acceptance:** Step 1 (plan mode): agree the content outline with the user before producing anything (T-061). The guide followed step by step on a clean clone (or a fresh worktree) reaches a running app; linked from README; CLAUDE.md layout note.
+**Notes:** Created 2026-11-28 from T-061. For any new developer, so it lives in `docs/`, not `docs/presentation/`.
+
+### T-116 — Shared presentation diagrams and screenshots
+**Status:** todo
+**Description:** Diagram sources (Mermaid/SVG, kept in git, rendered PNGs next to them) in `docs/presentation/diagrams/`, at two depths: high-level (business: product overview, "book → rules → app", edition-aware results) and detailed (technical: segment → parse → bind → rules → result, KB build pipeline book → chunks → rules → bundle, band data pipeline). App screenshots of the demo strings (T-114) in `docs/presentation/screenshots/`. Reused by both decks and the handout.
+**Acceptance:** Step 1 (plan mode): agree the content outline with the user before producing anything (T-061). Diagram sources + rendered images; screenshots list in `docs/presentation/README.md`; no book idiogram images or verbatim quotes (T-061 copyright limit).
+**Notes:** Created 2026-11-28 from T-061.
+
+### T-117 — FAQ for presentations
+**Status:** todo
+**Description:** `docs/presentation/faq.md`: expected questions with short answers — scope (what is checked, which notations), ISCN editions, limits, accuracy and how it is tested, data policy (T-048), copyright (T-043), associations are not a diagnosis (T-104), CytoGPS comparison, roadmap. Source for backup slides in the decks.
+**Acceptance:** Step 1 (plan mode): agree the content outline with the user before producing anything (T-061). FAQ committed; answers trace to decisions/docs.
+**Notes:** Created 2026-11-28 from T-061.
+
+### T-118 — Business presentation
+**Status:** todo
+**Description:** A `.pptx` deck for business people (not medical, some medical knowledge), in `docs/presentation/business/` with its generator source/outline (built with the pptx skill). Goal: get the idea "bought" and show that an app can be built from a book using AI. Contents: the problem, what CytoLex does today, strengths (limits mentioned briefly), a dedicated 2–3-slide "How it was built with AI" section (book → AI-written cited rules → human review → book examples as tests, with numbers from the repo), an objective CytoGPS comparison (T-051/T-052 data, `docs/research/cytogps-comparison.md`), future improvements, demo slides from T-114, backup slides from T-117. Light build details only (the book as source of truth, band data); high-level diagrams from T-116.
+**Acceptance:** Step 1 (plan mode): agree the content outline with the user before producing anything (T-061). `.pptx` + source committed; copyright limit kept (citations + paraphrase + short notation examples; no verbatim quotes, no book idiograms); associations, if shown, framed as literature associations with the disclaimer.
+**Notes:** Created 2026-11-28 from T-061.
+
+### T-119 — Technical presentation
+**Status:** todo
+**Description:** A `.pptx` deck for technical people in `docs/presentation/technical/` with its source. Main ideas and concepts at presentation depth: architecture (core / desktop / external / tools), validation pipeline, KB build pipeline and runtime bundle, version profiles and cited diagnostics, fix levels and autocorrection, semantic model and translation, tests (KB-example harness, corpus, mutations), external checkers (CytoGPS). Detailed diagrams from T-116; reuses the business deck's design.
+**Acceptance:** Step 1 (plan mode): agree the content outline with the user before producing anything (T-061). `.pptx` + source committed; same copyright limit as T-118.
+**Notes:** Created 2026-11-28 from T-061.
+
+### T-120 — One-page business handout
+**Status:** todo
+**Description:** A single-page summary (PDF + source) in `docs/presentation/handout/` to leave behind after the business talk: what CytoLex is, key strengths, how it was built, CytoGPS comparison in one line, next steps.
+**Acceptance:** Step 1 (plan mode): agree the content outline with the user before producing anything (T-061). One-page PDF + source committed; consistent with the business deck.
+**Notes:** Created 2026-11-28 from T-061.
+
+### T-121 — Demo script
+**Status:** todo
+**Description:** `docs/presentation/demo-script.md`: the step-by-step live demo flow over the demo strings (T-114) — order, what to click, what to say, timings, and a fallback (screenshots from T-116) if something fails. No recording (user, 2026-11-28).
+**Acceptance:** Step 1 (plan mode): agree the content outline with the user before producing anything (T-061). Script committed; every string it uses is in the demo list.
+**Notes:** Created 2026-11-28 from T-061.
