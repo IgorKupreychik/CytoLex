@@ -119,7 +119,7 @@ Keep the summary table and the task sections in sync (status changes are made in
 | T-108 | done | 3 | T-102 | Association rules: `curated/associations/associations.yaml`, schema, `kb build` checks + review report, runtime bundle, cited seed rules |
 | T-109 | done | 3 | T-108, T-101, T-069 | Core: match association rules (`exact`/`fusion`/`copy`, all/any/not, context) → `EditionResult.Associations`; batch JSON/CSV |
 | T-110 | done | 3 | T-109, T-098 | Desktop: "Associations" view tab (disclaimer, citations, unreviewed badges, span links) |
-| T-111 | todo | 4 | T-108 | `kb associations`: pre-fill constitutional rules from ClinGen dosage regions (CC0) + Orphanet names (CC BY 4.0) |
+| T-111 | todo | 5 | T-108 | `kb associations`: pre-fill constitutional rules from ClinGen dosage regions (CC0) + Orphanet names (CC BY 4.0) |
 | T-112 | discussion | 5 | T-109 | Diagnosis-suggestion mode: intended use and regulatory check (MDR/IVDR, FDA) before any build |
 | T-113 | discussion | 5 | – | Mitelman database: licence check, usable as an association source? |
 | T-114 | todo | 4 | – | Demo string list: `curated/demo/demo-strings.yaml` + rendered `docs/presentation/demo-strings.md` + test of expected verdicts |
@@ -1160,7 +1160,10 @@ Outcome (2026-11-24, confirmed by the user after the check by hand): "Autocorrec
 **Status:** todo
 **Description:** `kb associations` (like `kb probes`): download the pinned ClinGen dosage-sensitivity regions (CC0) and Orphanet names/IDs (CC BY 4.0, attribution recorded) into `build/cache/associations/`, sha256 pins in `curated/associations/sources.yaml`; add or refresh `copy` rules marked `(auto)` + `reviewed: no`, never touching other rules.
 **Acceptance:** Pinned downloads, idempotent re-runs, attribution in the review report and the app's about/licence text; tests on fixtures.
-**Notes:** Created 2026-11-27 from T-104.
+**Notes:** Created 2026-11-27 from T-104. 2026-11-28: implemented with ClinGen only and then reverted at the user's request (not needed at the moment); set back to `todo`, Pri 4 → 5. Findings for a later attempt:
+- The ClinGen region list (`ftp.clinicalgenome.org`, CC0) gives dosage-sensitive **regions**, not diseases: the region name is a locus label ("17p11.2 recurrent (SMS/PLS) region (includes RAI1)"), the scores are evidence that loss/gain is pathogenic, and the only disease link is a MONDO ID (51 of 77 score-3/2 rules had one, some of them generic categories). Readable disease names need Orphanet or MONDO labels, both CC BY 4.0, so a visible attribution in the app (about/licence text) once it is shared.
+- Pin the dated copy `archive/<YYYYMMDD>/ClinGen_region_curation_list_GRCh38.tsv`; the top-level file changes daily. 2026-11-26 release: 516 regions, 50 with haploinsufficiency score 3/2 and 28 with triplosensitivity score 3/2. Some cytoBand ranges are written qter→pter (`2p15-p16.1`), some bands don't overlap their positions (`Xp11.23`), some regions have no band.
+- Ideas discussed: show two kinds of result, named conditions vs. "dosage-sensitive region (ClinGen)"; an optional general `confidence` field on rules (ClinGen score 3 = high, 2 = moderate); strength `characteristic`; a person rule takes over a region by citing its ISCA ID; with any-overlap matching (T-109) a whole-chromosome gain also matches the regions it covers (`+21` → the 21q21.3 APP region).
 
 ### T-112 — Diagnosis-suggestion mode: intended use and regulatory check
 **Status:** discussion
